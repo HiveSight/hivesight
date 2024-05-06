@@ -2,42 +2,80 @@ import streamlit as st
 from anthropic import Anthropic
 import os
 from scipy.stats import beta
+import time
+import pandas as pd
+from custom_components import download_button
 
 # Assuming API key and client setup
 api_key = os.getenv("ANTHROPIC_API_KEY", st.secrets["ANTHROPIC_API_KEY"])
 client = Anthropic(api_key=api_key)
 
 
-def query_claude(question, model_type):
+def query_claude(question, model_type, request_explanation):
     model_map = {
         "Haiku": "claude-3-haiku-20240307",
         "Sonnet": "claude-3-sonnet-20240229",
         "Opus": "claude-3-opus-20240229",
     }
     try:
+        if request_explanation:
+            prompt = f"{question} Begin your response with 'yes' or 'no', and then provide an explanation."
+        else:
+            prompt = f"{question} Do not reply with anything other than 'yes' or 'no'."
+
         response = client.messages.create(
-            max_tokens=50,
+            max_tokens=500,
             model=model_map[model_type],
-            messages=[
-                {
-                    "role": "user",
-                    "content": f"{question} Do not reply with anything other than 'yes' or 'no'.",
-                }
-            ],
+            messages=[{"role": "user", "content": prompt}],
         )
         if (
             response.content
             and isinstance(response.content, list)
             and hasattr(response.content[0], "text")
         ):
-            return response.content[0].text.strip().lower().rstrip(".")
+            return response.content[0].text.strip()
     except Exception as e:
         print("Error during API call:", e)
     return "Error or no data"
 
 
-def is_valid_response(response):
-    return response in ["yes", "no"]
+def is_valid_response(response, request_explanation):
+    if request_explanation:
+        return response.lower().startswith(
+            "yes"
+        ) or response.lower().startswith("no")
+    else:
+        return response.lower() in ["yes", "no"]
+
+
+def summarize_explanations(explanations):
+    summary_prompt = (
+        "Please provide a concise summary of the main points from the following explanations:\n\n"
+        + "\n".join(explanations)
+    )
+    response = client.messages.create(
+        max_tokens=200,
+        model="claude-3-opus-20240229",
+        messages=[{"role": "user", "content": summary_prompt}],
+    )
+    if (
+        response.content
+        and isinstance(response.content, list)
+        and hasattr(response.content[0], "text")
+    ):
+        return response.content[0].text.strip()
+    else:
+        return "Error summarizing explanations"
+
+
+@st.cache_data
+def convert_df(df):
+    return df.to_csv(index=False).encode("utf-8")
+
+
+def get_download_button(df, filename, button_text):
+    csv = convert_df(df)
+    return download_button(csv, filename, button_text)
 
 
 def main():
@@ -51,36 +89,71 @@ def main():
     num_queries = st.number_input(
         "Number of Queries", min_value=1, max_value=100, value=10, step=1
     )
+    request_explanation = st.checkbox("Request Explanation")
 
     if st.button("Ask Claude"):
         yes_count = 0
         no_count = 0
         valid_responses = 0
-        for _ in range(num_queries):
-            response_text = query_claude(question, model_type)
-            print(response_text)
-            if is_valid_response(response_text):
-                if response_text == "yes":
+        raw_responses = []
+        explanations = []
+
+        progress_bar = st.empty()
+        status_text = st.empty()
+
+        for i in range(num_queries):
+            response_text = query_claude(
+                question, model_type, request_explanation
+            )
+            raw_responses.append(response_text)
+            if is_valid_response(response_text, request_explanation):
+                if response_text.lower().startswith("yes"):
                     yes_count += 1
                 else:
                     no_count += 1
                 valid_responses += 1
+                if request_explanation:
+                    explanations.append(response_text)
+
+            progress = (i + 1) / num_queries
+            progress_bar.progress(progress)
+            status_text.text(f"Processing query {i+1} of {num_queries}")
+            time.sleep(0.1)  # Add a small delay for better visual effect
+
+        if request_explanation and valid_responses > 0:
+            status_text.text("Summarizing explanations...")
+            explanation_summary = summarize_explanations(explanations)
+            status_text.empty()
+
+        progress_bar.empty()
 
         if valid_responses > 0:
             yes_percentage = yes_count / valid_responses * 100
-            no_percentage = no_count / valid_responses * 100
 
             # Calculate the 95% confidence interval for the 'yes' probability
             ci_low, ci_high = beta.interval(0.95, yes_count + 1, no_count + 1)
             ci_low *= 100
             ci_high *= 100
 
-            st.success(
-                f"Claude responded 'yes' {yes_percentage:.2f}% of the time and 'no' {no_percentage:.2f}% of the time."
+            success_text = (
+                f"Of {valid_responses} valid responses, Claude said 'yes' {yes_percentage:.1f}% of the time "
+                f"(95% CI: [{ci_low:.1f}%, {ci_high:.1f}%])"
             )
-            st.info(
-                f"95% Confidence Interval for 'yes' probability: [{ci_low:.2f}%, {ci_high:.2f}%]"
+            if request_explanation:
+                success_text += (
+                    "\n\nSummary of Explanations:\n" + explanation_summary
+                )
+
+            st.success(success_text)
+
+            # Create a DataFrame from the raw responses
+            df = pd.DataFrame({"Response": raw_responses})
+
+            # Create a custom download button for the raw responses
+            download_button_str = get_download_button(
+                df, "raw_responses.csv", "Download Raw Responses"
             )
+            st.markdown(download_button_str, unsafe_allow_html=True)
         else:
             st.error("No valid responses received from Claude.")
 
