@@ -7,10 +7,6 @@ import pandas as pd
 from custom_components import download_button
 import asyncio
 
-
-# Using a flag variable to switch between sequential and async
-USE_ASYNC = True
-
 # Assuming API key and client setup
 api_key = os.getenv("ANTHROPIC_API_KEY", st.secrets["ANTHROPIC_API_KEY"])
 client = Anthropic(api_key=api_key)
@@ -128,13 +124,14 @@ def main():
         "Number of Queries", min_value=1, max_value=100, value=10, step=1
     )
     request_explanation = st.checkbox("Request Explanation")
+    use_async = st.checkbox("Use Async")
 
     if st.button("Ask Claude"):
 
         progress_bar = st.empty()
         status_text = st.empty()
 
-        if USE_ASYNC:
+        if use_async:
             raw_responses = asyncio.run(
                 query_claude_async(question, model_type, request_explanation, num_queries)
             )
