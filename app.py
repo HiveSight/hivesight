@@ -1,14 +1,16 @@
 import streamlit as st
-from anthropic import Anthropic
+from anthropic import Anthropic, AsyncAnthropic
 import os
 from scipy.stats import beta
 import time
 import pandas as pd
 from custom_components import download_button
+import asyncio
 
 # Assuming API key and client setup
 api_key = os.getenv("ANTHROPIC_API_KEY", st.secrets["ANTHROPIC_API_KEY"])
 client = Anthropic(api_key=api_key)
+client_async = AsyncAnthropic(api_key=api_key)
 
 
 def query_claude(question, model_type, request_explanation):
@@ -34,6 +36,38 @@ def query_claude(question, model_type, request_explanation):
             and hasattr(response.content[0], "text")
         ):
             return response.content[0].text.strip()
+    except Exception as e:
+        print("Error during API call:", e)
+    return "Error or no data"
+
+
+async def query_claude_async(question, model_type, request_explanation, num_queries):
+    model_map = {
+        "Haiku": "claude-3-haiku-20240307",
+        "Sonnet": "claude-3-sonnet-20240229",
+        "Opus": "claude-3-opus-20240229",
+    }
+    try:
+        if request_explanation:
+            prompt = f"{question} Begin your response with 'yes' or 'no', and then provide an explanation."
+        else:
+            prompt = f"{question} Do not reply with anything other than 'yes' or 'no'."
+
+        async def send_message_async(content):
+            response = await client_async.messages.create(
+                model=model_map[model_type],
+                max_tokens=500,
+                messages=[{"role": "user", "content": content}]
+            )
+            return response
+
+        response = await asyncio.gather(*[send_message_async(prompt) for _ in range(num_queries)])
+        if (
+            response[0].content
+            and isinstance(response[0].content, list)
+            and hasattr(response[0].content[0], "text")
+        ):
+            return [r.content[0].text.strip() for r in response]
     except Exception as e:
         print("Error during API call:", e)
     return "Error or no data"
@@ -90,35 +124,57 @@ def main():
         "Number of Queries", min_value=1, max_value=100, value=10, step=1
     )
     request_explanation = st.checkbox("Request Explanation")
+    use_async = st.checkbox("Use Async")
 
     if st.button("Ask Claude"):
-        yes_count = 0
-        no_count = 0
-        valid_responses = 0
-        raw_responses = []
-        explanations = []
 
         progress_bar = st.empty()
         status_text = st.empty()
 
-        for i in range(num_queries):
-            response_text = query_claude(
-                question, model_type, request_explanation
+        if use_async:
+            raw_responses = asyncio.run(
+                query_claude_async(question, model_type, request_explanation, num_queries)
             )
-            raw_responses.append(response_text)
-            if is_valid_response(response_text, request_explanation):
-                if response_text.lower().startswith("yes"):
-                    yes_count += 1
-                else:
-                    no_count += 1
-                valid_responses += 1
-                if request_explanation:
-                    explanations.append(response_text)
 
-            progress = (i + 1) / num_queries
-            progress_bar.progress(progress)
-            status_text.text(f"Processing query {i+1} of {num_queries}")
-            time.sleep(0.1)  # Add a small delay for better visual effect
+            valid_responses = [is_valid_response(r_text, request_explanation) for r_text in raw_responses]
+            yes_responses = [
+                r_text.lower().startswith("yes") and is_valid
+                for r_text, is_valid in zip(raw_responses, valid_responses)
+            ]
+            no_responses = [
+                r_text.lower().startswith("no") and is_valid
+                for r_text, is_valid in zip(raw_responses, valid_responses)
+            ]
+
+            valid_responses = sum(valid_responses)
+            yes_count = sum(yes_responses)
+            no_count = sum(no_responses)
+            explanations = raw_responses if request_explanation else []
+        else:
+            yes_count = 0
+            no_count = 0
+            valid_responses = 0
+            raw_responses = []
+            explanations = []
+
+            for i in range(num_queries):
+                response_text = query_claude(
+                    question, model_type, request_explanation
+                )
+                raw_responses.append(response_text)
+                if is_valid_response(response_text, request_explanation):
+                    if response_text.lower().startswith("yes"):
+                        yes_count += 1
+                    else:
+                        no_count += 1
+                    valid_responses += 1
+                    if request_explanation:
+                        explanations.append(response_text)
+
+                progress = (i + 1) / num_queries
+                progress_bar.progress(progress)
+                status_text.text(f"Processing query {i+1} of {num_queries}")
+                time.sleep(0.1)  # Add a small delay for better visual effect
 
         if request_explanation and valid_responses > 0:
             status_text.text("Summarizing explanations...")
