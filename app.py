@@ -9,7 +9,7 @@ import asyncio
 from openai import OpenAI, AsyncOpenAI, NOT_GIVEN as OPENAI_NOT_GIVEN
 import json
 
-# Global variables ----------- 
+# Global variables -----------
 anthropic_api_key = os.getenv(
     "ANTHROPIC_API_KEY", st.secrets["ANTHROPIC_API_KEY"]
 )
@@ -22,22 +22,25 @@ openai_client = OpenAI()
 openai_client_async = AsyncOpenAI()
 
 
-SYSTEM_PROMPT = """
-You are trying to help a person answer a 'yes' or 'no' question. You will listen to
-what the user says and attempt to interpret the communication as a yes or no question.
-If you see the instructions to 'Please provide an explanation.' at the end
-of the user's prompt, then start your answer with 'yes,' and then provide the explanation. If
-you do not see instructions to provide an explanation, then do not replay with anything
-other than 'yes' or 'no' (omit the quotations in the reply)
-"""
+# SYSTEM_PROMPT = """
+# You are roleplaying as a {{role}} who is answering a 'yes' or 'no' question based on their beliefs, values, and decision-making process. When the user provides a question or statement, carefully consider how the [specific person or role] would respond based on their perspective.
+# If the user's prompt ends with the instruction 'Please provide an explanation.', start your answer with 'Yes,' or 'No,' followed by a concise explanation of your response from the perspective of the [specific person or role]. If there are no instructions to provide an explanation, simply reply with 'Yes' or 'No' without any additional text.
+# Remember to maintain the persona throughout the interaction and provide responses that align with their likely opinions and thought processes.
+# """
 
 EXPLANATION_APPEND = " Please provide an explanation."
 
 # Functions ----------------
 
+
 def query_openai(
-    question, model_type, request_explanation, num_queries,
-    temperature=1.0, top_p=None
+    question,
+    model_type,
+    request_explanation,
+    num_queries,
+    temperature=1.0,
+    top_p=None,
+    system_prompt=None,
 ):
     model_map = {
         "GPT-3.5": "gpt-3.5-turbo-0125",
@@ -53,11 +56,11 @@ def query_openai(
             temperature=temperature,
             top_p=top_p_input,
             messages=[
-                {"role": "system", "content": SYSTEM_PROMPT},
-                {"role": "user", "content": user_prompt}
+                {"role": "system", "content": system_prompt},
+                {"role": "user", "content": user_prompt},
             ],
             max_tokens=500,
-            n=num_queries
+            n=num_queries,
         )
 
         if response.choices[0].message.content:
@@ -67,8 +70,14 @@ def query_openai(
     return "Error or no data"
 
 
-def query_openai_batch(question, model_type, request_explanation, num_queries,
-                       temperature=1.0, top_p=None, status_box=None
+def query_openai_batch(
+    question,
+    model_type,
+    request_explanation,
+    num_queries,
+    temperature=1.0,
+    top_p=None,
+    status_box=None,
 ):
     model_map = {
         "GPT-3.5": "gpt-3.5-turbo-0125",
@@ -88,7 +97,7 @@ def query_openai_batch(question, model_type, request_explanation, num_queries,
             "top_p": top_p,
             "messages": [
                 {"role": "system", "content": SYSTEM_PROMPT},
-                {"role": "user", "content": user_prompt}
+                {"role": "user", "content": user_prompt},
             ],
             "n": num_queries,
             "max_tokens": 500,
@@ -152,8 +161,13 @@ def query_openai_batch(question, model_type, request_explanation, num_queries,
                 .decode("utf-8")
             )
             print("Batch results retrieved successfully.")
-            results = [json.loads(line) for line in content.strip().split("\n")]
-            return [c['message']['content'] for c in results[0]['response']['body']['choices']]
+            results = [
+                json.loads(line) for line in content.strip().split("\n")
+            ]
+            return [
+                c["message"]["content"]
+                for c in results[0]["response"]["body"]["choices"]
+            ]
         except Exception as e:
             print("Error retrieving batch results:", e)
             return None
@@ -163,12 +177,18 @@ def query_openai_batch(question, model_type, request_explanation, num_queries,
         return None
 
 
-def query_claude(question, model_type, request_explanation, temperature=1.0, 
-                 top_p=None, top_k=None):
+def query_claude(
+    question,
+    model_type,
+    request_explanation,
+    temperature=1.0,
+    top_p=None,
+    top_k=None,
+):
     model_map = {
         "Haiku": "claude-3-haiku-20240307",
         "Sonnet": "claude-3-sonnet-20240229",
-        "Opus": "claude-3-opus-20240229"
+        "Opus": "claude-3-opus-20240229",
     }
     top_k_input = NOT_GIVEN if top_k is None else top_k
     top_p_input = NOT_GIVEN if top_p is None else top_p
@@ -198,8 +218,13 @@ def query_claude(question, model_type, request_explanation, temperature=1.0,
 
 
 async def query_claude_async(
-    question, model_type, request_explanation, num_queries,
-    temperature=1.0, top_p=None, top_k=None
+    question,
+    model_type,
+    request_explanation,
+    num_queries,
+    temperature=1.0,
+    top_p=None,
+    top_k=None,
 ):
     model_map = {
         "Haiku": "claude-3-haiku-20240307",
@@ -293,51 +318,56 @@ def main():
         "Number of Queries", min_value=1, max_value=100, value=10, step=1
     )
     request_explanation = st.checkbox("Request Explanation")
+    role = st.text_input("Enter the role or persona for the model to inhabit")
+
     status_text = st.empty()
 
-    temperature = st.number_input(
-        label="Temperature",
-        value=1.0,
-        min_value=0.0,
-        max_value=2.0,
-        step=.01
-    )
-
-    use_top_p = st.checkbox("Use Top p")
-    top_p = None
-    if use_top_p:
-        top_p = st.number_input(
-            label="Top p",
+    more_options = st.expander("More Options")
+    with more_options:
+        temperature = st.number_input(
+            label="Temperature",
             value=1.0,
-            min_value=0.01,
-            max_value=1.0,
-            step=.01
+            min_value=0.0,
+            max_value=2.0,
+            step=0.01,
         )
 
-    use_aync = False
-    if model_type in ("Haiku", "Sonnet", "Opus"):
-        use_top_k = st.checkbox("Use Top k")
-        top_k = None
-        if use_top_k:
-            top_k = st.number_input(
-                label="Top k",
-                value=50,
-                min_value=1,
-                max_value=2000,
-                step=1
+        use_top_p = st.checkbox("Use Top p")
+        top_p = None
+        if use_top_p:
+            top_p = st.number_input(
+                label="Top p",
+                value=1.0,
+                min_value=0.01,
+                max_value=1.0,
+                step=0.01,
             )
-        use_async = st.checkbox("Use Async")
 
-    use_batch = False
-    if model_type in ("GPT-3.5", "GPT-4o"):
-        use_batch = st.checkbox("Use Batch")
+        use_async = False
+        if model_type in ("Haiku", "Sonnet", "Opus"):
+            use_top_k = st.checkbox("Use Top k")
+            top_k = None
+            if use_top_k:
+                top_k = st.number_input(
+                    label="Top k",
+                    value=50,
+                    min_value=1,
+                    max_value=2000,
+                    step=1,
+                )
+            use_async = st.checkbox("Use Async")
+
+        use_batch = False
+        if model_type in ("GPT-3.5", "GPT-4o"):
+            use_batch = st.checkbox("Use Batch")
 
     if st.button("Run LLM Multiple Times"):
+
+        SYSTEM_PROMPT = f"You are roleplaying as a {role} who is answering a 'yes' or 'no' question based on their beliefs, values, and decision-making process. When the user provides a question or statement, carefully consider how the {role} would respond based on their perspective.\n\nIf the user's prompt ends with the instruction 'Please provide an explanation.', start your answer with 'Yes,' or 'No,' followed by a concise explanation of your response from the perspective of the {role}. If there are no instructions to provide an explanation, simply reply with 'Yes' or 'No' without any additional text.\n\nRemember to maintain the persona of the {role} throughout the interaction and provide responses that align with their likely opinions and thought processes."
 
         if model_type in ["Haiku", "Sonnet", "Opus"]:
             if not use_async:  # Anthropic sequential
                 progress_bar = st.empty()
-
                 yes_count = 0
                 no_count = 0
                 valid_responses = 0
@@ -346,8 +376,12 @@ def main():
 
                 for i in range(num_queries):
                     response_text = query_claude(
-                        question, model_type, request_explanation,
-                        temperature=temperature, top_p=top_p, top_k=top_k
+                        question,
+                        model_type,
+                        request_explanation,
+                        temperature=temperature,
+                        top_p=top_p,
+                        top_k=top_k,
                     )
                     raw_responses.append(response_text)
                     if is_valid_response(response_text, request_explanation):
@@ -361,15 +395,23 @@ def main():
 
                     progress = (i + 1) / num_queries
                     progress_bar.progress(progress)
-                    status_text.text(f"Processing query {i+1} of {num_queries}")
-                    time.sleep(0.1)  # Add a small delay for better visual effect
-                
+                    status_text.text(
+                        f"Processing query {i+1} of {num_queries}"
+                    )
+                    # Add a small delay for better visual effect
+                    time.sleep(0.1)
+
                 progress_bar.empty()
             else:  # Claude async processing
                 raw_responses = asyncio.run(
                     query_claude_async(
-                        question, model_type, request_explanation, num_queries,
-                        temperature=temperature, top_p=top_p, top_k=top_k
+                        question,
+                        model_type,
+                        request_explanation,
+                        num_queries,
+                        temperature=temperature,
+                        top_p=top_p,
+                        top_k=top_k,
                     )
                 )
                 valid_responses = [
@@ -394,13 +436,24 @@ def main():
 
             if use_batch:
                 raw_responses = query_openai_batch(
-                    question, model_type, request_explanation, num_queries,
-                       temperature, top_p=top_p, status_box=status_text)
+                    question,
+                    model_type,
+                    request_explanation,
+                    num_queries,
+                    temperature,
+                    top_p=top_p,
+                    status_box=status_text,
+                )
 
             else:
                 raw_responses = query_openai(
-                    question, model_type, request_explanation, num_queries,
-                    temperature, top_p=top_p
+                    question,
+                    model_type,
+                    request_explanation,
+                    num_queries,
+                    temperature,
+                    top_p=top_p,
+                    system_prompt=SYSTEM_PROMPT,
                 )
 
             valid_responses = [
@@ -431,7 +484,6 @@ def main():
             explanation_summary = summarize_explanations(explanations)
             status_text.empty()
 
-
         if valid_responses > 0:
             yes_percentage = yes_count / valid_responses * 100
 
@@ -441,7 +493,7 @@ def main():
             ci_high *= 100
 
             success_text = (
-                f"Of {valid_responses} valid responses, Claude said 'yes' {yes_percentage:.1f}% of the time "
+                f"Of {valid_responses} valid responses, the LLM said 'yes' {yes_percentage:.1f}% of the time "
                 f"(95% CI: [{ci_low:.1f}%, {ci_high:.1f}%])"
             )
             if request_explanation:
@@ -450,6 +502,7 @@ def main():
                 )
 
             st.success(success_text)
+            print(SYSTEM_PROMPT)
 
             # Create a DataFrame from the raw responses
             df = pd.DataFrame({"Response": raw_responses})
@@ -460,7 +513,7 @@ def main():
             )
             st.markdown(download_button_str, unsafe_allow_html=True)
         else:
-            st.error("No valid responses received from Claude.")
+            st.error("No valid responses received.")
 
 
 if __name__ == "__main__":
