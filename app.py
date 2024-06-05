@@ -1,16 +1,30 @@
+import os
+
 import streamlit as st
 from scipy.stats import beta
 import pandas as pd
 from custom_components import download_button
 from gpt import query_openai
 from anthropic import Anthropic
-import os
+import gspread
+from oauth2client.service_account import ServiceAccountCredentials
+
 
 anthropic_api_key = os.getenv(
     "ANTHROPIC_API_KEY", st.secrets["ANTHROPIC_API_KEY"]
 )
 
 anthropic_client = Anthropic(api_key=anthropic_api_key)
+
+# Google Sheets setup -------
+scope = ['https://www.googleapis.com/auth/spreadsheets', 'https://www.googleapis.com/auth/drive']
+creds = ServiceAccountCredentials.from_json_keyfile_name('hivesight-key.json', scope)
+client = gspread.authorize(creds)
+sheet = client.open_by_url("https://docs.google.com/spreadsheets/d/13Ct9DKqxO3JM8ochPbJ40fNYy5jbpNgE7fwkfpQrnJc/edit#gid=0")
+worksheet = sheet.get_worksheet(0)
+data = ["Example Name", "Example Value"]
+worksheet.append_row(data)
+
 
 
 def is_valid_response(response, request_explanation):
