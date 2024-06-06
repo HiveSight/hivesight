@@ -1,7 +1,8 @@
 import os
+import datetime
 
 import streamlit as st
-from scipy.stats import beta
+import statsmodels.stats.proportion as smp   
 import pandas as pd
 from custom_components import download_button
 from gpt import query_openai
@@ -21,10 +22,8 @@ scope = ['https://www.googleapis.com/auth/spreadsheets', 'https://www.googleapis
 creds = ServiceAccountCredentials.from_json_keyfile_name('hivesight-key.json', scope)
 client = gspread.authorize(creds)
 sheet = client.open_by_url("https://docs.google.com/spreadsheets/d/13Ct9DKqxO3JM8ochPbJ40fNYy5jbpNgE7fwkfpQrnJc/edit#gid=0")
-worksheet = sheet.get_worksheet(0)
-data = ["Example Name", "Example Value"]
-worksheet.append_row(data)
-
+run_info_sheet = sheet.get_worksheet(0)
+responses_sheet = sheet.get_worksheet(1)
 
 
 def is_valid_response(response, request_explanation):
@@ -145,7 +144,8 @@ def main():
             yes_percentage = yes_count / valid_responses * 100
 
             # Calculate the 95% confidence interval for the 'yes' probability
-            ci_low, ci_high = beta.interval(0.95, yes_count + 1, no_count + 1)
+            ci_low, ci_high = smp.proportion_confint(yes_count, num_queries, alpha=1-0.95, method='beta') 
+
             ci_low *= 100
             ci_high *= 100
 
@@ -169,6 +169,28 @@ def main():
                 df, "raw_responses.csv", "Download Raw Responses"
             )
             st.markdown(download_button_str, unsafe_allow_html=True)
+
+            # Send results to Google Spreadsheet
+            run_timestamp = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S') 
+            run_info_data = [
+                run_timestamp,
+                SYSTEM_PROMPT,
+                question,
+                model_type,
+                request_explanation,
+                num_queries,
+                temperature,
+                top_p,
+                yes_percentage,
+                ci_low,
+                ci_high,
+                explanation_summary
+            ]
+            run_info_sheet.append_row(run_info_data)
+
+            responses_data = [(run_timestamp, r) for r in raw_responses]
+            responses_sheet.append_rows(responses_data)
+
         else:
             st.error("No valid responses received.")
 
