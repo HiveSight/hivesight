@@ -1,6 +1,7 @@
-streamlit
 anthropic
+openai
 numpy
 plotly
+policyengine-us
 scipy
-policyengine - us
+streamlit
