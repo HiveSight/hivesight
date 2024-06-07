@@ -1,4 +1,5 @@
 import os
+
 from openai import OpenAI, AsyncOpenAI, NOT_GIVEN as OPENAI_NOT_GIVEN
 import streamlit as st
 
@@ -12,6 +13,7 @@ openai_client_async = AsyncOpenAI()
 EXPLANATION_APPEND = " Please provide an explanation."
 
 MAX_TOKENS_EXPLANATION = 500
+
 
 def query_openai(
     question,
@@ -33,7 +35,9 @@ def query_openai(
             user_prompt = f"{user_prompt} {EXPLANATION_APPEND}"
             max_tokens = MAX_TOKENS_EXPLANATION
         else:
-            max_tokens = 1  # Limit to one token for yes/no without explanation.
+            max_tokens = (
+                1  # Limit to one token for yes/no without explanation.
+            )
 
         response = openai_client.chat.completions.create(
             model=model_map[model_type],
