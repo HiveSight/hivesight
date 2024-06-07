@@ -48,7 +48,7 @@ def summarize_explanations(explanations):
         + "\n".join(explanations)
     )
     response = anthropic_client.messages.create(
-        max_tokens=200,
+        max_tokens=500,
         model="claude-3-opus-20240229",
         messages=[{"role": "user", "content": summary_prompt}],
     )
