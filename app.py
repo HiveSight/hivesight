@@ -1,8 +1,9 @@
 import os
 import datetime
+import json
 
 import streamlit as st
-import statsmodels.stats.proportion as smp   
+import statsmodels.stats.proportion as smp
 import pandas as pd
 from custom_components import download_button
 from gpt import query_openai
@@ -10,18 +11,25 @@ from anthropic import Anthropic
 import gspread
 from oauth2client.service_account import ServiceAccountCredentials
 
+perspectives_df = pd.read_csv("perspectives.csv")
 
-anthropic_api_key = os.getenv(
-    "ANTHROPIC_API_KEY", st.secrets["ANTHROPIC_API_KEY"]
-)
+anthropic_api_key = os.getenv("ANTHROPIC_API_KEY", st.secrets["ANTHROPIC_API_KEY"])
 
 anthropic_client = Anthropic(api_key=anthropic_api_key)
 
 # Google Sheets setup -------
-scope = ['https://www.googleapis.com/auth/spreadsheets', 'https://www.googleapis.com/auth/drive']
-creds = ServiceAccountCredentials.from_json_keyfile_name('hivesight-key.json', scope)
+scope = [
+    "https://www.googleapis.com/auth/spreadsheets",
+    "https://www.googleapis.com/auth/drive",
+]
+service_account_info = json.loads(st.secrets["GOOGLE_APPLICATION_CREDENTIALS_JSON"])
+creds = ServiceAccountCredentials.from_json_keyfile_dict(
+    service_account_info, scopes=scope
+)
 client = gspread.authorize(creds)
-sheet = client.open_by_url("https://docs.google.com/spreadsheets/d/13Ct9DKqxO3JM8ochPbJ40fNYy5jbpNgE7fwkfpQrnJc/edit#gid=0")
+sheet = client.open_by_url(
+    "https://docs.google.com/spreadsheets/d/13Ct9DKqxO3JM8ochPbJ40fNYy5jbpNgE7fwkfpQrnJc/edit#gid=0"
+)
 run_info_sheet = sheet.get_worksheet(0)
 responses_sheet = sheet.get_worksheet(1)
 
@@ -29,9 +37,7 @@ responses_sheet = sheet.get_worksheet(1)
 def is_valid_response(response, request_explanation):
     response = response.strip("'\"")
     if request_explanation:
-        return response.lower().startswith(
-            "yes"
-        ) or response.lower().startswith("no")
+        return response.lower().startswith("yes") or response.lower().startswith("no")
     else:
         return response.lower() in ["yes", "no"]
 
@@ -76,7 +82,18 @@ def main():
         "Number of Queries", min_value=1, max_value=100, value=10, step=1
     )
     request_explanation = st.checkbox("Request Explanation")
-    role = st.text_input("Enter the role or persona for the model to inhabit")
+
+    perspective_type = st.radio(
+        "Choose Perspective Type", ("Custom", "Random from Dataset")
+    )
+
+    if perspective_type == "Custom":
+        role = st.text_input("Enter the role or persona for the model to inhabit")
+    else:
+        # Select a random perspective from the dataset based on weights
+        selected_perspective = perspectives_df.sample(n=1, weights="weight").iloc[0]
+        role = f"{selected_perspective['age']}-year-old from {selected_perspective['state']} with a wage of {selected_perspective['wages']}"
+        st.write(f"Selected Perspective: {role}")
 
     status_text = st.empty()
 
@@ -116,8 +133,7 @@ def main():
         )
 
         valid_responses = [
-            is_valid_response(r_text, request_explanation)
-            for r_text in raw_responses
+            is_valid_response(r_text, request_explanation) for r_text in raw_responses
         ]
         yes_responses = [
             r_text.lower().startswith("yes") and is_valid
@@ -144,7 +160,9 @@ def main():
             yes_percentage = yes_count / valid_responses * 100
 
             # Calculate the 95% confidence interval for the 'yes' probability
-            ci_low, ci_high = smp.proportion_confint(yes_count, num_queries, alpha=1-0.95, method='beta') 
+            ci_low, ci_high = smp.proportion_confint(
+                yes_count, num_queries, alpha=1 - 0.95, method="beta"
+            )
 
             ci_low *= 100
             ci_high *= 100
@@ -154,9 +172,7 @@ def main():
                 f"(95% CI: [{ci_low:.1f}%, {ci_high:.1f}%])"
             )
             if request_explanation:
-                success_text += (
-                    "\n\nSummary of Explanations:\n" + explanation_summary
-                )
+                success_text += "\n\nSummary of Explanations:\n" + explanation_summary
 
             st.success(success_text)
             print(SYSTEM_PROMPT)
@@ -171,7 +187,7 @@ def main():
             st.markdown(download_button_str, unsafe_allow_html=True)
 
             # Send results to Google Spreadsheet
-            run_timestamp = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S') 
+            run_timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
             run_info_data = [
                 run_timestamp,
                 SYSTEM_PROMPT,
@@ -184,7 +200,7 @@ def main():
                 yes_percentage,
                 ci_low,
                 ci_high,
-                explanation_summary
+                explanation_summary,
             ]
             run_info_sheet.append_row(run_info_data)
 
