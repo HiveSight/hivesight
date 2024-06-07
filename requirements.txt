@@ -1,7 +1,14 @@
 anthropic
+datetime
+gspread
+json
+oauth2client
 openai
+os
 numpy
+pandas
 plotly
 policyengine-us
 scipy
+statsmodels
 streamlit
