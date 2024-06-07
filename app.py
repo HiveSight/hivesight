@@ -161,7 +161,7 @@ def main():
 
             # Calculate the 95% confidence interval for the 'yes' probability
             ci_low, ci_high = smp.proportion_confint(
-                yes_count, num_queries, alpha=1 - 0.95, method="beta"
+                yes_count, valid_responses, alpha=1 - 0.95, method="beta"
             )
 
             ci_low *= 100
