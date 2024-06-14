@@ -7,7 +7,7 @@ import streamlit as st
 import statsmodels.stats.proportion as smp
 import pandas as pd
 from custom_components import download_button
-from gpt import query_openai
+from gpt import query_openai, query_openai_with_multiple_prompts
 from anthropic import Anthropic
 import gspread
 from oauth2client.service_account import ServiceAccountCredentials
@@ -176,7 +176,7 @@ def main():
             )
             return responses
 
-        raw_responses = asyncio.run(main())
+        raw_responses = asyncio.run(get_responses_async())
 
         #raw_responses = query_openai(
         #    question,
@@ -221,7 +221,7 @@ def main():
                 ci_high *= 100
 
                 success_text = (
-                    f"Role: {roles[i]}\n\n",
+                    f"Stats for Role: {roles[i]}\n\n"
                     f"Of {valid_responses} valid responses, the LLM said 'yes' {yes_percentage:.1f}% of the time "
                     f"(95% CI: [{ci_low:.1f}%, {ci_high:.1f}%])"
                 )
@@ -259,14 +259,15 @@ def main():
 
                 responses_data = [(run_timestamp, r) for r in raw_responses]
                 #responses_sheet.append_rows(responses_data)
-        else:
-            st.error("No valid responses received.")
+            else:
+                st.error(f"No valid responses received for role: {roles[i]}.")
 
         if request_explanation and valid_responses > 0:
             status_text.text("Summarizing explanations...")
             #explanation_summary = summarize_explanations(explanations)
             explanation_summary = summarize_explanations_by_role(explanations, roles)
-            success_text += "\n\nSummary of Explanations:\n" + explanation_summary
+            explanation_text = "\n\nSummary of Explanations:\n" + explanation_summary
+            st.success(explanation_text)
             status_text.empty()
 
 
