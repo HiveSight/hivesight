@@ -23,7 +23,6 @@ def query_openai(
     num_queries,
     temperature=1.0,
     top_p=None,
-    system_prompt=None,
 ):
     model_map = {
         "GPT-3.5": "gpt-3.5-turbo-0125",
@@ -59,14 +58,14 @@ def query_openai(
     return "Error or no data"
 
 
-async def query_openai(
+async def query_openai_async(
+    system_prompt,
     question,
     model_type,
     request_explanation,
     num_queries,
     temperature=1.0,
     top_p=None,
-    system_prompt=None,
 ):
     model_map = {
         "GPT-3.5": "gpt-3.5-turbo-0125",
@@ -101,38 +100,50 @@ async def query_openai(
         print("Error during API call:", e)
     return "Error or no data"
 
-# Example usage
 
-question = "Should we implement universal basic income?"
-model_type = "GPT-4o"
-
-test = asyncio.run(query_openai(question, model_type, True, 5, system_prompt = "Answer the question starting with Yes or No"))
-
-test[4]
-
-async def main():
-    question1 = "Should we implement universal basic income?"
-    question2 = "Should we lower taxes in 2025?"
-    model_type = "GPT-4o"
-    system_prompt = "Answer the question starting with Yes or No"
-
-    task1 = query_openai(question1, model_type, True, 5, system_prompt=system_prompt)
-    task2 = query_openai(question2, model_type, True, 5, system_prompt=system_prompt)
-
-    responses = await asyncio.gather(task1, task2)
+async def query_openai_with_multiple_prompts(
+    system_prompts,
+    question,
+    model_type,
+    request_explanation,
+    num_queries,
+    temperature=1.0,
+    top_p=None,
+):
+    tasks = [
+        query_openai_async(
+            system_prompt,
+            question,
+            model_type,
+            request_explanation,
+            num_queries,
+            temperature,
+            top_p
+        )
+        for system_prompt in system_prompts 
+    ]
+    responses = await asyncio.gather(*tasks)
     return responses
 
-responses = asyncio.run(main())
 
-print("Response to question 1:", responses[0])
-print("Response to question 2:", responses[1])
+async def main():
 
+    question = "Should we implement universal basic income?",
+    prompts = [
+        "You are a 40 year old lifelong republican. Answer the question starting with 'Yes' or 'No'",
+        "You are a 40 year old lifelong democrat. Answer the question starting with 'Yes' or 'No'"
+    ]
+    model_type = "GPT-3.5"
 
-responses[0][1]
-responses[0][2]
+    responses = await query_openai_with_multiple_prompts(
+        prompts,
+        question,
+        model_type,
+        True,
+        3
+    )
+    return responses
 
-responses[1][2]
-responses[1][3]
-
-
-
+#responses = asyncio.run(main())
+#responses[0]
+#responses[1]
