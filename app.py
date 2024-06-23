@@ -14,33 +14,49 @@ from gpt import query_openai_batch
 from scipy import stats
 
 
-# Load PolicyEngine microdata (placeholder)
+# Load perspectives data
 @st.cache_data
-def load_policy_engine_data():
-    # This is a placeholder. In reality, you'd load your actual PolicyEngine microdata here.
-    return pd.read_csv("policy_engine_microdata.csv")
+def load_perspectives_data():
+    return pd.read_csv("perspectives.csv")
 
 
-policy_engine_data = load_policy_engine_data()
+perspectives_data = load_perspectives_data()
 
 
-@lru_cache(maxsize=1000)
-def get_persona_from_microdata(age, income, education):
-    filtered_data = policy_engine_data[
-        (policy_engine_data["age"] >= age[0])
-        & (policy_engine_data["age"] <= age[1])
-        & (policy_engine_data["income"] >= income[0])
-        & (policy_engine_data["income"] <= income[1])
-        & (policy_engine_data["education"].isin(education))
+def select_diverse_personas(num_queries, age_range, wages_range):
+    filtered_data = perspectives_data[
+        (perspectives_data["age"] >= age_range[0])
+        & (perspectives_data["age"] <= age_range[1])
+        & (perspectives_data["wages"] >= wages_range[0])
+        & (perspectives_data["wages"] <= wages_range[1])
     ]
-    if filtered_data.empty:
-        return None
-    sample = filtered_data.sample(n=1).iloc[0]
-    return f"{sample['age']}-year-old {sample['gender']} from {sample['state']} with an income of ${sample['income']} and education level of {sample['education']}"
+    return filtered_data.sample(
+        n=min(num_queries, len(filtered_data)), weights="weight"
+    ).to_dict("records")
 
 
-def randomize_choices(choices):
-    return random.sample(choices, len(choices))
+def create_prompt(persona, statement, question_type, choices=None):
+    if question_type == "likert":
+        return f"""You are roleplaying as a {persona['age']}-year-old from {persona['state']} with an annual wage of ${persona['wages']}. 
+        Respond to the following statement based on this persona's likely perspective, beliefs, and experiences. 
+        Use a 5-point scale where 1 = Strongly disagree, 2 = Disagree, 3 = Neutral, 4 = Agree, 5 = Strongly agree.
+        Statement: "{statement}"
+        How much do you agree with the statement?
+        Respond with ONLY a single number from 1 to 5, no additional explanation."""
+    else:  # multiple choice
+        if choices is None:
+            raise ValueError(
+                "Choices must be provided for multiple choice questions."
+            )
+        numbered_choices = "\n".join(
+            f"{i+1}. {choice}" for i, choice in enumerate(choices)
+        )
+        return f"""You are roleplaying as a {persona['age']}-year-old from {persona['state']} with an annual wage of ${persona['wages']}. 
+        Respond to the following question based on this persona's likely perspective, beliefs, and experiences. 
+        Question: "{statement}"
+        Choose from the following options:
+        {numbered_choices}
+        Respond with ONLY the single number of your chosen option (1, 2, 3, etc.), nothing else. Do not include the choice text or any explanation."""
 
 
 def parse_numeric_response(response, max_value):
@@ -54,6 +70,9 @@ def parse_numeric_response(response, max_value):
 
 
 def analyze_responses(responses, question_type):
+    if not responses:
+        return {"count": 0}
+
     df = pd.DataFrame(responses)
 
     if question_type == "likert":
@@ -62,25 +81,102 @@ def analyze_responses(responses, question_type):
             "median": df["score"].median(),
             "std_dev": df["score"].std(),
             "count": df["score"].count(),
-            "confidence_interval": stats.t.interval(
-                alpha=0.95,
-                df=len(df) - 1,
-                loc=df["score"].mean(),
-                scale=stats.sem(df["score"]),
-            ),
         }
+
+        # Calculate confidence interval
+        try:
+            n = len(df)
+            sem = stats.sem(df["score"])
+            ci = stats.t.interval(
+                confidence=0.95, df=n - 1, loc=analysis["mean"], scale=sem
+            )
+            analysis["confidence_interval"] = ci
+        except Exception as e:
+            st.warning(f"Error calculating confidence interval: {str(e)}")
+            analysis["confidence_interval"] = (None, None)
+
     else:  # multiple choice
+        if "choice" not in df.columns:
+            return {"count": 0, "error": "No valid choices found in responses"}
         analysis = df["choice"].value_counts(normalize=True).to_dict()
         analysis["count"] = len(df)
 
     return analysis
 
 
-def create_response_visualizations(responses, analysis, question_type):
+def batch_simulate_responses(
+    statement,
+    choices,
+    num_queries,
+    model_type,
+    age_range,
+    wages_range,
+    question_type,
+):
+    personas = select_diverse_personas(num_queries, age_range, wages_range)
+    prompts = [
+        create_prompt(persona, statement, question_type, choices)
+        for persona in personas
+    ]
+
+    # Split prompts into batches of 20 (or adjust based on API limits)
+    batch_size = 20
+    batched_prompts = [
+        prompts[i : i + batch_size] for i in range(0, len(prompts), batch_size)
+    ]
+
+    all_responses = []
+    for batch in batched_prompts:
+        responses = query_openai_batch(
+            batch, model_type, max_tokens=1
+        )  # Limit to 1 token
+        all_responses.extend(responses)
+
+    valid_responses = []
+    for persona, response in zip(personas, all_responses):
+        if response.startswith("Error"):
+            st.warning(f"API Error: {response}")
+            continue
+        if question_type == "likert":
+            score = parse_numeric_response(response, 5)
+            if score is not None:
+                valid_responses.append(
+                    {
+                        "persona": f"{persona['age']}-year-old from {persona['state']} with a wage of ${persona['wages']}",
+                        "age": persona["age"],
+                        "wages": persona["wages"],
+                        "state": persona["state"],
+                        "score": score,
+                        "original_response": response,
+                    }
+                )
+        else:  # multiple choice
+            try:
+                choice_index = int(response.strip()) - 1
+                if 0 <= choice_index < len(choices):
+                    valid_responses.append(
+                        {
+                            "persona": f"{persona['age']}-year-old from {persona['state']} with a wage of ${persona['wages']}",
+                            "age": persona["age"],
+                            "wages": persona["wages"],
+                            "state": persona["state"],
+                            "choice": choices[choice_index],
+                            "original_response": response,
+                        }
+                    )
+                else:
+                    st.warning(f"Invalid choice index: {response}")
+            except ValueError:
+                st.warning(f"Invalid response for multiple choice: {response}")
+
+    return valid_responses
+
+
+def create_enhanced_visualizations(responses, analysis, question_type):
     df = pd.DataFrame(responses)
 
     if question_type == "likert":
-        # Distribution histogram
+        # Distribution of scores
         fig1 = px.histogram(
             df,
             x="score",
@@ -91,139 +187,154 @@ def create_response_visualizations(responses, analysis, question_type):
         fig1.update_layout(bargap=0.1)
         fig1.update_xaxes(tickvals=list(range(1, 6)))
 
-        # Demographic breakdown
-        age_groups = pd.cut(
-            df["age"],
-            bins=[0, 30, 50, 70, 100],
-            labels=["18-30", "31-50", "51-70", "71+"],
-        )
+        # Score distribution by age group
         fig2 = px.box(
             df,
-            x=age_groups,
+            x=pd.cut(
+                df["age"],
+                bins=[0, 30, 50, 70, 100],
+                labels=["0-30", "31-50", "51-70", "71+"],
+            ),
             y="score",
             title="Score Distribution by Age Group",
         )
 
-        # Confidence interval plot
-        ci_low, ci_high = analysis["confidence_interval"]
-        fig3 = go.Figure()
-        fig3.add_trace(
-            go.Indicator(
-                mode="number+gauge",
-                value=analysis["mean"],
-                domain={"x": [0, 1], "y": [0, 1]},
-                title={"text": "Mean Score with 95% CI"},
-                gauge={
-                    "axis": {"range": [1, 5]},
-                    "bar": {"color": "darkblue"},
-                    "steps": [
-                        {"range": [ci_low, ci_high], "color": "lightgray"}
-                    ],
-                    "threshold": {
-                        "line": {"color": "red", "width": 4},
-                        "thickness": 0.75,
-                        "value": analysis["mean"],
-                    },
-                },
-            )
+        # Score distribution by wage group
+        fig3 = px.box(
+            df,
+            x=pd.cut(
+                df["wages"],
+                bins=[0, 30000, 60000, 100000, np.inf],
+                labels=["0-30k", "30k-60k", "60k-100k", "100k+"],
+            ),
+            y="score",
+            title="Score Distribution by Wage Group",
+        )
+
+        # Heatmap of average score by age and wage groups
+        age_wage_pivot = df.pivot_table(
+            values="score",
+            index=pd.cut(
+                df["age"],
+                bins=[0, 30, 50, 70, 100],
+                labels=["0-30", "31-50", "51-70", "71+"],
+            ),
+            columns=pd.cut(
+                df["wages"],
+                bins=[0, 30000, 60000, 100000, np.inf],
+                labels=["0-30k", "30k-60k", "60k-100k", "100k+"],
+            ),
+            aggfunc="mean",
+        )
+        fig4 = px.imshow(
+            age_wage_pivot, title="Average Score by Age and Wage Groups"
         )
     else:  # multiple choice
-        # Bar chart of choices
+        # Distribution of choices
+        choice_counts = df["choice"].value_counts().reset_index()
+        choice_counts.columns = ["Choice", "Count"]
         fig1 = px.bar(
-            x=list(analysis.keys())[:-1],
-            y=list(analysis.values())[:-1],
-            labels={"x": "Choice", "y": "Percentage"},
+            choice_counts,
+            x="Choice",
+            y="Count",
             title="Distribution of Choices",
         )
 
-        # Demographic breakdown
-        age_groups = pd.cut(
-            df["age"],
-            bins=[0, 30, 50, 70, 100],
-            labels=["18-30", "31-50", "51-70", "71+"],
-        )
+        # Choice distribution by age group
         fig2 = px.histogram(
             df,
             x="choice",
-            color=age_groups,
-            barmode="group",
+            color=pd.cut(
+                df["age"],
+                bins=[0, 30, 50, 70, 100],
+                labels=["0-30", "31-50", "51-70", "71+"],
+            ),
             title="Choice Distribution by Age Group",
+            barmode="group",
         )
 
-        fig3 = go.Figure()  # Placeholder for consistency
-
-    return [fig1, fig2, fig3]
-
-
-def batch_simulate_responses(
-    statement,
-    choices,
-    num_queries,
-    model_type,
-    age_range,
-    income_range,
-    education_level,
-    question_type,
-):
-    prompts = []
-    personas = []
-    for _ in range(num_queries):
-        persona = get_persona_from_microdata(
-            tuple(age_range), tuple(income_range), tuple(education_level)
+        # Choice distribution by wage group
+        fig3 = px.histogram(
+            df,
+            x="choice",
+            color=pd.cut(
+                df["wages"],
+                bins=[0, 30000, 60000, 100000, np.inf],
+                labels=["0-30k", "30k-60k", "60k-100k", "100k+"],
+            ),
+            title="Choice Distribution by Wage Group",
+            barmode="group",
         )
-        if persona is None:
-            continue
-        personas.append(persona)
-        randomized_choices = randomize_choices(choices) if choices else None
 
-        if question_type == "likert":
-            prompt = f"""You are roleplaying as a {persona}. Respond to the following statement based on this persona's likely perspective, beliefs, and experiences. 
-            Use a 5-point scale where 1 = Strongly disagree, 2 = Disagree, 3 = Neutral, 4 = Agree, 5 = Strongly agree.
-            Statement: "{statement}"
-            How much do you agree with the statement?
-            Respond with ONLY a number from 1 to 5, no additional explanation."""
-        else:  # multiple choice
-            prompt = f"""You are roleplaying as a {persona}. Respond to the following question based on this persona's likely perspective, beliefs, and experiences. 
-            Question: "{statement}"
-            Choose from the following options: {', '.join(randomized_choices)}
-            Respond with ONLY the chosen option, no additional explanation."""
+        # Heatmap of choice distribution by age and wage groups
+        age_bins = [0, 30, 50, 70, 100]
+        wage_bins = [0, 30000, 60000, 100000, np.inf]
+        age_labels = ["0-30", "31-50", "51-70", "71+"]
+        wage_labels = ["0-30k", "30k-60k", "60k-100k", "100k+"]
 
-        prompts.append(prompt)
+        df["age_group"] = pd.cut(
+            df["age"], bins=age_bins, labels=age_labels, include_lowest=True
+        )
+        df["wage_group"] = pd.cut(
+            df["wages"],
+            bins=wage_bins,
+            labels=wage_labels,
+            include_lowest=True,
+        )
 
-    responses = query_openai_batch(prompts, model_type)
+        # Create a complete matrix with all combinations
+        heatmap_data = pd.DataFrame(index=age_labels, columns=wage_labels)
 
-    valid_responses = []
-    for persona, response in zip(personas, responses):
-        if question_type == "likert":
-            score = parse_numeric_response(response, 5)
-            if score is not None:
-                valid_responses.append(
-                    {
-                        "persona": persona,
-                        "score": score,
-                        "original_response": response,
-                    }
-                )
-        else:  # multiple choice
-            if response.strip() in choices:
-                valid_responses.append(
-                    {
-                        "persona": persona,
-                        "choice": response.strip(),
-                        "original_response": response,
-                    }
-                )
+        # Fill the matrix with proportions
+        for age_group in age_labels:
+            for wage_group in wage_labels:
+                group_data = df[
+                    (df["age_group"] == age_group)
+                    & (df["wage_group"] == wage_group)
+                ]
+                if len(group_data) > 0:
+                    most_common = group_data["choice"].mode().iloc[0]
+                    heatmap_data.loc[age_group, wage_group] = most_common
+                else:
+                    heatmap_data.loc[age_group, wage_group] = "No data"
 
-    return valid_responses
+        # Create a numerical mapping for choices
+        unique_choices = df["choice"].unique()
+        choice_map = {choice: i for i, choice in enumerate(unique_choices)}
+        choice_map["No data"] = -1
+
+        # Convert choices to numbers
+        heatmap_data_numeric = heatmap_data.applymap(lambda x: choice_map[x])
+
+        fig4 = px.imshow(
+            heatmap_data_numeric,
+            labels=dict(x="Wage Group", y="Age Group", color="Choice"),
+            x=wage_labels,
+            y=age_labels,
+            title="Most Common Choice by Age and Wage Groups",
+            aspect="auto",
+            color_continuous_scale="Viridis",
+            text_auto=True,
+        )
+        fig4.update_traces(text=heatmap_data.values, texttemplate="%{text}")
+        fig4.update_xaxes(side="top")
+
+        # Add a color bar with choice labels
+        tickvals = list(choice_map.values())[:-1]  # Exclude 'No data'
+        ticktext = list(choice_map.keys())[:-1]  # Exclude 'No data'
+        fig4.update_layout(
+            coloraxis_colorbar=dict(
+                tickvals=tickvals,
+                ticktext=ticktext,
+            )
+        )
+
+    return [fig1, fig2, fig3, fig4]
 
 
 def main():
-    st.set_page_config(page_title="HiveSight", page_icon="🐝", layout="wide")
-
     st.title("🐝 HiveSight")
-    st.write(
-        "Simulating diverse perspectives using AI and PolicyEngine microdata"
-    )
+    st.write("Simulating diverse perspectives using AI and perspectives data")
 
     col1, col2 = st.columns(2)
 
@@ -256,11 +367,8 @@ def main():
 
     with col2:
         st.write("Demographic Filters (optional)")
-        age_range = st.slider("Age Range", 18, 100, (25, 65))
-        income_range = st.slider("Income Range ($)", 0, 500000, (0, 500000))
-        education_level = st.multiselect(
-            "Education Level", ["High School", "Bachelor's", "Master's", "PhD"]
-        )
+        age_range = st.slider("Age Range", 0, 100, (25, 65))
+        wages_range = st.slider("Wages Range ($)", 0, 500000, (0, 100000))
 
     if st.button("Run Simulation"):
         if question_type == "Multiple Choice" and len(choices) < 2:
@@ -276,14 +384,20 @@ def main():
                 num_queries,
                 model_type,
                 age_range,
-                income_range,
-                education_level,
+                wages_range,
                 (
                     "likert"
                     if question_type == "Likert Scale"
                     else "multiple_choice"
                 ),
             )
+
+            if not responses:
+                st.error(
+                    "No valid responses were generated. Please try again or adjust your parameters."
+                )
+                return
+
             analysis = analyze_responses(
                 responses,
                 (
@@ -292,7 +406,7 @@ def main():
                     else "multiple_choice"
                 ),
             )
-            visualizations = create_response_visualizations(
+            visualizations = create_enhanced_visualizations(
                 responses,
                 analysis,
                 (
@@ -312,9 +426,14 @@ def main():
             st.write(f"Median Score: {analysis['median']:.2f}")
             st.write(f"Standard Deviation: {analysis['std_dev']:.2f}")
             st.write(f"Total Responses: {analysis['count']}")
-            st.write(
-                f"95% Confidence Interval: [{analysis['confidence_interval'][0]:.2f}, {analysis['confidence_interval'][1]:.2f}]"
-            )
+
+            ci_low, ci_high = analysis.get("confidence_interval", (None, None))
+            if ci_low is not None and ci_high is not None:
+                st.write(
+                    f"95% Confidence Interval: [{ci_low:.2f}, {ci_high:.2f}]"
+                )
+            else:
+                st.write("95% Confidence Interval: Not available")
         else:
             for choice, percentage in analysis.items():
                 if choice != "count":
@@ -326,7 +445,7 @@ def main():
             st.plotly_chart(fig)
 
         df = pd.DataFrame(responses)
-        download_button_str = get_download_button(
+        download_button_str = download_button(
             df, "simulated_responses.csv", "Download Simulated Responses"
         )
         st.markdown(download_button_str, unsafe_allow_html=True)

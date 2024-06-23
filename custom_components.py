@@ -181,9 +181,7 @@ if __name__ == "__main__":
     # Select a file to download
     # --------------------------
     if st.checkbox("Select a file to download"):
-        st.write(
-            "~> Use if you want to test uploading / downloading a certain file."
-        )
+        st.write("~> Use if you want to test uploading / downloading a certain file.")
 
         # Upload file for testing
         folder_path = st.text_input("Enter directory: deafult .", ".")

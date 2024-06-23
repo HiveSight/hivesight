@@ -10,6 +10,30 @@ openai_client_async = AsyncOpenAI()
 EXPLANATION_APPEND = " Please provide an explanation."
 
 
+def query_openai_batch(
+    prompts,
+    model_type,
+    temperature=1.0,
+    top_p=None,
+    system_prompt=None,
+    max_tokens=None,
+):
+    responses = []
+    for prompt in prompts:
+        response = query_openai(
+            prompt,
+            model_type,
+            False,
+            1,
+            temperature,
+            top_p,
+            system_prompt,
+            max_tokens,
+        )
+        responses.extend(response)
+    return responses
+
+
 def query_openai(
     question,
     model_type,
@@ -18,20 +42,30 @@ def query_openai(
     temperature=1.0,
     top_p=None,
     system_prompt=None,
+    max_tokens=None,
 ):
     model_map = {
         "GPT-3.5": "gpt-3.5-turbo-0125",
         "GPT-4": "gpt-4-0125-preview",
-        "Claude-3": "claude-3-opus-20240229",  # Note: This needs to be handled separately
+        "Claude-3": "claude-3-opus-20240229",
     }
     top_p_input = OPENAI_NOT_GIVEN if top_p is None else top_p
+
+    if not question:
+        print("Error: Empty question provided")
+        return ["Error: Empty question"]
+
     try:
         user_prompt = question
         if request_explanation:
             user_prompt = f"{user_prompt} {EXPLANATION_APPEND}"
 
+        messages = []
+        if system_prompt:
+            messages.append({"role": "system", "content": system_prompt})
+        messages.append({"role": "user", "content": user_prompt})
+
         if model_type == "Claude-3":
-            # Handle Claude-3 separately using the Anthropic API
             from anthropic import Anthropic
 
             anthropic_client = Anthropic(
@@ -41,12 +75,9 @@ def query_openai(
             )
             response = anthropic_client.messages.create(
                 model=model_map[model_type],
-                max_tokens=500,
+                max_tokens=max_tokens or 500,
                 temperature=temperature,
-                messages=[
-                    {"role": "system", "content": system_prompt},
-                    {"role": "user", "content": user_prompt},
-                ],
+                messages=messages,
             )
             return [response.content[0].text.strip()]
         else:
@@ -54,26 +85,11 @@ def query_openai(
                 model=model_map[model_type],
                 temperature=temperature,
                 top_p=top_p_input,
-                messages=[
-                    {"role": "system", "content": system_prompt},
-                    {"role": "user", "content": user_prompt},
-                ],
-                max_tokens=500,
+                messages=messages,
+                max_tokens=max_tokens or 500,
                 n=num_queries,
             )
             return [r.message.content.strip() for r in response.choices]
     except Exception as e:
-        print("Error during API call:", e)
-    return ["Error or no data"]
-
-
-def query_openai_batch(
-    prompts, model_type, temperature=1.0, top_p=None, system_prompt=None
-):
-    responses = []
-    for prompt in prompts:
-        response = query_openai(
-            prompt, model_type, False, 1, temperature, top_p, system_prompt
-        )
-        responses.extend(response)
-    return responses
+        print(f"Error during API call for model {model_type}:", e)
+        return [f"Error: {str(e)}"]
