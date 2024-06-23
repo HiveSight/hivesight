@@ -1,162 +1,335 @@
-import streamlit as st
-from scipy.stats import beta
-import pandas as pd
-from custom_components import download_button
-from gpt import query_openai
-from anthropic import Anthropic
 import os
+import datetime
+import json
+import random
+from functools import lru_cache
 
-anthropic_api_key = os.getenv(
-    "ANTHROPIC_API_KEY", st.secrets["ANTHROPIC_API_KEY"]
-)
-
-anthropic_client = Anthropic(api_key=anthropic_api_key)
-
-
-def is_valid_response(response, request_explanation):
-    response = response.strip("'\"")
-    if request_explanation:
-        return response.lower().startswith(
-            "yes"
-        ) or response.lower().startswith("no")
-    else:
-        return response.lower() in ["yes", "no"]
+import streamlit as st
+import pandas as pd
+import numpy as np
+import plotly.express as px
+import plotly.graph_objects as go
+from custom_components import download_button
+from gpt import query_openai_batch
+from scipy import stats
 
 
-def summarize_explanations(explanations):
-    summary_prompt = (
-        "Please provide a concise summary of the main points from the following explanations:\n\n"
-        + "\n".join(explanations)
-    )
-    response = anthropic_client.messages.create(
-        max_tokens=200,
-        model="claude-3-opus-20240229",
-        messages=[{"role": "user", "content": summary_prompt}],
-    )
-    if (
-        response.content
-        and isinstance(response.content, list)
-        and hasattr(response.content[0], "text")
-    ):
-        return response.content[0].text.strip()
-    else:
-        return "Error summarizing explanations"
-
-
+# Load PolicyEngine microdata (placeholder)
 @st.cache_data
-def convert_df(df):
-    return df.to_csv(index=False).encode("utf-8")
+def load_policy_engine_data():
+    # This is a placeholder. In reality, you'd load your actual PolicyEngine microdata here.
+    return pd.read_csv("policy_engine_microdata.csv")
 
 
-def get_download_button(df, filename, button_text):
-    csv = convert_df(df)
-    return download_button(csv, filename, button_text)
+policy_engine_data = load_policy_engine_data()
+
+
+@lru_cache(maxsize=1000)
+def get_persona_from_microdata(age, income, education):
+    filtered_data = policy_engine_data[
+        (policy_engine_data["age"] >= age[0])
+        & (policy_engine_data["age"] <= age[1])
+        & (policy_engine_data["income"] >= income[0])
+        & (policy_engine_data["income"] <= income[1])
+        & (policy_engine_data["education"].isin(education))
+    ]
+    if filtered_data.empty:
+        return None
+    sample = filtered_data.sample(n=1).iloc[0]
+    return f"{sample['age']}-year-old {sample['gender']} from {sample['state']} with an income of ${sample['income']} and education level of {sample['education']}"
+
+
+def randomize_choices(choices):
+    return random.sample(choices, len(choices))
+
+
+def parse_numeric_response(response, max_value):
+    try:
+        score = int(response.strip())
+        if 1 <= score <= max_value:
+            return score
+    except ValueError:
+        pass
+    return None
+
+
+def analyze_responses(responses, question_type):
+    df = pd.DataFrame(responses)
+
+    if question_type == "likert":
+        analysis = {
+            "mean": df["score"].mean(),
+            "median": df["score"].median(),
+            "std_dev": df["score"].std(),
+            "count": df["score"].count(),
+            "confidence_interval": stats.t.interval(
+                alpha=0.95,
+                df=len(df) - 1,
+                loc=df["score"].mean(),
+                scale=stats.sem(df["score"]),
+            ),
+        }
+    else:  # multiple choice
+        analysis = df["choice"].value_counts(normalize=True).to_dict()
+        analysis["count"] = len(df)
+
+    return analysis
+
+
+def create_response_visualizations(responses, analysis, question_type):
+    df = pd.DataFrame(responses)
+
+    if question_type == "likert":
+        # Distribution histogram
+        fig1 = px.histogram(
+            df,
+            x="score",
+            nbins=5,
+            labels={"score": "Likert Score"},
+            title="Distribution of Responses",
+        )
+        fig1.update_layout(bargap=0.1)
+        fig1.update_xaxes(tickvals=list(range(1, 6)))
+
+        # Demographic breakdown
+        age_groups = pd.cut(
+            df["age"],
+            bins=[0, 30, 50, 70, 100],
+            labels=["18-30", "31-50", "51-70", "71+"],
+        )
+        fig2 = px.box(
+            df,
+            x=age_groups,
+            y="score",
+            title="Score Distribution by Age Group",
+        )
+
+        # Confidence interval plot
+        ci_low, ci_high = analysis["confidence_interval"]
+        fig3 = go.Figure()
+        fig3.add_trace(
+            go.Indicator(
+                mode="number+gauge",
+                value=analysis["mean"],
+                domain={"x": [0, 1], "y": [0, 1]},
+                title={"text": "Mean Score with 95% CI"},
+                gauge={
+                    "axis": {"range": [1, 5]},
+                    "bar": {"color": "darkblue"},
+                    "steps": [
+                        {"range": [ci_low, ci_high], "color": "lightgray"}
+                    ],
+                    "threshold": {
+                        "line": {"color": "red", "width": 4},
+                        "thickness": 0.75,
+                        "value": analysis["mean"],
+                    },
+                },
+            )
+        )
+    else:  # multiple choice
+        # Bar chart of choices
+        fig1 = px.bar(
+            x=list(analysis.keys())[:-1],
+            y=list(analysis.values())[:-1],
+            labels={"x": "Choice", "y": "Percentage"},
+            title="Distribution of Choices",
+        )
+
+        # Demographic breakdown
+        age_groups = pd.cut(
+            df["age"],
+            bins=[0, 30, 50, 70, 100],
+            labels=["18-30", "31-50", "51-70", "71+"],
+        )
+        fig2 = px.histogram(
+            df,
+            x="choice",
+            color=age_groups,
+            barmode="group",
+            title="Choice Distribution by Age Group",
+        )
+
+        fig3 = go.Figure()  # Placeholder for consistency
+
+    return [fig1, fig2, fig3]
+
+
+def batch_simulate_responses(
+    statement,
+    choices,
+    num_queries,
+    model_type,
+    age_range,
+    income_range,
+    education_level,
+    question_type,
+):
+    prompts = []
+    personas = []
+    for _ in range(num_queries):
+        persona = get_persona_from_microdata(
+            tuple(age_range), tuple(income_range), tuple(education_level)
+        )
+        if persona is None:
+            continue
+        personas.append(persona)
+        randomized_choices = randomize_choices(choices) if choices else None
+
+        if question_type == "likert":
+            prompt = f"""You are roleplaying as a {persona}. Respond to the following statement based on this persona's likely perspective, beliefs, and experiences. 
+            Use a 5-point scale where 1 = Strongly disagree, 2 = Disagree, 3 = Neutral, 4 = Agree, 5 = Strongly agree.
+            Statement: "{statement}"
+            How much do you agree with the statement?
+            Respond with ONLY a number from 1 to 5, no additional explanation."""
+        else:  # multiple choice
+            prompt = f"""You are roleplaying as a {persona}. Respond to the following question based on this persona's likely perspective, beliefs, and experiences. 
+            Question: "{statement}"
+            Choose from the following options: {', '.join(randomized_choices)}
+            Respond with ONLY the chosen option, no additional explanation."""
+
+        prompts.append(prompt)
+
+    responses = query_openai_batch(prompts, model_type)
+
+    valid_responses = []
+    for persona, response in zip(personas, responses):
+        if question_type == "likert":
+            score = parse_numeric_response(response, 5)
+            if score is not None:
+                valid_responses.append(
+                    {
+                        "persona": persona,
+                        "score": score,
+                        "original_response": response,
+                    }
+                )
+        else:  # multiple choice
+            if response.strip() in choices:
+                valid_responses.append(
+                    {
+                        "persona": persona,
+                        "choice": response.strip(),
+                        "original_response": response,
+                    }
+                )
+
+    return valid_responses
 
 
 def main():
-    st.title("HiveSight")
-    st.write("What do AIs think?")
+    st.set_page_config(page_title="HiveSight", page_icon="🐝", layout="wide")
 
-    model_type = st.selectbox("Choose Model Type", ("GPT-3.5", "GPT-4o"))
-    question = st.text_area("Enter your binary question")
-    num_queries = st.number_input(
-        "Number of Queries", min_value=1, max_value=100, value=10, step=1
+    st.title("🐝 HiveSight")
+    st.write(
+        "Simulating diverse perspectives using AI and PolicyEngine microdata"
     )
-    request_explanation = st.checkbox("Request Explanation")
-    role = st.text_input("Enter the role or persona for the model to inhabit")
 
-    status_text = st.empty()
+    col1, col2 = st.columns(2)
 
-    more_options = st.expander("More Options")
-    with more_options:
-        temperature = st.number_input(
-            label="Temperature",
-            value=1.0,
-            min_value=0.0,
-            max_value=2.0,
-            step=0.01,
+    with col1:
+        question_type = st.radio(
+            "Question Type", ["Multiple Choice", "Likert Scale"]
         )
+        statement = st.text_area("Enter your question or statement")
 
-        use_top_p = st.checkbox("Use Top p")
-        top_p = None
-        if use_top_p:
-            top_p = st.number_input(
-                label="Top p",
-                value=1.0,
-                min_value=0.01,
-                max_value=1.0,
-                step=0.01,
-            )
-
-    if st.button("Run LLM Multiple Times"):
-
-        SYSTEM_PROMPT = f"You are roleplaying as a {role} who is answering a 'yes' or 'no' question based on their beliefs, values, and decision-making process. When the user provides a question or statement, carefully consider how the {role} would respond based on their perspective.\n\nIf the user's prompt ends with the instruction 'Please provide an explanation.', start your answer with 'Yes,' or 'No,' followed by a concise explanation of your response from the perspective of the {role}. If there are no instructions to provide an explanation, simply reply with 'Yes' or 'No' without any additional text.\n\nRemember to maintain the persona of the {role} throughout the interaction and provide responses that align with their likely opinions and thought processes."
-
-        raw_responses = query_openai(
-            question,
-            model_type,
-            request_explanation,
-            num_queries,
-            temperature,
-            top_p=top_p,
-            system_prompt=SYSTEM_PROMPT,
-        )
-
-        valid_responses = [
-            is_valid_response(r_text, request_explanation)
-            for r_text in raw_responses
-        ]
-        yes_responses = [
-            r_text.lower().startswith("yes") and is_valid
-            for r_text, is_valid in zip(raw_responses, valid_responses)
-        ]
-        no_responses = [
-            r_text.lower().startswith("no") and is_valid
-            for r_text, is_valid in zip(raw_responses, valid_responses)
-        ]
-
-        valid_responses = sum(valid_responses)
-        yes_count = sum(yes_responses)
-        no_count = sum(no_responses)
-        explanations = raw_responses if request_explanation else []
-
-        # End of model routing logic --------------------------------------
-        print(raw_responses)
-        if request_explanation and valid_responses > 0:
-            status_text.text("Summarizing explanations...")
-            explanation_summary = summarize_explanations(explanations)
-            status_text.empty()
-
-        if valid_responses > 0:
-            yes_percentage = yes_count / valid_responses * 100
-
-            # Calculate the 95% confidence interval for the 'yes' probability
-            ci_low, ci_high = beta.interval(0.95, yes_count + 1, no_count + 1)
-            ci_low *= 100
-            ci_high *= 100
-
-            success_text = (
-                f"Of {valid_responses} valid responses, the LLM said 'yes' {yes_percentage:.1f}% of the time "
-                f"(95% CI: [{ci_low:.1f}%, {ci_high:.1f}%])"
-            )
-            if request_explanation:
-                success_text += (
-                    "\n\nSummary of Explanations:\n" + explanation_summary
-                )
-
-            st.success(success_text)
-            print(SYSTEM_PROMPT)
-
-            # Create a DataFrame from the raw responses
-            df = pd.DataFrame({"Response": raw_responses})
-
-            # Create a custom download button for the raw responses
-            download_button_str = get_download_button(
-                df, "raw_responses.csv", "Download Raw Responses"
-            )
-            st.markdown(download_button_str, unsafe_allow_html=True)
+        if question_type == "Multiple Choice":
+            choices = st.text_area("Enter choices (one per line)")
+            choices = [
+                choice.strip()
+                for choice in choices.split("\n")
+                if choice.strip()
+            ]
         else:
-            st.error("No valid responses received.")
+            choices = None
+
+        num_queries = st.number_input(
+            "Number of Simulated Responses",
+            min_value=1,
+            max_value=1000,
+            value=100,
+            step=1,
+        )
+        model_type = st.selectbox(
+            "Choose Model Type", ("GPT-3.5", "GPT-4", "Claude-3")
+        )
+
+    with col2:
+        st.write("Demographic Filters (optional)")
+        age_range = st.slider("Age Range", 18, 100, (25, 65))
+        income_range = st.slider("Income Range ($)", 0, 500000, (0, 500000))
+        education_level = st.multiselect(
+            "Education Level", ["High School", "Bachelor's", "Master's", "PhD"]
+        )
+
+    if st.button("Run Simulation"):
+        if question_type == "Multiple Choice" and len(choices) < 2:
+            st.error(
+                "Please enter at least two choices for multiple choice questions."
+            )
+            return
+
+        with st.spinner("Simulating responses..."):
+            responses = batch_simulate_responses(
+                statement,
+                choices,
+                num_queries,
+                model_type,
+                age_range,
+                income_range,
+                education_level,
+                (
+                    "likert"
+                    if question_type == "Likert Scale"
+                    else "multiple_choice"
+                ),
+            )
+            analysis = analyze_responses(
+                responses,
+                (
+                    "likert"
+                    if question_type == "Likert Scale"
+                    else "multiple_choice"
+                ),
+            )
+            visualizations = create_response_visualizations(
+                responses,
+                analysis,
+                (
+                    "likert"
+                    if question_type == "Likert Scale"
+                    else "multiple_choice"
+                ),
+            )
+
+        st.success(
+            f"Simulation complete. Generated {len(responses)} valid responses."
+        )
+
+        st.subheader("Analysis")
+        if question_type == "Likert Scale":
+            st.write(f"Mean Score: {analysis['mean']:.2f}")
+            st.write(f"Median Score: {analysis['median']:.2f}")
+            st.write(f"Standard Deviation: {analysis['std_dev']:.2f}")
+            st.write(f"Total Responses: {analysis['count']}")
+            st.write(
+                f"95% Confidence Interval: [{analysis['confidence_interval'][0]:.2f}, {analysis['confidence_interval'][1]:.2f}]"
+            )
+        else:
+            for choice, percentage in analysis.items():
+                if choice != "count":
+                    st.write(f"{choice}: {percentage:.2%}")
+            st.write(f"Total Responses: {analysis['count']}")
+
+        st.subheader("Visualizations")
+        for fig in visualizations:
+            st.plotly_chart(fig)
+
+        df = pd.DataFrame(responses)
+        download_button_str = get_download_button(
+            df, "simulated_responses.csv", "Download Simulated Responses"
+        )
+        st.markdown(download_button_str, unsafe_allow_html=True)
 
 
 if __name__ == "__main__":
