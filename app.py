@@ -11,18 +11,31 @@ def main():
     st.title("🐝 HiveSight")
     st.write("Ask AIs anything.")
 
-    question_type = st.radio(
-        "Question Type", ["Multiple Choice", "Likert Scale"]
-    )
-    statement = st.text_area("Enter your question or statement")
+    tab_names = ["Multiple Choice", "Likert Scale"]
+    tab_index = st.tabs(tab_names)
 
-    if question_type == "Multiple Choice":
-        choices = st.text_area("Enter choices (one per line)")
-        choices = [
-            choice.strip() for choice in choices.split("\n") if choice.strip()
-        ]
-    else:
-        choices = None
+    with tab_index[0]:
+        st.subheader("Multiple Choice")
+        col1, col2 = st.columns(2)
+        with col1:
+            question_mc = st.text_area(
+                "Enter your question", key="question_mc"
+            )
+        with col2:
+            choices_mc = st.text_area(
+                "Enter choices (one per line)", key="choices_mc"
+            )
+            choices_mc = [
+                choice.strip()
+                for choice in choices_mc.split("\n")
+                if choice.strip()
+            ]
+
+    with tab_index[1]:
+        st.subheader("Likert Scale")
+        question_ls = st.text_area(
+            "Enter your statement or question", key="question_ls"
+        )
 
     num_queries = st.number_input(
         "Number of Simulated Responses",
@@ -35,20 +48,29 @@ def main():
     with st.expander("Additional Options", expanded=False):
         model_type = st.selectbox(
             "Choose Model Type",
-            MODEL_MAP.keys(),
+            list(MODEL_MAP.keys()),
         )
         st.write("Demographic Filters (optional)")
         age_range = st.slider("Age Range", 0, 100, (18, 100))
-        wages_range = st.slider(
+        income_range = st.slider(
             "Income Range ($)", 0, 1_000_000, (0, 1_000_000)
         )
 
     if st.button("Run Simulation"):
-        if question_type == "Multiple Choice" and len(choices) < 2:
+        # Determine the active tab
+        active_tab = "Multiple Choice" if question_mc else "Likert Scale"
+
+        if active_tab == "Multiple Choice" and len(choices_mc) < 2:
             st.error(
                 "Please enter at least two choices for multiple choice questions."
             )
             return
+
+        question_type = (
+            "likert" if active_tab == "Likert Scale" else "multiple_choice"
+        )
+        statement = question_ls if question_type == "likert" else question_mc
+        choices = None if question_type == "likert" else choices_mc
 
         with st.spinner("Simulating responses..."):
             responses = batch_simulate_responses(
@@ -57,12 +79,8 @@ def main():
                 num_queries,
                 model_type,
                 age_range,
-                wages_range,
-                (
-                    "likert"
-                    if question_type == "Likert Scale"
-                    else "multiple_choice"
-                ),
+                income_range,
+                question_type,
             )
 
             if not responses:
@@ -71,21 +89,9 @@ def main():
                 )
                 return
 
-            analysis = analyze_responses(
-                responses,
-                (
-                    "likert"
-                    if question_type == "Likert Scale"
-                    else "multiple_choice"
-                ),
-            )
+            analysis = analyze_responses(responses, question_type)
             visualizations = create_enhanced_visualizations(
-                responses,
-                (
-                    "likert"
-                    if question_type == "Likert Scale"
-                    else "multiple_choice"
-                ),
+                responses, question_type
             )
 
         st.success(
@@ -93,7 +99,7 @@ def main():
         )
 
         st.subheader("Analysis")
-        if question_type == "Likert Scale":
+        if question_type == "likert":
             st.write(f"Mean Score: {analysis['mean']:.2f}")
             st.write(f"Median Score: {analysis['median']:.2f}")
             st.write(f"Standard Deviation: {analysis['std_dev']:.2f}")

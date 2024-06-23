@@ -8,7 +8,7 @@ def create_prompt(
     choices: Optional[List[str]] = None,
 ) -> str:
     if question_type == "likert":
-        return f"""You are roleplaying as a {persona['age']}-year-old from {persona['state']} with an annual wage of ${persona['wages']}. 
+        return f"""You are roleplaying as a {persona['age']}-year-old from {persona['state']} with annual income of ${persona['income']}. 
         Respond to the following statement based on this persona's likely perspective, beliefs, and experiences. 
         Use a 5-point scale where 1 = Strongly disagree, 2 = Disagree, 3 = Neutral, 4 = Agree, 5 = Strongly agree.
         Statement: "{statement}"
@@ -22,7 +22,7 @@ def create_prompt(
         numbered_choices = "\n".join(
             f"{i+1}. {choice}" for i, choice in enumerate(choices)
         )
-        return f"""You are roleplaying as a {persona['age']}-year-old from {persona['state']} with an annual wage of ${persona['wages']}. 
+        return f"""You are roleplaying as a {persona['age']}-year-old from {persona['state']} with annual income of ${persona['income']}. 
         Respond to the following question based on this persona's likely perspective, beliefs, and experiences. 
         Question: "{statement}"
         Choose from the following options:

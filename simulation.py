@@ -23,10 +23,10 @@ def batch_simulate_responses(
     num_queries: int,
     model_type: str,
     age_range: Tuple[int, int],
-    wages_range: Tuple[float, float],
+    income_range: Tuple[float, float],
     question_type: str,
 ) -> List[Dict]:
-    personas = select_diverse_personas(num_queries, age_range, wages_range)
+    personas = select_diverse_personas(num_queries, age_range, income_range)
     prompts = [
         create_prompt(persona, statement, question_type, choices)
         for persona in personas
@@ -55,9 +55,9 @@ def batch_simulate_responses(
             if score is not None:
                 valid_responses.append(
                     {
-                        "persona": f"{persona['age']}-year-old from {persona['state']} with a wage of ${persona['wages']}",
+                        "persona": f"{persona['age']}-year-old from {persona['state']} with annual income of ${persona['income']}",
                         "age": persona["age"],
-                        "wages": persona["wages"],
+                        "income": persona["income"],
                         "state": persona["state"],
                         "score": score,
                         "original_response": response,
@@ -69,9 +69,9 @@ def batch_simulate_responses(
                 if 0 <= choice_index < len(choices):
                     valid_responses.append(
                         {
-                            "persona": f"{persona['age']}-year-old from {persona['state']} with a wage of ${persona['wages']}",
+                            "persona": f"{persona['age']}-year-old from {persona['state']} with annual income of ${persona['income']}",
                             "age": persona["age"],
-                            "wages": persona["wages"],
+                            "income": persona["income"],
                             "state": persona["state"],
                             "choice": choices[choice_index],
                             "original_response": response,

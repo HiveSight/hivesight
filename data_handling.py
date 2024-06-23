@@ -14,13 +14,13 @@ perspectives_data = load_perspectives_data()
 def select_diverse_personas(
     num_queries: int,
     age_range: Tuple[int, int],
-    wages_range: Tuple[float, float],
+    income_range: Tuple[float, float],
 ) -> List[dict]:
     filtered_data = perspectives_data[
         (perspectives_data["age"] >= age_range[0])
         & (perspectives_data["age"] <= age_range[1])
-        & (perspectives_data["wages"] >= wages_range[0])
-        & (perspectives_data["wages"] <= wages_range[1])
+        & (perspectives_data["income"] >= income_range[0])
+        & (perspectives_data["income"] <= income_range[1])
     ]
     return filtered_data.sample(
         n=min(num_queries, len(filtered_data)), weights="weight"
