@@ -1,6 +1,7 @@
 import os
 from openai import OpenAI, AsyncOpenAI, NOT_GIVEN as OPENAI_NOT_GIVEN
 import streamlit as st
+from config import MODEL_MAP
 
 openai_api_key = os.getenv("OPENAI_API_KEY", st.secrets["OPENAI_API_KEY"])
 
@@ -44,11 +45,6 @@ def query_openai(
     system_prompt=None,
     max_tokens=None,
 ):
-    model_map = {
-        "GPT-3.5": "gpt-3.5-turbo-0125",
-        "GPT-4": "gpt-4-0125-preview",
-        "Claude-3": "claude-3-opus-20240229",
-    }
     top_p_input = OPENAI_NOT_GIVEN if top_p is None else top_p
 
     if not question:
@@ -74,7 +70,7 @@ def query_openai(
                 )
             )
             response = anthropic_client.messages.create(
-                model=model_map[model_type],
+                model=MODEL_MAP[model_type],
                 max_tokens=max_tokens or 500,
                 temperature=temperature,
                 messages=messages,
@@ -82,7 +78,7 @@ def query_openai(
             return [response.content[0].text.strip()]
         else:
             response = openai_client.chat.completions.create(
-                model=model_map[model_type],
+                model=MODEL_MAP[model_type],
                 temperature=temperature,
                 top_p=top_p_input,
                 messages=messages,
