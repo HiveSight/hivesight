@@ -9,39 +9,39 @@ import pandas as pd
 
 def main():
     st.title("🐝 HiveSight")
-    st.write("Ask AI anything.")
+    st.write("Ask AIs anything.")
 
-    col1, col2 = st.columns(2)
+    question_type = st.radio(
+        "Question Type", ["Multiple Choice", "Likert Scale"]
+    )
+    statement = st.text_area("Enter your question or statement")
 
-    with col1:
-        question_type = st.radio(
-            "Question Type", ["Multiple Choice", "Likert Scale"]
+    if question_type == "Multiple Choice":
+        choices = st.text_area("Enter choices (one per line)")
+        choices = [
+            choice.strip() for choice in choices.split("\n") if choice.strip()
+        ]
+    else:
+        choices = None
+
+    num_queries = st.number_input(
+        "Number of Simulated Responses",
+        min_value=1,
+        max_value=1000,
+        value=10,
+        step=1,
+    )
+
+    with st.expander("Additional Options", expanded=False):
+        model_type = st.selectbox(
+            "Choose Model Type",
+            MODEL_MAP.keys(),
         )
-        statement = st.text_area("Enter your question or statement")
-
-        if question_type == "Multiple Choice":
-            choices = st.text_area("Enter choices (one per line)")
-            choices = [
-                choice.strip()
-                for choice in choices.split("\n")
-                if choice.strip()
-            ]
-        else:
-            choices = None
-
-        num_queries = st.number_input(
-            "Number of Simulated Responses",
-            min_value=1,
-            max_value=1000,
-            value=10,
-            step=1,
-        )
-        model_type = st.selectbox("Choose Model Type", MODEL_MAP.keys())
-
-    with col2:
         st.write("Demographic Filters (optional)")
-        age_range = st.slider("Age Range", 0, 100, (25, 65))
-        wages_range = st.slider("Wages Range ($)", 0, 500000, (0, 100000))
+        age_range = st.slider("Age Range", 0, 100, (18, 100))
+        wages_range = st.slider(
+            "Income Range ($)", 0, 1_000_000, (0, 1_000_000)
+        )
 
     if st.button("Run Simulation"):
         if question_type == "Multiple Choice" and len(choices) < 2:
