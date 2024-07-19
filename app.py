@@ -1,6 +1,7 @@
 import os
 import datetime
 import json
+import re
 
 import streamlit as st
 import statsmodels.stats.proportion as smp
@@ -10,7 +11,144 @@ from gpt import query_openai
 from anthropic import Anthropic
 import gspread
 from oauth2client.service_account import ServiceAccountCredentials
+from supabase import create_client, Client
+import stripe
+from st_paywall import add_auth
+from st_paywall.google_auth import get_logged_in_user_email, show_login_button
 
+
+# Experimental mock payment section
+# Set up clients
+supabase: Client = create_client(st.secrets["SUPABASE_URL"], st.secrets["SUPABASE_SERVICE_ROLE_SECRET"])
+stripe.api_key = st.secrets["stripe_api_key_test"]
+
+
+# Part of st_paywall that just deals with Google Auth (in src/st_paywall/aggregate_auth.py
+user_email = get_logged_in_user_email()
+
+if not user_email:
+    show_login_button(
+        text="Login with Google", color="#FD504D", sidebar=True
+    )
+    st.stop()
+
+if st.sidebar.button("Logout", type="primary"):
+    del st.session_state.email
+    st.rerun()
+
+
+st.write("Experimental Credit Payment Section--------")
+st.write(st.session_state.email)
+
+
+def get_or_create_stripe_customer(email):
+    customers = stripe.Customer.list(email=email).data
+    if customers:
+        return customers[0]
+    else:
+        customer = stripe.Customer.create(email=email)
+        return customer
+
+
+def get_total_user_credits_spent(email):
+    """ Ever in history """
+    response = supabase.table('credit_usage_history').select('credits_used').eq('email', email).execute()
+    if response.data:
+        df = pd.DataFrame(response.data)
+        return df[['credits_used']].sum().values[0]
+    else:
+        return 0
+
+
+def update_credit_usage_history(email, credits_used):
+    supabase.table('credit_usage_history').insert({'email': email, 'credits_used': credits_used}).execute()
+
+
+def extract_leading_integer(product_name):
+    match = re.match(r'(\d+)', product_name)
+    return int(match.group(1)) if match else 0
+
+
+def get_credits_purchased_ever(customer):
+    session_list = stripe.checkout.Session.list(customer=customer)
+    data = []
+    
+    for session in session_list.auto_paging_iter():
+        session_id = session.id
+        product_name = session.metadata.get("product_name", "N/A")
+        payment_status = session.payment_status
+        data.append({
+            "id": session_id,
+            "product_name": product_name,
+            "payment_status": payment_status
+        })
+    
+    df = pd.DataFrame(data)
+    df['credits'] = df['product_name'].apply(extract_leading_integer)
+    st.write("Product Purchase History from Stripe")
+    st.dataframe(df)
+    return df['credits'].sum()
+
+
+def purchase_credits(customer):
+    # Note: you can create a checkout session without any product in the catalog
+    session = stripe.checkout.Session.create(
+        payment_method_types=['card'],
+        line_items=[{
+            'price_data': {
+                'currency': 'usd',
+                'product_data': {
+                    'name': '3 Credits Pack',
+                },
+                'unit_amount': 500,  # Price in cents
+            },
+            'quantity': 1,
+        }],
+        mode='payment',
+        success_url="http://localhost:8501",
+        cancel_url="http://localhost:8501",
+        customer=customer.id,
+        metadata={
+            'product_name': '3 Credits Pack'
+        }
+    )
+    
+    print(f"[Complete Payment]({session['url']})")
+    st.markdown(f"[Complete Payment]({session['url']})")
+
+
+def get_credits_available_to_spend(customer):
+    credits_purchased_ever = get_credits_purchased_ever(customer)
+    credits_spent_ever = get_total_user_credits_spent(customer.email)
+    return credits_purchased_ever - credits_spent_ever
+
+
+# Mock main loop --
+# NOTE: testing
+#user_email = "b_test@gmail.com"
+#user_email = st.session_state.email
+
+
+customer = get_or_create_stripe_customer(user_email)
+st.write(f"The logged in email is {user_email}")
+st.write(f"The corresponding Stripe customer id is {customer.id}")
+
+
+credits_available = get_credits_available_to_spend(customer)
+st.title('Credit Management System')
+st.write(f'You have {credits_available} credits.')
+
+if credits_available < 1:
+    purchase_credits(customer)
+else:
+    if st.button('Spend a Credit'):
+        update_credit_usage_history(user_email, 1)
+        st.success(f'You spent a credit. You now have {credits} credits.')
+
+
+st.write("End Experimental Credit Payment Section----")
+
+# Rest of app --------------
 perspectives_df = pd.read_csv("perspectives.csv")
 
 anthropic_api_key = os.getenv("ANTHROPIC_API_KEY", st.secrets["ANTHROPIC_API_KEY"])

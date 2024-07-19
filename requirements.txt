@@ -9,3 +9,6 @@ policyengine-us
 scipy
 statsmodels
 streamlit
+st_paywall
+stripe
+supabase
