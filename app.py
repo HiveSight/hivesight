@@ -22,11 +22,11 @@ from st_paywall.google_auth import get_logged_in_user_email, show_login_button
 supabase: Client = create_client(st.secrets["SUPABASE_URL"], st.secrets["SUPABASE_SERVICE_ROLE_SECRET"])
 stripe.api_key = st.secrets["stripe_api_key_test"]
 
-
 # Part of st_paywall that just deals with Google Auth (in src/st_paywall/aggregate_auth.py
-user_email = get_logged_in_user_email()
+# This sets st.session_state["email"] if it's not already set
+get_logged_in_user_email()
 
-if not user_email:
+if "email" not in st.session_state.keys():
     show_login_button(
         text="Login with Google", color="#FD504D", sidebar=True
     )
@@ -37,9 +37,7 @@ if st.sidebar.button("Logout", type="primary"):
     st.rerun()
 
 
-st.write("Experimental Credit Payment Section--------")
-st.write(st.session_state.email)
-
+st.title('Experimental Credit Management System')
 
 def get_or_create_stripe_customer(email):
     customers = stripe.Customer.list(email=email).data
@@ -51,13 +49,9 @@ def get_or_create_stripe_customer(email):
 
 
 def get_total_user_credits_spent(email):
-    """ Ever in history """
-    response = supabase.table('credit_usage_history').select('credits_used').eq('email', email).execute()
+    response = supabase.table('credit_usage_history').select('*').eq('email', email).execute()
     if response.data:
-        df = pd.DataFrame(response.data)
-        return df[['credits_used']].sum().values[0]
-    else:
-        return 0
+        return pd.DataFrame(response.data)
 
 
 def update_credit_usage_history(email, credits_used):
@@ -84,14 +78,14 @@ def get_credits_purchased_ever(customer):
         })
     
     df = pd.DataFrame(data)
-    df['credits'] = df['product_name'].apply(extract_leading_integer)
-    st.write("Product Purchase History from Stripe")
-    st.dataframe(df)
-    return df['credits'].sum()
+    if not df.empty:
+        df['credits'] = df['product_name'].apply(extract_leading_integer)
+        return df.loc[df.payment_status == "paid"]
 
 
 def purchase_credits(customer):
     # Note: you can create a checkout session without any product in the catalog
+    # But be careful how often you run this, because the unpaid sessions go into the Stripe database
     session = stripe.checkout.Session.create(
         payment_method_types=['card'],
         line_items=[{
@@ -113,38 +107,59 @@ def purchase_credits(customer):
         }
     )
     
-    print(f"[Complete Payment]({session['url']})")
-    st.markdown(f"[Complete Payment]({session['url']})")
+    print(f"[Stripe Payment link]({session['url']})")
+    st.markdown(f"[Complete Payment my clicking here]({session['url']})")
 
 
-def get_credits_available_to_spend(customer):
-    credits_purchased_ever = get_credits_purchased_ever(customer)
-    credits_spent_ever = get_total_user_credits_spent(customer.email)
-    return credits_purchased_ever - credits_spent_ever
+# How to do interactive testing easily:
+# class St:
+#     def __init__(self):
+#         self.session_state = {}
+# 
+# st = St()
+# st.session_state['email'] = 'baogorek@gmail.com'
 
 
 # Mock main loop --
-# NOTE: testing
-#user_email = "b_test@gmail.com"
-#user_email = st.session_state.email
+if "email" in st.session_state.keys():
+    # Will use local variables, as they will get populated in the "data pipeline" model,
+    # and are still unique for each user session
+    email = st.session_state["email"]
+    customer = get_or_create_stripe_customer(email)
+    st.write(f"The logged in email is {email}")
+    st.write(f"The corresponding Stripe customer id is {customer.id}")
 
+    st.write("-- Stripe purchase history -- ")
+    credits_purchased_df = get_credits_purchased_ever(customer)
+    if credits_purchased_df is not None:
+        st.dataframe(credits_purchased_df)
+        credits_purchased = credits_purchased_df.credits.sum()
+    else:
+        st.write("No Stripe purchase history yet")
+        credits_purchased = 0
 
-customer = get_or_create_stripe_customer(user_email)
-st.write(f"The logged in email is {user_email}")
-st.write(f"The corresponding Stripe customer id is {customer.id}")
+    st.write("--- Hivesight credit usage history  ---")
+    credits_spent_df = get_total_user_credits_spent(email)
+    if credits_spent_df is not None:
+        st.dataframe(credits_spent_df)
+        credits_used = credits_spent_df.credits_used.sum() 
+    else:
+        st.write("No Hivesight credit spending history yet")
+        credits_used = 0
 
+    credits_available = credits_purchased - credits_used
+    st.write(f"You have {credits_available} Credits.")
 
-credits_available = get_credits_available_to_spend(customer)
-st.title('Credit Management System')
-st.write(f'You have {credits_available} credits.')
-
-if credits_available < 1:
-    purchase_credits(customer)
-else:
-    if st.button('Spend a Credit'):
-        update_credit_usage_history(user_email, 1)
-        st.success(f'You spent a credit. You now have {credits} credits.')
-
+    if credits_available < 1:
+        st.write(f'If you want more credits, you will need to make a purchase from stripe.')
+        if st.button("Get Stripe payment link to purchase 3 more stripe credits"):
+            purchase_credits(customer)
+    else:
+        if st.button('Spend a Credit'):
+            update_credit_usage_history(email, 1)
+            st.success(f"You spent a credit.")
+            st.rerun()   # I'd like to try markdown infusion to see if I could update this without a rerun
+           
 
 st.write("End Experimental Credit Payment Section----")
 
