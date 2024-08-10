@@ -1,4 +1,4 @@
-from typing import List, Dict, Tuple
+from typing import List, Dict, Tuple, Callable
 import streamlit as st
 from data_handling import select_diverse_personas
 from prompts import create_prompt
@@ -25,6 +25,7 @@ def batch_simulate_responses(
     age_range: Tuple[int, int],
     income_range: Tuple[float, float],
     question_type: str,
+    progress_callback: Callable[[float], None] = None,
 ) -> List[Dict]:
     personas = select_diverse_personas(num_queries, age_range, income_range)
     prompts = [
@@ -39,11 +40,15 @@ def batch_simulate_responses(
     ]
 
     all_responses = []
-    for batch in batched_prompts:
+    for i, batch in enumerate(batched_prompts):
         responses = query_openai_batch(
             batch, model_type, max_tokens=1
         )  # Limit to 1 token
         all_responses.extend(responses)
+
+        if progress_callback:
+            progress = (i + 1) / len(batched_prompts)
+            progress_callback(progress)
 
     valid_responses = []
     for persona, response in zip(personas, all_responses):
@@ -83,38 +88,3 @@ def batch_simulate_responses(
                 st.warning(f"Invalid response for multiple choice: {response}")
 
     return valid_responses
-
-
-def analyze_responses(responses: List[Dict], question_type: str) -> Dict:
-    if not responses:
-        return {"count": 0}
-
-    df = pd.DataFrame(responses)
-
-    if question_type == "likert":
-        analysis = {
-            "mean": df["score"].mean(),
-            "median": df["score"].median(),
-            "std_dev": df["score"].std(),
-            "count": df["score"].count(),
-        }
-
-        # Calculate confidence interval
-        try:
-            n = len(df)
-            sem = stats.sem(df["score"])
-            ci = stats.t.interval(
-                confidence=0.95, df=n - 1, loc=analysis["mean"], scale=sem
-            )
-            analysis["confidence_interval"] = ci
-        except Exception as e:
-            st.warning(f"Error calculating confidence interval: {str(e)}")
-            analysis["confidence_interval"] = (None, None)
-
-    else:  # multiple choice
-        if "choice" not in df.columns:
-            return {"count": 0, "error": "No valid choices found in responses"}
-        analysis = df["choice"].value_counts(normalize=True).to_dict()
-        analysis["count"] = len(df)
-
-    return analysis

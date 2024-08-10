@@ -1,25 +1,33 @@
 import streamlit as st
+import pandas as pd
+
+# Set page config at the very beginning
+st.set_page_config(layout="wide", page_title="🐝 HiveSight")
+
+# Import other necessary modules
 from visualization import create_enhanced_visualizations
 from analysis import analyze_responses, create_pivot_table
 from simulation import batch_simulate_responses
 from custom_components import download_button
 from config import MODEL_MAP
-
-import pandas as pd
+from gather_code import gather_code
 
 # Initialize session state
 if "responses" not in st.session_state:
     st.session_state.responses = None
+if "show_success" not in st.session_state:
+    st.session_state.show_success = False
 
-st.title("🐝 HiveSight")
-st.write("Simulate Public Opinion with AI")
+# Sidebar
+st.sidebar.title("🐝 HiveSight")
+st.sidebar.write("Simulate Public Opinion with AI")
 
-question_ls = st.text_area(
+question_ls = st.sidebar.text_area(
     "Enter your statement in a form to agree or disagree with.",
     key="question_ls",
 )
 
-num_queries = st.number_input(
+num_queries = st.sidebar.number_input(
     "Number of Responses",
     min_value=1,
     max_value=1000,
@@ -27,7 +35,7 @@ num_queries = st.number_input(
     step=1,
 )
 
-with st.expander("Additional Options", expanded=False):
+with st.sidebar.expander("Additional Options", expanded=False):
     model_type = st.selectbox(
         "Choose Model Type",
         list(MODEL_MAP.keys()),
@@ -38,11 +46,11 @@ with st.expander("Additional Options", expanded=False):
         "Income Range ($)", 0, 1_000_000, (0, 1_000_000), step=10000
     )
 
-groupby_var = st.selectbox("Group By", ["age", "income"], index=0)
-
-if st.button("Run Simulation"):
+if st.sidebar.button("Run Simulation"):
     if not question_ls.strip():
-        st.error("Please enter a statement before running the simulation.")
+        st.sidebar.error(
+            "Please enter a statement before running the simulation."
+        )
     else:
         with st.spinner("Simulating responses..."):
             progress_bar = st.progress(0)
@@ -58,48 +66,63 @@ if st.button("Run Simulation"):
             )
 
             if not responses:
-                st.error(
+                st.sidebar.error(
                     "No valid responses were generated. Please try again or adjust your parameters."
                 )
             else:
                 st.session_state.responses = responses
+                st.session_state.show_success = True
+
+# Show success message in sidebar if needed
+if st.session_state.show_success:
+    success_message = f"Simulation complete. Generated {len(st.session_state.responses)} valid responses."
+    st.sidebar.success(success_message)
+
+# Main panel
+st.title("Simulation Results")
 
 if st.session_state.responses:
-    response_counts = analyze_responses(st.session_state.responses)
-    pivot_table = create_pivot_table(
-        pd.DataFrame(st.session_state.responses), groupby_var
-    )
-    visualizations = create_enhanced_visualizations(
-        response_counts, pivot_table, groupby_var
-    )
-
-    st.success(
-        f"Simulation complete. Generated {len(st.session_state.responses)} valid responses."
-    )
-
-    st.subheader("Analysis")
-    col1, col2 = st.columns(2)
-    with col1:
-        st.write(f"Mean Score: {response_counts['percentage'].mean():.2f}")
-        st.write(f"Median Score: {response_counts['percentage'].median():.2f}")
-    with col2:
-        st.write(
-            f"Standard Deviation: {response_counts['percentage'].std():.2f}"
-        )
-        st.write(f"Total Responses: {response_counts['percentage'].sum()}")
-
-    ci_low, ci_high = response_counts["percentage"].quantile([0.025, 0.975])
-    if ci_low is not None and ci_high is not None:
-        st.write(f"95% Confidence Interval: [{ci_low:.2f}, {ci_high:.2f}]")
-    else:
-        st.write("95% Confidence Interval: Not available")
-
-    st.subheader("Visualizations")
-    for fig in visualizations:
-        st.plotly_chart(fig, use_container_width=True)
-
     df = pd.DataFrame(st.session_state.responses)
+    response_counts = analyze_responses(df)
+
+    st.subheader("Overall Distribution")
+    overall_viz = create_enhanced_visualizations(response_counts, None, None)
+    st.plotly_chart(overall_viz[0], use_container_width=True)
+
+    st.subheader("Demographic Breakdown")
+    breakdown_type = st.selectbox(
+        "Select breakdown type:", ("By Age", "By Income")
+    )
+
+    if breakdown_type == "By Age":
+        age_pivot = create_pivot_table(df, "age")
+        age_viz = create_enhanced_visualizations(
+            response_counts, age_pivot, "age"
+        )
+        st.plotly_chart(age_viz[1], use_container_width=True)
+    elif breakdown_type == "By Income":
+        income_pivot = create_pivot_table(df, "income")
+        income_viz = create_enhanced_visualizations(
+            response_counts, income_pivot, "income"
+        )
+        st.plotly_chart(income_viz[1], use_container_width=True)
+
     download_button_str = download_button(
         df, "simulated_responses.csv", "Download Simulated Responses"
     )
     st.markdown(download_button_str, unsafe_allow_html=True)
+
+else:
+    st.write(
+        "Welcome to HiveSight! To get started, enter a statement in the sidebar and click 'Run Simulation'."
+    )
+    st.write(
+        "Once you've run a simulation, you'll see the results and analysis here."
+    )
+
+# Footer
+st.sidebar.markdown("---")
+st.sidebar.subheader("Developer Tools")
+all_code = gather_code()
+with st.sidebar.expander("View All Code"):
+    st.code(all_code, language="python", line_numbers=True)

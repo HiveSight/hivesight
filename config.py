@@ -7,8 +7,8 @@ API_KEYS = {
 }
 
 MODEL_MAP = {
+    "GPT-4o-mini": "gpt-4o-mini",
     "GPT-4o": "gpt-4o",
-    "GPT-4o-mini": "gpt-4-mini",
     "GPT-3.5": "gpt-3.5-turbo",
 }
 
