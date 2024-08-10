@@ -1,73 +1,67 @@
 import os
 import asyncio
-from openai import OpenAI, AsyncOpenAI, NOT_GIVEN as OPENAI_NOT_GIVEN
+from openai import AsyncOpenAI
 import streamlit as st
 from config import MODEL_MAP
+import time
+import random
 
 openai_api_key = os.getenv("OPENAI_API_KEY", st.secrets["OPENAI_API_KEY"])
-
-openai_client = OpenAI()
 openai_client_async = AsyncOpenAI()
 
-EXPLANATION_APPEND = " Please provide an explanation."
+# Configuration for rate limiting and retries
+MAX_RETRIES = 5
+INITIAL_RETRY_DELAY = 1  # in seconds
+MAX_RETRY_DELAY = 60  # in seconds
 
 
 async def query_openai_async(
     prompt,
     model_type,
     temperature=1.0,
-    top_p=None,
-    system_prompt=None,
     max_tokens=None,
 ):
-    top_p_input = OPENAI_NOT_GIVEN if top_p is None else top_p
-
     if not prompt:
         print("Error: Empty prompt provided")
         return "Error: Empty prompt"
 
-    try:
-        messages = []
-        if system_prompt:
-            messages.append({"role": "system", "content": system_prompt})
-        messages.append({"role": "user", "content": prompt})
-
-        if model_type == "Claude-3":
-            from anthropic import Anthropic
-
-            anthropic_client = Anthropic(
-                api_key=os.getenv(
-                    "ANTHROPIC_API_KEY", st.secrets["ANTHROPIC_API_KEY"]
-                )
-            )
-            response = await anthropic_client.messages.create(
-                model=MODEL_MAP[model_type],
-                max_tokens=max_tokens or 500,
-                temperature=temperature,
-                messages=messages,
-            )
-            return response.content[0].text.strip()
-        else:
+    retries = 0
+    while retries < MAX_RETRIES:
+        try:
+            messages = [{"role": "user", "content": prompt}]
             response = await openai_client_async.chat.completions.create(
                 model=MODEL_MAP[model_type],
                 temperature=temperature,
-                top_p=top_p_input,
                 messages=messages,
                 max_tokens=max_tokens or 500,
                 n=1,
             )
             return response.choices[0].message.content.strip()
-    except Exception as e:
-        print(f"Error during API call for model {model_type}:", e)
-        return f"Error: {str(e)}"
+        except Exception as e:
+            retries += 1
+            if retries == MAX_RETRIES:
+                print(f"Error during API call for model {model_type}:", e)
+                return f"Error: {str(e)}"
+
+            if "rate_limit_exceeded" in str(e):
+                retry_delay = min(
+                    INITIAL_RETRY_DELAY * (2 ** (retries - 1))
+                    + random.uniform(0, 1),
+                    MAX_RETRY_DELAY,
+                )
+                print(
+                    f"Rate limit exceeded. Retrying in {retry_delay:.2f} seconds..."
+                )
+                await asyncio.sleep(retry_delay)
+            else:
+                print(f"Unexpected error. Retrying in 1 second...")
+                await asyncio.sleep(1)
 
 
 async def query_openai_batch(
     prompts,
     model_type,
     temperature=1.0,
-    top_p=None,
-    system_prompt=None,
     max_tokens=None,
 ):
     tasks = [
@@ -75,8 +69,6 @@ async def query_openai_batch(
             prompt,
             model_type,
             temperature,
-            top_p,
-            system_prompt,
             max_tokens,
         )
         for prompt in prompts
@@ -84,73 +76,7 @@ async def query_openai_batch(
     return await asyncio.gather(*tasks)
 
 
-def run_batch_query(
-    prompts,
-    model_type,
-    temperature=1.0,
-    top_p=None,
-    system_prompt=None,
-    max_tokens=None,
-):
+def run_batch_query(prompts, model_type, temperature=1.0, max_tokens=None):
     return asyncio.run(
-        query_openai_batch(
-            prompts, model_type, temperature, top_p, system_prompt, max_tokens
-        )
+        query_openai_batch(prompts, model_type, temperature, max_tokens)
     )
-
-
-# Keep the original query_openai function for non-batch queries
-def query_openai(
-    question,
-    model_type,
-    request_explanation,
-    num_queries,
-    temperature=1.0,
-    top_p=None,
-    system_prompt=None,
-    max_tokens=None,
-):
-    top_p_input = OPENAI_NOT_GIVEN if top_p is None else top_p
-
-    if not question:
-        print("Error: Empty question provided")
-        return ["Error: Empty question"]
-
-    try:
-        user_prompt = question
-        if request_explanation:
-            user_prompt = f"{user_prompt} {EXPLANATION_APPEND}"
-
-        messages = []
-        if system_prompt:
-            messages.append({"role": "system", "content": system_prompt})
-        messages.append({"role": "user", "content": user_prompt})
-
-        if model_type == "Claude-3":
-            from anthropic import Anthropic
-
-            anthropic_client = Anthropic(
-                api_key=os.getenv(
-                    "ANTHROPIC_API_KEY", st.secrets["ANTHROPIC_API_KEY"]
-                )
-            )
-            response = anthropic_client.messages.create(
-                model=MODEL_MAP[model_type],
-                max_tokens=max_tokens or 500,
-                temperature=temperature,
-                messages=messages,
-            )
-            return [response.content[0].text.strip()]
-        else:
-            response = openai_client.chat.completions.create(
-                model=MODEL_MAP[model_type],
-                temperature=temperature,
-                top_p=top_p_input,
-                messages=messages,
-                max_tokens=max_tokens or 500,
-                n=num_queries,
-            )
-            return [r.message.content.strip() for r in response.choices]
-    except Exception as e:
-        print(f"Error during API call for model {model_type}:", e)
-        return [f"Error: {str(e)}"]
