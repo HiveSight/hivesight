@@ -7,8 +7,9 @@ API_KEYS = {
 }
 
 MODEL_MAP = {
-    "GPT-3.5": "gpt-3.5-turbo",
     "GPT-4o": "gpt-4o",
+    "GPT-4o-mini": "gpt-4-mini",
+    "GPT-3.5": "gpt-3.5-turbo",
 }
 
 AGE_BINS = [0, 18, 25, 35, 45, 55, 65, np.inf]
