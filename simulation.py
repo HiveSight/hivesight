@@ -2,9 +2,7 @@ from typing import List, Dict, Tuple, Callable
 import streamlit as st
 from data_handling import select_diverse_personas
 from prompts import create_prompt
-from gpt import query_openai_batch
-from scipy import stats
-import pandas as pd
+from gpt import run_batch_query
 
 
 def parse_numeric_response(response, max_value):
@@ -33,22 +31,11 @@ def batch_simulate_responses(
         for persona in personas
     ]
 
-    # Split prompts into batches of 20 (or adjust based on API limits)
-    batch_size = 20
-    batched_prompts = [
-        prompts[i : i + batch_size] for i in range(0, len(prompts), batch_size)
-    ]
+    # Run all prompts in a single batch
+    all_responses = run_batch_query(prompts, model_type, max_tokens=1)
 
-    all_responses = []
-    for i, batch in enumerate(batched_prompts):
-        responses = query_openai_batch(
-            batch, model_type, max_tokens=1
-        )  # Limit to 1 token
-        all_responses.extend(responses)
-
-        if progress_callback:
-            progress = (i + 1) / len(batched_prompts)
-            progress_callback(progress)
+    if progress_callback:
+        progress_callback(1.0)  # Set progress to 100% after batch completion
 
     valid_responses = []
     for persona, response in zip(personas, all_responses):
