@@ -2,9 +2,7 @@ from typing import List, Dict, Tuple, Callable
 import streamlit as st
 from data_handling import select_diverse_personas
 from prompts import create_prompt
-from gpt import query_openai_batch
-from scipy import stats
-import pandas as pd
+from gpt import run_batch_query
 
 
 def parse_numeric_response(response, max_value):
@@ -41,7 +39,7 @@ def batch_simulate_responses(
 
     all_responses = []
     for i, batch in enumerate(batched_prompts):
-        responses = query_openai_batch(
+        responses = run_batch_query(
             batch, model_type, max_tokens=1
         )  # Limit to 1 token
         all_responses.extend(responses)

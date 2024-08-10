@@ -45,6 +45,7 @@ def create_pivot_table(df: pd.DataFrame, groupby_var: str) -> pd.DataFrame:
         columns="likert_label",
         aggfunc="count",
         fill_value=0,
+        observed=False,
     )
 
     # Ensure all Likert labels are present

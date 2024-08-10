@@ -1,4 +1,5 @@
 import os
+import asyncio
 from openai import OpenAI, AsyncOpenAI, NOT_GIVEN as OPENAI_NOT_GIVEN
 import streamlit as st
 from config import MODEL_MAP
@@ -11,7 +12,57 @@ openai_client_async = AsyncOpenAI()
 EXPLANATION_APPEND = " Please provide an explanation."
 
 
-def query_openai_batch(
+async def query_openai_async(
+    prompt,
+    model_type,
+    temperature=1.0,
+    top_p=None,
+    system_prompt=None,
+    max_tokens=None,
+):
+    top_p_input = OPENAI_NOT_GIVEN if top_p is None else top_p
+
+    if not prompt:
+        print("Error: Empty prompt provided")
+        return "Error: Empty prompt"
+
+    try:
+        messages = []
+        if system_prompt:
+            messages.append({"role": "system", "content": system_prompt})
+        messages.append({"role": "user", "content": prompt})
+
+        if model_type == "Claude-3":
+            from anthropic import Anthropic
+
+            anthropic_client = Anthropic(
+                api_key=os.getenv(
+                    "ANTHROPIC_API_KEY", st.secrets["ANTHROPIC_API_KEY"]
+                )
+            )
+            response = await anthropic_client.messages.create(
+                model=MODEL_MAP[model_type],
+                max_tokens=max_tokens or 500,
+                temperature=temperature,
+                messages=messages,
+            )
+            return response.content[0].text.strip()
+        else:
+            response = await openai_client_async.chat.completions.create(
+                model=MODEL_MAP[model_type],
+                temperature=temperature,
+                top_p=top_p_input,
+                messages=messages,
+                max_tokens=max_tokens or 500,
+                n=1,
+            )
+            return response.choices[0].message.content.strip()
+    except Exception as e:
+        print(f"Error during API call for model {model_type}:", e)
+        return f"Error: {str(e)}"
+
+
+async def query_openai_batch(
     prompts,
     model_type,
     temperature=1.0,
@@ -19,22 +70,36 @@ def query_openai_batch(
     system_prompt=None,
     max_tokens=None,
 ):
-    responses = []
-    for prompt in prompts:
-        response = query_openai(
+    tasks = [
+        query_openai_async(
             prompt,
             model_type,
-            False,
-            1,
             temperature,
             top_p,
             system_prompt,
             max_tokens,
         )
-        responses.extend(response)
-    return responses
+        for prompt in prompts
+    ]
+    return await asyncio.gather(*tasks)
 
 
+def run_batch_query(
+    prompts,
+    model_type,
+    temperature=1.0,
+    top_p=None,
+    system_prompt=None,
+    max_tokens=None,
+):
+    return asyncio.run(
+        query_openai_batch(
+            prompts, model_type, temperature, top_p, system_prompt, max_tokens
+        )
+    )
+
+
+# Keep the original query_openai function for non-batch queries
 def query_openai(
     question,
     model_type,
