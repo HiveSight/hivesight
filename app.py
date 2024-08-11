@@ -4,7 +4,7 @@ import streamlit as st
 st.set_page_config(layout="wide", page_title="🐝 HiveSight")
 
 from products.survey.survey import render as render_survey
-from products.council.council import render as render_council
+from products.council.main import render as render_council
 
 """
 HiveSight: A multi-product platform for AI-powered insights.
