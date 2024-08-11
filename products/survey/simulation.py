@@ -1,8 +1,8 @@
 from typing import List, Dict, Tuple, Callable
 import streamlit as st
-from data_handling import select_diverse_personas
-from prompts import create_prompt
-from gpt import run_batch_query
+from products.survey.data_handling import select_diverse_personas
+from products.survey.prompts import create_prompt
+from utils.openai_utils import run_batch_query
 
 
 def parse_numeric_response(response, max_value):
