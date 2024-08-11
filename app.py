@@ -6,13 +6,10 @@ st.set_page_config(layout="wide", page_title="🐝 HiveSight")
 from products.survey.survey import render as render_survey
 from products.council.main import render as render_council
 
-"""
-HiveSight: A multi-product platform for AI-powered insights.
-
-This module serves as the main entry point for the HiveSight application,
-handling navigation between different products and rendering the appropriate
-interfaces based on user selection.
-"""
+# HiveSight: A multi-product platform for AI-powered insights.
+# This module serves as the main entry point for the HiveSight application,
+# handling navigation between different products and rendering the appropriate
+# interfaces based on user selection.
 
 
 def init_session_state():
