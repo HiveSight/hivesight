@@ -1,10 +1,14 @@
 import os
-import asyncio
-from openai import AsyncOpenAI
-import streamlit as st
-from config import MODEL_MAP
 import time
 import random
+import asyncio
+
+from openai import AsyncOpenAI
+import streamlit as st
+import tiktoken
+
+from config import MODEL_MAP
+
 
 openai_api_key = os.getenv("OPENAI_API_KEY", st.secrets["OPENAI_API_KEY"])
 openai_client_async = AsyncOpenAI()
@@ -13,6 +17,18 @@ openai_client_async = AsyncOpenAI()
 MAX_RETRIES = 5
 INITIAL_RETRY_DELAY = 1  # in seconds
 MAX_RETRY_DELAY = 60  # in seconds
+
+
+def estimate_input_tokens(messages, model_type):
+    # NOTE: loading this encoding results in a brief delay.
+    encoding = tiktoken.encoding_for_model(MODEL_MAP[model_type])
+    tokens_per_message = 3
+    num_tokens = 0
+    for message in messages:
+        num_tokens += tokens_per_message  # tokens used by the {role}\n{content}\n structure.
+        num_tokens += len(encoding.encode(message))
+    num_tokens += 3  # every reply is primed with <|start|>assistant<|message|>   
+    return num_tokens
 
 
 async def query_openai_async(

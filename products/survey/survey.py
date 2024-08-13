@@ -1,9 +1,13 @@
 import streamlit as st
 import pandas as pd
+
 from products.survey.visualization import create_enhanced_visualizations
 from products.survey.analysis import analyze_responses, create_pivot_table
 from products.survey.simulation import batch_simulate_responses
+from products.survey.data_handling import select_diverse_personas                                                                                                                                                                      
+from products.survey.prompts import create_prompt  
 from utils.custom_components import download_button
+from utils.openai_utils import estimate_input_tokens
 from config import MODEL_MAP
 
 
@@ -63,6 +67,32 @@ def render():
             help="Filter responses by annual income range.",
         )
 
+    # Echo user's choices and calculate cost
+    if question_ls:
+        question_type = "likert"
+        choices = None
+        personas = select_diverse_personas(num_queries, age_range, income_range)
+        prompts = [
+            create_prompt(persona, question_ls, question_type, choices)
+            for persona in personas
+        ]
+        # TODO: is there any way not to repeat this?
+
+
+        input_tokens_est = estimate_input_tokens(prompts, model_type)
+        output_tokens_est = 1 * num_queries
+
+        # TODO: make a model cost config
+        input_tokens_cost = input_tokens_est * 0.15 / 1E6
+        output_tokens_cost = input_tokens_est * 0.60 / 1E6
+        total_cost = round(input_tokens_cost + output_tokens_cost, 3)
+
+        st.write("#### Cost estimation")
+        st.write(f"**Projected Number of Tokens:** {input_tokens_est} input and {output_tokens_est} output")
+        st.write(f"**Projected Cost to Run Simulation:** Total estimate of {total_cost}.")
+
+    # NOTE: I think you want to create your prompts before you click the button, so you
+    # Know what you're about to send oover
     if st.button(
         "Run Simulation",
         help="Click to start the simulation with the current settings.",

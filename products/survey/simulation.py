@@ -3,6 +3,7 @@ import streamlit as st
 from products.survey.data_handling import select_diverse_personas
 from products.survey.prompts import create_prompt
 from utils.openai_utils import run_batch_query
+import tiktoken
 
 
 def parse_numeric_response(response, max_value):
@@ -25,12 +26,14 @@ def batch_simulate_responses(
     question_type: str,
     progress_callback: Callable[[float], None] = None,
 ) -> List[Dict]:
+
+    # TODO: I think this should be called outside of this function
     personas = select_diverse_personas(num_queries, age_range, income_range)
     prompts = [
         create_prompt(persona, statement, question_type, choices)
         for persona in personas
     ]
-
+    
     # Run all prompts in a single batch
     all_responses = run_batch_query(prompts, model_type, max_tokens=1)
 

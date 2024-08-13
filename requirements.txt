@@ -9,3 +9,4 @@ policyengine-us
 scipy
 statsmodels
 streamlit
+tiktoken
