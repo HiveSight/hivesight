@@ -1,7 +1,10 @@
 # config.py
 
 import os
+from collections import namedtuple
+
 import numpy as np
+
 
 API_KEYS = {
     "OPENAI": os.getenv("OPENAI_API_KEY"),
@@ -9,10 +12,18 @@ API_KEYS = {
 }
 
 MODEL_MAP = {
-    "GPT-4o-mini": "gpt-4o-mini",
-    "GPT-4o": "gpt-4o",
-    "GPT-3.5": "gpt-3.5-turbo",
+    "GPT-4o-mini": "gpt-4o-mini-2024-07-18",
+    "GPT-4o": "gpt-4o-2024-05-13",
+    "GPT-3.5": "gpt-3.5-turbo-0125",
 }
+
+CostPerMillion = namedtuple("CostPerMillion", ['Input', 'Output'])
+MODEL_COST_MAP = {
+    "GPT-4o-mini": CostPerMillion(0.15, 0.60),
+    "GPT-4o": CostPerMillion(5.0, 15.0),
+    "GPT-3.5": CostPerMillion(.5, 1.5)
+}
+
 
 AGE_BINS = [0, 18, 25, 35, 45, 55, 65, np.inf]
 INCOME_BINS = [0, 30000, 60000, 90000, 120000, np.inf]

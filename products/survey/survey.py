@@ -8,7 +8,7 @@ from products.survey.data_handling import select_diverse_personas
 from products.survey.prompts import create_prompt  
 from utils.custom_components import download_button
 from utils.openai_utils import estimate_input_tokens
-from config import MODEL_MAP
+from config import MODEL_MAP, MODEL_COST_MAP
 
 
 def init_session_state():
@@ -16,6 +16,10 @@ def init_session_state():
         st.session_state.responses = None
     if "show_success" not in st.session_state:
         st.session_state.show_success = False
+
+
+def reset_step():
+    st.session_state.step = 1
 
 
 def render():
@@ -29,7 +33,8 @@ def render():
     with col1:
         question_ls = st.text_area(
             "Enter your statement for agreement/disagreement:",
-            key="question_ls",
+            key="widget",
+            on_change=reset_step,
             help="Enter a statement that people can agree or disagree with.",
         )
 
@@ -40,6 +45,7 @@ def render():
             max_value=1000,
             value=10,
             step=1,
+            on_change=reset_step,
             help="Choose how many AI-generated responses you want.",
         )
 
@@ -56,6 +62,7 @@ def render():
             0,
             100,
             (18, 100),
+            on_change=reset_step,
             help="Filter responses by age range.",
         )
         income_range = st.slider(
@@ -64,72 +71,77 @@ def render():
             1_000_000,
             (0, 1_000_000),
             step=10000,
+            on_change=reset_step,
             help="Filter responses by annual income range.",
         )
 
-    # Echo user's choices and calculate cost
-    if question_ls:
-        question_type = "likert"
-        choices = None
-        personas = select_diverse_personas(num_queries, age_range, income_range)
-        prompts = [
-            create_prompt(persona, question_ls, question_type, choices)
-            for persona in personas
-        ]
-        # TODO: is there any way not to repeat this?
-
-
-        input_tokens_est = estimate_input_tokens(prompts, model_type)
-        output_tokens_est = 1 * num_queries
-
-        # TODO: make a model cost config
-        input_tokens_cost = input_tokens_est * 0.15 / 1E6
-        output_tokens_cost = input_tokens_est * 0.60 / 1E6
-        total_cost = round(input_tokens_cost + output_tokens_cost, 3)
-
+    # Multi-step proceedure for cost estimation and running the simulation b/c nested buttons don't work 
+    if 'step' not in st.session_state:
+        st.session_state.step = 1
+    
+    # Step 1: Cost Estimation
+    if st.session_state.step == 1:
+        if st.button("Proceed to Cost Estimation", help="Get cost estimate and run simulation"):
+            if not question_ls.strip():
+                st.error("Please enter a statement before running the simulation.")
+            else:
+                question_type = "likert"
+                choices = None
+                personas = select_diverse_personas(num_queries, age_range, income_range)
+                prompts = [create_prompt(persona, question_ls, question_type, choices) for persona in personas]
+    
+                input_tokens_est = estimate_input_tokens(prompts, model_type)
+                output_tokens_est = 1 * num_queries
+    
+                input_tokens_cost = input_tokens_est * MODEL_COST_MAP[model_type].Input / 1E6
+                output_tokens_cost = output_tokens_est * MODEL_COST_MAP[model_type].Output / 1E6
+                total_cost = round(input_tokens_cost + output_tokens_cost, 5)
+    
+                st.session_state.cost_estimation = {
+                    "input_tokens_est": input_tokens_est,
+                    "output_tokens_est": output_tokens_est,
+                    "total_cost": total_cost,
+                    "personas": personas,
+                    "prompts": prompts
+                }
+                st.session_state.step = 2
+                st.rerun()
+    
+    # Step 2: Run Simulation
+    elif st.session_state.step == 2:
+        cost_data = st.session_state.cost_estimation
         st.write("#### Cost estimation")
-        st.write(f"**Projected Number of Tokens:** {input_tokens_est} input and {output_tokens_est} output")
-        st.write(f"**Projected Cost to Run Simulation:** Total estimate of {total_cost}.")
-
-    # NOTE: I think you want to create your prompts before you click the button, so you
-    # Know what you're about to send oover
-    if st.button(
-        "Run Simulation",
-        help="Click to start the simulation with the current settings.",
-    ):
-        run_simulation(
-            question_ls, num_queries, model_type, age_range, income_range
-        )
-
-    show_results()
+        st.write(f"**Projected Number of Tokens:** {cost_data['input_tokens_est']} input and {cost_data['output_tokens_est']} output")
+        st.write(f"**Projected Cost to Run Simulation:** Total estimate of {cost_data['total_cost']}.")
+    
+        if st.button("Run Simulation", help="Click to start the simulation with the current settings."):
+            run_simulation(question_ls, num_queries, model_type, cost_data['personas'], cost_data['prompts'])
+            show_results()
 
 
 def run_simulation(
-    question_ls, num_queries, model_type, age_range, income_range
+    question_ls, num_queries, model_type, personas, prompts
 ):
-    if not question_ls.strip():
-        st.error("Please enter a statement before running the simulation.")
-    else:
-        with st.spinner("Simulating responses..."):
-            progress_bar = st.progress(0)
-            responses = batch_simulate_responses(
-                question_ls,
-                None,  # No choices for Likert scale
-                num_queries,
-                model_type,
-                age_range,
-                income_range,
-                "likert",  # Passing "likert" as a fixed parameter
-                progress_callback=lambda x: progress_bar.progress(x),
-            )
+    with st.spinner("Simulating responses..."):
+        progress_bar = st.progress(0)
+        responses = batch_simulate_responses(
+            question_ls,
+            None,  # No choices for Likert scale
+            num_queries,
+            model_type,
+            personas,
+            prompts,
+            "likert",  # Passing "likert" as a fixed parameter
+            progress_callback=lambda x: progress_bar.progress(x),
+        )
 
-            if not responses:
-                st.error(
-                    "No valid responses were generated. Please try again or adjust your parameters."
-                )
-            else:
-                st.session_state.responses = responses
-                st.session_state.show_success = True
+        if not responses:
+            st.error(
+                "No valid responses were generated. Please try again or adjust your parameters."
+            )
+        else:
+            st.session_state.responses = responses
+            st.session_state.show_success = True
 
 
 def show_results():

@@ -3,13 +3,17 @@ from config import DEFAULT_PERSONAS
 from .state import add_custom_advisor, remove_custom_advisor
 
 
+def reset_step():
+    st.session_state.step = 1
+
+
 def render_ui():
     render_advisor_management()
     render_history()
 
     all_advisors = {**DEFAULT_PERSONAS, **st.session_state.custom_advisors}
 
-    question = st.text_input("Enter your question for the advisory council:")
+    question = st.text_input("Enter your question for the advisory council:", on_change=reset_step)
 
     selected_personas = st.multiselect(
         "Select advisors to consult (2-4 recommended):",
@@ -19,9 +23,10 @@ def render_ui():
             if "CEO" in all_advisors and "CFO" in all_advisors
             else []
         ),
+        on_change=reset_step
     )
 
-    max_tokens = st.slider("Max tokens per response", 100, 1000, 800)
+    max_tokens = st.slider("Max tokens per response", 100, 1000, 800, on_change=reset_step)
 
     return question, selected_personas, max_tokens
 
