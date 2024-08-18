@@ -1,46 +1,30 @@
 import logging
-from config import ANTHROPIC_MODEL
-import anthropic
 import re
 from typing import Union, List
+
+import anthropic
 from anthropic.types import TextBlock
+
+from config import (
+    ANTHROPIC_MODEL,
+    COUNCIL_SUMMARY_USER_PROMPT_TEMPLATE,
+    SUMMARY_MAX_TOKENS
+)
+
 
 logger = logging.getLogger(__name__)
 client = anthropic.Anthropic()
 
 
 def get_summary(question, responses):
-    summary_prompt = f"""
-    Analyze the following responses from different executives to this question:
-    "{question}"
-
-    Responses:
-    {responses}
-
-    Provide a comprehensive analysis including:
-    1. A concise summary of the key points
-    2. Common themes and any disagreements among the executives
-    3. Overall consensus level from 1 (strong disagreement) to 10 (strong agreement)
-    4. Sentiment analysis for each executive's response (positive, neutral, or negative)
-    5. Top 5 key takeaways from all responses combined
-
-    Format your response as follows:
-    SUMMARY: [Your summary here]
-    CONSENSUS_LEVEL: [Number between 1-10]
-    SENTIMENTS:
-    [Executive1]: [Sentiment]
-    [Executive2]: [Sentiment]
-    ...
-    KEY_TAKEAWAYS:
-    - [Takeaway 1]
-    - [Takeaway 2]
-    ...
-    """
-
+    summary_prompt = COUNCIL_SUMMARY_USER_PROMPT_TEMPLATE.format(
+        question=question,
+        responses=responses
+    )
     try:
         message = client.messages.create(
             model=ANTHROPIC_MODEL,
-            max_tokens=1000,
+            max_tokens=SUMMARY_MAX_TOKENS,
             messages=[{"role": "user", "content": summary_prompt}],
         )
         logger.info(f"Raw API response: {message}")
