@@ -111,9 +111,10 @@ def render():
     elif st.session_state.step == 2:
         cost_data = st.session_state.cost_estimation
         st.write("#### Cost estimation")
-        st.write(f"**Projected Number of Tokens:** {cost_data['input_tokens_est']} input and {cost_data['output_tokens_est']} output")
-        st.write(f"**Projected Cost to Run Simulation:** Total estimate of {cost_data['total_cost']}.")
-    
+        st.write(f"**Tokens:** {cost_data['input_tokens_est']} input, "
+                 f"{cost_data['output_tokens_est']} output")
+        st.write(f"**Total Cost:** {cost_data['total_cost']}")
+  
         if st.button("Run Simulation", help="Click to start the simulation with the current settings."):
             run_simulation(question_ls, num_queries, model_type, cost_data['personas'], cost_data['prompts'])
             show_results()
