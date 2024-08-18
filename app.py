@@ -22,12 +22,12 @@ def render_home():
     with col1:
         if st.button("HiveSight Survey", use_container_width=True):
             st.session_state.current_product = "HiveSight Survey"
-            st.experimental_rerun()
+            st.rerun()
 
     with col2:
         if st.button("HiveSight Council", use_container_width=True):
             st.session_state.current_product = "HiveSight Council"
-            st.experimental_rerun()
+            st.rerun()
 
 
 def render_about():
@@ -63,7 +63,7 @@ def render_sidebar():
     selected_product = st.sidebar.radio("Choose a product:", products)
     if selected_product != st.session_state.current_product:
         st.session_state.current_product = selected_product
-        st.experimental_rerun()
+        st.rerun()
 
     render_about()
     render_developer_tools()
@@ -79,12 +79,12 @@ def main():
         render_survey()
         if st.sidebar.button("Back to Home"):
             st.session_state.current_product = "Home"
-            st.experimental_rerun()
+            st.rerun()
     elif st.session_state.current_product == "HiveSight Council":
         render_council()
         if st.sidebar.button("Back to Home"):
             st.session_state.current_product = "Home"
-            st.experimental_rerun()
+            st.rerun()
 
 
 if __name__ == "__main__":
