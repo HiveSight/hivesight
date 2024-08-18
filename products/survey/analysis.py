@@ -1,5 +1,4 @@
 import pandas as pd
-from typing import List, Dict
 from config import LIKERT_LABELS, AGE_BINS, INCOME_BINS
 import numpy as np
 import locale

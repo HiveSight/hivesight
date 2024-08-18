@@ -34,6 +34,7 @@ def process_advice_request(question, selected_personas, max_tokens):
                 persona,
                 advisor_info.get("description"),
                 advisor_info.get("expertise"),
+                max_tokens
             )
             parsed_response = parse_response(response)
             responses[persona] = parsed_response

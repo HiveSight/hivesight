@@ -1,29 +1,40 @@
 import logging
-from config import ANTHROPIC_MODEL
+
 import anthropic
+
+from config import (
+    ANTHROPIC_MODEL,
+    COUNCIL_ADVISOR_SYSTEM_PROMPT_TEMPLATE,
+    COUNCIL_ADVISOR_USER_PROMPT_TEMPLATE
+)
+
 
 logger = logging.getLogger(__name__)
 client = anthropic.Anthropic()
 
 
-def get_advisor_response(question, persona, description, expertise):
-    system_prompt = f"""You are the {persona} of an organization. {description or 'Provide advice based on your role.'}
-Your areas of expertise are: {', '.join(expertise.keys()) if expertise else 'various areas relevant to your role'}.
-Provide your perspective on the given question, considering your role and expertise.
-At the end of your response, include:
-1. A brief 'Summary' section
-2. A 'Key Takeaways' section with 3-5 bullet points
-3. A 'Confidence' rating from 1-10 on how confident you are in your advice, given your expertise"""
+def get_advisor_response(question, persona, description, expertise, max_tokens):
+
+    description_text = description if description else 'Provide advice based on your role.'
+    expertise_text = (
+        ', '.join(expertise.keys()) if expertise else 'various areas relevant to your role'
+    )
+
+    system_prompt = COUNCIL_ADVISOR_SYSTEM_PROMPT_TEMPLATE.format(
+        persona=persona,
+        description=description_text,
+        expertise=expertise_text
+    )
 
     try:
         message = client.messages.create(
             model=ANTHROPIC_MODEL,
-            max_tokens=800,
+            max_tokens=max_tokens,
             system=system_prompt,
             messages=[
                 {
                     "role": "user",
-                    "content": f"Please provide your perspective on the following question: {question}",
+                    "content": COUNCIL_ADVISOR_USER_PROMPT_TEMPLATE.format(question=question)
                 }
             ],
         )
