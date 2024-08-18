@@ -1,5 +1,5 @@
 import plotly.graph_objects as go
-from typing import Dict, List, Optional
+from typing import List, Optional
 import pandas as pd
 from config import LIKERT_LABELS, LIKERT_COLORS
 

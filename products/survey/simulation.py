@@ -1,7 +1,6 @@
-from typing import List, Dict, Tuple, Callable
+from typing import List, Dict, Callable
 import streamlit as st
 from utils.openai_utils import run_batch_query
-import tiktoken
 
 
 def parse_numeric_response(response, max_value):

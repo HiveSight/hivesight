@@ -1,5 +1,3 @@
-# config.py
-
 import os
 from collections import namedtuple
 
@@ -17,12 +15,12 @@ MODEL_MAP = {
     "GPT-3.5": "gpt-3.5-turbo-0125",
 }
 
-CostPerMillion = namedtuple("CostPerMillion", ['Input', 'Output'])
+CostPerMillion = namedtuple("CostPerMillion", ["Input", "Output"])
 MODEL_COST_MAP = {
     "GPT-4o-mini": CostPerMillion(0.15, 0.60),
     "GPT-4o": CostPerMillion(5.0, 15.0),
-    "GPT-3.5": CostPerMillion(.5, 1.5),
-    "Sonnet": CostPerMillion(3.0, 15.0)
+    "GPT-3.5": CostPerMillion(0.5, 1.5),
+    "Sonnet": CostPerMillion(3.0, 15.0),
 }
 
 
@@ -98,7 +96,9 @@ A the end of your response, include:
 3. A 'Confidence' rating from 1-10 on how confident you are in your advice, given your expertise
 """
 
-COUNCIL_ADVISOR_USER_PROMPT_TEMPLATE = "Please provide your perspective on the following question: {question}"
+COUNCIL_ADVISOR_USER_PROMPT_TEMPLATE = (
+    "Please provide your perspective on the following question: {question}"
+)
 
 COUNCIL_SUMMARY_USER_PROMPT_TEMPLATE = """
     Analyze the following responses from different executives to this question:
@@ -126,5 +126,3 @@ COUNCIL_SUMMARY_USER_PROMPT_TEMPLATE = """
     - [Takeaway 2]
     ...
 """
-
-

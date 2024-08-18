@@ -1,5 +1,4 @@
 import os
-import time
 import random
 import asyncio
 
@@ -27,7 +26,7 @@ def estimate_input_tokens(messages, model_type):
     for message in messages:
         num_tokens += tokens_per_message  # tokens used by the {role}\n{content}\n structure.
         num_tokens += len(encoding.encode(message))
-    num_tokens += 3  # every reply is primed with <|start|>assistant<|message|>   
+    num_tokens += 3  # every reply is primed with <|start|>assistant<|message|>
     return num_tokens
 
 
