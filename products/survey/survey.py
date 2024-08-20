@@ -75,10 +75,6 @@ def render():
             help="Filter responses by annual income range.",
         )
 
-    # Multi-step proceedure for cost estimation and running the simulation b/c nested buttons don't work 
-    if 'step' not in st.session_state:
-        st.session_state.step = 1
-    
     # Step 1: Cost Estimation
     if st.session_state.step == 1:
         if st.button("Proceed to Cost Estimation", help="Get cost estimate and run simulation"):
@@ -114,10 +110,18 @@ def render():
         st.write(f"**Tokens:** {cost_data['input_tokens_est']} input, "
                  f"{cost_data['output_tokens_est']} output")
         st.write(f"**Total Cost:** {cost_data['total_cost']}")
-  
-        if st.button("Run Simulation", help="Click to start the simulation with the current settings."):
-            run_simulation(question_ls, num_queries, model_type, cost_data['personas'], cost_data['prompts'])
-            show_results()
+
+        enough_credits = True 
+        st.write(f"TESTING: enough credits is {enough_credits}")
+
+        if enough_credits:
+            if st.button("Run Simulation", help="Click to start the simulation with the current settings."):
+                run_simulation(question_ls, num_queries, model_type, cost_data['personas'], cost_data['prompts'])
+                show_results()
+        else:
+            if st.button("Buy More Credits", help="Click to start a Stripe checkout session."):
+                st.write("Buy More Credits")
+
 
 
 def run_simulation(

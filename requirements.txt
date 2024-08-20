@@ -1,5 +1,4 @@
 anthropic
-gspread
 oauth2client
 openai
 numpy
@@ -10,3 +9,6 @@ scipy
 statsmodels
 streamlit
 tiktoken
+st_paywall
+stripe
+supabase
