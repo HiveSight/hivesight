@@ -1,5 +1,8 @@
 import streamlit as st
 import pandas as pd
+from supabase import create_client, Client
+import stripe
+# from st_paywall.google_auth import get_logged_in_user_email
 
 from products.survey.visualization import create_enhanced_visualizations
 from products.survey.analysis import analyze_responses, create_pivot_table
@@ -8,6 +11,12 @@ from products.survey.data_handling import select_diverse_personas
 from products.survey.prompts import create_prompt  
 from utils.custom_components import download_button
 from utils.openai_utils import estimate_input_tokens
+from utils.credit_utils import (
+    get_or_create_stripe_customer,
+    get_total_user_credits_spent,
+    get_credits_purchased_ever,
+    purchase_credits
+)
 from config import MODEL_MAP, MODEL_COST_MAP
 
 
@@ -110,6 +119,49 @@ def render():
         st.write(f"**Tokens:** {cost_data['input_tokens_est']} input, "
                  f"{cost_data['output_tokens_est']} output")
         st.write(f"**Total Cost:** {cost_data['total_cost']}")
+
+        #supabase: Client = create_client(st.secrets["SUPABASE_URL"], st.secrets["SUPABASE_SERVICE_ROLE_SECRET"])
+        #stripe.api_key = st.secrets["stripe_api_key_test"]
+        #user_email = get_logged_in_user_email()
+
+        # TESTING: Porting over Credit logic from baogorek/stripe-initial
+        email = st.session_state["email"]
+        customer = get_or_create_stripe_customer(email)
+        st.write(f"The logged in email is {email}")
+        st.write(f"The corresponding Stripe customer id is {customer.id}")
+
+        st.write("-- Stripe purchase history -- ")
+        credits_purchased_df = get_credits_purchased_ever(customer)
+        if credits_purchased_df is not None:
+            st.dataframe(credits_purchased_df)
+            credits_purchased = credits_purchased_df.credits.sum()
+        else:
+            st.write("No Stripe purchase history yet")
+            credits_purchased = 0
+
+        st.write("--- Hivesight credit usage history  ---")
+        credits_spent_df = get_total_user_credits_spent(email)
+        if credits_spent_df is not None:
+            st.dataframe(credits_spent_df)
+            credits_used = credits_spent_df.credits_used.sum() 
+        else:
+            st.write("No Hivesight credit spending history yet")
+            credits_used = 0
+
+        credits_available = credits_purchased - credits_used
+        st.write(f"You have {credits_available} Credits.")
+
+        if credits_available < 1:
+            st.write(f'If you want more credits, you will need to make a purchase from stripe.')
+            if st.button("Get Stripe payment link to purchase 3 more stripe credits"):
+                purchase_credits(customer)
+        else:
+            if st.button('Spend a Credit'):
+                update_credit_usage_history(email, 1)
+                st.success(f"You spent a credit.")
+                st.rerun()
+
+        # END TESTING of port ----- 
 
         enough_credits = True 
         st.write(f"TESTING: enough credits is {enough_credits}")
