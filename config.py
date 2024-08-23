@@ -3,6 +3,7 @@ from collections import namedtuple
 
 import numpy as np
 
+NEW_USER_FREE_CREDITS = 3
 
 API_KEYS = {
     "OPENAI": os.getenv("OPENAI_API_KEY"),

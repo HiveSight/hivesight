@@ -1,4 +1,5 @@
 import streamlit as st
+st.set_page_config(layout="wide", page_title="🐝 HiveSight")  # Needs to be called immediately
 import stripe
 from supabase import create_client, Client
 from st_paywall import add_auth
@@ -7,9 +8,6 @@ from st_paywall.google_auth import get_logged_in_user_email, show_login_button
 from products.survey.survey import render as render_survey
 from products.council.main import render as render_council
 from utils.code_utils import gather_code
-
-
-st.set_page_config(layout="wide", page_title="🐝 HiveSight")
 
 
 def init_session_state():

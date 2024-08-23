@@ -5,6 +5,8 @@ import streamlit as st
 from supabase import create_client, Client
 import stripe
 
+from config import NEW_USER_FREE_CREDITS
+
 
 supabase = create_client(st.secrets["SUPABASE_URL"], st.secrets["SUPABASE_SERVICE_ROLE_SECRET"])
 
@@ -15,6 +17,7 @@ def get_or_create_stripe_customer(email):
         return customers[0]
     else:
         customer = stripe.Customer.create(email=email)
+        add_extra_credits(email, NEW_USER_FREE_CREDITS)
         return customer
 
 
@@ -26,6 +29,17 @@ def get_total_user_credits_spent(email):
 
 def update_credit_usage_history(email, credits_used):
     supabase.table('credit_usage_history').insert({'email': email, 'credits_used': credits_used}).execute()
+
+
+def add_extra_credits(email, extra_credits):
+    supabase.table('extra_credits').insert({'email': email, 'credits': extra_credits}).execute()
+    st.toast(f"Congrats! You just got {extra_credits} credits")
+
+
+def get_extra_credits(email):
+    response = supabase.table('extra_credits').select('*').eq('email', email).execute()
+    if response.data:
+        return pd.DataFrame(response.data)
 
 
 def extract_leading_integer(product_name):
