@@ -64,6 +64,7 @@ def render():
         model_type = st.selectbox(
             "Choose Model Type",
             list(MODEL_MAP.keys()),
+            on_change=reset_step,
             help="Select the AI model to use for generating responses.",
         )
 
@@ -89,7 +90,7 @@ def render():
 
     # Step 1: Cost Estimation
     if st.session_state.step == 1:
-        if st.button("Proceed to Cost Estimation", help="Get cost estimate and run simulation"):
+        if st.button("Proceed to Cost Estimation"):
             if not question_ls.strip():
                 st.error("Please enter a statement before running the simulation.")
             else:
@@ -100,15 +101,17 @@ def render():
     
                 input_tokens_est = estimate_input_tokens(prompts, model_type)
                 output_tokens_est = 1 * num_queries
-    
+
                 input_tokens_cost = input_tokens_est * MODEL_COST_MAP[model_type].Input / 1E6
                 output_tokens_cost = output_tokens_est * MODEL_COST_MAP[model_type].Output / 1E6
                 total_cost = round(input_tokens_cost + output_tokens_cost, 5)
+                total_cost_in_credits = round(total_cost * 10000)
     
                 st.session_state.cost_estimation = {
                     "input_tokens_est": input_tokens_est,
                     "output_tokens_est": output_tokens_est,
                     "total_cost": total_cost,
+                    "total_cost_in_credits": total_cost_in_credits,
                     "personas": personas,
                     "prompts": prompts
                 }
@@ -121,9 +124,10 @@ def render():
         st.write("#### Cost estimation")
         st.write(f"**Tokens:** {cost_data['input_tokens_est']} input, "
                  f"{cost_data['output_tokens_est']} output")
-        st.write(f"**Total Cost:** {cost_data['total_cost']}")
+        st.write(f"**Total Cost in USD for Simulation:** ${cost_data['total_cost']}")
+        st.write(f"**Credits Required:** {cost_data['total_cost_in_credits']}")
 
-        # TESTING -- 
+        # TESTING ( TODO: where did I get this from, and do I need it here or can I use functions?)-- 
         email = st.session_state["email"]
         customer = get_or_create_stripe_customer(email)
 
@@ -146,34 +150,24 @@ def render():
             extra_credits = 0
 
         credits_available = (credits_purchased + extra_credits) - credits_used
-        st.write(f"You have {credits_available} Credits.")
+        st.write(f"**User Credits** (at time of cost estimation): {credits_available}")
 
-        if credits_available < 1:
-            st.write(f'If you want more credits, you will need to make a purchase from stripe.')
-            if st.button("Get Stripe payment link to purchase HiveSight credits"):
-                purchase_credits(customer)
-            if st.button("Get Free Credits for Testing"):
-                add_extra_credits(email, 3)
-                st.rerun()
-        else:
-            if st.button('Spend a Credit'):
-                update_credit_usage_history(email, 1)
-                st.success(f"You spent a credit.")
-                st.rerun()
+        # END TESTING of port ----- # TODO: what did I "port"?  was this something from utilities
+        st.sidebar.title("Test Section for replenishing credits")
+        free_test_credits = st.sidebar.number_input("How many free test credits?", min_value=1, max_value=10, value=5, step=1)
+        if st.sidebar.button("Get Free Credits for Testing"):
+            add_extra_credits(email, free_test_credits)
+            st.rerun()
 
-        # END TESTING of port ----- 
-        # TODO: let's link credits to cost
-        enough_credits = True 
-        st.write(f"TESTING: enough credits is {enough_credits}")
-
+        enough_credits = credits_available >= cost_data['total_cost_in_credits']
         if enough_credits:
             if st.button("Run Simulation", help="Click to start the simulation with the current settings."):
+                update_credit_usage_history(email, cost_data['total_cost_in_credits'])
                 run_simulation(question_ls, num_queries, model_type, cost_data['personas'], cost_data['prompts'])
                 show_results()
         else:
-            if st.button("Buy More Credits", help="Click to start a Stripe checkout session."):
-                st.write("Buy More Credits")
-
+            if st.button("Not enough credits! Buy more via Stripe checkout."):
+                purchase_credits(customer)
 
 
 def run_simulation(
