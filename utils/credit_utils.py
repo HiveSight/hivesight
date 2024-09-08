@@ -5,7 +5,7 @@ import streamlit as st
 from supabase import create_client, Client
 import stripe
 
-from config import NEW_USER_FREE_CREDITS
+from config import NEW_USER_FREE_CREDITS, CREDITS_TO_USD_MULTIPLIER
 
 
 supabase = create_client(st.secrets["SUPABASE_URL"], st.secrets["SUPABASE_SERVICE_ROLE_SECRET"])
@@ -18,6 +18,7 @@ def get_or_create_stripe_customer(email):
     else:
         customer = stripe.Customer.create(email=email)
         add_extra_credits(email, NEW_USER_FREE_CREDITS)
+        st.success("Welcome! You've earned 1000 free credits just by logging in!") 
         return customer
 
 
@@ -67,29 +68,92 @@ def get_credits_purchased_ever(customer):
         return df.loc[df.payment_status == "paid"]
 
 
-def purchase_credits(customer):
-    # Note: you can create a checkout session without any product in the catalog
-    # Note: the unpaid sessions go into the Stripe database
+def get_credits_available(email):
+    #email = st.session_state["email"]
+    customer = get_or_create_stripe_customer(email)
+
+    credits_purchased_df = get_credits_purchased_ever(customer)
+    if credits_purchased_df is not None:
+        credits_purchased = credits_purchased_df.credits.sum()
+    else:
+        credits_purchased = 0
+
+    credits_spent_df = get_total_user_credits_spent(email)
+    if credits_spent_df is not None:
+        credits_used = credits_spent_df.credits_used.sum() 
+    else:
+        credits_used = 0
+
+    extra_credits_df = get_extra_credits(email)
+    if extra_credits_df is not None:
+        extra_credits = extra_credits_df.credits.sum() 
+    else:
+        extra_credits = 0
+
+    credits_available = (credits_purchased + extra_credits) - credits_used
+    return credits_available
+
+
+def get_dilution_factor(user_dollars):
+    """ Returns a factor that determines how much less computation a user gets per dollar
+
+    Credits upon purchase is CREDITS_TO_USD_MULTIPLIER * user_dollars * DILUTION_FACTOR
+
+    Args:
+        user_dollars (float): dollars (USD) paid for the credits package
+   """
+    if user_dollars > 0 and user_dollars <= 5.0:
+        dilution_factor = 0.25
+    elif user_dollars > 5.0 and user_dollars <= 10.0:
+        dilution_factor = 0.5
+    elif user_dollars > 10.0:
+        dilution_factor = .6
+    else:
+        raise ValueError(f"{user_dollars} does not correspond to known range")
+    return dilution_factor
+
+
+def get_number_of_credits_with_purchase(user_dollars):
+    break_even_credits = CREDITS_TO_USD_MULTIPLIER * user_dollars
+    dilution_factor = get_dilution_factor(user_dollars)
+    user_credits = break_even_credits * dilution_factor
+    user_credits_nearest_100 = round(user_credits, -2)
+    return int(user_credits_nearest_100)
+
+
+def get_stripe_checkout_url(customer, number_of_credits, total_cost_in_usd):
+    """ Creates a Stripe checkout session to buy a credits package using USD
+
+    A checkout session doesn't need any product in the Stripe catalog, but
+    every time this fuction is run with out the user completing the checkout,
+    an unpaid session goes into the Stripe database (so run sparingly).
+
+    Args:
+        customer: a Stripe customer object. Only the id is used in the code.
+        number_of_credits (int): the number of credits that the user will purchase
+        total_cost_in_usd (float): the amount in USD that the user will pay for the 
+          total credits package
+    """
+    # TODO: can I remove the product name from one of these places?
     session = stripe.checkout.Session.create(
         payment_method_types=['card'],
         line_items=[{
             'price_data': {
                 'currency': 'usd',
                 'product_data': {
-                    'name': '3 Credits Pack',
+                    'name': f"{number_of_credits:,} Credits Pack",
                 },
-                'unit_amount': 500,  # Price in cents
+                'unit_amount': total_cost_in_usd * 100,
             },
             'quantity': 1,
         }],
         mode='payment',
+        # TODO: replace with final URLs. I think they should just tell the user to go back to their tab
         success_url="http://localhost:8501",
         cancel_url="http://localhost:8501",
         customer=customer.id,
         metadata={
-            'product_name': '3 Credits Pack'
+            'product_name': f"{number_of_credits} Credits Pack"
         }
     )
-    
-    print(f"[Stripe Payment link]({session['url']})")
-    st.markdown(f"[Complete Payment my clicking here]({session['url']})")
+    return session['url']

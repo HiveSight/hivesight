@@ -3,7 +3,10 @@ from collections import namedtuple
 
 import numpy as np
 
-NEW_USER_FREE_CREDITS = 3
+
+CREDITS_TO_USD_MULTIPLIER = 10000  # 100 credits in 1 cent, like basis points
+NEW_USER_FREE_CREDITS = 1000  # 10 cents of our money per free user?
+PRESET_DOLLAR_AMOUNTS = [5, 10, 20]
 
 API_KEYS = {
     "OPENAI": os.getenv("OPENAI_API_KEY"),
