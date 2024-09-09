@@ -2,7 +2,6 @@ import streamlit as st
 import pandas as pd
 from supabase import create_client, Client
 import stripe
-# from st_paywall.google_auth import get_logged_in_user_email
 
 from products.survey.visualization import create_enhanced_visualizations
 from products.survey.analysis import analyze_responses, create_pivot_table
@@ -13,16 +12,15 @@ from utils.custom_components import download_button
 from utils.openai_utils import estimate_input_tokens
 from utils.credit_utils import (
     get_or_create_stripe_customer,
-    #get_total_user_credits_spent,
-    #get_credits_purchased_ever,
-    #get_extra_credits,
     get_credits_available,
     get_number_of_credits_with_purchase,
     get_stripe_checkout_url,
     update_credit_usage_history,
-    add_extra_credits
+    add_extra_credits,
+    create_credit_purchase_sidebar,
+    create_free_credits_sidebar
 )
-from config import MODEL_MAP, MODEL_COST_MAP, PRESET_DOLLAR_AMOUNTS 
+from config import MODEL_MAP, MODEL_COST_MAP, PRESET_DOLLAR_AMOUNTS, CREDITS_TO_USD_MULTIPLIER
 
 
 def init_session_state():
@@ -90,30 +88,7 @@ def render():
             help="Filter responses by annual income range.",
         )
 
-    # Experimental:
-    print(st.query_params)
-
-    # Credit purchase section on the sidebar
-    st.sidebar.title("Purchase Credits")
-
-    options = [
-        f"${amount} (USD) for {get_number_of_credits_with_purchase(amount):,} credits"
-        for amount in PRESET_DOLLAR_AMOUNTS
-    ]
-
-    selected_package = st.sidebar.radio(
-        'Choose a credits package to buy:', options
-    )
-    if st.sidebar.button("Get Stripe link to buy credits"):
-        selected_index = options.index(selected_package)
-        total_cost_in_usd = PRESET_DOLLAR_AMOUNTS[selected_index]
-        number_of_credits = get_number_of_credits_with_purchase(total_cost_in_usd)
-        customer = get_or_create_stripe_customer(st.session_state["email"])
-        print(f"Customer {customer.id} has shown intent to buy")
-        stripe_url = get_stripe_checkout_url(customer, number_of_credits, total_cost_in_usd)
-        st.sidebar.markdown(f"[Complete Payment by clicking here]({stripe_url})")
-        if st.sidebar.button("Update credits after making payment"):
-            st.rerun()
+    create_credit_purchase_sidebar()
 
     # Step 1: Cost Estimation
     if st.session_state.step == 1:
@@ -128,7 +103,6 @@ def render():
     
                 input_tokens_est = estimate_input_tokens(prompts, model_type)
                 output_tokens_est = 1 * num_queries
-
                 input_tokens_cost = input_tokens_est * MODEL_COST_MAP[model_type].Input / 1E6
                 output_tokens_cost = output_tokens_est * MODEL_COST_MAP[model_type].Output / 1E6
                 total_cost = round(input_tokens_cost + output_tokens_cost, 5)
@@ -154,50 +128,25 @@ def render():
         st.write(f"**Total Cost (to developers) in USD for Simulation:** ${cost_data['total_cost']}")
         st.write(f"**Credits Required (for user):** {cost_data['total_cost_in_credits']}")
 
-        ## TESTING ( TODO: where did I get this from, and do I need it here or can I use functions?)-- 
-        #email = st.session_state["email"]
-        #customer = get_or_create_stripe_customer(email)
-
-        #credits_purchased_df = get_credits_purchased_ever(customer)
-        #if credits_purchased_df is not None:
-        #    credits_purchased = credits_purchased_df.credits.sum()
-        #else:
-        #    credits_purchased = 0
-
-        #credits_spent_df = get_total_user_credits_spent(email)
-        #if credits_spent_df is not None:
-        #    credits_used = credits_spent_df.credits_used.sum() 
-        #else:
-        #    credits_used = 0
-
-        #extra_credits_df = get_extra_credits(email)
-        #if extra_credits_df is not None:
-        #    extra_credits = extra_credits_df.credits.sum() 
-        #else:
-        #    extra_credits = 0
-
-        #credits_available = (credits_purchased + extra_credits) - credits_used
         credits_available = get_credits_available(st.session_state["email"])
-        st.write(f"**User Credits** (at time of cost estimation): {credits_available}")
+        st.write(f"**User Credits** (at time of cost estimation): {credits_available:,}")
 
-        # END TESTING of port ----- # TODO: what did I "port"?  was this something from utilities
-        # NOTE: this port is from credit_utils.py
-        st.sidebar.title("Test Section for replenishing credits")
-        free_test_credits = st.sidebar.number_input("How many free test credits?", min_value=1, max_value=10, value=5, step=1)
-        if st.sidebar.button("Get Free Credits for Testing"):
-            add_extra_credits(email, free_test_credits)
-            st.rerun()
+        #st.sidebar.title("Test Section for replenishing credits")
+        #free_test_credits = st.sidebar.number_input("How many free test credits?", min_value=1,
+        #                                            max_value=10, value=5, step=1)
+        #if st.sidebar.button("Get Free Credits for Testing"):
+        #    add_extra_credits(st.session_state['email'], free_test_credits)
+        #    st.rerun()
+        create_free_credits_sidebar()
 
         enough_credits = credits_available >= cost_data['total_cost_in_credits']
         if enough_credits:
             if st.button("Run Simulation", help="Click to start the simulation with the current settings."):
-                update_credit_usage_history(email, cost_data['total_cost_in_credits'])
+                update_credit_usage_history(st.session_state['email'], cost_data['total_cost_in_credits'])
                 run_simulation(question_ls, num_queries, model_type, cost_data['personas'], cost_data['prompts'])
                 show_results()
         else:
             st.write("Not enough credits! See the sidebar to buy more.")
-            #if st.button("Not enough credits! Buy more via Stripe checkout."):
-            #    purchase_credits(customer)
 
 
 def run_simulation(

@@ -17,6 +17,7 @@ MODEL_MAP = {
     "GPT-4o-mini": "gpt-4o-mini-2024-07-18",
     "GPT-4o": "gpt-4o-2024-05-13",
     "GPT-3.5": "gpt-3.5-turbo-0125",
+    "Sonnet": "gpt-4o-2024-05-13",  # Use OpenAI's tokenizer for Sonnet
 }
 
 CostPerMillion = namedtuple("CostPerMillion", ["Input", "Output"])
@@ -48,6 +49,9 @@ LIKERT_COLORS = {
 }
 
 # Council-specific configurations
+ADVISOR_MODEL_TYPE = "GPT-4o-mini"
+SUMMARIZER_MODEL_TYPE = "Sonnet"
+
 DEFAULT_PERSONAS = {
     "CEO": {
         "description": "A visionary leader focused on long-term strategy and organizational growth.",

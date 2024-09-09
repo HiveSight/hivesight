@@ -5,10 +5,11 @@ import streamlit as st
 from supabase import create_client, Client
 import stripe
 
-from config import NEW_USER_FREE_CREDITS, CREDITS_TO_USD_MULTIPLIER
+from config import NEW_USER_FREE_CREDITS, CREDITS_TO_USD_MULTIPLIER, PRESET_DOLLAR_AMOUNTS
 
 
 supabase = create_client(st.secrets["SUPABASE_URL"], st.secrets["SUPABASE_SERVICE_ROLE_SECRET"])
+stripe.api_key = st.secrets['stripe_api_key_test']  # TODO: Remove test mode as necessary
 
 
 def get_or_create_stripe_customer(email):
@@ -69,7 +70,6 @@ def get_credits_purchased_ever(customer):
 
 
 def get_credits_available(email):
-    #email = st.session_state["email"]
     customer = get_or_create_stripe_customer(email)
 
     credits_purchased_df = get_credits_purchased_ever(customer)
@@ -134,7 +134,6 @@ def get_stripe_checkout_url(customer, number_of_credits, total_cost_in_usd):
         total_cost_in_usd (float): the amount in USD that the user will pay for the 
           total credits package
     """
-    # TODO: can I remove the product name from one of these places?
     session = stripe.checkout.Session.create(
         payment_method_types=['card'],
         line_items=[{
@@ -157,3 +156,34 @@ def get_stripe_checkout_url(customer, number_of_credits, total_cost_in_usd):
         }
     )
     return session['url']
+
+
+def create_credit_purchase_sidebar():
+    st.sidebar.title("Purchase Credits")
+
+    options = [
+        f"${amount} (USD) for {get_number_of_credits_with_purchase(amount):,} credits"
+        for amount in PRESET_DOLLAR_AMOUNTS
+    ]
+
+    selected_package = st.sidebar.radio(
+        'Choose a credits package to buy:', options
+    )
+    if st.sidebar.button("Get Stripe link to buy credits"):
+        selected_index = options.index(selected_package)
+        total_cost_in_usd = PRESET_DOLLAR_AMOUNTS[selected_index]
+        number_of_credits = get_number_of_credits_with_purchase(total_cost_in_usd)
+        customer = get_or_create_stripe_customer(st.session_state["email"])
+        print(f"Customer {customer.id} has shown intent to buy")
+        stripe_url = get_stripe_checkout_url(customer, number_of_credits, total_cost_in_usd)
+        st.sidebar.markdown(f"[Complete Payment by clicking here]({stripe_url})")
+        if st.sidebar.button("Update credits after making payment"):
+            st.rerun()
+
+def create_free_credits_sidebar():
+    st.sidebar.title("Test Section for replenishing credits")
+    free_test_credits = st.sidebar.number_input("How many free test credits?", min_value=1,
+                                                max_value=10, value=5, step=1)
+    if st.sidebar.button("Get Free Credits for Testing"):
+        add_extra_credits(st.session_state['email'], free_test_credits)
+        st.rerun()
