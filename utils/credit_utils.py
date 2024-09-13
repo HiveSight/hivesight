@@ -5,7 +5,12 @@ import streamlit as st
 from supabase import create_client, Client
 import stripe
 
-from config import NEW_USER_FREE_CREDITS, CREDITS_TO_USD_MULTIPLIER, PRESET_DOLLAR_AMOUNTS
+from config import (
+    NEW_USER_FREE_CREDITS,
+    CREDITS_PER_CENT_OF_COMPUTE,
+    CREDIT_PRICE_IN_CENTS,
+    PRESET_DOLLAR_AMOUNTS
+)
 
 
 supabase = create_client(st.secrets["SUPABASE_URL"], st.secrets["SUPABASE_SERVICE_ROLE_SECRET"])
@@ -94,7 +99,11 @@ def get_credits_available(email):
     return credits_available
 
 
-def get_dilution_factor(user_dollars):
+def get_cost_in_credits(dollars_of_compute):
+    return max(1, round(CREDITS_PER_CENT_OF_COMPUTE * 100 * dollars_of_compute))
+
+
+def get_credit_bonus(user_dollars):
     """ Returns a factor that determines how much less computation a user gets per dollar
 
     Credits upon purchase is CREDITS_TO_USD_MULTIPLIER * user_dollars * DILUTION_FACTOR
@@ -103,22 +112,20 @@ def get_dilution_factor(user_dollars):
         user_dollars (float): dollars (USD) paid for the credits package
    """
     if user_dollars > 0 and user_dollars <= 5.0:
-        dilution_factor = 0.25
+        credit_bonus = 50 
     elif user_dollars > 5.0 and user_dollars <= 10.0:
-        dilution_factor = 0.5
+        credit_bonus = 100 
     elif user_dollars > 10.0:
-        dilution_factor = .6
+        credit_bonus = 200 
     else:
         raise ValueError(f"{user_dollars} does not correspond to known range")
-    return dilution_factor
+    return credit_bonus
 
 
 def get_number_of_credits_with_purchase(user_dollars):
-    break_even_credits = CREDITS_TO_USD_MULTIPLIER * user_dollars
-    dilution_factor = get_dilution_factor(user_dollars)
-    user_credits = break_even_credits * dilution_factor
-    user_credits_nearest_100 = round(user_credits, -2)
-    return int(user_credits_nearest_100)
+    base_credits_purchased = user_dollars * 100 * CREDIT_PRICE_IN_CENTS
+    credits_bonus = get_credit_bonus(user_dollars)
+    return int(round(base_credits_purchased + credits_bonus, -2))
 
 
 def get_stripe_checkout_url(customer, number_of_credits, total_cost_in_usd):
@@ -147,9 +154,9 @@ def get_stripe_checkout_url(customer, number_of_credits, total_cost_in_usd):
             'quantity': 1,
         }],
         mode='payment',
-        # TODO: replace with final URLs. I think they should just tell the user to go back to their tab
-        success_url="http://localhost:8501",
-        cancel_url="http://localhost:8501",
+        # TODO: replace with final URLs. Key is to tell users their tab is still there
+        success_url="https://baogorek.github.io/pages/",
+        cancel_url="https://baogorek.github.io/pages/",
         customer=customer.id,
         metadata={
             'product_name': f"{number_of_credits} Credits Pack"
@@ -159,10 +166,14 @@ def get_stripe_checkout_url(customer, number_of_credits, total_cost_in_usd):
 
 
 def create_credit_purchase_sidebar():
+
     st.sidebar.title("Purchase Credits")
+    credits_available = get_credits_available(st.session_state["email"])
+    st.sidebar.write(f"You have {credits_available} credits currently")
 
     options = [
-        f"${amount} (USD) for {get_number_of_credits_with_purchase(amount):,} credits"
+        f"${amount} (USD) for {get_number_of_credits_with_purchase(amount):,} credits "
+        + f"(+{get_credit_bonus(amount)} credit bonus!)"
         for amount in PRESET_DOLLAR_AMOUNTS
     ]
 

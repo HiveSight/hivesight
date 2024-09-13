@@ -4,8 +4,11 @@ from collections import namedtuple
 import numpy as np
 
 
-CREDITS_TO_USD_MULTIPLIER = 10000  # 100 credits in 1 cent, like basis points
-NEW_USER_FREE_CREDITS = 1000  # 10 cents of our money per free user?
+#CREDITS_TO_USD_MULTIPLIER = 10000  # 100 credits in 1 cent, like basis points
+
+CREDITS_PER_CENT_OF_COMPUTE = 2  # User's value of a credit
+CREDIT_PRICE_IN_CENTS = 1  # User's cost of a credit
+NEW_USER_FREE_CREDITS = 100  # 50 cents of free compute
 PRESET_DOLLAR_AMOUNTS = [5, 10, 20]
 
 API_KEYS = {

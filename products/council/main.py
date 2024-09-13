@@ -21,7 +21,6 @@ from config import (
     COUNCIL_SUMMARY_USER_PROMPT_TEMPLATE,
     COUNCIL_ADVISOR_USER_PROMPT_TEMPLATE,
     SUMMARY_MAX_TOKENS,
-    CREDITS_TO_USD_MULTIPLIER
 )
 from .state import init_session_state
 from .ui import render_ui
