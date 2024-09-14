@@ -4,6 +4,13 @@ from collections import namedtuple
 import numpy as np
 
 
+#CREDITS_TO_USD_MULTIPLIER = 10000  # 100 credits in 1 cent, like basis points
+
+CREDITS_PER_CENT_OF_COMPUTE = 2  # User's value of a credit
+CREDIT_PRICE_IN_CENTS = 1  # User's cost of a credit
+NEW_USER_FREE_CREDITS = 100  # 50 cents of free compute
+PRESET_DOLLAR_AMOUNTS = [5, 10, 20]
+
 API_KEYS = {
     "OPENAI": os.getenv("OPENAI_API_KEY"),
     "ANTHROPIC": os.getenv("ANTHROPIC_API_KEY"),
@@ -13,6 +20,7 @@ MODEL_MAP = {
     "GPT-4o-mini": "gpt-4o-mini-2024-07-18",
     "GPT-4o": "gpt-4o-2024-05-13",
     "GPT-3.5": "gpt-3.5-turbo-0125",
+    "Sonnet": "gpt-4o-2024-05-13",  # Use OpenAI's tokenizer for Sonnet
 }
 
 CostPerMillion = namedtuple("CostPerMillion", ["Input", "Output"])
@@ -44,6 +52,9 @@ LIKERT_COLORS = {
 }
 
 # Council-specific configurations
+ADVISOR_MODEL_TYPE = "GPT-4o-mini"
+SUMMARIZER_MODEL_TYPE = "Sonnet"
+
 DEFAULT_PERSONAS = {
     "CEO": {
         "description": "A visionary leader focused on long-term strategy and organizational growth.",

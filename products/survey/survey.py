@@ -1,5 +1,7 @@
 import streamlit as st
 import pandas as pd
+from supabase import create_client, Client
+import stripe
 
 from products.survey.visualization import create_enhanced_visualizations
 from products.survey.analysis import analyze_responses, create_pivot_table
@@ -8,7 +10,19 @@ from products.survey.data_handling import select_diverse_personas
 from products.survey.prompts import create_prompt  
 from utils.custom_components import download_button
 from utils.openai_utils import estimate_input_tokens
-from config import MODEL_MAP, MODEL_COST_MAP
+from utils.credit_utils import (
+    get_or_create_stripe_customer,
+    get_credits_available,
+    get_number_of_credits_with_purchase,
+    get_stripe_checkout_url,
+    get_cost_in_credits,
+    get_credit_bonus,
+    update_credit_usage_history,
+    add_extra_credits,
+    create_credit_purchase_sidebar,
+    create_free_credits_sidebar
+)
+from config import MODEL_MAP, MODEL_COST_MAP, PRESET_DOLLAR_AMOUNTS
 
 
 def init_session_state():
@@ -52,6 +66,7 @@ def render():
         model_type = st.selectbox(
             "Choose Model Type",
             list(MODEL_MAP.keys()),
+            on_change=reset_step,
             help="Select the AI model to use for generating responses.",
         )
 
@@ -75,49 +90,69 @@ def render():
             help="Filter responses by annual income range.",
         )
 
-    # Multi-step proceedure for cost estimation and running the simulation b/c nested buttons don't work 
-    if 'step' not in st.session_state:
-        st.session_state.step = 1
-    
-    # Step 1: Cost Estimation
-    if st.session_state.step == 1:
-        if st.button("Proceed to Cost Estimation", help="Get cost estimate and run simulation"):
-            if not question_ls.strip():
-                st.error("Please enter a statement before running the simulation.")
-            else:
-                question_type = "likert"
-                choices = None
-                personas = select_diverse_personas(num_queries, age_range, income_range)
-                prompts = [create_prompt(persona, question_ls, question_type, choices) for persona in personas]
-    
-                input_tokens_est = estimate_input_tokens(prompts, model_type)
-                output_tokens_est = 1 * num_queries
-    
-                input_tokens_cost = input_tokens_est * MODEL_COST_MAP[model_type].Input / 1E6
-                output_tokens_cost = output_tokens_est * MODEL_COST_MAP[model_type].Output / 1E6
-                total_cost = round(input_tokens_cost + output_tokens_cost, 5)
-    
-                st.session_state.cost_estimation = {
-                    "input_tokens_est": input_tokens_est,
-                    "output_tokens_est": output_tokens_est,
-                    "total_cost": total_cost,
-                    "personas": personas,
-                    "prompts": prompts
-                }
-                st.session_state.step = 2
-                st.rerun()
-    
-    # Step 2: Run Simulation
-    elif st.session_state.step == 2:
-        cost_data = st.session_state.cost_estimation
-        st.write("#### Cost estimation")
-        st.write(f"**Tokens:** {cost_data['input_tokens_est']} input, "
-                 f"{cost_data['output_tokens_est']} output")
-        st.write(f"**Total Cost:** {cost_data['total_cost']}")
-  
-        if st.button("Run Simulation", help="Click to start the simulation with the current settings."):
-            run_simulation(question_ls, num_queries, model_type, cost_data['personas'], cost_data['prompts'])
-            show_results()
+    create_credit_purchase_sidebar()
+
+
+    if not question_ls.strip():
+        st.info("When you finish typing your your statement, a button will appear.")
+    else:
+        question_type = "likert"
+        choices = None
+        personas = select_diverse_personas(num_queries, age_range, income_range)
+        prompts = [create_prompt(persona, question_ls, question_type, choices) for persona in personas]
+
+        input_tokens_est = estimate_input_tokens(prompts, model_type)
+        output_tokens_est = 1 * num_queries
+        input_tokens_cost = input_tokens_est * MODEL_COST_MAP[model_type].Input / 1E6
+        output_tokens_cost = output_tokens_est * MODEL_COST_MAP[model_type].Output / 1E6
+        total_compute_cost_in_usd = round(input_tokens_cost + output_tokens_cost, 5)
+        cost_in_credits = get_cost_in_credits(total_compute_cost_in_usd)
+        # create_free_credits_sidebar()
+        credits_available = get_credits_available(st.session_state["email"])
+        enough_credits = credits_available >= cost_in_credits
+        if enough_credits:
+            if st.button(f"Run Simulation for {cost_in_credits} credit(s)",
+                         help="Click to start the simulation with the current settings."):
+                update_credit_usage_history(st.session_state['email'], cost_in_credits)
+                run_simulation(question_ls, num_queries, model_type, personas, prompts)
+                show_results()
+        else:
+            st.write("Not enough credits! See the sidebar to buy more.")
+
+    ## Step 1: Cost Estimation
+    #if st.session_state.step == 1:
+    #    if st.button("Proceed to Cost Estimation"):
+    #        if not question_ls.strip():
+    #            st.error("Please enter a statement before running the simulation.")
+    #        else:
+    #            question_type = "likert"
+    #            choices = None
+    #            personas = select_diverse_personas(num_queries, age_range, income_range)
+    #            prompts = [create_prompt(persona, question_ls, question_type, choices) for persona in personas]
+    #
+    #            input_tokens_est = estimate_input_tokens(prompts, model_type)
+    #            output_tokens_est = 1 * num_queries
+    #            input_tokens_cost = input_tokens_est * MODEL_COST_MAP[model_type].Input / 1E6
+    #            output_tokens_cost = output_tokens_est * MODEL_COST_MAP[model_type].Output / 1E6
+    #            total_compute_cost_in_usd = round(input_tokens_cost + output_tokens_cost, 5)
+    #            st.session_state['cost_in_credits'] = get_cost_in_credits(total_compute_cost_in_usd)
+    #            st.session_state.step = 2
+    #            st.rerun()
+    #
+    ## Step 2: Run Simulation
+    #elif st.session_state.step == 2:
+    #    credits_available = get_credits_available(st.session_state["email"])
+    #    # create_free_credits_sidebar()
+
+    #    enough_credits = credits_available >= st.session_state['cost_in_credits']
+    #    if enough_credits:
+    #        if st.button(f"Run Simulation for {st.session_state['cost_in_credits']} credit",
+    #                     help="Click to start the simulation with the current settings."):
+    #            update_credit_usage_history(st.session_state['email'], st.session_state['cost_in_credits'])
+    #            run_simulation(question_ls, num_queries, model_type, personas, prompts)
+    #            show_results()
+    #    else:
+    #        st.write("Not enough credits! See the sidebar to buy more.")
 
 
 def run_simulation(
