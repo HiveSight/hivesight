@@ -38,8 +38,7 @@ async function queryLLM(
         { role: "system", content: systemPrompt },
         { role: "user", content: userPrompt },
       ],
-      max_tokens: 500,
-      temperature: 0.7,
+      max_completion_tokens: 2000, // GPT-5 uses reasoning tokens
     });
 
     const content = completion.choices[0]?.message?.content ?? "";

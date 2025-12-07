@@ -7,7 +7,7 @@ import { TIER_CONFIG } from "@/types";
 // Use service role key for webhook handler
 const supabaseAdmin = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
+  process.env.SUPABASE_SECRET_KEY!
 );
 
 export async function POST(request: Request) {

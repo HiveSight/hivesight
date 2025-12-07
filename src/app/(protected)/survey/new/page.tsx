@@ -1,10 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Slider } from "@/components/ui/slider";
 import {
@@ -15,60 +14,38 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { MODEL_CONFIG, TIER_CONFIG } from "@/types";
+import { MODEL_CONFIG } from "@/types";
 import type { Model, ResponseType, DemographicFilters } from "@/types";
-
-interface CostEstimate {
-  tokens: { input: number; output: number; total: number };
-  cost: { input: number; output: number; total: number };
-  credits: number;
-  model: string;
-}
 
 export default function NewSurveyPage() {
   const router = useRouter();
   const [step, setStep] = useState(1);
   const [loading, setLoading] = useState(false);
-  const [estimating, setEstimating] = useState(false);
-  const [estimate, setEstimate] = useState<CostEstimate | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   // Form state
   const [question, setQuestion] = useState("");
   const [responseType, setResponseType] = useState<ResponseType>("likert");
-  const [model, setModel] = useState<Model>("gpt-4o-mini");
-  const [hiveSize, setHiveSize] = useState(10);
+  const [model, setModel] = useState<Model>("gpt-5-mini");
+  const [credits, setCredits] = useState(10);
   const [ageRange, setAgeRange] = useState<[number, number]>([18, 100]);
   const [incomeRange, setIncomeRange] = useState<[number, number]>([0, 500000]);
+
+  // Calculate respondents from credits
+  const respondentsPerCredit = useMemo(() => {
+    const config = MODEL_CONFIG[model];
+    return responseType === "likert"
+      ? config.respondentsPerCreditLikert
+      : config.respondentsPerCreditOpenEnded;
+  }, [model, responseType]);
+
+  const hiveSize = useMemo(() => {
+    return credits * respondentsPerCredit;
+  }, [credits, respondentsPerCredit]);
 
   const demographicFilters: DemographicFilters = {
     ageRange,
     incomeRange,
-  };
-
-  const fetchEstimate = async () => {
-    if (question.length < 10) return;
-    setEstimating(true);
-    try {
-      const res = await fetch("/api/survey/estimate", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          question,
-          responseType,
-          model,
-          hiveSize,
-        }),
-      });
-      const data = await res.json();
-      if (res.ok) {
-        setEstimate(data);
-      }
-    } catch {
-      // Ignore estimate errors
-    } finally {
-      setEstimating(false);
-    }
   };
 
   const handleSubmit = async () => {
@@ -227,7 +204,7 @@ export default function NewSurveyPage() {
         </Card>
       )}
 
-      {/* Step 3: Model & Size */}
+      {/* Step 3: Model & Credits */}
       {step === 3 && (
         <Card>
           <CardHeader>
@@ -241,30 +218,38 @@ export default function NewSurveyPage() {
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="gpt-4o-mini">
-                    GPT-4o Mini (faster, cheaper)
+                  <SelectItem value="gpt-5-mini">
+                    GPT-5 Mini (best value)
                   </SelectItem>
-                  <SelectItem value="gpt-4o">
-                    GPT-4o (more capable)
+                  <SelectItem value="gpt-5">
+                    GPT-5 (highest quality)
                   </SelectItem>
                 </SelectContent>
               </Select>
+              <p className="text-sm text-muted-foreground">
+                {MODEL_CONFIG[model].name}: {respondentsPerCredit} {responseType === "likert" ? "likert" : "open-ended"} respondents per credit
+              </p>
             </div>
 
             <div className="space-y-4">
-              <Label>Hive size: {hiveSize} respondents</Label>
+              <Label>Credits to spend: {credits}</Label>
               <div className="px-2">
                 <Slider
-                  value={[hiveSize]}
-                  onValueChange={(v) => setHiveSize(v[0])}
+                  value={[credits]}
+                  onValueChange={(v) => setCredits(v[0])}
                   min={1}
                   max={100}
                   step={1}
                 />
               </div>
-              <p className="text-sm text-muted-foreground">
-                More respondents = more statistically significant results
-              </p>
+              <div className="p-4 bg-primary/10 rounded-lg">
+                <p className="text-2xl font-bold text-primary">
+                  {hiveSize} respondents
+                </p>
+                <p className="text-sm text-muted-foreground">
+                  for {credits} credits (${(credits * 0.01).toFixed(2)})
+                </p>
+              </div>
             </div>
           </CardContent>
         </Card>
@@ -295,8 +280,8 @@ export default function NewSurveyPage() {
                   <p className="text-muted-foreground">{MODEL_CONFIG[model].name}</p>
                 </div>
                 <div>
-                  <p className="font-medium">Hive Size</p>
-                  <p className="text-muted-foreground">{hiveSize} respondents</p>
+                  <p className="font-medium">Respondents</p>
+                  <p className="text-muted-foreground">{hiveSize}</p>
                 </div>
                 <div>
                   <p className="font-medium">Age Range</p>
@@ -306,19 +291,15 @@ export default function NewSurveyPage() {
                 </div>
               </div>
 
-              {estimate && (
-                <div className="p-4 border rounded-lg space-y-2">
-                  <p className="font-medium">Estimated Cost</p>
-                  <div className="grid grid-cols-2 gap-2 text-sm">
-                    <p className="text-muted-foreground">Tokens:</p>
-                    <p>{estimate.tokens.total.toLocaleString()}</p>
-                    <p className="text-muted-foreground">Cost:</p>
-                    <p>${estimate.cost.total.toFixed(4)}</p>
-                    <p className="text-muted-foreground font-medium">Credits:</p>
-                    <p className="font-medium">{estimate.credits}</p>
-                  </div>
+              <div className="p-4 border-2 border-primary rounded-lg space-y-2 bg-primary/5">
+                <div className="flex justify-between items-center">
+                  <p className="font-semibold text-lg">Cost</p>
+                  <p className="text-2xl font-bold text-primary">{credits} credits</p>
                 </div>
-              )}
+                <p className="text-sm text-muted-foreground">
+                  {hiveSize} respondents at {respondentsPerCredit} per credit
+                </p>
+              </div>
             </div>
           </CardContent>
         </Card>
@@ -335,16 +316,13 @@ export default function NewSurveyPage() {
         </Button>
         {step < 4 ? (
           <Button
-            onClick={() => {
-              setStep(step + 1);
-              if (step === 3) fetchEstimate();
-            }}
+            onClick={() => setStep(step + 1)}
             disabled={!canProceed()}
           >
             Continue
           </Button>
         ) : (
-          <Button onClick={handleSubmit} disabled={loading || estimating}>
+          <Button onClick={handleSubmit} disabled={loading}>
             {loading ? "Creating..." : "Run Survey"}
           </Button>
         )}

@@ -1,7 +1,7 @@
 import { createClient } from "@/lib/supabase/server";
 import { NextResponse } from "next/server";
 import { z } from "zod/v4";
-import { runSimulation, estimateTokens } from "@/lib/simulation/engine";
+import { runSimulation } from "@/lib/simulation/engine";
 import { MODEL_CONFIG } from "@/types";
 import type { Database } from "@/types/database";
 
@@ -12,7 +12,7 @@ type Respondent = Database["public"]["Tables"]["respondents"]["Row"];
 const CreateSurveySchema = z.object({
   question: z.string().min(10),
   responseType: z.enum(["likert", "open_ended"]),
-  model: z.enum(["gpt-4o-mini", "gpt-4o"]),
+  model: z.enum(["gpt-5-mini", "gpt-5"]),
   hiveSize: z.number().min(1).max(1000),
   demographicFilters: z.object({
     ageRange: z.tuple([z.number(), z.number()]),
@@ -61,14 +61,13 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Profile not found" }, { status: 404 });
     }
 
-    // Estimate cost
-    const tokenEstimate = estimateTokens(question, responseType, hiveSize);
+    // Calculate credits using per-respondent pricing
     const modelConfig = MODEL_CONFIG[model];
-    const estimatedCost = Math.ceil(
-      (tokenEstimate.input * modelConfig.inputCostPer1M) / 1000000 +
-        (tokenEstimate.output * modelConfig.outputCostPer1M) / 1000000
-    );
-    const creditsRequired = Math.max(1, Math.ceil(estimatedCost * 100)); // $0.01 = 1 credit
+    const respondentsPerCredit =
+      responseType === "likert"
+        ? modelConfig.respondentsPerCreditLikert
+        : modelConfig.respondentsPerCreditOpenEnded;
+    const creditsRequired = Math.max(1, Math.ceil(hiveSize / respondentsPerCredit));
 
     if (profile.credit_balance < creditsRequired) {
       return NextResponse.json(

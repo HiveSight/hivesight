@@ -1,12 +1,10 @@
 import { NextResponse } from "next/server";
 import { z } from "zod/v4";
-import { estimateTokens } from "@/lib/simulation/engine";
 import { MODEL_CONFIG } from "@/types";
 
 const EstimateSchema = z.object({
-  question: z.string().min(1),
   responseType: z.enum(["likert", "open_ended"]),
-  model: z.enum(["gpt-4o-mini", "gpt-4o"]),
+  model: z.enum(["gpt-5-mini", "gpt-5"]),
   hiveSize: z.number().min(1).max(1000),
 });
 
@@ -22,33 +20,23 @@ export async function POST(request: Request) {
       );
     }
 
-    const { question, responseType, model, hiveSize } = parsed.data;
-
-    const tokenEstimate = estimateTokens(question, responseType, hiveSize);
+    const { responseType, model, hiveSize } = parsed.data;
     const modelConfig = MODEL_CONFIG[model];
 
-    const inputCost =
-      (tokenEstimate.input * modelConfig.inputCostPer1M) / 1000000;
-    const outputCost =
-      (tokenEstimate.output * modelConfig.outputCostPer1M) / 1000000;
-    const totalCost = inputCost + outputCost;
+    // Per-respondent pricing
+    const respondentsPerCredit =
+      responseType === "likert"
+        ? modelConfig.respondentsPerCreditLikert
+        : modelConfig.respondentsPerCreditOpenEnded;
 
-    // Convert to credits (1 credit = $0.01)
-    const creditsRequired = Math.max(1, Math.ceil(totalCost * 100));
+    const creditsRequired = Math.max(1, Math.ceil(hiveSize / respondentsPerCredit));
 
     return NextResponse.json({
-      tokens: {
-        input: tokenEstimate.input,
-        output: tokenEstimate.output,
-        total: tokenEstimate.input + tokenEstimate.output,
-      },
-      cost: {
-        input: inputCost,
-        output: outputCost,
-        total: totalCost,
-      },
       credits: creditsRequired,
+      respondentsPerCredit,
       model: modelConfig.name,
+      hiveSize,
+      responseType,
     });
   } catch (error) {
     console.error("Estimate API error:", error);
