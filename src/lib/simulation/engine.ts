@@ -3,9 +3,16 @@ import type { Model, ResponseType, LikertScale, DemographicFilters } from "@/typ
 import { generatePersonas, type Persona } from "./personas";
 import { buildSystemPrompt, buildUserPrompt, parseLikertResponse } from "./prompts";
 
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-});
+// Lazy-initialize OpenAI client
+let _openai: OpenAI | null = null;
+function getOpenAI() {
+  if (!_openai) {
+    _openai = new OpenAI({
+      apiKey: process.env.OPENAI_API_KEY,
+    });
+  }
+  return _openai;
+}
 
 export interface SimulationResult {
   personaId: string;
@@ -32,7 +39,7 @@ async function queryLLM(
   const userPrompt = buildUserPrompt(question, responseType);
 
   try {
-    const completion = await openai.chat.completions.create({
+    const completion = await getOpenAI().chat.completions.create({
       model,
       messages: [
         { role: "system", content: systemPrompt },

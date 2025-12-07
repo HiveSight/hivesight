@@ -4,11 +4,13 @@ import { NextResponse } from "next/server";
 import type Stripe from "stripe";
 import { TIER_CONFIG } from "@/types";
 
-// Use service role key for webhook handler
-const supabaseAdmin = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SECRET_KEY!
-);
+// Lazy-initialize supabase admin client
+function getSupabaseAdmin() {
+  return createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SECRET_KEY!
+  );
+}
 
 export async function POST(request: Request) {
   const body = await request.text();
@@ -44,7 +46,7 @@ export async function POST(request: Request) {
           const credits = parseInt(session.metadata?.credits || "0", 10);
           if (credits > 0) {
             // Get current balance
-            const { data: profile } = await supabaseAdmin
+            const { data: profile } = await getSupabaseAdmin()
               .from("profiles")
               .select("credit_balance")
               .eq("id", userId)
@@ -53,7 +55,7 @@ export async function POST(request: Request) {
             const currentBalance = (profile as { credit_balance: number } | null)?.credit_balance ?? 0;
 
             // Add credits to balance
-            await supabaseAdmin
+            await getSupabaseAdmin()
               .from("profiles")
               .update({
                 credit_balance: currentBalance + credits,
@@ -61,7 +63,7 @@ export async function POST(request: Request) {
               .eq("id", userId);
 
             // Log credit purchase
-            await supabaseAdmin.from("credit_transactions").insert({
+            await getSupabaseAdmin().from("credit_transactions").insert({
               user_id: userId,
               amount: credits,
               type: "purchase",
@@ -77,7 +79,7 @@ export async function POST(request: Request) {
           const credits = TIER_CONFIG[tier].monthlyCredits;
 
           // Update user tier
-          await supabaseAdmin
+          await getSupabaseAdmin()
             .from("profiles")
             .update({
               tier,
@@ -86,7 +88,7 @@ export async function POST(request: Request) {
             .eq("id", userId);
 
           // Log credit grant
-          await supabaseAdmin.from("credit_transactions").insert({
+          await getSupabaseAdmin().from("credit_transactions").insert({
             user_id: userId,
             amount: credits,
             type: "grant",
@@ -101,7 +103,7 @@ export async function POST(request: Request) {
         const customerId = invoice.customer as string;
 
         // Find user by Stripe customer ID
-        const { data: profiles } = await supabaseAdmin
+        const { data: profiles } = await getSupabaseAdmin()
           .from("profiles")
           .select("id, tier")
           .eq("stripe_customer_id", customerId)
@@ -112,14 +114,14 @@ export async function POST(request: Request) {
           const credits = TIER_CONFIG[profile.tier].monthlyCredits;
 
           // Grant monthly credits
-          await supabaseAdmin
+          await getSupabaseAdmin()
             .from("profiles")
             .update({
               credit_balance: credits,
             } as never)
             .eq("id", profile.id);
 
-          await supabaseAdmin.from("credit_transactions").insert({
+          await getSupabaseAdmin().from("credit_transactions").insert({
             user_id: profile.id,
             amount: credits,
             type: "grant",
@@ -134,14 +136,14 @@ export async function POST(request: Request) {
         const customerId = subscription.customer as string;
 
         // Downgrade user to free tier
-        const { data: profiles } = await supabaseAdmin
+        const { data: profiles } = await getSupabaseAdmin()
           .from("profiles")
           .select("id")
           .eq("stripe_customer_id", customerId)
           .limit(1);
 
         if (profiles && profiles.length > 0) {
-          await supabaseAdmin
+          await getSupabaseAdmin()
             .from("profiles")
             .update({
               tier: "free",
