@@ -169,3 +169,13 @@ export const UserProfileSchema = z.object({
 });
 
 export type UserProfile = z.infer<typeof UserProfileSchema>;
+
+// Credit pricing - $0.10 per credit (simple, transparent)
+export const CREDIT_PRICE_CENTS = 10; // $0.10 per credit
+
+// Pre-defined credit bundles for UI convenience
+export const CREDIT_BUNDLES = [
+  { credits: 100, price: 10, popular: false },
+  { credits: 500, price: 50, popular: true },
+  { credits: 1000, price: 100, popular: false },
+] as const;

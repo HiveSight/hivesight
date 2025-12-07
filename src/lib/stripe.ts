@@ -28,3 +28,4 @@ export const STRIPE_PRICE_IDS = {
   basic: process.env.STRIPE_PRICE_BASIC || "price_basic",
   premium: process.env.STRIPE_PRICE_PREMIUM || "price_premium",
 } as const;
+

@@ -37,8 +37,42 @@ export async function POST(request: Request) {
       case "checkout.session.completed": {
         const session = event.data.object as Stripe.Checkout.Session;
         const userId = session.metadata?.supabase_user_id;
-        const tier = session.metadata?.tier as "basic" | "premium";
+        const purchaseType = session.metadata?.type;
 
+        // Handle credit bundle purchase
+        if (purchaseType === "credit_purchase" && userId) {
+          const credits = parseInt(session.metadata?.credits || "0", 10);
+          if (credits > 0) {
+            // Get current balance
+            const { data: profile } = await supabaseAdmin
+              .from("profiles")
+              .select("credit_balance")
+              .eq("id", userId)
+              .single();
+
+            const currentBalance = (profile as { credit_balance: number } | null)?.credit_balance ?? 0;
+
+            // Add credits to balance
+            await supabaseAdmin
+              .from("profiles")
+              .update({
+                credit_balance: currentBalance + credits,
+              } as never)
+              .eq("id", userId);
+
+            // Log credit purchase
+            await supabaseAdmin.from("credit_transactions").insert({
+              user_id: userId,
+              amount: credits,
+              type: "purchase",
+              description: `Purchased ${credits} credits`,
+            } as never);
+          }
+          break;
+        }
+
+        // Handle subscription purchase
+        const tier = session.metadata?.tier as "basic" | "premium";
         if (userId && tier) {
           const credits = TIER_CONFIG[tier].monthlyCredits;
 
