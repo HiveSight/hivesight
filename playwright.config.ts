@@ -20,6 +20,7 @@ export default defineConfig({
     {
       name: "setup",
       testMatch: /auth\.setup\.ts/,
+      timeout: 120000, // 2 minutes for OAuth
       use: { ...devices["Desktop Chrome"] },
     },
     // Public tests - no auth required

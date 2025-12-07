@@ -66,7 +66,7 @@ test.describe("Survey Creation Wizard", () => {
 
     // Step 3: Model & Credits
     await expect(page.getByText(/step 3 of 4/i)).toBeVisible();
-    await expect(page.getByText(/gpt-5 mini/i)).toBeVisible();
+    await expect(page.getByRole("combobox")).toBeVisible(); // Model selector
     await expect(page.getByText(/credits to spend/i)).toBeVisible();
     await page.getByRole("button", { name: /continue/i }).click();
 
@@ -115,7 +115,7 @@ test.describe("Survey Wizard - Credits UI", () => {
 
     // Now on step 3 - check credits UI
     await expect(page.getByText(/credits to spend/i)).toBeVisible();
-    await expect(page.getByText(/respondents/i)).toBeVisible();
+    await expect(page.getByText(/40 respondents/i)).toBeVisible();
 
     // Should show model selection
     await expect(page.getByText(/ai model/i)).toBeVisible();

@@ -28,7 +28,7 @@ setup("authenticate", async ({ page }) => {
   await page.waitForURL("**/dashboard", { timeout: 120000 });
 
   // Verify we're logged in
-  await expect(page.getByText(/dashboard|survey|credit/i)).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Dashboard" })).toBeVisible();
 
   console.log("✅ Authentication successful! Saving session...\n");
 
