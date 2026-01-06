@@ -14,14 +14,24 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Progress } from "@/components/ui/progress";
 import { MODEL_CONFIG } from "@/types";
 import type { Model, ResponseType, DemographicFilters } from "@/types";
+
+interface ProgressState {
+  stage: string;
+  message: string;
+  progress: number;
+  completed?: number;
+  total?: number;
+}
 
 export default function NewSurveyPage() {
   const router = useRouter();
   const [step, setStep] = useState(1);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [progressState, setProgressState] = useState<ProgressState | null>(null);
 
   // Form state
   const [question, setQuestion] = useState("");
@@ -51,9 +61,14 @@ export default function NewSurveyPage() {
   const handleSubmit = async () => {
     setLoading(true);
     setError(null);
+    setProgressState({
+      stage: "starting",
+      message: "Starting survey...",
+      progress: 0,
+    });
 
     try {
-      const res = await fetch("/api/survey", {
+      const res = await fetch("/api/survey/stream", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -65,16 +80,55 @@ export default function NewSurveyPage() {
         }),
       });
 
-      const data = await res.json();
-
       if (!res.ok) {
+        const data = await res.json();
         throw new Error(data.error || "Failed to create survey");
       }
 
-      router.push(`/survey/${data.surveyId}`);
+      const reader = res.body?.getReader();
+      if (!reader) {
+        throw new Error("No response stream");
+      }
+
+      const decoder = new TextDecoder();
+      let buffer = "";
+
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+
+        buffer += decoder.decode(value, { stream: true });
+        const lines = buffer.split("\n");
+        buffer = lines.pop() || "";
+
+        let eventType = "";
+        for (const line of lines) {
+          if (line.startsWith("event: ")) {
+            eventType = line.slice(7);
+          } else if (line.startsWith("data: ")) {
+            const data = JSON.parse(line.slice(6));
+
+            if (eventType === "progress") {
+              setProgressState({
+                stage: data.stage,
+                message: data.message,
+                progress: data.progress,
+                completed: data.completed,
+                total: data.total,
+              });
+            } else if (eventType === "complete") {
+              router.push(`/survey/${data.surveyId}`);
+              return;
+            } else if (eventType === "error") {
+              throw new Error(data.message);
+            }
+          }
+        }
+      }
     } catch (err) {
       setError(err instanceof Error ? err.message : "Something went wrong");
       setLoading(false);
+      setProgressState(null);
     }
   };
 
@@ -95,6 +149,28 @@ export default function NewSurveyPage() {
 
   return (
     <div className="max-w-2xl mx-auto space-y-6">
+      {/* Progress Modal */}
+      {loading && progressState && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+          <Card className="w-full max-w-md mx-4">
+            <CardHeader>
+              <CardTitle className="text-center">Running Survey</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <Progress value={progressState.progress} />
+              <p className="text-center text-sm text-muted-foreground">
+                {progressState.message}
+              </p>
+              {progressState.completed !== undefined && progressState.total !== undefined && (
+                <p className="text-center text-xs text-muted-foreground">
+                  {progressState.completed} of {progressState.total} responses
+                </p>
+              )}
+            </CardContent>
+          </Card>
+        </div>
+      )}
+
       <div className="flex items-center justify-between">
         <h1 className="text-3xl font-bold">New Survey</h1>
         <div className="text-sm text-muted-foreground">Step {step} of 4</div>
