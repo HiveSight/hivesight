@@ -1,13 +1,9 @@
 import type { ResponseType, LikertScale } from "@/types";
-import type { Persona } from "./personas";
-import { formatPersonaDescription } from "./personas";
 
 export function buildSystemPrompt(
   responseType: ResponseType,
-  persona: Persona
+  personaDescription: string
 ): string {
-  const personaDescription = formatPersonaDescription(persona);
-
   if (responseType === "likert") {
     return `You are simulating the opinion of an American citizen. You must respond as this person would, based on their demographic characteristics.
 
@@ -27,7 +23,7 @@ REASONING: [brief explanation]`;
 
 ${personaDescription}
 
-When asked for your opinion, respond thoughtfully in 2-4 sentences as this person would. Consider their age, income level, and location when forming your response.`;
+When asked for your opinion, respond thoughtfully in 2-4 sentences as this person would. Consider their age, income level, occupation, family situation, and location when forming your response.`;
 }
 
 export function buildUserPrompt(

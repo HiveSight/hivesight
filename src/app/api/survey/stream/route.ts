@@ -1,7 +1,10 @@
 import { createClient } from "@/lib/supabase/server";
 import { z } from "zod/v4";
-import { MODEL_CONFIG } from "@/types";
-import { generatePersonas, type Persona } from "@/lib/simulation/personas";
+import { MODEL_CONFIG, LocationFilterSchema } from "@/types";
+import { loadAndSampleForLocation } from "@/lib/data/location-resolver";
+import { formatPersonDescription } from "@/lib/data/demographics";
+import { getRaceLabel } from "@/lib/data/race-codes";
+import { getOccupationLabel } from "@/lib/data/occupation-codes";
 import {
   buildSystemPrompt,
   buildUserPrompt,
@@ -12,7 +15,8 @@ import type {
   Model,
   ResponseType,
   LikertScale,
-  DemographicFilters,
+  PersonRecord,
+  LocationFilter,
 } from "@/types";
 import type { Database } from "@/types/database";
 
@@ -21,7 +25,7 @@ type Survey = Database["public"]["Tables"]["surveys"]["Row"];
 type Respondent = Database["public"]["Tables"]["respondents"]["Row"];
 
 interface SimulationResult {
-  personaId: string;
+  personIndex: number;
   likertResponse: LikertScale | null;
   openEndedResponse: string | null;
   reasoning: string | null;
@@ -42,11 +46,15 @@ const CreateSurveySchema = z.object({
   responseType: z.enum(["likert", "open_ended"]),
   model: z.enum(["gpt-5-mini", "gpt-5"]),
   hiveSize: z.number().min(1).max(1000),
-  demographicFilters: z.object({
-    ageRange: z.tuple([z.number(), z.number()]),
-    incomeRange: z.tuple([z.number(), z.number()]),
-    states: z.array(z.string()).optional(),
-  }),
+  location: LocationFilterSchema.optional(),
+  // Legacy support
+  demographicFilters: z
+    .object({
+      ageRange: z.tuple([z.number(), z.number()]),
+      incomeRange: z.tuple([z.number(), z.number()]),
+      states: z.array(z.string()).optional(),
+    })
+    .optional(),
 });
 
 function sendEvent(
@@ -63,9 +71,10 @@ async function queryLLM(
   question: string,
   responseType: ResponseType,
   model: Model,
-  persona: Persona
+  personDescription: string,
+  personIndex: number
 ): Promise<SimulationResult> {
-  const systemPrompt = buildSystemPrompt(responseType, persona);
+  const systemPrompt = buildSystemPrompt(responseType, personDescription);
   const userPrompt = buildUserPrompt(question, responseType);
 
   try {
@@ -83,7 +92,7 @@ async function queryLLM(
     if (responseType === "likert") {
       const { likert, reasoning } = parseLikertResponse(content);
       return {
-        personaId: persona.id,
+        personIndex,
         likertResponse: likert,
         openEndedResponse: null,
         reasoning,
@@ -91,15 +100,15 @@ async function queryLLM(
     }
 
     return {
-      personaId: persona.id,
+      personIndex,
       likertResponse: null,
       openEndedResponse: content,
       reasoning: null,
     };
   } catch (error) {
-    console.error(`Error querying LLM for persona ${persona.id}:`, error);
+    console.error(`Error querying LLM for person ${personIndex}:`, error);
     return {
-      personaId: persona.id,
+      personIndex,
       likertResponse: null,
       openEndedResponse: null,
       reasoning: `Error: ${error instanceof Error ? error.message : "Unknown error"}`,
@@ -107,20 +116,65 @@ async function queryLLM(
   }
 }
 
+// Rate limiting for free tier (unauthenticated users)
+const FREE_TIER_MAX_SURVEYS_PER_DAY = 3;
+const FREE_TIER_MAX_RESPONDENTS = 25;
+
+async function checkRateLimit(ip: string): Promise<boolean> {
+  const supabase = await createClient();
+  const oneDayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
+
+  const { data } = await supabase
+    .from("rate_limits")
+    .select("survey_count")
+    .eq("ip_address", ip)
+    .gte("window_start", oneDayAgo)
+    .single();
+
+  if (!data) return true; // No record = allowed
+  return data.survey_count < FREE_TIER_MAX_SURVEYS_PER_DAY;
+}
+
+async function incrementRateLimit(ip: string) {
+  const supabase = await createClient();
+  const oneDayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
+
+  // Try to increment existing record
+  const { data } = await supabase
+    .from("rate_limits")
+    .select("id, survey_count")
+    .eq("ip_address", ip)
+    .gte("window_start", oneDayAgo)
+    .single();
+
+  if (data) {
+    await supabase
+      .from("rate_limits")
+      .update({ survey_count: data.survey_count + 1 } as never)
+      .eq("id", data.id);
+  } else {
+    await supabase
+      .from("rate_limits")
+      .insert({ ip_address: ip, survey_count: 1 } as never);
+  }
+}
+
+function getStateFromDistrict(districtId: string): string {
+  if (districtId.length === 2) return districtId;
+  const parts = districtId.split("-");
+  return parts[0] || "US";
+}
+
 export async function POST(request: Request) {
   const supabase = await createClient();
 
-  // Check authentication
+  // Check authentication (optional for free tier)
   const {
     data: { user },
   } = await supabase.auth.getUser();
 
-  if (!user) {
-    return new Response(JSON.stringify({ error: "Unauthorized" }), {
-      status: 401,
-      headers: { "Content-Type": "application/json" },
-    });
-  }
+  const ip =
+    request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ?? "unknown";
 
   // Parse request body
   const body = await request.json();
@@ -133,43 +187,69 @@ export async function POST(request: Request) {
     );
   }
 
-  const { question, responseType, model, hiveSize, demographicFilters } =
-    parsed.data;
+  const { question, responseType, model, location } = parsed.data;
+  let { hiveSize } = parsed.data;
 
-  // Get user profile for credit check
-  const { data: profileData } = await supabase
-    .from("profiles")
-    .select("credit_balance, tier")
-    .eq("id", user.id)
-    .single();
+  // Free tier vs authenticated
+  let creditsRequired = 0;
+  let profile: Pick<Profile, "credit_balance" | "tier"> | null = null;
 
-  const profile = profileData as Pick<Profile, "credit_balance" | "tier"> | null;
+  if (user) {
+    // Authenticated: credit-based
+    const { data: profileData } = await supabase
+      .from("profiles")
+      .select("credit_balance, tier")
+      .eq("id", user.id)
+      .single();
 
-  if (!profile) {
-    return new Response(JSON.stringify({ error: "Profile not found" }), {
-      status: 404,
-      headers: { "Content-Type": "application/json" },
-    });
+    profile = profileData as typeof profile;
+
+    if (!profile) {
+      return new Response(JSON.stringify({ error: "Profile not found" }), {
+        status: 404,
+        headers: { "Content-Type": "application/json" },
+      });
+    }
+
+    const modelConfig = MODEL_CONFIG[model];
+    const respondentsPerCredit =
+      responseType === "likert"
+        ? modelConfig.respondentsPerCreditLikert
+        : modelConfig.respondentsPerCreditOpenEnded;
+    creditsRequired = Math.max(1, Math.ceil(hiveSize / respondentsPerCredit));
+
+    if (profile.credit_balance < creditsRequired) {
+      return new Response(
+        JSON.stringify({
+          error: "Insufficient credits",
+          required: creditsRequired,
+          available: profile.credit_balance,
+        }),
+        { status: 402, headers: { "Content-Type": "application/json" } }
+      );
+    }
+  } else {
+    // Free tier: rate limited, capped respondents
+    const allowed = await checkRateLimit(ip);
+    if (!allowed) {
+      return new Response(
+        JSON.stringify({
+          error: "Rate limit exceeded",
+          message:
+            "Free tier allows 3 surveys per day. Sign up for more!",
+        }),
+        { status: 429, headers: { "Content-Type": "application/json" } }
+      );
+    }
+    hiveSize = Math.min(hiveSize, FREE_TIER_MAX_RESPONDENTS);
   }
 
-  // Calculate credits
-  const modelConfig = MODEL_CONFIG[model];
-  const respondentsPerCredit =
-    responseType === "likert"
-      ? modelConfig.respondentsPerCreditLikert
-      : modelConfig.respondentsPerCreditOpenEnded;
-  const creditsRequired = Math.max(1, Math.ceil(hiveSize / respondentsPerCredit));
-
-  if (profile.credit_balance < creditsRequired) {
-    return new Response(
-      JSON.stringify({
-        error: "Insufficient credits",
-        required: creditsRequired,
-        available: profile.credit_balance,
-      }),
-      { status: 402, headers: { "Content-Type": "application/json" } }
-    );
-  }
+  // Default location if not provided
+  const effectiveLocation: LocationFilter = location ?? {
+    type: "national",
+    value: "US",
+    label: "United States",
+  };
 
   // Create SSE stream
   const stream = new ReadableStream({
@@ -186,12 +266,13 @@ export async function POST(request: Request) {
           .from("surveys")
           .insert([
             {
-              user_id: user.id,
+              user_id: user?.id ?? null,
               question,
               response_type: responseType,
               model,
               hive_size: hiveSize,
-              demographic_filters: demographicFilters,
+              demographic_filters: {},
+              location: effectiveLocation,
               status: "processing",
             },
           ] as never)
@@ -199,67 +280,129 @@ export async function POST(request: Request) {
           .single();
 
         if (surveyError || !surveyData) {
-          sendEvent(controller, "error", { message: "Failed to create survey" });
+          sendEvent(controller, "error", {
+            message: "Failed to create survey",
+          });
           controller.close();
           return;
         }
 
         const survey = surveyData as unknown as Survey;
 
-        // Step 2: Generate personas
+        // Step 2: Load and sample real persons
         sendEvent(controller, "progress", {
-          stage: "personas",
-          message: "Generating personas...",
+          stage: "loading",
+          message: `Loading population data for ${effectiveLocation.label}...`,
           progress: 10,
         });
 
-        const personas = generatePersonas(
-          hiveSize,
-          demographicFilters as DemographicFilters
+        let sampledPersons: PersonRecord[];
+        try {
+          sampledPersons = await loadAndSampleForLocation(
+            effectiveLocation,
+            hiveSize
+          );
+        } catch (loadError) {
+          console.error("Failed to load persona data:", loadError);
+          sendEvent(controller, "error", {
+            message: `Failed to load data for ${effectiveLocation.label}. The data may not be available yet.`,
+          });
+          await supabase
+            .from("surveys")
+            .update({ status: "failed" } as never)
+            .eq("id", survey.id);
+          controller.close();
+          return;
+        }
+
+        // Step 3: Generate descriptions and process responses
+        const descriptions = sampledPersons.map((p) =>
+          formatPersonDescription(p)
         );
 
-        // Step 3: Process responses in batches
         const BATCH_SIZE = 10;
         const results: SimulationResult[] = [];
-        const totalBatches = Math.ceil(personas.length / BATCH_SIZE);
+        const totalBatches = Math.ceil(sampledPersons.length / BATCH_SIZE);
 
-        for (let i = 0; i < personas.length; i += BATCH_SIZE) {
+        for (let i = 0; i < sampledPersons.length; i += BATCH_SIZE) {
           const batchNum = Math.floor(i / BATCH_SIZE) + 1;
-          const completed = Math.min(i + BATCH_SIZE, personas.length);
-          const progressPercent = 10 + Math.floor((completed / personas.length) * 75);
+          const completed = Math.min(i + BATCH_SIZE, sampledPersons.length);
+          const progressPercent =
+            15 + Math.floor((completed / sampledPersons.length) * 70);
 
           sendEvent(controller, "progress", {
             stage: "processing",
-            message: `Processing responses... (${completed}/${personas.length})`,
+            message: `Processing responses... (${completed}/${sampledPersons.length})`,
             progress: progressPercent,
             completed,
-            total: personas.length,
+            total: sampledPersons.length,
             batch: batchNum,
             totalBatches,
           });
 
-          const batch = personas.slice(i, i + BATCH_SIZE);
+          const batchIndices = Array.from(
+            { length: Math.min(BATCH_SIZE, sampledPersons.length - i) },
+            (_, j) => i + j
+          );
+
           const batchResults = await Promise.all(
-            batch.map((persona) =>
-              queryLLM(question, responseType as ResponseType, model, persona)
+            batchIndices.map((idx) =>
+              queryLLM(
+                question,
+                responseType as ResponseType,
+                model,
+                descriptions[idx],
+                idx
+              )
             )
           );
           results.push(...batchResults);
         }
 
-        // Step 4: Save respondents
+        // Step 4: Save respondents with rich demographics
         sendEvent(controller, "progress", {
           stage: "saving",
           message: "Saving results...",
           progress: 90,
         });
 
-        const respondentInserts = personas.map((persona) => ({
+        const respondentInserts = sampledPersons.map((person) => ({
           survey_id: survey.id,
-          age: persona.age,
-          income: persona.income,
-          state: persona.state,
-          weight: persona.weight,
+          age: person.age,
+          income: Math.round(
+            person.employment_income + person.self_employment_income
+          ),
+          state: getStateFromDistrict(effectiveLocation.value),
+          weight: person.weight,
+          sex: person.is_female ? "Female" : "Male",
+          race_ethnicity: getRaceLabel(person.cps_race, person.is_hispanic),
+          occupation: getOccupationLabel(person.occupation_code),
+          is_college_student: person.is_in_college,
+          is_disabled: person.is_disabled,
+          tenure_type:
+            person.tenure_type === 1
+              ? "Owner"
+              : person.tenure_type === 2
+              ? "Renter"
+              : "Other",
+          has_children: person.children_count > 0,
+          children_count: person.children_count,
+          insurance_type: person.has_medicare
+            ? "Medicare"
+            : person.has_medicaid
+            ? "Medicaid"
+            : "Private/uninsured",
+          receives_benefits:
+            person.receives_snap ||
+            person.receives_ssi ||
+            person.receives_tanf ||
+            person.receives_unemployment ||
+            person.receives_social_security,
+          zip_code: person.zcta,
+          congressional_district:
+            effectiveLocation.type === "district"
+              ? effectiveLocation.value
+              : null,
         }));
 
         const { data: respondentsData, error: respondentError } = await supabase
@@ -281,16 +424,10 @@ export async function POST(request: Request) {
 
         const respondents = respondentsData as unknown as Respondent[];
 
-        // Map persona IDs to respondent IDs
-        const personaToRespondent = new Map<string, string>();
-        personas.forEach((persona, index) => {
-          personaToRespondent.set(persona.id, respondents[index].id);
-        });
-
         // Save responses
         const responseInserts = results.map((result) => ({
           survey_id: survey.id,
-          respondent_id: personaToRespondent.get(result.personaId)!,
+          respondent_id: respondents[result.personIndex].id,
           likert_response: result.likertResponse,
           open_ended_response: result.openEndedResponse,
           reasoning: result.reasoning,
@@ -310,22 +447,28 @@ export async function POST(request: Request) {
           return;
         }
 
-        // Deduct credits
-        await supabase
-          .from("profiles")
-          .update({
-            credit_balance: profile.credit_balance - creditsRequired,
-          } as never)
-          .eq("id", user.id);
+        // Deduct credits (only for authenticated users)
+        if (user && profile && creditsRequired > 0) {
+          await supabase
+            .from("profiles")
+            .update({
+              credit_balance: profile.credit_balance - creditsRequired,
+            } as never)
+            .eq("id", user.id);
 
-        // Log transaction
-        await supabase.from("credit_transactions").insert({
-          user_id: user.id,
-          amount: -creditsRequired,
-          type: "usage",
-          description: `Survey: ${hiveSize} respondents with ${model}`,
-          survey_id: survey.id,
-        } as never);
+          await supabase.from("credit_transactions").insert({
+            user_id: user.id,
+            amount: -creditsRequired,
+            type: "usage",
+            description: `Survey: ${hiveSize} respondents in ${effectiveLocation.label} with ${model}`,
+            survey_id: survey.id,
+          } as never);
+        }
+
+        // Increment rate limit for free tier
+        if (!user) {
+          await incrementRateLimit(ip);
+        }
 
         // Update survey status
         await supabase
