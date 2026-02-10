@@ -6,6 +6,7 @@ import {
   loadNationalPersons,
 } from "./persona-loader";
 import { samplePersons, sampleAcrossDistricts, filterByZcta } from "./sampler";
+import { generateSyntheticPersons } from "./fallback";
 
 const HF_BASE_URL =
   "https://huggingface.co/datasets/hivesight/persona-data/resolve/main";
@@ -107,8 +108,25 @@ export async function resolveLocation(
 
 /**
  * Load and sample persons for a given location.
+ * Falls back to synthetic generation if HuggingFace data is unavailable.
  */
 export async function loadAndSampleForLocation(
+  location: LocationFilter,
+  count: number
+): Promise<{ persons: PersonRecord[]; synthetic: boolean }> {
+  try {
+    const persons = await loadRealPersons(location, count);
+    return { persons, synthetic: false };
+  } catch (error) {
+    console.warn(
+      `Real persona data unavailable for ${location.label}, using synthetic fallback:`,
+      error instanceof Error ? error.message : error
+    );
+    return { persons: generateSyntheticPersons(count, location), synthetic: true };
+  }
+}
+
+async function loadRealPersons(
   location: LocationFilter,
   count: number
 ): Promise<PersonRecord[]> {
@@ -141,7 +159,6 @@ export async function loadAndSampleForLocation(
       if (filtered.length > 0) {
         persons = filtered;
       }
-      // If no persons match the ZCTA, use the full district (data may not have ZCTA granularity)
     }
 
     districtData.push({ persons, share });

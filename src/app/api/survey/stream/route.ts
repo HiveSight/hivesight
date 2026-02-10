@@ -121,41 +121,50 @@ const FREE_TIER_MAX_RESPONDENTS = 25;
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 // rate_limits table added in migration 00002 but not in generated Supabase types yet
+// These functions are best-effort — if the table doesn't exist, they silently allow/skip
 async function checkRateLimit(ip: string): Promise<boolean> {
-  const supabase = await createClient();
-  const oneDayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
+  try {
+    const supabase = await createClient();
+    const oneDayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
 
-  const { data } = (await (supabase as any)
-    .from("rate_limits")
-    .select("survey_count")
-    .eq("ip_address", ip)
-    .gte("window_start", oneDayAgo)
-    .single()) as { data: { survey_count: number } | null };
+    const { data, error } = (await (supabase as any)
+      .from("rate_limits")
+      .select("survey_count")
+      .eq("ip_address", ip)
+      .gte("window_start", oneDayAgo)
+      .single()) as { data: { survey_count: number } | null; error: unknown };
 
-  if (!data) return true; // No record = allowed
-  return data.survey_count < FREE_TIER_MAX_SURVEYS_PER_DAY;
+    if (error || !data) return true; // Table missing or no record = allowed
+    return data.survey_count < FREE_TIER_MAX_SURVEYS_PER_DAY;
+  } catch {
+    return true; // Allow on error
+  }
 }
 
 async function incrementRateLimit(ip: string) {
-  const supabase = await createClient();
-  const oneDayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
+  try {
+    const supabase = await createClient();
+    const oneDayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
 
-  const { data } = (await (supabase as any)
-    .from("rate_limits")
-    .select("id, survey_count")
-    .eq("ip_address", ip)
-    .gte("window_start", oneDayAgo)
-    .single()) as { data: { id: string; survey_count: number } | null };
+    const { data } = (await (supabase as any)
+      .from("rate_limits")
+      .select("id, survey_count")
+      .eq("ip_address", ip)
+      .gte("window_start", oneDayAgo)
+      .single()) as { data: { id: string; survey_count: number } | null };
 
-  if (data) {
-    await (supabase as any)
-      .from("rate_limits")
-      .update({ survey_count: data.survey_count + 1 })
-      .eq("id", data.id);
-  } else {
-    await (supabase as any)
-      .from("rate_limits")
-      .insert({ ip_address: ip, survey_count: 1 });
+    if (data) {
+      await (supabase as any)
+        .from("rate_limits")
+        .update({ survey_count: data.survey_count + 1 })
+        .eq("id", data.id);
+    } else {
+      await (supabase as any)
+        .from("rate_limits")
+        .insert({ ip_address: ip, survey_count: 1 });
+    }
+  } catch {
+    // Silently skip if rate_limits table doesn't exist
   }
 }
 /* eslint-enable @typescript-eslint/no-explicit-any */
@@ -265,7 +274,12 @@ export async function POST(request: Request) {
           progress: 5,
         });
 
-        const { data: surveyData, error: surveyError } = await supabase
+        // Try inserting with new schema first, fall back to base schema
+        let surveyData;
+        let surveyError;
+
+        // First try with location column (new schema)
+        ({ data: surveyData, error: surveyError } = await supabase
           .from("surveys")
           .insert([
             {
@@ -280,11 +294,33 @@ export async function POST(request: Request) {
             },
           ] as never)
           .select()
-          .single();
+          .single());
+
+        // If it failed (likely missing columns or NOT NULL on user_id), try base schema
+        if (surveyError) {
+          console.warn("New schema insert failed, trying base schema:", surveyError.message);
+          const baseInsert: Record<string, unknown> = {
+            question,
+            response_type: responseType,
+            model,
+            hive_size: hiveSize,
+            demographic_filters: {},
+            status: "processing",
+          };
+          // Only include user_id if we have one (old schema has NOT NULL)
+          if (user?.id) {
+            baseInsert.user_id = user.id;
+          }
+          ({ data: surveyData, error: surveyError } = await supabase
+            .from("surveys")
+            .insert([baseInsert] as never)
+            .select()
+            .single());
+        }
 
         if (surveyError || !surveyData) {
           sendEvent(controller, "error", {
-            message: "Failed to create survey",
+            message: `Failed to create survey: ${surveyError?.message || "unknown"}`,
           });
           controller.close();
           return;
@@ -299,23 +335,15 @@ export async function POST(request: Request) {
           progress: 10,
         });
 
-        let sampledPersons: PersonRecord[];
-        try {
-          sampledPersons = await loadAndSampleForLocation(
-            effectiveLocation,
-            hiveSize
-          );
-        } catch (loadError) {
-          console.error("Failed to load persona data:", loadError);
-          sendEvent(controller, "error", {
-            message: `Failed to load data for ${effectiveLocation.label}. The data may not be available yet.`,
+        const { persons: sampledPersons, synthetic } =
+          await loadAndSampleForLocation(effectiveLocation, hiveSize);
+
+        if (synthetic) {
+          sendEvent(controller, "progress", {
+            stage: "loading",
+            message: `Using synthetic demographic profiles for ${effectiveLocation.label}...`,
+            progress: 12,
           });
-          await supabase
-            .from("surveys")
-            .update({ status: "failed" } as never)
-            .eq("id", survey.id);
-          controller.close();
-          return;
         }
 
         // Step 3: Generate descriptions and process responses
@@ -369,7 +397,8 @@ export async function POST(request: Request) {
           progress: 90,
         });
 
-        const respondentInserts = sampledPersons.map((person) => ({
+        // Build respondent inserts - try rich schema first, fall back to base
+        const richInserts = sampledPersons.map((person) => ({
           survey_id: survey.id,
           age: person.age,
           income: Math.round(
@@ -408,10 +437,34 @@ export async function POST(request: Request) {
               : null,
         }));
 
-        const { data: respondentsData, error: respondentError } = await supabase
+        // Base inserts (only columns from initial schema)
+        const baseInserts = sampledPersons.map((person) => ({
+          survey_id: survey.id,
+          age: person.age,
+          income: Math.round(
+            person.employment_income + person.self_employment_income
+          ),
+          state: getStateFromDistrict(effectiveLocation.value),
+          weight: person.weight,
+        }));
+
+        let respondentsData;
+        let respondentError;
+
+        // Try rich insert first
+        ({ data: respondentsData, error: respondentError } = await supabase
           .from("respondents")
-          .insert(respondentInserts as never)
-          .select();
+          .insert(richInserts as never)
+          .select());
+
+        // Fall back to base columns if rich insert fails
+        if (respondentError) {
+          console.warn("Rich respondent insert failed, using base schema:", respondentError.message);
+          ({ data: respondentsData, error: respondentError } = await supabase
+            .from("respondents")
+            .insert(baseInserts as never)
+            .select());
+        }
 
         if (respondentError || !respondentsData) {
           await supabase
@@ -419,7 +472,7 @@ export async function POST(request: Request) {
             .update({ status: "failed" } as never)
             .eq("id", survey.id);
           sendEvent(controller, "error", {
-            message: "Failed to store respondents",
+            message: `Failed to store respondents: ${respondentError?.message || "unknown"}`,
           });
           controller.close();
           return;
@@ -473,8 +526,8 @@ export async function POST(request: Request) {
           await incrementRateLimit(ip);
         }
 
-        // Update survey status
-        await supabase
+        // Update survey status (try with new fields, fall back to base)
+        const { error: statusError } = await supabase
           .from("surveys")
           .update({
             status: "completed",
@@ -482,6 +535,14 @@ export async function POST(request: Request) {
             credits_used: creditsRequired,
           } as never)
           .eq("id", survey.id);
+
+        if (statusError) {
+          // Fall back to just status update
+          await supabase
+            .from("surveys")
+            .update({ status: "completed" } as never)
+            .eq("id", survey.id);
+        }
 
         // Send completion
         sendEvent(controller, "progress", {
