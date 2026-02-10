@@ -53,6 +53,7 @@ export type Database = {
           model: string;
           hive_size: number;
           demographic_filters: Json;
+          location: Json | null;
           status: "pending" | "processing" | "completed" | "failed";
           credits_used: number;
           created_at: string;
@@ -65,7 +66,8 @@ export type Database = {
           response_type: "likert" | "open_ended";
           model: string;
           hive_size: number;
-          demographic_filters: Json;
+          demographic_filters?: Json;
+          location?: Json | null;
           status?: "pending" | "processing" | "completed" | "failed";
           credits_used?: number;
           created_at?: string;
@@ -79,6 +81,7 @@ export type Database = {
           model?: string;
           hive_size?: number;
           demographic_filters?: Json;
+          location?: Json | null;
           status?: "pending" | "processing" | "completed" | "failed";
           credits_used?: number;
           created_at?: string;
@@ -93,6 +96,18 @@ export type Database = {
           income: number;
           state: string;
           weight: number | null;
+          sex: string | null;
+          race_ethnicity: string | null;
+          occupation: string | null;
+          is_college_student: boolean | null;
+          is_disabled: boolean | null;
+          tenure_type: string | null;
+          has_children: boolean | null;
+          children_count: number | null;
+          insurance_type: string | null;
+          receives_benefits: boolean | null;
+          zip_code: string | null;
+          congressional_district: string | null;
           created_at: string;
         };
         Insert: {
@@ -102,6 +117,18 @@ export type Database = {
           income: number;
           state: string;
           weight?: number | null;
+          sex?: string | null;
+          race_ethnicity?: string | null;
+          occupation?: string | null;
+          is_college_student?: boolean | null;
+          is_disabled?: boolean | null;
+          tenure_type?: string | null;
+          has_children?: boolean | null;
+          children_count?: number | null;
+          insurance_type?: string | null;
+          receives_benefits?: boolean | null;
+          zip_code?: string | null;
+          congressional_district?: string | null;
           created_at?: string;
         };
         Update: {
@@ -111,6 +138,18 @@ export type Database = {
           income?: number;
           state?: string;
           weight?: number | null;
+          sex?: string | null;
+          race_ethnicity?: string | null;
+          occupation?: string | null;
+          is_college_student?: boolean | null;
+          is_disabled?: boolean | null;
+          tenure_type?: string | null;
+          has_children?: boolean | null;
+          children_count?: number | null;
+          insurance_type?: string | null;
+          receives_benefits?: boolean | null;
+          zip_code?: string | null;
+          congressional_district?: string | null;
           created_at?: string;
         };
       };

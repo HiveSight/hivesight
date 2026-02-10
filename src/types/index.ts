@@ -62,7 +62,16 @@ export const MODEL_CONFIG: Record<
   },
 };
 
-// Demographic filters
+// Location filter (replaces demographic filters for location-first flow)
+export const LocationFilterSchema = z.object({
+  type: z.enum(["zip", "state", "district", "city", "national"]),
+  value: z.string(),
+  label: z.string(),
+});
+
+export type LocationFilter = z.infer<typeof LocationFilterSchema>;
+
+// Legacy demographic filters (kept for backward compatibility with existing surveys)
 export const DemographicFiltersSchema = z.object({
   ageRange: z.tuple([z.number().min(18).max(100), z.number().min(18).max(100)]),
   incomeRange: z.tuple([z.number().min(0), z.number()]),
@@ -71,13 +80,49 @@ export const DemographicFiltersSchema = z.object({
 
 export type DemographicFilters = z.infer<typeof DemographicFiltersSchema>;
 
-// Persona (respondent)
+// Person record from real microdata (CPS-based, from PolicyEngine HF district files)
+export interface PersonRecord {
+  age: number;
+  is_female: boolean;
+  cps_race: number;
+  is_hispanic: boolean;
+  employment_income: number;
+  self_employment_income: number;
+  occupation_code: number;
+  tenure_type: number;
+  children_count: number;
+  is_in_college: boolean;
+  is_disabled: boolean;
+  has_medicaid: boolean;
+  has_medicare: boolean;
+  receives_ssi: boolean;
+  receives_snap: boolean;
+  receives_tanf: boolean;
+  receives_unemployment: boolean;
+  receives_social_security: boolean;
+  zcta: string;
+  weight: number;
+}
+
+// Enriched persona (includes real microdata fields + generated ID)
 export const PersonaSchema = z.object({
   id: z.string(),
   age: z.number(),
   income: z.number(),
   state: z.string(),
   weight: z.number().optional(),
+  // New rich demographic fields
+  sex: z.string().optional(),
+  race_ethnicity: z.string().optional(),
+  occupation: z.string().optional(),
+  tenure_type: z.string().optional(),
+  children_count: z.number().optional(),
+  is_college_student: z.boolean().optional(),
+  is_disabled: z.boolean().optional(),
+  insurance_type: z.string().optional(),
+  receives_benefits: z.boolean().optional(),
+  congressional_district: z.string().optional(),
+  zip_code: z.string().optional(),
 });
 
 export type Persona = z.infer<typeof PersonaSchema>;
@@ -88,9 +133,9 @@ export const SurveyConfigSchema = z.object({
   responseType: ResponseTypeSchema,
   model: ModelSchema,
   hiveSize: z.number().min(1).max(1000),
-  demographicFilters: DemographicFiltersSchema,
-  useCustomPersonas: z.boolean().default(false),
-  customPersonas: z.array(PersonaSchema).optional(),
+  location: LocationFilterSchema.optional(),
+  // Legacy field kept for backward compatibility
+  demographicFilters: DemographicFiltersSchema.optional(),
 });
 
 export type SurveyConfig = z.infer<typeof SurveyConfigSchema>;
