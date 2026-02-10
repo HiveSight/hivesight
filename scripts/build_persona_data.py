@@ -393,7 +393,7 @@ def upload_to_huggingface(output_dir: Path):
         print("Install huggingface_hub: uv pip install huggingface_hub")
         sys.exit(1)
 
-    repo_id = "policyengine/hivesight-persona-data"
+    repo_id = "MaxGhenis/hivesight-persona-data"
     api = HfApi()
 
     print(f"\nUploading to {repo_id}...")

@@ -2,7 +2,7 @@ import { gunzipSync } from "zlib";
 import type { PersonRecord } from "@/types";
 
 const HF_BASE_URL =
-  "https://huggingface.co/datasets/policyengine/hivesight-persona-data/resolve/main";
+  "https://huggingface.co/datasets/MaxGhenis/hivesight-persona-data/resolve/main";
 
 // LRU cache for loaded district/state data
 const cache = new Map<string, { data: PersonRecord[]; timestamp: number }>();
