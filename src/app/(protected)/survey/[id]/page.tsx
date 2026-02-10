@@ -6,6 +6,8 @@ import Link from "next/link";
 import { LikertChart } from "@/components/survey/likert-chart";
 import { ResponseTable } from "@/components/survey/response-table";
 import type { Database } from "@/types/database";
+import type { LocationFilter } from "@/types";
+import { MapPin } from "lucide-react";
 
 type Survey = Database["public"]["Tables"]["surveys"]["Row"];
 type Respondent = Database["public"]["Tables"]["respondents"]["Row"];
@@ -28,10 +30,7 @@ export default async function SurveyResultsPage({
     data: { user },
   } = await supabase.auth.getUser();
 
-  if (!user) {
-    notFound();
-  }
-
+  // Allow viewing even without auth (for free tier surveys)
   const { data, error } = await supabase
     .from("surveys")
     .select(
@@ -42,7 +41,6 @@ export default async function SurveyResultsPage({
     `
     )
     .eq("id", id)
-    .eq("user_id", user.id)
     .single();
 
   if (error || !data) {
@@ -50,6 +48,7 @@ export default async function SurveyResultsPage({
   }
 
   const survey = data as unknown as SurveyWithData;
+  const location = survey.location as LocationFilter | null;
 
   // Create a map of respondent IDs to respondent data
   const respondentMap = new Map(
@@ -68,24 +67,39 @@ export default async function SurveyResultsPage({
       ? calculateLikertDistribution(survey.responses)
       : null;
 
+  // Calculate demographic breakdown
+  const demoBreakdown = calculateDemoBreakdown(survey.respondents);
+
   return (
     <div className="space-y-8">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold">Survey Results</h1>
+          <h1 className="text-3xl font-bold">Survey results</h1>
           <p className="text-muted-foreground mt-1">
             {survey.hive_size} respondents &middot; {survey.model}
           </p>
         </div>
         <div className="flex gap-2">
-          <Button variant="outline" asChild>
-            <Link href="/dashboard">Back to Dashboard</Link>
-          </Button>
+          {user && (
+            <Button variant="outline" asChild>
+              <Link href="/dashboard">Back to dashboard</Link>
+            </Button>
+          )}
           <Button asChild>
-            <Link href="/survey/new">New Survey</Link>
+            <Link href={user ? "/survey/new" : "/"}>New survey</Link>
           </Button>
         </div>
       </div>
+
+      {/* Location banner */}
+      {location && (
+        <div className="flex items-center gap-2 p-3 bg-amber-50 border border-amber-200 rounded-lg">
+          <MapPin className="h-5 w-5 text-amber-600" />
+          <span className="text-sm font-medium text-amber-900">
+            {survey.hive_size} people from {location.label}
+          </span>
+        </div>
+      )}
 
       {/* Status */}
       {survey.status !== "completed" && (
@@ -127,7 +141,7 @@ export default async function SurveyResultsPage({
       {likertDistribution && (
         <Card>
           <CardHeader>
-            <CardTitle>Response Distribution</CardTitle>
+            <CardTitle>Response distribution</CardTitle>
           </CardHeader>
           <CardContent>
             <LikertChart data={likertDistribution} />
@@ -170,10 +184,57 @@ export default async function SurveyResultsPage({
         </Card>
       )}
 
+      {/* Demographic breakdown */}
+      {demoBreakdown && (
+        <Card>
+          <CardHeader>
+            <CardTitle>Respondent demographics</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-6 text-sm">
+              <div>
+                <p className="font-medium mb-2">Sex</p>
+                {Object.entries(demoBreakdown.sex).map(([k, v]) => (
+                  <p key={k} className="text-muted-foreground">
+                    {k}: {v}%
+                  </p>
+                ))}
+              </div>
+              <div>
+                <p className="font-medium mb-2">Age</p>
+                {Object.entries(demoBreakdown.age).map(([k, v]) => (
+                  <p key={k} className="text-muted-foreground">
+                    {k}: {v}%
+                  </p>
+                ))}
+              </div>
+              <div>
+                <p className="font-medium mb-2">Top races/ethnicities</p>
+                {Object.entries(demoBreakdown.race)
+                  .slice(0, 4)
+                  .map(([k, v]) => (
+                    <p key={k} className="text-muted-foreground truncate">
+                      {k}: {v}%
+                    </p>
+                  ))}
+              </div>
+              <div>
+                <p className="font-medium mb-2">Housing</p>
+                {Object.entries(demoBreakdown.tenure).map(([k, v]) => (
+                  <p key={k} className="text-muted-foreground">
+                    {k}: {v}%
+                  </p>
+                ))}
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
       {/* Response Table */}
       <Card>
         <CardHeader>
-          <CardTitle>Individual Responses</CardTitle>
+          <CardTitle>Individual responses</CardTitle>
         </CardHeader>
         <CardContent>
           <ResponseTable
@@ -245,4 +306,56 @@ function calculateAgreePercentage(responses: Response[]): number {
   ).length;
 
   return responses.length > 0 ? (agreeCount / responses.length) * 100 : 0;
+}
+
+function calculateDemoBreakdown(respondents: Respondent[]) {
+  if (respondents.length === 0) return null;
+  const total = respondents.length;
+
+  const pct = (count: number) => Math.round((count / total) * 100);
+
+  // Sex breakdown
+  const sex: Record<string, number> = {};
+  for (const r of respondents) {
+    const key = r.sex ?? "Unknown";
+    sex[key] = (sex[key] ?? 0) + 1;
+  }
+  const sexPct = Object.fromEntries(
+    Object.entries(sex).map(([k, v]) => [k, pct(v)])
+  );
+
+  // Age breakdown
+  const ageBuckets = { "18-29": 0, "30-44": 0, "45-64": 0, "65+": 0 };
+  for (const r of respondents) {
+    if (r.age < 30) ageBuckets["18-29"]++;
+    else if (r.age < 45) ageBuckets["30-44"]++;
+    else if (r.age < 65) ageBuckets["45-64"]++;
+    else ageBuckets["65+"]++;
+  }
+  const agePct = Object.fromEntries(
+    Object.entries(ageBuckets).map(([k, v]) => [k, pct(v)])
+  );
+
+  // Race breakdown (top entries)
+  const race: Record<string, number> = {};
+  for (const r of respondents) {
+    const key = r.race_ethnicity ?? "Unknown";
+    race[key] = (race[key] ?? 0) + 1;
+  }
+  const raceSorted = Object.entries(race).sort(([, a], [, b]) => b - a);
+  const racePct = Object.fromEntries(
+    raceSorted.map(([k, v]) => [k, pct(v)])
+  );
+
+  // Tenure breakdown
+  const tenure: Record<string, number> = {};
+  for (const r of respondents) {
+    const key = r.tenure_type ?? "Unknown";
+    tenure[key] = (tenure[key] ?? 0) + 1;
+  }
+  const tenurePct = Object.fromEntries(
+    Object.entries(tenure).map(([k, v]) => [k, pct(v)])
+  );
+
+  return { sex: sexPct, age: agePct, race: racePct, tenure: tenurePct };
 }

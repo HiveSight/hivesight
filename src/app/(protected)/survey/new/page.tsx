@@ -16,7 +16,9 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Progress } from "@/components/ui/progress";
 import { MODEL_CONFIG } from "@/types";
-import type { Model, ResponseType, DemographicFilters } from "@/types";
+import { LocationInput } from "@/components/survey/location-input";
+import type { Model, ResponseType, LocationFilter } from "@/types";
+import { ChevronDown, ChevronUp } from "lucide-react";
 
 interface ProgressState {
   stage: string;
@@ -28,18 +30,17 @@ interface ProgressState {
 
 export default function NewSurveyPage() {
   const router = useRouter();
-  const [step, setStep] = useState(1);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [progressState, setProgressState] = useState<ProgressState | null>(null);
+  const [showAdvanced, setShowAdvanced] = useState(false);
 
   // Form state
   const [question, setQuestion] = useState("");
   const [responseType, setResponseType] = useState<ResponseType>("likert");
+  const [location, setLocation] = useState<LocationFilter | null>(null);
   const [model, setModel] = useState<Model>("gpt-5-mini");
-  const [credits, setCredits] = useState(10);
-  const [ageRange, setAgeRange] = useState<[number, number]>([18, 100]);
-  const [incomeRange, setIncomeRange] = useState<[number, number]>([0, 500000]);
+  const [credits, setCredits] = useState(25);
 
   // Calculate respondents from credits
   const respondentsPerCredit = useMemo(() => {
@@ -53,12 +54,11 @@ export default function NewSurveyPage() {
     return credits * respondentsPerCredit;
   }, [credits, respondentsPerCredit]);
 
-  const demographicFilters: DemographicFilters = {
-    ageRange,
-    incomeRange,
-  };
+  const canSubmit = question.length >= 10 && location !== null;
 
   const handleSubmit = async () => {
+    if (!canSubmit) return;
+
     setLoading(true);
     setError(null);
     setProgressState({
@@ -76,7 +76,7 @@ export default function NewSurveyPage() {
           responseType,
           model,
           hiveSize,
-          demographicFilters,
+          location,
         }),
       });
 
@@ -132,21 +132,6 @@ export default function NewSurveyPage() {
     }
   };
 
-  const canProceed = () => {
-    switch (step) {
-      case 1:
-        return question.length >= 10;
-      case 2:
-        return true;
-      case 3:
-        return true;
-      case 4:
-        return true;
-      default:
-        return false;
-    }
-  };
-
   return (
     <div className="max-w-2xl mx-auto space-y-6">
       {/* Progress Modal */}
@@ -154,7 +139,7 @@ export default function NewSurveyPage() {
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
           <Card className="w-full max-w-md mx-4">
             <CardHeader>
-              <CardTitle className="text-center">Running Survey</CardTitle>
+              <CardTitle className="text-center">Running survey</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <Progress value={progressState.progress} />
@@ -171,124 +156,85 @@ export default function NewSurveyPage() {
         </div>
       )}
 
-      <div className="flex items-center justify-between">
-        <h1 className="text-3xl font-bold">New Survey</h1>
-        <div className="text-sm text-muted-foreground">Step {step} of 4</div>
-      </div>
-
-      {/* Progress indicator */}
-      <div className="flex gap-2">
-        {[1, 2, 3, 4].map((s) => (
-          <div
-            key={s}
-            className={`h-2 flex-1 rounded-full ${
-              s <= step ? "bg-primary" : "bg-muted"
-            }`}
-          />
-        ))}
-      </div>
+      <h1 className="text-3xl font-bold">New survey</h1>
 
       {error && (
         <div className="p-4 bg-red-50 text-red-700 rounded-lg">{error}</div>
       )}
 
-      {/* Step 1: Question */}
-      {step === 1 && (
+      {/* Main form */}
+      <Card>
+        <CardContent className="pt-6 space-y-6">
+          {/* Question */}
+          <div className="space-y-2">
+            <Label htmlFor="question">Your question or statement</Label>
+            <textarea
+              id="question"
+              className="w-full min-h-28 p-3 border rounded-md resize-none focus:outline-none focus:ring-2 focus:ring-primary"
+              placeholder="e.g., I support increasing the minimum wage to $15/hour"
+              value={question}
+              onChange={(e) => setQuestion(e.target.value)}
+            />
+            <p className="text-sm text-muted-foreground">
+              {question.length < 10
+                ? `${10 - question.length} more characters needed`
+                : "Ready"}
+            </p>
+          </div>
+
+          {/* Location */}
+          <div className="space-y-2">
+            <Label>Location</Label>
+            <LocationInput
+              value={location}
+              onSelect={setLocation}
+            />
+          </div>
+
+          {/* Response type */}
+          <div className="space-y-2">
+            <Label>Response type</Label>
+            <Tabs
+              value={responseType}
+              onValueChange={(v) => setResponseType(v as ResponseType)}
+            >
+              <TabsList className="w-full">
+                <TabsTrigger value="likert" className="flex-1">
+                  Likert scale
+                </TabsTrigger>
+                <TabsTrigger value="open_ended" className="flex-1">
+                  Open-ended
+                </TabsTrigger>
+              </TabsList>
+              <TabsContent value="likert" className="text-sm text-muted-foreground">
+                Respondents will agree/disagree on a 5-point scale
+              </TabsContent>
+              <TabsContent value="open_ended" className="text-sm text-muted-foreground">
+                Respondents will provide free-text answers
+              </TabsContent>
+            </Tabs>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Advanced options (collapsible) */}
+      <button
+        onClick={() => setShowAdvanced(!showAdvanced)}
+        className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground w-full"
+      >
+        {showAdvanced ? (
+          <ChevronUp className="h-4 w-4" />
+        ) : (
+          <ChevronDown className="h-4 w-4" />
+        )}
+        Advanced options
+      </button>
+
+      {showAdvanced && (
         <Card>
-          <CardHeader>
-            <CardTitle>What do you want to ask?</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
+          <CardContent className="pt-6 space-y-6">
             <div className="space-y-2">
-              <Label htmlFor="question">Your question or statement</Label>
-              <textarea
-                id="question"
-                className="w-full min-h-32 p-3 border rounded-md resize-none focus:outline-none focus:ring-2 focus:ring-primary"
-                placeholder="e.g., I support increasing the minimum wage to $15/hour"
-                value={question}
-                onChange={(e) => setQuestion(e.target.value)}
-              />
-              <p className="text-sm text-muted-foreground">
-                {question.length < 10
-                  ? `${10 - question.length} more characters needed`
-                  : "Ready to continue"}
-              </p>
-            </div>
-
-            <div className="space-y-2">
-              <Label>Response type</Label>
-              <Tabs
-                value={responseType}
-                onValueChange={(v) => setResponseType(v as ResponseType)}
-              >
-                <TabsList className="w-full">
-                  <TabsTrigger value="likert" className="flex-1">
-                    Likert Scale
-                  </TabsTrigger>
-                  <TabsTrigger value="open_ended" className="flex-1">
-                    Open-ended
-                  </TabsTrigger>
-                </TabsList>
-                <TabsContent value="likert" className="text-sm text-muted-foreground">
-                  Respondents will agree/disagree on a 5-point scale
-                </TabsContent>
-                <TabsContent value="open_ended" className="text-sm text-muted-foreground">
-                  Respondents will provide free-text answers
-                </TabsContent>
-              </Tabs>
-            </div>
-          </CardContent>
-        </Card>
-      )}
-
-      {/* Step 2: Demographics */}
-      {step === 2 && (
-        <Card>
-          <CardHeader>
-            <CardTitle>Who should respond?</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-6">
-            <div className="space-y-4">
-              <Label>Age range: {ageRange[0]} - {ageRange[1]}</Label>
-              <div className="px-2">
-                <Slider
-                  value={ageRange}
-                  onValueChange={(v) => setAgeRange(v as [number, number])}
-                  min={18}
-                  max={100}
-                  step={1}
-                />
-              </div>
-            </div>
-
-            <div className="space-y-4">
-              <Label>
-                Income range: ${incomeRange[0].toLocaleString()} - $
-                {incomeRange[1].toLocaleString()}
-              </Label>
-              <div className="px-2">
-                <Slider
-                  value={incomeRange}
-                  onValueChange={(v) => setIncomeRange(v as [number, number])}
-                  min={0}
-                  max={500000}
-                  step={10000}
-                />
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      )}
-
-      {/* Step 3: Model & Credits */}
-      {step === 3 && (
-        <Card>
-          <CardHeader>
-            <CardTitle>Configure simulation</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-6">
-            <div className="space-y-2">
-              <Label>AI Model</Label>
+              <Label>AI model</Label>
               <Select value={model} onValueChange={(v) => setModel(v as Model)}>
                 <SelectTrigger>
                   <SelectValue />
@@ -303,7 +249,9 @@ export default function NewSurveyPage() {
                 </SelectContent>
               </Select>
               <p className="text-sm text-muted-foreground">
-                {MODEL_CONFIG[model].name}: {respondentsPerCredit} {responseType === "likert" ? "likert" : "open-ended"} respondents per credit
+                {MODEL_CONFIG[model].name}: {respondentsPerCredit}{" "}
+                {responseType === "likert" ? "likert" : "open-ended"} respondents
+                per credit
               </p>
             </div>
 
@@ -323,7 +271,7 @@ export default function NewSurveyPage() {
                   {hiveSize} respondents
                 </p>
                 <p className="text-sm text-muted-foreground">
-                  for {credits} credits (${(credits * 0.01).toFixed(2)})
+                  for {credits} credits (${(credits * 0.10).toFixed(2)})
                 </p>
               </div>
             </div>
@@ -331,77 +279,25 @@ export default function NewSurveyPage() {
         </Card>
       )}
 
-      {/* Step 4: Review */}
-      {step === 4 && (
-        <Card>
-          <CardHeader>
-            <CardTitle>Review & Submit</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-6">
-            <div className="space-y-4">
-              <div className="p-4 bg-muted rounded-lg">
-                <p className="font-medium">Question</p>
-                <p className="text-muted-foreground">&quot;{question}&quot;</p>
-              </div>
-
-              <div className="grid grid-cols-2 gap-4 text-sm">
-                <div>
-                  <p className="font-medium">Response Type</p>
-                  <p className="text-muted-foreground">
-                    {responseType === "likert" ? "Likert Scale" : "Open-ended"}
-                  </p>
-                </div>
-                <div>
-                  <p className="font-medium">Model</p>
-                  <p className="text-muted-foreground">{MODEL_CONFIG[model].name}</p>
-                </div>
-                <div>
-                  <p className="font-medium">Respondents</p>
-                  <p className="text-muted-foreground">{hiveSize}</p>
-                </div>
-                <div>
-                  <p className="font-medium">Age Range</p>
-                  <p className="text-muted-foreground">
-                    {ageRange[0]} - {ageRange[1]}
-                  </p>
-                </div>
-              </div>
-
-              <div className="p-4 border-2 border-primary rounded-lg space-y-2 bg-primary/5">
-                <div className="flex justify-between items-center">
-                  <p className="font-semibold text-lg">Cost</p>
-                  <p className="text-2xl font-bold text-primary">{credits} credits</p>
-                </div>
-                <p className="text-sm text-muted-foreground">
-                  {hiveSize} respondents at {respondentsPerCredit} per credit
-                </p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      )}
-
-      {/* Navigation */}
-      <div className="flex justify-between">
+      {/* Summary and submit */}
+      <div className="flex items-center justify-between">
+        <div className="text-sm text-muted-foreground">
+          {location ? (
+            <>
+              {hiveSize} respondents in {location.label} &middot; {credits}{" "}
+              credits
+            </>
+          ) : (
+            "Select a location to continue"
+          )}
+        </div>
         <Button
-          variant="outline"
-          onClick={() => setStep(step - 1)}
-          disabled={step === 1}
+          size="lg"
+          onClick={handleSubmit}
+          disabled={!canSubmit || loading}
         >
-          Back
+          {loading ? "Running..." : "Run survey"}
         </Button>
-        {step < 4 ? (
-          <Button
-            onClick={() => setStep(step + 1)}
-            disabled={!canProceed()}
-          >
-            Continue
-          </Button>
-        ) : (
-          <Button onClick={handleSubmit} disabled={loading}>
-            {loading ? "Creating..." : "Run Survey"}
-          </Button>
-        )}
       </div>
     </div>
   );

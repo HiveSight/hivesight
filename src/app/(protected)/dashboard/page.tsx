@@ -94,7 +94,12 @@ export default async function DashboardPage() {
                       {survey.question}
                     </p>
                     <p className="text-sm text-muted-foreground">
-                      {survey.hive_size} respondents &middot;{" "}
+                      {survey.hive_size} respondents
+                      {survey.location &&
+                        typeof survey.location === "object" &&
+                        "label" in (survey.location as Record<string, unknown>) &&
+                        ` in ${(survey.location as { label: string }).label}`}
+                      {" "}&middot;{" "}
                       {new Date(survey.created_at).toLocaleDateString()}
                     </p>
                   </div>

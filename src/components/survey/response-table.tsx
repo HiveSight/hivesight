@@ -37,14 +37,18 @@ export function ResponseTable({ responses, responseType }: ResponseTableProps) {
   const downloadCSV = () => {
     const headers =
       responseType === "likert"
-        ? ["Age", "Income", "State", "Response", "Reasoning"]
-        : ["Age", "Income", "State", "Response"];
+        ? ["Age", "Sex", "Race/Ethnicity", "Occupation", "Income", "State", "ZIP", "Response", "Reasoning"]
+        : ["Age", "Sex", "Race/Ethnicity", "Occupation", "Income", "State", "ZIP", "Response"];
 
     const rows = responses.map((r) => {
       const base = [
         r.respondent.age,
+        r.respondent.sex ?? "",
+        r.respondent.race_ethnicity ?? "",
+        r.respondent.occupation ?? "",
         r.respondent.income,
         r.respondent.state,
+        r.respondent.zip_code ?? "",
       ];
       if (responseType === "likert") {
         return [
@@ -84,8 +88,11 @@ export function ResponseTable({ responses, responseType }: ResponseTableProps) {
           <thead>
             <tr className="border-b">
               <th className="text-left py-2 px-3">Age</th>
+              <th className="text-left py-2 px-3">Sex</th>
+              <th className="text-left py-2 px-3">Race/Ethnicity</th>
+              <th className="text-left py-2 px-3">Occupation</th>
               <th className="text-left py-2 px-3">Income</th>
-              <th className="text-left py-2 px-3">State</th>
+              <th className="text-left py-2 px-3">ZIP</th>
               <th className="text-left py-2 px-3">Response</th>
               {responseType === "likert" && (
                 <th className="text-left py-2 px-3">Reasoning</th>
@@ -97,9 +104,20 @@ export function ResponseTable({ responses, responseType }: ResponseTableProps) {
               <tr key={response.id} className="border-b">
                 <td className="py-2 px-3">{response.respondent.age}</td>
                 <td className="py-2 px-3">
+                  {response.respondent.sex ?? "-"}
+                </td>
+                <td className="py-2 px-3 max-w-[120px] truncate">
+                  {response.respondent.race_ethnicity ?? "-"}
+                </td>
+                <td className="py-2 px-3 max-w-[120px] truncate">
+                  {response.respondent.occupation ?? "-"}
+                </td>
+                <td className="py-2 px-3">
                   ${response.respondent.income.toLocaleString()}
                 </td>
-                <td className="py-2 px-3">{response.respondent.state}</td>
+                <td className="py-2 px-3">
+                  {response.respondent.zip_code ?? "-"}
+                </td>
                 <td className="py-2 px-3">
                   {responseType === "likert"
                     ? response.likert_response

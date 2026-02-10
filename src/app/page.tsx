@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Check, Hexagon } from "lucide-react";
 import Link from "next/link";
+import { HeroSurveyForm } from "@/components/survey/hero-survey-form";
 
 export default async function Home() {
   const supabase = await createClient();
@@ -29,40 +30,38 @@ export default async function Home() {
         </div>
       </header>
 
-      {/* Hero Section */}
-      <section className="relative py-20 px-4">
-        <div className="max-w-4xl mx-auto text-center space-y-6">
-          <h1 className="text-5xl md:text-6xl font-bold tracking-tight">
-            Simulate Public Opinion
-            <br />
-            <span className="text-muted-foreground">At Scale</span>
+      {/* Hero Section with functional survey input */}
+      <section className="relative py-16 px-4">
+        <div className="max-w-3xl mx-auto text-center space-y-6">
+          <h1 className="text-4xl md:text-5xl font-bold tracking-tight">
+            What do the people in your area think?
           </h1>
-          <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-            HiveSight uses AI to simulate how diverse Americans would respond to
-            your questions. Get instant feedback from hundreds of perspectives.
+          <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+            Ask a question and get instant AI-simulated responses from real
+            demographic profiles in any US location.
           </p>
-          <div className="flex gap-4 justify-center pt-4">
-            <LoginButton />
-            <Button variant="outline" size="lg" asChild>
-              <Link href="#how-it-works">Learn more</Link>
-            </Button>
-          </div>
+          <HeroSurveyForm />
+          <p className="text-sm text-muted-foreground">
+            Free to try — no account needed. 3 surveys per day, 25 respondents each.
+          </p>
         </div>
       </section>
 
       {/* How it Works */}
-      <section id="how-it-works" className="py-20 px-4 bg-muted/50">
+      <section id="how-it-works" className="py-16 px-4 bg-muted/50">
         <div className="max-w-6xl mx-auto">
-          <h2 className="text-3xl font-bold text-center mb-12">How It Works</h2>
+          <h2 className="text-3xl font-bold text-center mb-12">
+            How it works
+          </h2>
           <div className="grid md:grid-cols-3 gap-8">
             <Card>
               <CardContent className="pt-6 space-y-4">
                 <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center text-2xl font-bold">
                   1
                 </div>
-                <h3 className="text-xl font-semibold">Ask Your Question</h3>
+                <h3 className="text-xl font-semibold">Ask your question</h3>
                 <p className="text-muted-foreground">
-                  Enter a statement or question you want to test with a
+                  Type any statement or question you want to test with a
                   representative sample of Americans.
                 </p>
               </CardContent>
@@ -72,10 +71,10 @@ export default async function Home() {
                 <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center text-2xl font-bold">
                   2
                 </div>
-                <h3 className="text-xl font-semibold">Configure Your Hive</h3>
+                <h3 className="text-xl font-semibold">Pick a location</h3>
                 <p className="text-muted-foreground">
-                  Choose demographic filters, sample size, and response type.
-                  Target specific age ranges, incomes, or regions.
+                  Choose a ZIP code, state, or congressional district. Responses
+                  come from real demographic profiles calibrated to that area.
                 </p>
               </CardContent>
             </Card>
@@ -84,10 +83,10 @@ export default async function Home() {
                 <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center text-2xl font-bold">
                   3
                 </div>
-                <h3 className="text-xl font-semibold">Get Insights</h3>
+                <h3 className="text-xl font-semibold">Get insights</h3>
                 <p className="text-muted-foreground">
-                  Receive detailed results with distribution charts, statistics,
-                  and individual responses. Export to CSV for further analysis.
+                  See distribution charts, demographic breakdowns, and
+                  individual responses. Export to CSV for further analysis.
                 </p>
               </CardContent>
             </Card>
@@ -96,19 +95,19 @@ export default async function Home() {
       </section>
 
       {/* Features */}
-      <section className="py-20 px-4">
+      <section className="py-16 px-4">
         <div className="max-w-6xl mx-auto">
           <h2 className="text-3xl font-bold text-center mb-12">Features</h2>
           <div className="grid md:grid-cols-2 gap-6">
             {[
-              "Simulate responses from diverse demographic groups",
+              "Real demographic profiles from US Census microdata",
+              "Target any ZIP code, state, or congressional district",
               "Likert scale and open-ended response formats",
-              "Filter by age, income, and geographic region",
-              "Statistical analysis with confidence intervals",
+              "Rich demographics: age, sex, race, occupation, income, housing",
               "Export raw data to CSV for further analysis",
-              "Real-time cost estimation before running surveys",
-              "Powered by GPT-4o and GPT-4o Mini",
-              "Fast results - typically under a minute",
+              "Free tier: no sign-up required",
+              "Powered by GPT-5 and GPT-5 Mini",
+              "Fast results — typically under a minute",
             ].map((feature) => (
               <div key={feature} className="flex items-center gap-3">
                 <Check className="h-5 w-5 text-green-500 flex-shrink-0" />
@@ -120,11 +119,12 @@ export default async function Home() {
       </section>
 
       {/* CTA */}
-      <section className="py-20 px-4 bg-muted/50">
+      <section className="py-16 px-4 bg-muted/50">
         <div className="max-w-xl mx-auto text-center space-y-6">
-          <h2 className="text-3xl font-bold">Ready to get started?</h2>
+          <h2 className="text-3xl font-bold">Want more?</h2>
           <p className="text-muted-foreground">
-            Sign up now and get 100 free credits to try HiveSight.
+            Sign up for an account to run larger surveys with up to 1,000
+            respondents and access premium AI models.
           </p>
           <LoginButton />
         </div>
