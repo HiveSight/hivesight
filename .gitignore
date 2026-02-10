@@ -43,5 +43,8 @@ playwright-report/
 playwright/.cache/
 e2e/.auth/
 
+# Generated data (hosted on HuggingFace)
+scripts/output/
+
 # Misc
 *.pem
