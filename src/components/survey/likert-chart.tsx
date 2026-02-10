@@ -43,8 +43,8 @@ export function LikertChart({ data }: LikertChartProps) {
             tick={{ fontSize: 12 }}
           />
           <Tooltip
-            formatter={(value: number, _name: string, props) => [
-              `${value} (${props.payload.percentage.toFixed(1)}%)`,
+            formatter={(value, _name, props) => [
+              `${value} (${(props.payload as LikertData).percentage.toFixed(1)}%)`,
               "Responses",
             ]}
           />

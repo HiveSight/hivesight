@@ -1,6 +1,6 @@
 import OpenAI from "openai";
 import type { Model, ResponseType, LikertScale, DemographicFilters } from "@/types";
-import { generatePersonas, type Persona } from "./personas";
+import { generatePersonas, formatPersonaDescription, type Persona } from "./personas";
 import { buildSystemPrompt, buildUserPrompt, parseLikertResponse } from "./prompts";
 
 // Lazy-initialize OpenAI client
@@ -35,7 +35,7 @@ async function queryLLM(
   model: Model,
   persona: Persona
 ): Promise<SimulationResult> {
-  const systemPrompt = buildSystemPrompt(responseType, persona);
+  const systemPrompt = buildSystemPrompt(responseType, formatPersonaDescription(persona));
   const userPrompt = buildUserPrompt(question, responseType);
 
   try {

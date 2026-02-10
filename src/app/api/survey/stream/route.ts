@@ -20,7 +20,6 @@ import type {
 } from "@/types";
 import type { Database } from "@/types/database";
 
-type Profile = Database["public"]["Tables"]["profiles"]["Row"];
 type Survey = Database["public"]["Tables"]["surveys"]["Row"];
 type Respondent = Database["public"]["Tables"]["respondents"]["Row"];
 
@@ -120,16 +119,18 @@ async function queryLLM(
 const FREE_TIER_MAX_SURVEYS_PER_DAY = 3;
 const FREE_TIER_MAX_RESPONDENTS = 25;
 
+/* eslint-disable @typescript-eslint/no-explicit-any */
+// rate_limits table added in migration 00002 but not in generated Supabase types yet
 async function checkRateLimit(ip: string): Promise<boolean> {
   const supabase = await createClient();
   const oneDayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
 
-  const { data } = await supabase
+  const { data } = (await (supabase as any)
     .from("rate_limits")
     .select("survey_count")
     .eq("ip_address", ip)
     .gte("window_start", oneDayAgo)
-    .single();
+    .single()) as { data: { survey_count: number } | null };
 
   if (!data) return true; // No record = allowed
   return data.survey_count < FREE_TIER_MAX_SURVEYS_PER_DAY;
@@ -139,25 +140,25 @@ async function incrementRateLimit(ip: string) {
   const supabase = await createClient();
   const oneDayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
 
-  // Try to increment existing record
-  const { data } = await supabase
+  const { data } = (await (supabase as any)
     .from("rate_limits")
     .select("id, survey_count")
     .eq("ip_address", ip)
     .gte("window_start", oneDayAgo)
-    .single();
+    .single()) as { data: { id: string; survey_count: number } | null };
 
   if (data) {
-    await supabase
+    await (supabase as any)
       .from("rate_limits")
-      .update({ survey_count: data.survey_count + 1 } as never)
+      .update({ survey_count: data.survey_count + 1 })
       .eq("id", data.id);
   } else {
-    await supabase
+    await (supabase as any)
       .from("rate_limits")
-      .insert({ ip_address: ip, survey_count: 1 } as never);
+      .insert({ ip_address: ip, survey_count: 1 });
   }
 }
+/* eslint-enable @typescript-eslint/no-explicit-any */
 
 function getStateFromDistrict(districtId: string): string {
   if (districtId.length === 2) return districtId;
@@ -192,7 +193,7 @@ export async function POST(request: Request) {
 
   // Free tier vs authenticated
   let creditsRequired = 0;
-  let profile: Pick<Profile, "credit_balance" | "tier"> | null = null;
+  let profileBalance = 0;
 
   if (user) {
     // Authenticated: credit-based
@@ -202,7 +203,7 @@ export async function POST(request: Request) {
       .eq("id", user.id)
       .single();
 
-    profile = profileData as typeof profile;
+    const profile = profileData as unknown as { credit_balance: number; tier: string } | null;
 
     if (!profile) {
       return new Response(JSON.stringify({ error: "Profile not found" }), {
@@ -211,6 +212,8 @@ export async function POST(request: Request) {
       });
     }
 
+    profileBalance = profile.credit_balance;
+
     const modelConfig = MODEL_CONFIG[model];
     const respondentsPerCredit =
       responseType === "likert"
@@ -218,12 +221,12 @@ export async function POST(request: Request) {
         : modelConfig.respondentsPerCreditOpenEnded;
     creditsRequired = Math.max(1, Math.ceil(hiveSize / respondentsPerCredit));
 
-    if (profile.credit_balance < creditsRequired) {
+    if (profileBalance < creditsRequired) {
       return new Response(
         JSON.stringify({
           error: "Insufficient credits",
           required: creditsRequired,
-          available: profile.credit_balance,
+          available: profileBalance,
         }),
         { status: 402, headers: { "Content-Type": "application/json" } }
       );
@@ -448,11 +451,11 @@ export async function POST(request: Request) {
         }
 
         // Deduct credits (only for authenticated users)
-        if (user && profile && creditsRequired > 0) {
+        if (user && creditsRequired > 0) {
           await supabase
             .from("profiles")
             .update({
-              credit_balance: profile.credit_balance - creditsRequired,
+              credit_balance: profileBalance - creditsRequired,
             } as never)
             .eq("id", user.id);
 
