@@ -2,11 +2,11 @@
 
 ## Supabase Admin Access
 
-Use the **secret key** (not the old service_role JWT) for admin operations:
+Use the **service_role key** for admin operations:
 
 ```bash
 # Update user credits via REST API
-curl -X PATCH "https://xwmpmvtxuubzybmwnswv.supabase.co/rest/v1/profiles?email=eq.USER@EMAIL.COM" \
+curl -X PATCH "https://nbtaqmnxvwftbooxjhnd.supabase.co/rest/v1/profiles?email=eq.USER@EMAIL.COM" \
   -H "apikey: $SUPABASE_SECRET_KEY" \
   -H "Authorization: Bearer $SUPABASE_SECRET_KEY" \
   -H "Content-Type: application/json" \
@@ -14,15 +14,14 @@ curl -X PATCH "https://xwmpmvtxuubzybmwnswv.supabase.co/rest/v1/profiles?email=e
   -d '{"credit_balance": 10000}'
 ```
 
-The secret key is in `.env.local` as `SUPABASE_SECRET_KEY` (format: `sb_secret_...`).
-
-Per [Supabase docs](https://supabase.com/docs/guides/api/api-keys), secret keys replace the old `service_role` JWT keys and are easier to rotate.
+The service_role key is in `.env.local` as `SUPABASE_SECRET_KEY`.
 
 ## Environment
 
-- **Supabase Project**: `xwmpmvtxuubzybmwnswv`
-- **URL**: https://xwmpmvtxuubzybmwnswv.supabase.co
-- **Dashboard**: https://supabase.com/dashboard/project/xwmpmvtxuubzybmwnswv
+- **Supabase Project**: `nbtaqmnxvwftbooxjhnd`
+- **URL**: https://nbtaqmnxvwftbooxjhnd.supabase.co
+- **Dashboard**: https://supabase.com/dashboard/project/nbtaqmnxvwftbooxjhnd
+- **DB Password**: stored locally (check session notes)
 
 ## E2E Tests
 

@@ -9,7 +9,7 @@ import { samplePersons, sampleAcrossDistricts, filterByZcta } from "./sampler";
 import { generateSyntheticPersons } from "./fallback";
 
 const HF_BASE_URL =
-  "https://huggingface.co/datasets/hivesight/persona-data/resolve/main";
+  "https://huggingface.co/datasets/policyengine/hivesight-persona-data/resolve/main";
 
 // ZCTA-to-district lookup, loaded once and cached
 let zctalookup: Record<
