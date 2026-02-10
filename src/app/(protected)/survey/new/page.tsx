@@ -243,8 +243,8 @@ export default function NewSurveyPage() {
                   <SelectItem value="gpt-5-mini">
                     GPT-5 Mini (best value)
                   </SelectItem>
-                  <SelectItem value="gpt-5">
-                    GPT-5 (highest quality)
+                  <SelectItem value="gpt-5.2">
+                    GPT-5.2 (highest quality)
                   </SelectItem>
                 </SelectContent>
               </Select>

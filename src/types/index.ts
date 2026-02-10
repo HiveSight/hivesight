@@ -33,7 +33,7 @@ export const LIKERT_VALUES: Record<LikertScale, number> = {
 };
 
 // Model configuration
-export const ModelSchema = z.enum(["gpt-5-mini", "gpt-5"]);
+export const ModelSchema = z.enum(["gpt-5-mini", "gpt-5.2"]);
 export type Model = z.infer<typeof ModelSchema>;
 
 export const MODEL_CONFIG: Record<
@@ -53,10 +53,10 @@ export const MODEL_CONFIG: Record<
     respondentsPerCreditLikert: 4,
     respondentsPerCreditOpenEnded: 2,
   },
-  "gpt-5": {
-    name: "GPT-5",
-    inputCostPer1M: 1.25,
-    outputCostPer1M: 10.0,
+  "gpt-5.2": {
+    name: "GPT-5.2",
+    inputCostPer1M: 1.75,
+    outputCostPer1M: 14.0,
     respondentsPerCreditLikert: 1,
     respondentsPerCreditOpenEnded: 1,
   },

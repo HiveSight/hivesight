@@ -43,7 +43,7 @@ function getOpenAI() {
 const CreateSurveySchema = z.object({
   question: z.string().min(10),
   responseType: z.enum(["likert", "open_ended"]),
-  model: z.enum(["gpt-5-mini", "gpt-5"]),
+  model: z.enum(["gpt-5-mini", "gpt-5.2"]),
   hiveSize: z.number().min(1).max(1000),
   location: LocationFilterSchema.optional(),
   // Legacy support
@@ -363,22 +363,20 @@ export async function POST(request: Request) {
 
         for (let i = 0; i < sampledPersons.length; i += BATCH_SIZE) {
           const batchNum = Math.floor(i / BATCH_SIZE) + 1;
-          const completed = Math.min(i + BATCH_SIZE, sampledPersons.length);
-          const progressPercent =
-            15 + Math.floor((completed / sampledPersons.length) * 70);
+          const batchSize = Math.min(BATCH_SIZE, sampledPersons.length - i);
 
           sendEvent(controller, "progress", {
             stage: "processing",
-            message: `Processing responses... (${completed}/${sampledPersons.length})`,
-            progress: progressPercent,
-            completed,
+            message: `Processing batch ${batchNum} of ${totalBatches}... (${results.length}/${sampledPersons.length} complete)`,
+            progress: 15 + Math.floor((results.length / sampledPersons.length) * 70),
+            completed: results.length,
             total: sampledPersons.length,
             batch: batchNum,
             totalBatches,
           });
 
           const batchIndices = Array.from(
-            { length: Math.min(BATCH_SIZE, sampledPersons.length - i) },
+            { length: batchSize },
             (_, j) => i + j
           );
 
@@ -394,6 +392,16 @@ export async function POST(request: Request) {
             )
           );
           results.push(...batchResults);
+
+          sendEvent(controller, "progress", {
+            stage: "processing",
+            message: `Processing responses... (${results.length}/${sampledPersons.length} complete)`,
+            progress: 15 + Math.floor((results.length / sampledPersons.length) * 70),
+            completed: results.length,
+            total: sampledPersons.length,
+            batch: batchNum,
+            totalBatches,
+          });
         }
 
         // Step 4: Save respondents with rich demographics

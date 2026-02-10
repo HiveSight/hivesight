@@ -4,7 +4,7 @@ import { MODEL_CONFIG } from "@/types";
 
 const EstimateSchema = z.object({
   responseType: z.enum(["likert", "open_ended"]),
-  model: z.enum(["gpt-5-mini", "gpt-5"]),
+  model: z.enum(["gpt-5-mini", "gpt-5.2"]),
   hiveSize: z.number().min(1).max(1000),
 });
 

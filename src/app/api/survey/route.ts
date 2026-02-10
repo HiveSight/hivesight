@@ -12,7 +12,7 @@ type Respondent = Database["public"]["Tables"]["respondents"]["Row"];
 const CreateSurveySchema = z.object({
   question: z.string().min(10),
   responseType: z.enum(["likert", "open_ended"]),
-  model: z.enum(["gpt-5-mini", "gpt-5"]),
+  model: z.enum(["gpt-5-mini", "gpt-5.2"]),
   hiveSize: z.number().min(1).max(1000),
   demographicFilters: z.object({
     ageRange: z.tuple([z.number(), z.number()]),
