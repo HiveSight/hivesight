@@ -44,6 +44,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
   ({ className, variant, size, asChild = false, ...props }, ref) => {
     const Comp = asChild ? Slot : "button";
     return (
+      /* eslint-disable-next-line @typescript-eslint/ban-ts-comment */
       // @ts-ignore React 18 types incompatibility with @radix-ui/react-slot
       <Comp
         className={cn(buttonVariants({ variant, size, className }))}
