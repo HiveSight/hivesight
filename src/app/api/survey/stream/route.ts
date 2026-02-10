@@ -299,21 +299,27 @@ export async function POST(request: Request) {
         // If it failed (likely missing columns or NOT NULL on user_id), try base schema
         if (surveyError) {
           console.warn("New schema insert failed, trying base schema:", surveyError.message);
-          const baseInsert: Record<string, unknown> = {
-            question,
-            response_type: responseType,
-            model,
-            hive_size: hiveSize,
-            demographic_filters: {},
-            status: "processing",
-          };
-          // Only include user_id if we have one (old schema has NOT NULL)
-          if (user?.id) {
-            baseInsert.user_id = user.id;
+
+          // If no user and insert failed, old schema requires user_id NOT NULL
+          if (!user?.id) {
+            sendEvent(controller, "error", {
+              message: "Please sign in to create surveys. Anonymous surveys will be available soon.",
+            });
+            controller.close();
+            return;
           }
+
           ({ data: surveyData, error: surveyError } = await supabase
             .from("surveys")
-            .insert([baseInsert] as never)
+            .insert([{
+              user_id: user.id,
+              question,
+              response_type: responseType,
+              model,
+              hive_size: hiveSize,
+              demographic_filters: {},
+              status: "processing",
+            }] as never)
             .select()
             .single());
         }
