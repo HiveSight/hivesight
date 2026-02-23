@@ -124,7 +124,7 @@ export function HeroSurveyForm() {
   return (
     <div className="w-full max-w-xl mx-auto space-y-4 text-left">
       <textarea
-        className="w-full min-h-24 p-4 border rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-primary text-base"
+        className="w-full min-h-24 p-4 border rounded-lg resize-none focus:outline-hidden focus:ring-2 focus:ring-primary text-base"
         placeholder="e.g., I support increasing the minimum wage to $15/hour"
         value={question}
         onChange={(e) => setQuestion(e.target.value)}

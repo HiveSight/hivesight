@@ -77,7 +77,7 @@ export default function BrandPage() {
         </div>
 
         {/* Brand essence */}
-        <div className="bg-gradient-to-br from-amber-500/10 to-amber-600/5 rounded-2xl p-8 mb-12">
+        <div className="bg-linear-to-br from-amber-500/10 to-amber-600/5 rounded-2xl p-8 mb-12">
           <h2 className="text-2xl font-bold mb-6">Brand essence</h2>
           <div className="grid md:grid-cols-3 gap-6">
             <div>

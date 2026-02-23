@@ -170,7 +170,7 @@ export default function NewSurveyPage() {
             <Label htmlFor="question">Your question or statement</Label>
             <textarea
               id="question"
-              className="w-full min-h-28 p-3 border rounded-md resize-none focus:outline-none focus:ring-2 focus:ring-primary"
+              className="w-full min-h-28 p-3 border rounded-md resize-none focus:outline-hidden focus:ring-2 focus:ring-primary"
               placeholder="e.g., I support increasing the minimum wage to $15/hour"
               value={question}
               onChange={(e) => setQuestion(e.target.value)}

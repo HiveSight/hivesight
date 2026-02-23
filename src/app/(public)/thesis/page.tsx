@@ -329,14 +329,14 @@ export default function ThesisPage() {
   return (
     <div className="min-h-screen bg-neutral-950 text-white">
       {/* Top nav */}
-      <nav className="fixed top-0 left-0 right-0 h-16 flex items-center px-6 bg-neutral-950/90 backdrop-blur-sm border-b border-neutral-800 z-50">
+      <nav className="fixed top-0 left-0 right-0 h-16 flex items-center px-6 bg-neutral-950/90 backdrop-blur-xs border-b border-neutral-800 z-50">
         <Link href="/" className="flex items-center gap-2 text-xl font-semibold hover:opacity-80">
           HiveSight
         </Link>
       </nav>
 
       {/* Progress nav */}
-      <nav className="fixed top-20 left-1/2 -translate-x-1/2 flex flex-wrap justify-center gap-2 p-2 bg-neutral-900/90 backdrop-blur-sm border border-neutral-700 rounded-full z-40 max-w-[90%]">
+      <nav className="fixed top-20 left-1/2 -translate-x-1/2 flex flex-wrap justify-center gap-2 p-2 bg-neutral-900/90 backdrop-blur-xs border border-neutral-700 rounded-full z-40 max-w-[90%]">
         {sections.map((s) => (
           <button
             key={s}
@@ -1096,7 +1096,7 @@ export default function ThesisPage() {
             <span className="text-sm text-neutral-500 uppercase tracking-widest block mb-4">
               Seed Round
             </span>
-            <span className="text-5xl font-bold bg-gradient-to-r from-amber-500 to-amber-400 bg-clip-text text-transparent">
+            <span className="text-5xl font-bold bg-linear-to-r from-amber-500 to-amber-400 bg-clip-text text-transparent">
               $1-2M
             </span>
           </div>

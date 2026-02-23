@@ -7,9 +7,9 @@ export default function BrandLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className="min-h-screen bg-gradient-to-b from-amber-50/50 to-background">
+    <div className="min-h-screen bg-linear-to-b from-amber-50/50 to-background">
       {/* Header */}
-      <header className="py-4 px-4 border-b bg-background/80 backdrop-blur-sm sticky top-0 z-50">
+      <header className="py-4 px-4 border-b bg-background/80 backdrop-blur-xs sticky top-0 z-50">
         <div className="max-w-6xl mx-auto flex items-center justify-between">
           <Link href="/" className="flex items-center gap-2">
             <Hexagon className="h-8 w-8 text-amber-500 fill-amber-500/20" />

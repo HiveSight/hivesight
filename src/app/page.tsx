@@ -109,7 +109,7 @@ export default async function Home() {
               "Fast results — typically under a minute",
             ].map((feature) => (
               <div key={feature} className="flex items-center gap-3">
-                <Check className="h-5 w-5 text-green-500 flex-shrink-0" />
+                <Check className="h-5 w-5 text-green-500 shrink-0" />
                 <span>{feature}</span>
               </div>
             ))}

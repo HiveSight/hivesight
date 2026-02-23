@@ -342,7 +342,7 @@ export default function DesignPage() {
               <h3 className="text-lg font-semibold mb-4">Alerts and notices</h3>
               <div className="space-y-4">
                 <div className="flex items-start gap-3 p-4 rounded-lg bg-amber-500/10 border border-amber-500/20">
-                  <Hexagon className="h-5 w-5 text-amber-500 flex-shrink-0 mt-0.5" />
+                  <Hexagon className="h-5 w-5 text-amber-500 shrink-0 mt-0.5" />
                   <div>
                     <p className="font-medium text-amber-700 dark:text-amber-400">
                       Information
@@ -354,7 +354,7 @@ export default function DesignPage() {
                   </div>
                 </div>
                 <div className="flex items-start gap-3 p-4 rounded-lg bg-green-500/10 border border-green-500/20">
-                  <Check className="h-5 w-5 text-green-500 flex-shrink-0 mt-0.5" />
+                  <Check className="h-5 w-5 text-green-500 shrink-0 mt-0.5" />
                   <div>
                     <p className="font-medium text-green-700 dark:text-green-400">
                       Success
@@ -365,7 +365,7 @@ export default function DesignPage() {
                   </div>
                 </div>
                 <div className="flex items-start gap-3 p-4 rounded-lg bg-red-500/10 border border-red-500/20">
-                  <X className="h-5 w-5 text-red-500 flex-shrink-0 mt-0.5" />
+                  <X className="h-5 w-5 text-red-500 shrink-0 mt-0.5" />
                   <div>
                     <p className="font-medium text-red-700 dark:text-red-400">
                       Error
@@ -376,7 +376,7 @@ export default function DesignPage() {
                   </div>
                 </div>
                 <div className="flex items-start gap-3 p-4 rounded-lg bg-yellow-500/10 border border-yellow-500/20">
-                  <AlertTriangle className="h-5 w-5 text-yellow-600 flex-shrink-0 mt-0.5" />
+                  <AlertTriangle className="h-5 w-5 text-yellow-600 shrink-0 mt-0.5" />
                   <div>
                     <p className="font-medium text-yellow-700 dark:text-yellow-400">
                       Warning
@@ -457,7 +457,7 @@ export default function DesignPage() {
             </Card>
             <Card>
               <CardContent className="pt-6">
-                <div className="h-32 rounded-lg bg-gradient-to-br from-amber-500/10 to-amber-600/5 flex items-center justify-center">
+                <div className="h-32 rounded-lg bg-linear-to-br from-amber-500/10 to-amber-600/5 flex items-center justify-center">
                   <span className="text-sm text-muted-foreground">
                     Gradient overlay
                   </span>
