@@ -584,7 +584,7 @@ export default function ThesisPage() {
 
           <div className="grid gap-6 mb-12">
             <div className="p-6 bg-neutral-900 border border-neutral-800 rounded-xl">
-              <h3 className="text-lg font-semibold mb-2">Market Research Services</h3>
+              <h3 className="text-lg font-semibold mb-2">Market research services</h3>
               <div className="text-2xl font-bold text-amber-500 mb-2">
                 $84B → $140B<Cite id={17} />
               </div>
@@ -594,7 +594,7 @@ export default function ThesisPage() {
             </div>
 
             <div className="p-6 bg-neutral-900 border border-neutral-800 rounded-xl">
-              <h3 className="text-lg font-semibold mb-2">AI Research Services</h3>
+              <h3 className="text-lg font-semibold mb-2">AI research services</h3>
               <div className="text-2xl font-bold text-amber-500 mb-2">
                 $8B → $35B<Cite id={5} />
               </div>
@@ -605,15 +605,15 @@ export default function ThesisPage() {
 
             <div className="grid md:grid-cols-2 gap-6">
               <div className="p-6 bg-neutral-900 border border-neutral-800 rounded-xl">
-                <h3 className="text-lg font-semibold mb-2">Academic Research</h3>
+                <h3 className="text-lg font-semibold mb-2">Academic research</h3>
                 <div className="text-lg font-bold text-amber-500 mb-2">Underserved</div>
                 <p className="text-sm text-neutral-400">
                   PhD students, postdocs, and faculty with limited budgets but need for survey data.
                 </p>
               </div>
               <div className="p-6 bg-neutral-900 border border-neutral-800 rounded-xl">
-                <h3 className="text-lg font-semibold mb-2">Product Teams</h3>
-                <div className="text-lg font-bold text-amber-500 mb-2">High Velocity</div>
+                <h3 className="text-lg font-semibold mb-2">Product teams</h3>
+                <div className="text-lg font-bold text-amber-500 mb-2">High velocity</div>
                 <p className="text-sm text-neutral-400">
                   Rapid iteration on messaging, feature prioritization, and user sentiment testing.
                 </p>
@@ -622,7 +622,7 @@ export default function ThesisPage() {
           </div>
 
           <div className="p-6 bg-amber-500/10 border-l-4 border-amber-500 rounded-r-lg">
-            <h3 className="text-lg font-semibold text-white mb-2">Industry Adoption</h3>
+            <h3 className="text-lg font-semibold text-white mb-2">Industry adoption</h3>
             <p className="text-neutral-300">
               <strong className="text-white">83%</strong> of market research professionals plan to
               invest in AI for research in 2025.<Cite id={6} /> <strong className="text-white">64%</strong> of
@@ -730,9 +730,9 @@ export default function ThesisPage() {
       {/* Pricing */}
       <section ref={setRef("pricing")} className="min-h-screen px-6 py-24 flex flex-col items-center">
         <div className="max-w-2xl w-full">
-          <h2 className="text-4xl font-bold mb-8">6. Pricing Strategy</h2>
+          <h2 className="text-4xl font-bold mb-8">6. Pricing strategy</h2>
           <p className="text-xl font-medium text-white mb-4">
-            Hybrid model: Credits + Subscriptions
+            Hybrid model: credits + subscriptions
           </p>
           <p className="text-neutral-400 leading-relaxed mb-8">
             The AI SaaS industry is moving toward hybrid pricing.<Cite id={7} /> 39% of SaaS companies
@@ -747,7 +747,7 @@ export default function ThesisPage() {
             </p>
           </div>
 
-          <h3 className="text-xl font-semibold mb-6">Comparable Pricing Models</h3>
+          <h3 className="text-xl font-semibold mb-6">Comparable pricing models</h3>
           <div className="overflow-x-auto mb-8">
             <table className="w-full text-sm">
               <thead>
@@ -782,25 +782,25 @@ export default function ThesisPage() {
             </table>
           </div>
 
-          <h3 className="text-xl font-semibold mb-4">HiveSight Pricing</h3>
+          <h3 className="text-xl font-semibold mb-4">HiveSight pricing</h3>
           <div className="space-y-1">
             <div className="flex justify-between items-center p-5 bg-neutral-900 border-l-4 border-green-500">
               <div>
-                <h4 className="font-medium">Credits (One-Time)</h4>
+                <h4 className="font-medium">Credits (one-time)</h4>
                 <p className="text-sm text-neutral-400">Pay for what you use. No commitment.</p>
               </div>
               <span className="text-amber-500 font-semibold">$0.10/credit</span>
             </div>
             <div className="flex justify-between items-center p-5 bg-neutral-900 border-l-4 border-blue-500">
               <div>
-                <h4 className="font-medium">Basic Subscription</h4>
+                <h4 className="font-medium">Basic subscription</h4>
                 <p className="text-sm text-neutral-400">1,000 credits/mo for regular users</p>
               </div>
               <span className="text-amber-500 font-semibold">$29/mo</span>
             </div>
             <div className="flex justify-between items-center p-5 bg-neutral-900 border-l-4 border-purple-500">
               <div>
-                <h4 className="font-medium">Premium Subscription</h4>
+                <h4 className="font-medium">Premium subscription</h4>
                 <p className="text-sm text-neutral-400">10,000 credits/mo for power users</p>
               </div>
               <span className="text-amber-500 font-semibold">$99/mo</span>
@@ -812,10 +812,10 @@ export default function ThesisPage() {
       {/* Business Model */}
       <section ref={setRef("model")} className="min-h-screen px-6 py-24 flex flex-col items-center">
         <div className="max-w-2xl w-full">
-          <h2 className="text-4xl font-bold mb-8">7. Business Model</h2>
+          <h2 className="text-4xl font-bold mb-8">7. Business model</h2>
 
           <div className="p-8 bg-neutral-900 border border-neutral-800 rounded-xl text-center mb-8">
-            <h3 className="text-lg font-medium text-neutral-400 mb-6">Unit Economics</h3>
+            <h3 className="text-lg font-medium text-neutral-400 mb-6">Unit economics</h3>
             <div className="grid grid-cols-3 gap-6">
               <div>
                 <span className="text-3xl font-bold text-white block">$0.10</span>
@@ -832,10 +832,10 @@ export default function ThesisPage() {
             </div>
           </div>
 
-          <h3 className="text-xl font-semibold mb-4">Revenue Streams</h3>
+          <h3 className="text-xl font-semibold mb-4">Revenue streams</h3>
           <div className="space-y-4 mb-8">
             <div className="flex justify-between items-center p-4 bg-neutral-900 rounded-lg">
-              <span className="text-neutral-400">Credit Purchases</span>
+              <span className="text-neutral-400">Credit purchases</span>
               <span className="text-white">One-time, variable revenue</span>
             </div>
             <div className="flex justify-between items-center p-4 bg-neutral-900 rounded-lg">
@@ -848,7 +848,7 @@ export default function ThesisPage() {
             </div>
           </div>
 
-          <h3 className="text-xl font-semibold mb-4">Why Hybrid Works for HiveSight</h3>
+          <h3 className="text-xl font-semibold mb-4">Why hybrid works for HiveSight</h3>
           <ul className="space-y-3 text-neutral-400">
             <li className="flex items-start gap-3">
               <span className="text-amber-500">→</span>
@@ -881,7 +881,7 @@ export default function ThesisPage() {
           </ul>
 
           <div className="mt-8 p-6 bg-neutral-900/50 border border-neutral-800 rounded-xl">
-            <h3 className="text-lg font-semibold mb-4">Open Source Precedent<Cite id={16} /></h3>
+            <h3 className="text-lg font-semibold mb-4">Open source precedent<Cite id={16} /></h3>
             <div className="grid grid-cols-3 gap-4 text-center">
               <div>
                 <span className="text-neutral-500 text-sm block">MongoDB</span>
@@ -903,7 +903,7 @@ export default function ThesisPage() {
       {/* Traction */}
       <section ref={setRef("traction")} className="min-h-screen px-6 py-24 flex flex-col items-center">
         <div className="max-w-2xl w-full">
-          <h2 className="text-4xl font-bold mb-8">8. Traction & Roadmap</h2>
+          <h2 className="text-4xl font-bold mb-8">8. Traction & roadmap</h2>
 
           <div className="space-y-6">
             <div className="p-6 bg-neutral-900 border border-neutral-800 rounded-xl">
@@ -928,7 +928,7 @@ export default function ThesisPage() {
                 <span className="px-3 py-1 bg-amber-500/20 text-amber-400 text-xs font-medium rounded-full">
                   Next
                 </span>
-                <h3 className="text-lg font-semibold">Growth Features</h3>
+                <h3 className="text-lg font-semibold">Growth features</h3>
               </div>
               <ul className="space-y-2 text-sm text-neutral-400">
                 <li>• Subscription tiers (Basic, Premium)</li>
@@ -995,7 +995,7 @@ export default function ThesisPage() {
 
             <div className="p-6 bg-neutral-900 border border-neutral-800 rounded-xl border-dashed">
               <h3 className="text-xl font-semibold mb-2">Hiring</h3>
-              <p className="text-amber-500 text-sm mb-4">Co-founders & Early Team</p>
+              <p className="text-amber-500 text-sm mb-4">Co-founders & early team</p>
               <ul className="space-y-2 text-sm text-neutral-400">
                 <li>• Full-stack engineer with AI/ML experience</li>
                 <li>• Growth/marketing for research tools</li>
@@ -1012,7 +1012,7 @@ export default function ThesisPage() {
       {/* Risks */}
       <section ref={setRef("risks")} className="min-h-screen px-6 py-24 flex flex-col items-center">
         <div className="max-w-2xl w-full">
-          <h2 className="text-4xl font-bold mb-8">10. Risks & Mitigations</h2>
+          <h2 className="text-4xl font-bold mb-8">10. Risks & mitigations</h2>
 
           <div className="grid md:grid-cols-2 gap-6">
             <div className="p-6 bg-neutral-900 border border-neutral-800 rounded-xl">
@@ -1090,11 +1090,11 @@ export default function ThesisPage() {
       {/* Ask */}
       <section ref={setRef("ask")} className="min-h-screen px-6 py-24 flex flex-col items-center">
         <div className="max-w-2xl w-full">
-          <h2 className="text-4xl font-bold mb-8">11. The Ask</h2>
+          <h2 className="text-4xl font-bold mb-8">11. The ask</h2>
 
           <div className="p-8 bg-neutral-900 border border-neutral-800 rounded-xl text-center mb-8">
             <span className="text-sm text-neutral-500 uppercase tracking-widest block mb-4">
-              Seed Round
+              Seed round
             </span>
             <span className="text-5xl font-bold bg-linear-to-r from-amber-500 to-amber-400 bg-clip-text text-transparent">
               $1-2M
@@ -1103,7 +1103,7 @@ export default function ThesisPage() {
 
           <div className="grid md:grid-cols-2 gap-6 mb-8">
             <div className="p-6 bg-neutral-900/50 rounded-xl">
-              <h3 className="text-lg font-semibold mb-4">Use of Funds</h3>
+              <h3 className="text-lg font-semibold mb-4">Use of funds</h3>
               <div className="space-y-3">
                 <div className="relative h-8 bg-neutral-950 rounded overflow-hidden">
                   <div className="absolute inset-0 bg-amber-500/30 w-[50%]" />
@@ -1114,7 +1114,7 @@ export default function ThesisPage() {
                 <div className="relative h-8 bg-neutral-950 rounded overflow-hidden">
                   <div className="absolute inset-0 bg-amber-500/30 w-[25%]" />
                   <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm z-10">
-                    25% Go-to-Market
+                    25% Go-to-market
                   </span>
                 </div>
                 <div className="relative h-8 bg-neutral-950 rounded overflow-hidden">
@@ -1159,7 +1159,7 @@ export default function ThesisPage() {
             </div>
           </div>
 
-          <h3 className="text-xl font-semibold mb-4">Revenue Path</h3>
+          <h3 className="text-xl font-semibold mb-4">Revenue path</h3>
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
@@ -1243,7 +1243,7 @@ export default function ThesisPage() {
             href="mailto:max@hivesight.ai"
             className="px-6 py-3 bg-amber-500 text-white font-medium rounded-lg hover:bg-amber-600 transition-colors"
           >
-            Get in Touch
+            Get in touch
           </a>
           <Link
             href="/dashboard"
@@ -1255,7 +1255,7 @@ export default function ThesisPage() {
             href="/"
             className="px-6 py-3 border border-neutral-700 text-white font-medium rounded-lg hover:border-neutral-500 transition-colors"
           >
-            ← Back to Home
+            ← Back to home
           </Link>
         </div>
       </section>
