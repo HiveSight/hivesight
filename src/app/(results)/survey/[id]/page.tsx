@@ -6,12 +6,17 @@ import Link from "next/link";
 import { LikertChart } from "@/components/survey/likert-chart";
 import { ResponseTable } from "@/components/survey/response-table";
 import type { Database } from "@/types/database";
-import type { LocationFilter } from "@/types";
+import { LIKERT_VALUES, type LocationFilter } from "@/types";
 import { MapPin } from "lucide-react";
 
 type Survey = Database["public"]["Tables"]["surveys"]["Row"];
 type Respondent = Database["public"]["Tables"]["respondents"]["Row"];
 type Response = Database["public"]["Tables"]["responses"]["Row"];
+
+const STATUS_STYLES: Record<string, string> = {
+  processing: "bg-amber-50 text-amber-700 dark:bg-amber-900/20 dark:text-amber-400",
+  failed: "bg-red-50 text-red-700 dark:bg-red-900/20 dark:text-red-400",
+};
 
 interface SurveyWithData extends Survey {
   respondents: Respondent[];
@@ -108,11 +113,7 @@ export default async function SurveyResultsPage({
             <div className="flex items-center gap-2">
               <span
                 className={`px-2.5 py-1 text-sm font-medium rounded-full ${
-                  survey.status === "processing"
-                    ? "bg-amber-50 text-amber-700 dark:bg-amber-900/20 dark:text-amber-400"
-                    : survey.status === "failed"
-                    ? "bg-red-50 text-red-700 dark:bg-red-900/20 dark:text-red-400"
-                    : "bg-muted text-muted-foreground"
+                  STATUS_STYLES[survey.status] ?? "bg-muted text-muted-foreground"
                 }`}
               >
                 {survey.status}
@@ -246,14 +247,6 @@ export default async function SurveyResultsPage({
     </div>
   );
 }
-
-const LIKERT_VALUES: Record<string, number> = {
-  strongly_disagree: 1,
-  disagree: 2,
-  neutral: 3,
-  agree: 4,
-  strongly_agree: 5,
-};
 
 function calculateLikertDistribution(responses: Response[]) {
   const counts = {

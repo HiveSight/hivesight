@@ -7,15 +7,9 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { LocationInput } from "./location-input";
 import type { LocationFilter } from "@/types";
+import type { ProgressState } from "@/lib/survey-stream";
+import { readSurveyStream } from "@/lib/survey-stream";
 import { ArrowRight } from "lucide-react";
-
-interface ProgressState {
-  stage: string;
-  message: string;
-  progress: number;
-  completed?: number;
-  total?: number;
-}
 
 export function HeroSurveyForm() {
   const router = useRouter();
@@ -58,44 +52,11 @@ export function HeroSurveyForm() {
         throw new Error(data.error || data.message || "Failed to create survey");
       }
 
-      const reader = res.body?.getReader();
-      if (!reader) throw new Error("No response stream");
-
-      const decoder = new TextDecoder();
-      let buffer = "";
-
-      while (true) {
-        const { done, value } = await reader.read();
-        if (done) break;
-
-        buffer += decoder.decode(value, { stream: true });
-        const lines = buffer.split("\n");
-        buffer = lines.pop() || "";
-
-        let eventType = "";
-        for (const line of lines) {
-          if (line.startsWith("event: ")) {
-            eventType = line.slice(7);
-          } else if (line.startsWith("data: ")) {
-            const data = JSON.parse(line.slice(6));
-
-            if (eventType === "progress") {
-              setProgressState({
-                stage: data.stage,
-                message: data.message,
-                progress: data.progress,
-                completed: data.completed,
-                total: data.total,
-              });
-            } else if (eventType === "complete") {
-              router.push(`/survey/${data.surveyId}`);
-              return;
-            } else if (eventType === "error") {
-              throw new Error(data.message);
-            }
-          }
-        }
-      }
+      await readSurveyStream(res, {
+        onProgress: setProgressState,
+        onComplete: (surveyId) => router.push(`/survey/${surveyId}`),
+        onError: (message) => { throw new Error(message); },
+      });
     } catch (err) {
       setError(err instanceof Error ? err.message : "Something went wrong");
       setLoading(false);

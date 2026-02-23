@@ -8,6 +8,12 @@ import { Plus } from "lucide-react";
 type Profile = Database["public"]["Tables"]["profiles"]["Row"];
 type Survey = Database["public"]["Tables"]["surveys"]["Row"];
 
+const STATUS_STYLES: Record<string, string> = {
+  completed: "bg-emerald-50 text-emerald-700 dark:bg-emerald-900/20 dark:text-emerald-400",
+  processing: "bg-amber-50 text-amber-700 dark:bg-amber-900/20 dark:text-amber-400",
+  failed: "bg-red-50 text-red-700 dark:bg-red-900/20 dark:text-red-400",
+};
+
 export default async function DashboardPage() {
   const supabase = await createClient();
 
@@ -110,13 +116,7 @@ export default async function DashboardPage() {
                   <div className="flex items-center gap-3 ml-4">
                     <span
                       className={`px-2.5 py-1 text-xs font-medium rounded-full ${
-                        survey.status === "completed"
-                          ? "bg-emerald-50 text-emerald-700 dark:bg-emerald-900/20 dark:text-emerald-400"
-                          : survey.status === "processing"
-                          ? "bg-amber-50 text-amber-700 dark:bg-amber-900/20 dark:text-amber-400"
-                          : survey.status === "failed"
-                          ? "bg-red-50 text-red-700 dark:bg-red-900/20 dark:text-red-400"
-                          : "bg-muted text-muted-foreground"
+                        STATUS_STYLES[survey.status] ?? "bg-muted text-muted-foreground"
                       }`}
                     >
                       {survey.status}

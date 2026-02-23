@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
+import { LIKERT_LABELS } from "@/types";
 import type { Database } from "@/types/database";
 import { Download, ChevronLeft, ChevronRight } from "lucide-react";
 
@@ -16,14 +17,6 @@ interface ResponseTableProps {
   responses: ResponseWithRespondent[];
   responseType: "likert" | "open_ended";
 }
-
-const LIKERT_LABELS: Record<string, string> = {
-  strongly_disagree: "Strongly Disagree",
-  disagree: "Disagree",
-  neutral: "Neutral",
-  agree: "Agree",
-  strongly_agree: "Strongly Agree",
-};
 
 export function ResponseTable({ responses, responseType }: ResponseTableProps) {
   const [page, setPage] = useState(0);

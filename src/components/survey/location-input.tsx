@@ -26,11 +26,20 @@ interface LocationInputProps {
   placeholder?: string;
 }
 
+type LocationType = "zip" | "state" | "district" | "national";
+
 interface LocationOption {
-  type: "zip" | "state" | "district" | "national";
+  type: LocationType;
   id: string;
   label: string;
 }
+
+const LOCATION_TYPE_LABELS: Record<LocationType, string> = {
+  zip: "ZIP code",
+  state: "State",
+  district: "Congressional district",
+  national: "National",
+};
 
 export function LocationInput({
   value,
@@ -210,13 +219,7 @@ export function LocationInput({
                 <MapPin className="h-3.5 w-3.5 text-amber-500 shrink-0" />
                 <span className="font-medium">{option.label}</span>
                 <span className="ml-auto text-xs text-muted-foreground/70">
-                  {option.type === "zip"
-                    ? "ZIP code"
-                    : option.type === "state"
-                    ? "State"
-                    : option.type === "district"
-                    ? "Congressional district"
-                    : "National"}
+                  {LOCATION_TYPE_LABELS[option.type]}
                 </span>
               </div>
             </button>

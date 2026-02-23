@@ -215,6 +215,15 @@ export const UserProfileSchema = z.object({
 
 export type UserProfile = z.infer<typeof UserProfileSchema>;
 
+// Survey progress state (used by hero form and new survey page)
+export interface ProgressState {
+  stage: string;
+  message: string;
+  progress: number;
+  completed?: number;
+  total?: number;
+}
+
 // Credit pricing - $0.10 per credit (simple, transparent)
 export const CREDIT_PRICE_CENTS = 10; // $0.10 per credit
 

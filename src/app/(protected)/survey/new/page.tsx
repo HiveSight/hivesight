@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -18,15 +18,9 @@ import { Progress } from "@/components/ui/progress";
 import { MODEL_CONFIG } from "@/types";
 import { LocationInput } from "@/components/survey/location-input";
 import type { Model, ResponseType, LocationFilter } from "@/types";
+import type { ProgressState } from "@/lib/survey-stream";
+import { readSurveyStream } from "@/lib/survey-stream";
 import { ChevronDown, ChevronUp, ArrowRight } from "lucide-react";
-
-interface ProgressState {
-  stage: string;
-  message: string;
-  progress: number;
-  completed?: number;
-  total?: number;
-}
 
 export default function NewSurveyPage() {
   const router = useRouter();
@@ -43,16 +37,12 @@ export default function NewSurveyPage() {
   const [credits, setCredits] = useState(25);
 
   // Calculate respondents from credits
-  const respondentsPerCredit = useMemo(() => {
-    const config = MODEL_CONFIG[model];
-    return responseType === "likert"
+  const config = MODEL_CONFIG[model];
+  const respondentsPerCredit =
+    responseType === "likert"
       ? config.respondentsPerCreditLikert
       : config.respondentsPerCreditOpenEnded;
-  }, [model, responseType]);
-
-  const hiveSize = useMemo(() => {
-    return credits * respondentsPerCredit;
-  }, [credits, respondentsPerCredit]);
+  const hiveSize = credits * respondentsPerCredit;
 
   const canSubmit = question.length >= 10 && location !== null;
 
@@ -85,46 +75,11 @@ export default function NewSurveyPage() {
         throw new Error(data.error || "Failed to create survey");
       }
 
-      const reader = res.body?.getReader();
-      if (!reader) {
-        throw new Error("No response stream");
-      }
-
-      const decoder = new TextDecoder();
-      let buffer = "";
-
-      while (true) {
-        const { done, value } = await reader.read();
-        if (done) break;
-
-        buffer += decoder.decode(value, { stream: true });
-        const lines = buffer.split("\n");
-        buffer = lines.pop() || "";
-
-        let eventType = "";
-        for (const line of lines) {
-          if (line.startsWith("event: ")) {
-            eventType = line.slice(7);
-          } else if (line.startsWith("data: ")) {
-            const data = JSON.parse(line.slice(6));
-
-            if (eventType === "progress") {
-              setProgressState({
-                stage: data.stage,
-                message: data.message,
-                progress: data.progress,
-                completed: data.completed,
-                total: data.total,
-              });
-            } else if (eventType === "complete") {
-              router.push(`/survey/${data.surveyId}`);
-              return;
-            } else if (eventType === "error") {
-              throw new Error(data.message);
-            }
-          }
-        }
-      }
+      await readSurveyStream(res, {
+        onProgress: setProgressState,
+        onComplete: (surveyId) => router.push(`/survey/${surveyId}`),
+        onError: (message) => { throw new Error(message); },
+      });
     } catch (err) {
       setError(err instanceof Error ? err.message : "Something went wrong");
       setLoading(false);
