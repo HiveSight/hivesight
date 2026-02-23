@@ -18,7 +18,7 @@ import { Progress } from "@/components/ui/progress";
 import { MODEL_CONFIG } from "@/types";
 import { LocationInput } from "@/components/survey/location-input";
 import type { Model, ResponseType, LocationFilter } from "@/types";
-import { ChevronDown, ChevronUp } from "lucide-react";
+import { ChevronDown, ChevronUp, ArrowRight } from "lucide-react";
 
 interface ProgressState {
   stage: string;
@@ -133,13 +133,13 @@ export default function NewSurveyPage() {
   };
 
   return (
-    <div className="max-w-2xl mx-auto space-y-6">
+    <div className="max-w-2xl mx-auto space-y-6 animate-fade-in">
       {/* Progress Modal */}
       {loading && progressState && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-          <Card className="w-full max-w-md mx-4">
+        <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50">
+          <Card className="w-full max-w-md mx-4 animate-slide-up animate-glow-pulse">
             <CardHeader>
-              <CardTitle className="text-center">Running survey</CardTitle>
+              <CardTitle className="text-center font-serif">Running survey</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <Progress value={progressState.progress} />
@@ -147,7 +147,7 @@ export default function NewSurveyPage() {
                 {progressState.message}
               </p>
               {progressState.completed !== undefined && progressState.total !== undefined && (
-                <p className="text-center text-xs text-muted-foreground">
+                <p className="text-center text-xs text-muted-foreground/70">
                   {progressState.completed} of {progressState.total} responses
                 </p>
               )}
@@ -156,10 +156,10 @@ export default function NewSurveyPage() {
         </div>
       )}
 
-      <h1 className="text-3xl font-bold">New survey</h1>
+      <h1 className="text-3xl font-bold font-serif">New survey</h1>
 
       {error && (
-        <div className="p-4 bg-red-50 text-red-700 rounded-lg">{error}</div>
+        <div className="p-4 bg-red-50 text-red-700 rounded-xl border border-red-200 dark:bg-red-900/10 dark:text-red-400 dark:border-red-800/30">{error}</div>
       )}
 
       {/* Main form */}
@@ -170,12 +170,12 @@ export default function NewSurveyPage() {
             <Label htmlFor="question">Your question or statement</Label>
             <textarea
               id="question"
-              className="w-full min-h-28 p-3 border rounded-md resize-none focus:outline-none focus:ring-2 focus:ring-primary"
+              className="w-full min-h-28 p-4 border border-amber-900/10 rounded-xl resize-none bg-white/80 text-base leading-relaxed placeholder:text-muted-foreground/50 focus:outline-hidden focus:ring-2 focus:ring-amber-500/30 focus:border-amber-300 transition-all duration-200 dark:bg-amber-950/20 dark:border-amber-100/10 dark:focus:ring-amber-500/30 dark:focus:border-amber-700"
               placeholder="e.g., I support increasing the minimum wage to $15/hour"
               value={question}
               onChange={(e) => setQuestion(e.target.value)}
             />
-            <p className="text-sm text-muted-foreground">
+            <p className="text-sm text-muted-foreground/70">
               {question.length < 10
                 ? `${10 - question.length} more characters needed`
                 : "Ready"}
@@ -220,7 +220,7 @@ export default function NewSurveyPage() {
       {/* Advanced options (collapsible) */}
       <button
         onClick={() => setShowAdvanced(!showAdvanced)}
-        className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground w-full"
+        className="flex items-center gap-2 text-sm text-muted-foreground hover:text-amber-700 dark:hover:text-amber-400 w-full transition-colors duration-200"
       >
         {showAdvanced ? (
           <ChevronUp className="h-4 w-4" />
@@ -231,7 +231,7 @@ export default function NewSurveyPage() {
       </button>
 
       {showAdvanced && (
-        <Card>
+        <Card className="animate-slide-down">
           <CardContent className="pt-6 space-y-6">
             <div className="space-y-2">
               <Label>AI model</Label>
@@ -266,11 +266,11 @@ export default function NewSurveyPage() {
                   step={1}
                 />
               </div>
-              <div className="p-4 bg-primary/10 rounded-lg">
-                <p className="text-2xl font-bold text-primary">
+              <div className="p-5 bg-gradient-to-br from-amber-50 to-amber-100/50 rounded-xl border border-amber-200/50 dark:from-amber-900/10 dark:to-amber-800/10 dark:border-amber-700/20">
+                <p className="text-2xl font-bold font-serif text-amber-700 dark:text-amber-400">
                   {hiveSize} respondents
                 </p>
-                <p className="text-sm text-muted-foreground">
+                <p className="text-sm text-muted-foreground mt-1">
                   for {credits} credits (${(credits * 0.10).toFixed(2)})
                 </p>
               </div>
@@ -280,7 +280,7 @@ export default function NewSurveyPage() {
       )}
 
       {/* Summary and submit */}
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between py-2">
         <div className="text-sm text-muted-foreground">
           {location ? (
             <>
@@ -295,8 +295,10 @@ export default function NewSurveyPage() {
           size="lg"
           onClick={handleSubmit}
           disabled={!canSubmit || loading}
+          className="gap-2"
         >
           {loading ? "Running..." : "Run survey"}
+          {!loading && <ArrowRight className="h-4 w-4" />}
         </Button>
       </div>
     </div>

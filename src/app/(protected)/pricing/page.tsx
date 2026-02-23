@@ -74,37 +74,40 @@ export default function PricingPage() {
   ];
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-8 animate-fade-in">
       <div className="text-center">
-        <h1 className="text-3xl font-bold">Pricing</h1>
-        <p className="text-muted-foreground mt-2">
+        <p className="text-sm font-medium uppercase tracking-widest text-amber-600 dark:text-amber-400 mb-3">Plans</p>
+        <h1 className="text-3xl md:text-4xl font-bold font-serif">Pricing</h1>
+        <p className="text-muted-foreground mt-3 text-lg">
           Choose the plan that works for you
         </p>
       </div>
 
-      <div className="grid md:grid-cols-3 gap-6">
+      <div className="grid md:grid-cols-3 gap-6 stagger-children">
         {tiers.map((tier) => {
           const isCurrentTier = profile?.tier === tier.id;
 
           return (
             <Card
               key={tier.id}
-              className={isCurrentTier ? "border-primary" : undefined}
+              className={isCurrentTier ? "border-amber-500 ring-1 ring-amber-500/20" : undefined}
             >
               <CardHeader>
-                <CardTitle className="flex items-center justify-between">
+                <CardTitle className="flex items-center justify-between font-serif">
                   <span>{tier.name}</span>
-                  <span className="text-2xl">{tier.price}</span>
+                  <span className="text-2xl text-amber-700 dark:text-amber-400">{tier.price}</span>
                 </CardTitle>
                 <p className="text-sm text-muted-foreground">
                   {tier.description}
                 </p>
               </CardHeader>
               <CardContent className="space-y-4">
-                <ul className="space-y-2">
+                <ul className="space-y-2.5">
                   {tier.features.map((feature) => (
-                    <li key={feature} className="flex items-center gap-2 text-sm">
-                      <Check className="h-4 w-4 text-green-500" />
+                    <li key={feature} className="flex items-center gap-2.5 text-sm">
+                      <div className="flex-shrink-0 w-5 h-5 rounded-full bg-emerald-500/10 flex items-center justify-center">
+                        <Check className="h-3 w-3 text-emerald-600 dark:text-emerald-400" />
+                      </div>
                       {feature}
                     </li>
                   ))}
@@ -112,7 +115,7 @@ export default function PricingPage() {
 
                 {tier.id === "free" ? (
                   <Button variant="outline" className="w-full" disabled>
-                    {isCurrentTier ? "Current Plan" : "Free"}
+                    {isCurrentTier ? "Current plan" : "Free"}
                   </Button>
                 ) : (
                   <Button
@@ -121,7 +124,7 @@ export default function PricingPage() {
                     disabled={loading || subscribing !== null || isCurrentTier}
                   >
                     {isCurrentTier
-                      ? "Current Plan"
+                      ? "Current plan"
                       : subscribing === tier.id
                       ? "Redirecting..."
                       : `Subscribe to ${tier.name}`}
@@ -136,17 +139,17 @@ export default function PricingPage() {
       {profile && (
         <Card>
           <CardHeader>
-            <CardTitle>Your Usage</CardTitle>
+            <CardTitle className="font-serif">Your usage</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-2 gap-6">
               <div>
-                <p className="text-sm text-muted-foreground">Current Plan</p>
-                <p className="text-xl font-bold capitalize">{profile.tier}</p>
+                <p className="text-sm text-muted-foreground mb-1">Current plan</p>
+                <p className="text-xl font-bold capitalize font-serif">{profile.tier}</p>
               </div>
               <div>
-                <p className="text-sm text-muted-foreground">Credit Balance</p>
-                <p className="text-xl font-bold">{profile.credit_balance}</p>
+                <p className="text-sm text-muted-foreground mb-1">Credit balance</p>
+                <p className="text-xl font-bold font-serif text-amber-700 dark:text-amber-400">{profile.credit_balance}</p>
               </div>
             </div>
           </CardContent>

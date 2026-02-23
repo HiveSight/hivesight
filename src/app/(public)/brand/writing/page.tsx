@@ -25,7 +25,7 @@ function Example({
   return (
     <div className="grid md:grid-cols-2 gap-4">
       <div className="flex items-start gap-3 p-4 rounded-lg bg-green-500/10 border border-green-500/20">
-        <Check className="h-5 w-5 text-green-500 flex-shrink-0 mt-0.5" />
+        <Check className="h-5 w-5 text-green-500 shrink-0 mt-0.5" />
         <div>
           <p className="text-sm font-medium text-green-700 dark:text-green-400 mb-1">
             Do
@@ -34,7 +34,7 @@ function Example({
         </div>
       </div>
       <div className="flex items-start gap-3 p-4 rounded-lg bg-red-500/10 border border-red-500/20">
-        <X className="h-5 w-5 text-red-500 flex-shrink-0 mt-0.5" />
+        <X className="h-5 w-5 text-red-500 shrink-0 mt-0.5" />
         <div>
           <p className="text-sm font-medium text-red-700 dark:text-red-400 mb-1">
             Don&apos;t
@@ -526,7 +526,7 @@ export default function WritingPage() {
                   "Proofread for spelling and grammar",
                 ].map((item) => (
                   <li key={item} className="flex items-start gap-3">
-                    <div className="w-5 h-5 rounded border-2 border-muted-foreground/30 flex-shrink-0 mt-0.5" />
+                    <div className="w-5 h-5 rounded border-2 border-muted-foreground/30 shrink-0 mt-0.5" />
                     <span className="text-sm">{item}</span>
                   </li>
                 ))}

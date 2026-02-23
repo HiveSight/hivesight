@@ -15,17 +15,17 @@ export default async function ResultsLayout({
   } = await supabase.auth.getUser();
 
   return (
-    <div className="min-h-screen flex flex-col">
-      <header className="border-b">
+    <div className="min-h-screen flex flex-col bg-honeycomb">
+      <header className="border-b border-amber-900/[0.06] bg-background/80 backdrop-blur-sm sticky top-0 z-50">
         <div className="container mx-auto px-4 h-16 flex items-center justify-between">
-          <Link href={user ? "/dashboard" : "/"} className="flex items-center gap-2">
-            <Hexagon className="h-6 w-6 text-amber-500 fill-amber-500/20" />
-            <span className="text-xl font-bold">HiveSight</span>
+          <Link href={user ? "/dashboard" : "/"} className="flex items-center gap-2.5 group">
+            <Hexagon className="h-7 w-7 text-amber-500 fill-amber-500/20 transition-transform duration-300 group-hover:rotate-[30deg]" />
+            <span className="text-xl font-bold font-serif tracking-tight">HiveSight</span>
           </Link>
           {user ? <UserNav /> : <LoginButton />}
         </div>
       </header>
-      <main className="flex-1 container mx-auto px-4 py-8">{children}</main>
+      <main className="flex-1 container mx-auto px-4 py-10">{children}</main>
     </div>
   );
 }

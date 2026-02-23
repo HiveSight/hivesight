@@ -47,10 +47,11 @@ export default function CreditsPage() {
   };
 
   return (
-    <div className="space-y-8 max-w-2xl mx-auto">
+    <div className="space-y-8 max-w-2xl mx-auto animate-fade-in">
       <div className="text-center">
-        <h1 className="text-3xl font-bold">Buy Credits</h1>
-        <p className="text-muted-foreground mt-2">
+        <p className="text-sm font-medium uppercase tracking-widest text-amber-600 dark:text-amber-400 mb-3">Top up</p>
+        <h1 className="text-3xl md:text-4xl font-bold font-serif">Buy credits</h1>
+        <p className="text-muted-foreground mt-3 text-lg">
           ${(CREDIT_PRICE_CENTS / 100).toFixed(2)} per credit
         </p>
       </div>
@@ -60,8 +61,8 @@ export default function CreditsPage() {
         <Card>
           <CardContent className="pt-6">
             <div className="flex items-center justify-between">
-              <span className="text-muted-foreground">Current Balance</span>
-              <span className="text-2xl font-bold">
+              <span className="text-muted-foreground">Current balance</span>
+              <span className="text-2xl font-bold font-serif text-amber-700 dark:text-amber-400">
                 {profile.credit_balance} credits
               </span>
             </div>
@@ -70,24 +71,24 @@ export default function CreditsPage() {
       )}
 
       {/* Quick Buy Bundles */}
-      <div className="grid grid-cols-3 gap-4">
+      <div className="grid grid-cols-3 gap-4 stagger-children">
         {CREDIT_BUNDLES.map((bundle) => (
           <Card
             key={bundle.credits}
-            className={`cursor-pointer transition-all hover:border-primary ${
-              credits === bundle.credits ? "border-primary ring-1 ring-primary" : ""
+            className={`cursor-pointer transition-all duration-200 ${
+              credits === bundle.credits ? "border-amber-500 ring-1 ring-amber-500/20" : "hover:border-amber-300"
             } ${bundle.popular ? "relative" : ""}`}
             onClick={() => setCredits(bundle.credits)}
           >
             {bundle.popular && (
-              <span className="absolute -top-2 left-1/2 -translate-x-1/2 bg-primary text-primary-foreground text-xs px-2 py-0.5 rounded-full">
+              <span className="absolute -top-2.5 left-1/2 -translate-x-1/2 bg-amber-600 text-white text-xs font-medium px-2.5 py-0.5 rounded-full">
                 Popular
               </span>
             )}
             <CardContent className="pt-6 text-center">
-              <p className="text-2xl font-bold">{bundle.credits}</p>
+              <p className="text-2xl font-bold font-serif">{bundle.credits}</p>
               <p className="text-sm text-muted-foreground">credits</p>
-              <p className="text-lg font-semibold mt-2">${bundle.price}</p>
+              <p className="text-lg font-semibold mt-2 text-amber-700 dark:text-amber-400">${bundle.price}</p>
             </CardContent>
           </Card>
         ))}
@@ -96,7 +97,7 @@ export default function CreditsPage() {
       {/* Custom Amount */}
       <Card>
         <CardHeader>
-          <CardTitle>Custom Amount</CardTitle>
+          <CardTitle className="font-serif">Custom amount</CardTitle>
         </CardHeader>
         <CardContent className="space-y-6">
           <div className="flex items-center gap-4">
@@ -118,9 +119,9 @@ export default function CreditsPage() {
             />
           </div>
 
-          <div className="flex items-center justify-between text-lg">
+          <div className="flex items-center justify-between text-lg p-4 bg-amber-50/50 rounded-xl border border-amber-200/40 dark:bg-amber-900/10 dark:border-amber-700/20">
             <span>{credits} credits</span>
-            <span className="font-bold">${price.toFixed(2)}</span>
+            <span className="font-bold text-amber-700 dark:text-amber-400">${price.toFixed(2)}</span>
           </div>
 
           <Button
@@ -137,21 +138,24 @@ export default function CreditsPage() {
       {/* What can you do with credits */}
       <Card>
         <CardHeader>
-          <CardTitle>What can you do with credits?</CardTitle>
+          <CardTitle className="font-serif">What can you do with credits?</CardTitle>
         </CardHeader>
         <CardContent>
-          <ul className="space-y-2 text-sm text-muted-foreground">
-            <li>
-              <strong>GPT-5 Mini (Likert):</strong> 4 respondents per credit
+          <ul className="space-y-3 text-sm text-muted-foreground">
+            <li className="flex items-center gap-3">
+              <span className="w-1.5 h-1.5 rounded-full bg-amber-500 shrink-0" />
+              <span><strong className="text-foreground">GPT-5 Mini (Likert):</strong> 4 respondents per credit</span>
             </li>
-            <li>
-              <strong>GPT-5 Mini (Open-ended):</strong> 2 respondents per credit
+            <li className="flex items-center gap-3">
+              <span className="w-1.5 h-1.5 rounded-full bg-amber-500 shrink-0" />
+              <span><strong className="text-foreground">GPT-5 Mini (Open-ended):</strong> 2 respondents per credit</span>
             </li>
-            <li>
-              <strong>GPT-5 (Likert/Open-ended):</strong> 1 respondent per credit
+            <li className="flex items-center gap-3">
+              <span className="w-1.5 h-1.5 rounded-full bg-amber-500 shrink-0" />
+              <span><strong className="text-foreground">GPT-5 (Likert/Open-ended):</strong> 1 respondent per credit</span>
             </li>
           </ul>
-          <p className="mt-4 text-sm text-muted-foreground">
+          <p className="mt-5 text-sm text-muted-foreground/70">
             Credits never expire and can be used anytime.
           </p>
         </CardContent>
