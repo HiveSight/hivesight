@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { Input } from "@/components/ui/input";
 import type { LocationFilter } from "@/types";
+import { MapPin } from "lucide-react";
 
 // US states for quick matching
 const US_STATES: Record<string, string> = {
@@ -195,26 +196,29 @@ export function LocationInput({
       {isOpen && options.length > 0 && (
         <div
           ref={dropdownRef}
-          className="absolute z-50 mt-1 w-full bg-white border rounded-md shadow-lg max-h-60 overflow-auto"
+          className="absolute z-50 mt-1.5 w-full bg-card border border-amber-900/[0.06] rounded-xl shadow-warm-lg max-h-60 overflow-auto animate-slide-down dark:border-amber-100/[0.06]"
         >
           {options.map((option, i) => (
             <button
               key={`${option.type}-${option.id}`}
               onClick={() => selectOption(option)}
-              className={`w-full text-left px-3 py-2 text-sm hover:bg-muted ${
-                i === highlightIndex ? "bg-muted" : ""
+              className={`w-full text-left px-3 py-2.5 text-sm transition-colors duration-150 first:rounded-t-xl last:rounded-b-xl ${
+                i === highlightIndex ? "bg-amber-50 dark:bg-amber-950/20" : "hover:bg-amber-50/50 dark:hover:bg-amber-950/10"
               }`}
             >
-              <span className="font-medium">{option.label}</span>
-              <span className="ml-2 text-xs text-muted-foreground">
-                {option.type === "zip"
-                  ? "ZIP code"
-                  : option.type === "state"
-                  ? "State"
-                  : option.type === "district"
-                  ? "Congressional district"
-                  : "National"}
-              </span>
+              <div className="flex items-center gap-2">
+                <MapPin className="h-3.5 w-3.5 text-amber-500 shrink-0" />
+                <span className="font-medium">{option.label}</span>
+                <span className="ml-auto text-xs text-muted-foreground/70">
+                  {option.type === "zip"
+                    ? "ZIP code"
+                    : option.type === "state"
+                    ? "State"
+                    : option.type === "district"
+                    ? "Congressional district"
+                    : "National"}
+                </span>
+              </div>
             </button>
           ))}
         </div>

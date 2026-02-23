@@ -9,7 +9,7 @@ export function UserNav() {
 
   if (loading) {
     return (
-      <div className="h-9 w-24 animate-pulse rounded-md bg-muted" />
+      <div className="h-9 w-24 animate-pulse rounded-lg bg-amber-100/50 dark:bg-amber-900/20" />
     );
   }
 
@@ -22,7 +22,7 @@ export function UserNav() {
       <div className="text-sm">
         <span className="font-medium">{profile?.name || user.email}</span>
         {profile && (
-          <span className="ml-2 text-muted-foreground">
+          <span className="ml-2 text-amber-600/70 dark:text-amber-400/70">
             {profile.credit_balance} credits
           </span>
         )}

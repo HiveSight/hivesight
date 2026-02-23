@@ -23,7 +23,7 @@ export default function BrandPage() {
           <div className="inline-flex items-center justify-center w-20 h-20 rounded-2xl bg-amber-500/10 mb-6">
             <Hexagon className="h-10 w-10 text-amber-500 fill-amber-500/20" />
           </div>
-          <h1 className="text-4xl font-bold tracking-tight mb-4">
+          <h1 className="text-4xl font-bold tracking-tight mb-4 font-serif">
             HiveSight brand
           </h1>
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
@@ -78,7 +78,7 @@ export default function BrandPage() {
 
         {/* Brand essence */}
         <div className="bg-linear-to-br from-amber-500/10 to-amber-600/5 rounded-2xl p-8 mb-12">
-          <h2 className="text-2xl font-bold mb-6">Brand essence</h2>
+          <h2 className="text-2xl font-bold mb-6 font-serif">Brand essence</h2>
           <div className="grid md:grid-cols-3 gap-6">
             <div>
               <h3 className="font-semibold text-amber-600 dark:text-amber-400 mb-2">
@@ -112,7 +112,7 @@ export default function BrandPage() {
 
         {/* Logo usage */}
         <div className="mb-12">
-          <h2 className="text-2xl font-bold mb-6">Logo</h2>
+          <h2 className="text-2xl font-bold mb-6 font-serif">Logo</h2>
           <div className="grid md:grid-cols-2 gap-6">
             <Card>
               <CardContent className="pt-6">
@@ -147,7 +147,7 @@ export default function BrandPage() {
 
         {/* Quick reference */}
         <div className="border rounded-xl p-6">
-          <h2 className="text-xl font-bold mb-4">Quick reference</h2>
+          <h2 className="text-xl font-bold mb-4 font-serif">Quick reference</h2>
           <div className="grid gap-4 text-sm">
             <div className="flex items-start gap-4">
               <span className="font-medium min-w-[120px]">Primary color</span>

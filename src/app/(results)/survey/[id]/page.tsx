@@ -71,11 +71,11 @@ export default async function SurveyResultsPage({
   const demoBreakdown = calculateDemoBreakdown(survey.respondents);
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-8 animate-fade-in">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold">Survey results</h1>
-          <p className="text-muted-foreground mt-1">
+          <h1 className="text-3xl font-bold font-serif">Survey results</h1>
+          <p className="text-muted-foreground mt-1.5">
             {survey.hive_size} respondents &middot; {survey.model}
           </p>
         </div>
@@ -93,9 +93,9 @@ export default async function SurveyResultsPage({
 
       {/* Location banner */}
       {location && (
-        <div className="flex items-center gap-2 p-3 bg-amber-50 border border-amber-200 rounded-lg">
-          <MapPin className="h-5 w-5 text-amber-600" />
-          <span className="text-sm font-medium text-amber-900">
+        <div className="flex items-center gap-2.5 p-4 bg-amber-50 border border-amber-200/60 rounded-xl dark:bg-amber-900/10 dark:border-amber-700/20">
+          <MapPin className="h-5 w-5 text-amber-600 dark:text-amber-400" />
+          <span className="text-sm font-medium text-amber-900 dark:text-amber-200">
             {survey.hive_size} people from {location.label}
           </span>
         </div>
@@ -107,12 +107,12 @@ export default async function SurveyResultsPage({
           <CardContent className="pt-6">
             <div className="flex items-center gap-2">
               <span
-                className={`px-2 py-1 text-sm rounded-full ${
+                className={`px-2.5 py-1 text-sm font-medium rounded-full ${
                   survey.status === "processing"
-                    ? "bg-yellow-100 text-yellow-800"
+                    ? "bg-amber-50 text-amber-700 dark:bg-amber-900/20 dark:text-amber-400"
                     : survey.status === "failed"
-                    ? "bg-red-100 text-red-800"
-                    : "bg-gray-100 text-gray-800"
+                    ? "bg-red-50 text-red-700 dark:bg-red-900/20 dark:text-red-400"
+                    : "bg-muted text-muted-foreground"
                 }`}
               >
                 {survey.status}
@@ -130,10 +130,10 @@ export default async function SurveyResultsPage({
       {/* Question */}
       <Card>
         <CardHeader>
-          <CardTitle className="text-lg">Question</CardTitle>
+          <CardTitle className="text-lg font-serif">Question</CardTitle>
         </CardHeader>
         <CardContent>
-          <p className="text-lg">&quot;{survey.question}&quot;</p>
+          <p className="text-lg font-serif italic leading-relaxed">&quot;{survey.question}&quot;</p>
         </CardContent>
       </Card>
 
@@ -141,7 +141,7 @@ export default async function SurveyResultsPage({
       {likertDistribution && (
         <Card>
           <CardHeader>
-            <CardTitle>Response distribution</CardTitle>
+            <CardTitle className="font-serif">Response distribution</CardTitle>
           </CardHeader>
           <CardContent>
             <LikertChart data={likertDistribution} />
@@ -153,31 +153,31 @@ export default async function SurveyResultsPage({
       {likertDistribution && (
         <Card>
           <CardHeader>
-            <CardTitle>Statistics</CardTitle>
+            <CardTitle className="font-serif">Statistics</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
               <div>
-                <p className="text-sm text-muted-foreground">Mean</p>
-                <p className="text-2xl font-bold">
+                <p className="text-sm text-muted-foreground mb-1">Mean</p>
+                <p className="text-2xl font-bold font-serif text-amber-700 dark:text-amber-400">
                   {calculateMean(survey.responses).toFixed(2)}
                 </p>
               </div>
               <div>
-                <p className="text-sm text-muted-foreground">Median</p>
-                <p className="text-2xl font-bold">
+                <p className="text-sm text-muted-foreground mb-1">Median</p>
+                <p className="text-2xl font-bold font-serif text-amber-700 dark:text-amber-400">
                   {calculateMedian(survey.responses)}
                 </p>
               </div>
               <div>
-                <p className="text-sm text-muted-foreground">Agree %</p>
-                <p className="text-2xl font-bold">
+                <p className="text-sm text-muted-foreground mb-1">Agree %</p>
+                <p className="text-2xl font-bold font-serif text-amber-700 dark:text-amber-400">
                   {calculateAgreePercentage(survey.responses).toFixed(0)}%
                 </p>
               </div>
               <div>
-                <p className="text-sm text-muted-foreground">Responses</p>
-                <p className="text-2xl font-bold">{survey.responses.length}</p>
+                <p className="text-sm text-muted-foreground mb-1">Responses</p>
+                <p className="text-2xl font-bold font-serif">{survey.responses.length}</p>
               </div>
             </div>
           </CardContent>
@@ -188,7 +188,7 @@ export default async function SurveyResultsPage({
       {demoBreakdown && (
         <Card>
           <CardHeader>
-            <CardTitle>Respondent demographics</CardTitle>
+            <CardTitle className="font-serif">Respondent demographics</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-6 text-sm">
@@ -234,7 +234,7 @@ export default async function SurveyResultsPage({
       {/* Response Table */}
       <Card>
         <CardHeader>
-          <CardTitle>Individual responses</CardTitle>
+          <CardTitle className="font-serif">Individual responses</CardTitle>
         </CardHeader>
         <CardContent>
           <ResponseTable

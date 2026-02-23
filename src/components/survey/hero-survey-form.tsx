@@ -7,6 +7,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { LocationInput } from "./location-input";
 import type { LocationFilter } from "@/types";
+import { ArrowRight } from "lucide-react";
 
 interface ProgressState {
   stage: string;
@@ -104,7 +105,7 @@ export function HeroSurveyForm() {
 
   if (loading && progressState) {
     return (
-      <Card className="w-full max-w-xl mx-auto">
+      <Card className="w-full max-w-xl mx-auto animate-glow-pulse">
         <CardContent className="pt-6 space-y-4">
           <Progress value={progressState.progress} />
           <p className="text-center text-sm text-muted-foreground">
@@ -112,7 +113,7 @@ export function HeroSurveyForm() {
           </p>
           {progressState.completed !== undefined &&
             progressState.total !== undefined && (
-              <p className="text-center text-xs text-muted-foreground">
+              <p className="text-center text-xs text-muted-foreground/70">
                 {progressState.completed} of {progressState.total} responses
               </p>
             )}
@@ -122,9 +123,9 @@ export function HeroSurveyForm() {
   }
 
   return (
-    <div className="w-full max-w-xl mx-auto space-y-4 text-left">
+    <div className="w-full max-w-xl mx-auto space-y-3 text-left">
       <textarea
-        className="w-full min-h-24 p-4 border rounded-lg resize-none focus:outline-hidden focus:ring-2 focus:ring-primary text-base"
+        className="w-full min-h-24 p-4 border border-amber-900/10 rounded-xl resize-none bg-white/80 shadow-warm-sm text-base leading-relaxed placeholder:text-muted-foreground/50 focus:outline-hidden focus:ring-2 focus:ring-amber-500/30 focus:border-amber-300 transition-all duration-200 dark:bg-amber-950/20 dark:border-amber-100/10 dark:focus:ring-amber-500/30 dark:focus:border-amber-700"
         placeholder="e.g., I support increasing the minimum wage to $15/hour"
         value={question}
         onChange={(e) => setQuestion(e.target.value)}
@@ -141,13 +142,14 @@ export function HeroSurveyForm() {
           size="lg"
           onClick={handleSubmit}
           disabled={!canSubmit}
-          className="px-8"
+          className="px-6 gap-2"
         >
           Ask
+          <ArrowRight className="h-4 w-4" />
         </Button>
       </div>
       {error && (
-        <p className="text-sm text-red-600">{error}</p>
+        <p className="text-sm text-red-600 dark:text-red-400">{error}</p>
       )}
     </div>
   );
