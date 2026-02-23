@@ -355,10 +355,10 @@ export default function ThesisPage() {
       {/* Hero */}
       <section className="min-h-[60vh] flex flex-col justify-center items-center text-center px-6 pt-32 pb-20">
         <p className="text-xs font-semibold uppercase tracking-widest text-amber-500 mb-4">
-          Research Prospectus
+          Research prospectus
         </p>
         <h1 className="text-5xl md:text-7xl font-bold mb-6 tracking-tight">
-          The Future of Survey Research
+          The future of survey research
         </h1>
         <p className="text-xl text-neutral-400 max-w-xl">
           AI-powered survey responses, instant and demographically representative.
@@ -372,7 +372,7 @@ export default function ThesisPage() {
       {/* Problem */}
       <section ref={setRef("problem")} className="min-h-screen px-6 py-24 flex flex-col items-center">
         <div className="max-w-2xl w-full">
-          <h2 className="text-4xl font-bold mb-8">1. The Problem</h2>
+          <h2 className="text-4xl font-bold mb-8">1. The problem</h2>
           <p className="text-xl font-medium text-white mb-8 leading-relaxed">
             Traditional survey research is slow, expensive, and increasingly unreliable.
           </p>
@@ -438,14 +438,14 @@ export default function ThesisPage() {
       {/* Science */}
       <section ref={setRef("science")} className="min-h-screen px-6 py-24 flex flex-col items-center">
         <div className="max-w-2xl w-full">
-          <h2 className="text-4xl font-bold mb-8">2. The Science</h2>
+          <h2 className="text-4xl font-bold mb-8">2. The science</h2>
           <p className="text-neutral-400 leading-relaxed mb-8">
             The breakthrough: LLMs conditioned on demographic traits reproduce the same response
             patterns we see in human surveys. This is "silicon sampling."<Cite id={4} />
           </p>
 
           <div className="bg-amber-500/10 border-l-4 border-amber-500 p-6 rounded-r-lg mb-8">
-            <h3 className="text-lg font-semibold text-white mb-2">The Key Insight</h3>
+            <h3 className="text-lg font-semibold text-white mb-2">The key insight</h3>
             <p className="text-neutral-300">
               When prompted with demographic traits (age, income, education, location), language models
               generate responses that correlate with actual human survey data at <strong>85%+ accuracy</strong>
@@ -453,7 +453,7 @@ export default function ThesisPage() {
             </p>
           </div>
 
-          <h3 className="text-xl font-semibold mb-4">Validation Research</h3>
+          <h3 className="text-xl font-semibold mb-4">Validation research</h3>
           <div className="space-y-4 mb-8">
             <div className="p-4 bg-neutral-900 border border-neutral-800 rounded-lg">
               <h4 className="font-medium text-white mb-2">Argyle et al. (2023)<Cite id={1} /></h4>
@@ -478,23 +478,23 @@ export default function ThesisPage() {
             </div>
           </div>
 
-          <h3 className="text-xl font-semibold mb-4">Known Limitations</h3>
+          <h3 className="text-xl font-semibold mb-4">Known limitations</h3>
           <div className="space-y-4">
             <div className="p-4 bg-neutral-900/50 border border-neutral-800 rounded-lg">
-              <h4 className="font-medium text-amber-500 mb-2">WEIRD Bias</h4>
+              <h4 className="font-medium text-amber-500 mb-2">WEIRD bias</h4>
               <p className="text-sm text-neutral-400">
                 Models perform better for Western, Educated, Industrialized, Rich, and Democratic
                 populations due to training data distribution.<Cite id={15} />
               </p>
             </div>
             <div className="p-4 bg-neutral-900/50 border border-neutral-800 rounded-lg">
-              <h4 className="font-medium text-amber-500 mb-2">Sample Size Requirements</h4>
+              <h4 className="font-medium text-amber-500 mb-2">Sample size requirements</h4>
               <p className="text-sm text-neutral-400">
                 Simulated sample sizes below 200 can produce unreliable or reversed results.<Cite id={20} />
               </p>
             </div>
             <div className="p-4 bg-neutral-900/50 border border-neutral-800 rounded-lg">
-              <h4 className="font-medium text-amber-500 mb-2">Complementary, Not Replacement</h4>
+              <h4 className="font-medium text-amber-500 mb-2">Complementary, not replacement</h4>
               <p className="text-sm text-neutral-400">
                 Silicon sampling is best used alongside traditional research, not as a complete
                 replacement—especially for novel topics or high-stakes decisions.<Cite id={18} />
@@ -507,7 +507,7 @@ export default function ThesisPage() {
       {/* Product */}
       <section ref={setRef("product")} className="min-h-screen px-6 py-24 flex flex-col items-center">
         <div className="max-w-2xl w-full">
-          <h2 className="text-4xl font-bold mb-8">3. The Product</h2>
+          <h2 className="text-4xl font-bold mb-8">3. The product</h2>
           <p className="text-neutral-400 leading-relaxed mb-8">
             HiveSight is a web application that makes silicon sampling accessible. Ask a question,
             specify demographics, get instant responses.
@@ -515,7 +515,7 @@ export default function ThesisPage() {
 
           <div className="grid md:grid-cols-2 gap-6 mb-12">
             <div className="p-6 bg-neutral-900 border border-neutral-800 rounded-xl">
-              <h3 className="text-lg font-semibold mb-2">Likert Scale</h3>
+              <h3 className="text-lg font-semibold mb-2">Likert scale</h3>
               <p className="text-sm text-neutral-400 mb-4">
                 5-point agree/disagree scales. Visualize distributions and calculate statistics.
               </p>
@@ -524,7 +524,7 @@ export default function ThesisPage() {
               </code>
             </div>
             <div className="p-6 bg-neutral-900 border border-neutral-800 rounded-xl">
-              <h3 className="text-lg font-semibold mb-2">Open-Ended</h3>
+              <h3 className="text-lg font-semibold mb-2">Open-ended</h3>
               <p className="text-sm text-neutral-400 mb-4">
                 Free-form responses with reasoning. Qualitative insights at scale.
               </p>
@@ -535,7 +535,7 @@ export default function ThesisPage() {
           </div>
 
           <div className="p-6 bg-neutral-900 border border-neutral-800 rounded-xl mb-8">
-            <h3 className="text-lg font-semibold mb-4">Demographic Filters</h3>
+            <h3 className="text-lg font-semibold mb-4">Demographic filters</h3>
             <div className="grid grid-cols-3 gap-6 text-sm">
               <div>
                 <span className="text-neutral-500 block mb-1">Age</span>
@@ -553,7 +553,7 @@ export default function ThesisPage() {
           </div>
 
           <div className="p-6 bg-neutral-900 border border-neutral-800 rounded-xl">
-            <h3 className="text-lg font-semibold mb-4">How It Works</h3>
+            <h3 className="text-lg font-semibold mb-4">How it works</h3>
             <div className="flex flex-wrap gap-3">
               {[
                 "1. Enter your question",
@@ -577,7 +577,7 @@ export default function ThesisPage() {
       {/* Markets */}
       <section ref={setRef("markets")} className="min-h-screen px-6 py-24 flex flex-col items-center">
         <div className="max-w-2xl w-full">
-          <h2 className="text-4xl font-bold mb-8">4. The Markets</h2>
+          <h2 className="text-4xl font-bold mb-8">4. The markets</h2>
           <p className="text-neutral-400 leading-relaxed mb-8">
             We sit at the infrastructure layer beneath multiple large and growing markets.
           </p>

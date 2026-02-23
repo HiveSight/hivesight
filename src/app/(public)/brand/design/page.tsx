@@ -11,7 +11,7 @@ import { Input } from "@/components/ui/input";
 import { ArrowLeft, Hexagon, Check, X, AlertTriangle } from "lucide-react";
 
 export const metadata = {
-  title: "Design system - HiveSight Brand",
+  title: "Design system - HiveSight brand",
   description: "HiveSight design system: colors, typography, spacing, and components",
 };
 

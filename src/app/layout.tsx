@@ -15,7 +15,7 @@ const newsreader = Newsreader({
 });
 
 export const metadata: Metadata = {
-  title: "HiveSight - AI-Powered Opinion Simulation",
+  title: "HiveSight - AI-powered opinion simulation",
   description:
     "Simulate public opinion by querying AI from diverse demographic perspectives",
 };

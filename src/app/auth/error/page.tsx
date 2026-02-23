@@ -8,7 +8,7 @@ export default function AuthError() {
       <Card className="w-full max-w-md">
         <CardHeader>
           <CardTitle className="text-center text-red-600">
-            Authentication Error
+            Authentication error
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4 text-center">
@@ -16,7 +16,7 @@ export default function AuthError() {
             There was a problem signing you in. Please try again.
           </p>
           <Button asChild>
-            <Link href="/">Return Home</Link>
+            <Link href="/">Return home</Link>
           </Button>
         </CardContent>
       </Card>

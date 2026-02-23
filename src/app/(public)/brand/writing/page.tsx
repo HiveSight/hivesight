@@ -9,7 +9,7 @@ import {
 import { ArrowLeft, Check, X, MessageSquare, FileText, Hexagon } from "lucide-react";
 
 export const metadata = {
-  title: "Writing guide - HiveSight Brand",
+  title: "Writing guide - HiveSight brand",
   description: "HiveSight writing style: voice, tone, and content guidelines",
 };
 
