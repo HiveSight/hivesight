@@ -15,9 +15,12 @@ const newsreader = Newsreader({
 });
 
 export const metadata: Metadata = {
-  title: "HiveSight - AI-powered opinion simulation",
+  title: {
+    default: "HiveSight",
+    template: "%s | HiveSight",
+  },
   description:
-    "Simulate public opinion by querying AI from diverse demographic perspectives",
+    "AI-powered survey research for any US ZIP code, state, congressional district, or the full country.",
 };
 
 export default function RootLayout({

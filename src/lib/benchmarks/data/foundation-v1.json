@@ -1,0 +1,175 @@
+{
+  "version": 1,
+  "updatedAt": "2026-04-12",
+  "title": "HiveSight benchmark program",
+  "subtitle": "A public benchmark plan for direct inference on calibrated local synthetic populations.",
+  "thesis": "The goal is not to prove that LLM surveys work in the abstract. It is to test whether HiveSight's geography-assigned calibrated population outperforms weaker prompting baselines, including rich nonlocal microdata, on stable, recent, human-collected benchmarks.",
+  "currentStatus": "Benchmark scaffolding is live. The first execution pass is designed as contamination-resistant public benchmarking with frozen question manifests, preregistered comparison arms, and confirmatory subgroup-error endpoints.",
+  "comparisons": [
+    {
+      "id": "generic_persona",
+      "label": "Generic persona prompting",
+      "description": "Sparse synthetic personas with no explicit local population conditioning."
+    },
+    {
+      "id": "geography_only",
+      "label": "Geography-only prompting",
+      "description": "Audience prompts that know the place but do not use richer local household records."
+    },
+    {
+      "id": "rich_nonlocal_microdata",
+      "label": "Rich nonlocal microdata",
+      "description": "Richer household and policy-linked records drawn from calibrated microdata without geography-specific local assignment."
+    },
+    {
+      "id": "hivesight_local_population",
+      "label": "HiveSight local population",
+      "description": "Direct inference over geography-assigned calibrated synthetic microdata."
+    },
+    {
+      "id": "synthetic_fallback",
+      "label": "Fallback profiles",
+      "description": "The lightweight fallback population used when calibrated local microdata is unavailable."
+    }
+  ],
+  "metrics": [
+    {
+      "id": "topline_mae",
+      "label": "Topline MAE",
+      "description": "Absolute error on overall support or preference levels."
+    },
+    {
+      "id": "subgroup_mae",
+      "label": "Subgroup MAE",
+      "description": "Absolute error on slices like age, sex, income, tenure, and race/ethnicity where the benchmark supports them."
+    },
+    {
+      "id": "local_mae",
+      "label": "Local MAE",
+      "description": "Absolute error across state, district, or other available geography cuts."
+    },
+    {
+      "id": "rank_accuracy",
+      "label": "Rank accuracy",
+      "description": "How often models preserve the ordering between answer options, messages, or geographies."
+    },
+    {
+      "id": "prompt_stability",
+      "label": "Prompt stability",
+      "description": "How sensitive results are to small wording and formatting changes."
+    }
+  ],
+  "suites": [
+    {
+      "id": "gss_2024_evergreen",
+      "title": "GSS 2024 evergreen attitudes",
+      "status": "planned",
+      "focus": "Stable social attitudes with low week-to-week news sensitivity.",
+      "whyThisSuite": "This is the best broad benchmark for trust, happiness, redistribution, family, speech, and other durable dispositions.",
+      "questionFamilies": [
+        "General trust and fairness",
+        "Work, redistribution, and role-of-government attitudes",
+        "Family, religion, and speech norms"
+      ],
+      "targetComparisons": [
+        "generic_persona",
+        "geography_only",
+        "rich_nonlocal_microdata",
+        "hivesight_local_population",
+        "synthetic_fallback"
+      ],
+      "targetMetrics": [
+        "topline_mae",
+        "subgroup_mae",
+        "prompt_stability"
+      ],
+      "source": {
+        "name": "GSS 2024 Cross-section",
+        "url": "https://gss.norc.org/us/en/gss/get-the-data.html",
+        "fieldDates": "2024",
+        "releaseDate": "May 2025",
+        "freshnessNote": "Fresh enough to reduce training-set contamination risk while still covering evergreen attitudes."
+      },
+      "notes": "Start with questions that do not depend on a specific political controversy or headline cycle."
+    },
+    {
+      "id": "shed_2024_household_finance",
+      "title": "SHED 2024 household finance",
+      "status": "planned",
+      "focus": "Economic perceptions and household stress that map to real disposable-income context.",
+      "whyThisSuite": "These questions should benefit from HiveSight's richer household and policy-linked attributes rather than pure demographics.",
+      "questionFamilies": [
+        "Financial well-being",
+        "Ability to absorb shocks",
+        "Housing, debt, and retirement expectations"
+      ],
+      "targetComparisons": [
+        "generic_persona",
+        "geography_only",
+        "rich_nonlocal_microdata",
+        "hivesight_local_population",
+        "synthetic_fallback"
+      ],
+      "targetMetrics": [
+        "topline_mae",
+        "subgroup_mae",
+        "rank_accuracy",
+        "prompt_stability"
+      ],
+      "source": {
+        "name": "Survey of Household Economics and Decisionmaking 2024",
+        "url": "https://www.federalreserve.gov/consumerscommunities/shed.htm",
+        "fieldDates": "October 2024",
+        "releaseDate": "May 28, 2025",
+        "freshnessNote": "Recent enough to be useful, but centered on durable household economics rather than campaign events."
+      },
+      "notes": "This suite is especially relevant to the claim that policy-linked household records matter for marketing and consumer research."
+    },
+    {
+      "id": "sdcpc_2024_consumer_choice",
+      "title": "SDCPC 2024 consumer choice",
+      "status": "planned",
+      "focus": "Stable consumer preference and payment-choice behavior outside politics.",
+      "whyThisSuite": "This is the cleanest public non-political consumer benchmark available without paying for new fieldwork.",
+      "questionFamilies": [
+        "Payment preference",
+        "Convenience and security tradeoffs",
+        "Consumer behavior by income and household characteristics"
+      ],
+      "targetComparisons": [
+        "generic_persona",
+        "geography_only",
+        "rich_nonlocal_microdata",
+        "hivesight_local_population",
+        "synthetic_fallback"
+      ],
+      "targetMetrics": [
+        "topline_mae",
+        "subgroup_mae",
+        "rank_accuracy"
+      ],
+      "source": {
+        "name": "Survey and Diary of Consumer Payment Choice 2024",
+        "url": "https://www.atlantafed.org/research-and-data/surveys/survey-and-diary-of-consumer-payment-choice/2024-survey-and-diary",
+        "fieldDates": "2024",
+        "releaseDate": "May 2025",
+        "freshnessNote": "Recent public-use files with topics that are much less exposed to weekly media swings than election sentiment."
+      },
+      "notes": "Use this suite to pressure-test the non-civics positioning and the claim that local household calibration matters in consumer settings too."
+    }
+  ],
+  "roadmap": [
+    {
+      "step": "Lock the benchmark schema, page, and CLI so the methodology has one source of truth.",
+      "status": "now"
+    },
+    {
+      "step": "Add the first reproducible dataset adapters and question manifests for GSS 2024 and SHED 2024.",
+      "status": "next"
+    },
+    {
+      "step": "Publish benchmark runs comparing generic personas, geography-only prompts, rich nonlocal microdata, HiveSight local populations, and fallback profiles.",
+      "status": "later"
+    }
+  ]
+}

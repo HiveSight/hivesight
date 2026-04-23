@@ -1,81 +1,107 @@
 import { test, expect } from "@playwright/test";
 
 test.describe("Landing Page", () => {
-  test("displays hero section with key messaging", async ({ page }) => {
+  test("displays editorial hero with key messaging", async ({ page }) => {
     await page.goto("/");
 
-    // Check main headline
     await expect(
-      page.getByRole("heading", { name: /simulate public opinion/i })
+      page.getByRole("heading", {
+        name: /audience research grounded in real data, delivered at synthetic speed/i,
+      })
     ).toBeVisible();
 
-    // Check value proposition text
     await expect(
-      page.getByText(/HiveSight uses AI to simulate/i)
+      page.getByText(/lets marketers, product teams, campaigns, and researchers/i)
+    ).toBeVisible();
+    await expect(
+      page.getByText(/ask synthetic audiences the same questions/i)
     ).toBeVisible();
 
-    // Check CTA buttons
-    await expect(page.getByRole("link", { name: /learn more/i })).toBeVisible();
+    await expect(
+      page.getByRole("link", { name: /open the research desk/i }).first()
+    ).toBeVisible();
+    await expect(
+      page.getByRole("link", { name: /inspect the workflow/i })
+    ).toBeVisible();
+    await expect(page.getByText("Marketers", { exact: true })).toBeVisible();
   });
 
-  test("displays how it works section", async ({ page }) => {
+  test("displays geography and workflow sections", async ({ page }) => {
     await page.goto("/");
 
-    // Check how it works section exists
     await expect(
-      page.getByRole("heading", { name: /how it works/i })
+      page.getByRole("heading", {
+        name: /start with geography\. read the audience underneath it\./i,
+      })
     ).toBeVisible();
-
-    // Check the three steps
-    await expect(page.getByText(/ask your question/i)).toBeVisible();
-    await expect(page.getByText(/configure your hive/i)).toBeVisible();
-    await expect(page.getByText(/get insights/i)).toBeVisible();
-  });
-
-  test("displays features section", async ({ page }) => {
-    await page.goto("/");
-
-    // Check features section exists
     await expect(
-      page.getByRole("heading", { name: /features/i })
+      page.getByRole("heading", { name: /how the research desk works/i })
     ).toBeVisible();
-
-    // Check some feature items
     await expect(
-      page.getByText(/simulate responses from diverse/i)
+      page.getByRole("heading", { name: /^zip code lens$/i })
     ).toBeVisible();
-    await expect(page.getByText(/likert scale/i)).toBeVisible();
+    await expect(
+      page.getByRole("heading", { name: /^state lens$/i })
+    ).toBeVisible();
+    await expect(
+      page.getByRole("heading", { name: /^district lens$/i })
+    ).toBeVisible();
+    await expect(page.getByText("Housing tenure", { exact: true })).toBeVisible();
+    await expect(
+      page.getByRole("heading", { name: /^write the line$/i })
+    ).toBeVisible();
+    await expect(
+      page.getByRole("heading", { name: /^choose the geography$/i })
+    ).toBeVisible();
+    await expect(
+      page.getByRole("heading", { name: /^read the breakpoints$/i })
+    ).toBeVisible();
   });
 
   test("header has logo and login button", async ({ page }) => {
     await page.goto("/");
 
-    // Check logo/brand in header
     await expect(
       page.getByRole("link", { name: "HiveSight" })
     ).toBeVisible();
 
-    // Check login button exists in header
     await expect(
       page.getByRole("banner").getByRole("button", { name: /sign in/i })
     ).toBeVisible();
   });
 
-  test("footer has copyright and links", async ({ page }) => {
+  test("footer links route to live legal pages", async ({ page }) => {
     await page.goto("/");
 
-    // Check copyright (dynamic year)
     await expect(page.getByText(/© \d{4} HiveSight/i)).toBeVisible();
-
-    // Check footer links
     await expect(page.getByRole("link", { name: /privacy/i })).toBeVisible();
     await expect(page.getByRole("link", { name: /terms/i })).toBeVisible();
+
+    await page.getByRole("link", { name: /privacy/i }).click();
+    await expect(
+      page.getByRole("heading", { name: /^privacy$/i })
+    ).toBeVisible();
+    await expect(page.getByText(/last updated march 20, 2026/i)).toBeVisible();
+
+    await page.goto("/");
+    await page.getByRole("link", { name: /terms/i }).click();
+    await expect(page.getByRole("heading", { name: /^terms$/i })).toBeVisible();
+    await expect(
+      page.getByText(/research tool, not a poll/i)
+    ).toBeVisible();
   });
 
-  test("CTA section mentions free credits", async ({ page }) => {
+  test("free-tier copy is visible in the hero", async ({ page }) => {
     await page.goto("/");
 
-    // Check free credits mention
-    await expect(page.getByText(/100 free credits/i)).toBeVisible();
+    await expect(
+      page.getByText(/three runs per day with 25 respondents each/i)
+    ).toBeVisible();
+    await expect(
+      page.getByText(/scale sample size and model strength when the question calls for more precision/i)
+    ).toBeVisible();
+    await expect(
+      page.getByText(/fast signal, grounded in calibrated local populations/i)
+    ).toBeVisible();
   });
 });

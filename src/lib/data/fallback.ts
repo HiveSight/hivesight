@@ -75,7 +75,10 @@ export function generateSyntheticPersons(
       receives_tanf: Math.random() < 0.02,
       receives_unemployment: Math.random() < 0.02,
       receives_social_security: age >= 62 ? Math.random() < 0.8 : Math.random() < 0.05,
-      zcta: String(Math.floor(Math.random() * 90000) + 10000),
+      zcta:
+        location.type === "zip"
+          ? location.value
+          : String(Math.floor(Math.random() * 90000) + 10000),
       weight: 1,
     });
   }

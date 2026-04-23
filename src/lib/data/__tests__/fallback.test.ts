@@ -1,6 +1,6 @@
-import { describe, it, expect, vi } from "vitest";
+import { describe, it, expect } from "vitest";
 import { generateSyntheticPersons } from "../fallback";
-import type { LocationFilter, PersonRecord } from "@/types";
+import type { LocationFilter } from "@/types";
 
 describe("generateSyntheticPersons", () => {
   it("generates the requested number of persons", () => {

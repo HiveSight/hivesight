@@ -1,0 +1,167 @@
+{
+  "version": 1,
+  "updatedAt": "2026-04-12",
+  "model": {
+    "id": "gpt-5-mini",
+    "label": "GPT-5 Mini",
+    "provider": "OpenAI",
+    "apiSurface": "chat.completions.create",
+    "maxCompletionTokens": 2000,
+    "reasoningEffort": "not_set",
+    "temperature": "provider_default",
+    "snapshotDate": "2026-04-12"
+  },
+  "promptTemplates": {
+    "systemLikertTemplateId": "buildSystemPrompt:likert:v1",
+    "userLikertTemplateId": "buildUserPrompt:likert:v1",
+    "sourceFile": "src/lib/simulation/prompts.ts",
+    "sourceSha256": "941a892ffdfff3203464b4cb5a93edee97bea946a87a42d716bd794b75e3b9c6",
+    "personaFormatterId": "createPersonDescriptionFormatter:v1",
+    "personaFormatterFile": "src/lib/data/demographics.ts",
+    "personaFormatterSha256": "ec6f623b5b5a50cac495f04e53a2e2cad1d6bed648b79be60a9291ee30de8740",
+    "dependencyFiles": [
+      {
+        "file": "src/lib/data/race-codes.ts",
+        "sha256": "c8b04e19d161671f236982eac1eb5bab5830d818280d871087e1102c05791ab9"
+      },
+      {
+        "file": "src/lib/data/occupation-codes.ts",
+        "sha256": "a969006297d6ad4594bf38058dd7fb79e90d66cb25e6d16d3d4ee428c5d3d574"
+      }
+    ]
+  },
+  "dataPipeline": {
+    "normalizerFiles": [
+      {
+        "file": "scripts/normalize-common.mjs",
+        "sha256": "1f603e9b6834d5da6ed57cee4f68046ae73e72b45f6647a20f48ab21aa4d0fa1"
+      },
+      {
+        "file": "scripts/normalize-shed-2024.mjs",
+        "sha256": "37d7aad07ad2b4e45905137ace7527b2f1d066df1d0b8f85f88d9f6008f3c859"
+      },
+      {
+        "file": "scripts/normalize-gss-2024.mjs",
+        "sha256": "ba4cc72a8e94cf298fd06791302ea4664fcf656b52dd9afca31980fbcf5730d2"
+      }
+    ]
+  },
+  "simulationProtocol": {
+    "respondentsPerQuestion": 400,
+    "seeds": [101, 202, 303],
+    "promptPerturbations": [
+      "instruction_phrasing_v1",
+      "answer_order_reversal_v1",
+      "layout_length_v1",
+      "neutral_preamble_v1"
+    ]
+  },
+  "analysisPlan": {
+    "confirmatorySuites": [
+      "gss_2024_evergreen",
+      "shed_2024_household_finance"
+    ],
+    "confirmatorySliceFamilies": ["age_band", "income_band"],
+    "confirmatorySliceDefinitions": {
+      "age_band": {
+        "bins": [
+          { "id": "age_18_29", "label": "18-29", "minInclusive": 18, "maxInclusive": 29 },
+          { "id": "age_30_44", "label": "30-44", "minInclusive": 30, "maxInclusive": 44 },
+          { "id": "age_45_64", "label": "45-64", "minInclusive": 45, "maxInclusive": 64 },
+          { "id": "age_65_plus", "label": "65+", "minInclusive": 65, "maxInclusive": null }
+        ],
+        "minimumHumanRespondentsPerBin": 30,
+        "missingRule": "Exclude unknown or unmappable age values. If any fixed confirmatory age bin has fewer than 30 non-missing human respondents for a question, that entire question-age_band estimate is excluded from confirmatory analysis."
+      },
+      "income_band": {
+        "bins": [
+          { "id": "income_under_25k", "label": "<$25k", "minInclusive": 0, "maxInclusive": 24999 },
+          { "id": "income_25k_74k", "label": "$25k-$74,999", "minInclusive": 25000, "maxInclusive": 74999 },
+          { "id": "income_75k_149k", "label": "$75k-$149,999", "minInclusive": 75000, "maxInclusive": 149999 },
+          { "id": "income_150k_plus", "label": "$150k+", "minInclusive": 150000, "maxInclusive": null }
+        ],
+        "minimumHumanRespondentsPerBin": 30,
+        "missingRule": "Exclude unknown or unmappable income values. If any fixed confirmatory income bin has fewer than 30 non-missing human respondents for a question, that entire question-income_band estimate is excluded from confirmatory analysis."
+      }
+    },
+    "poolingRule": "For each question and confirmatory slice family, compute category-level MAE and average equally across eligible category levels. Average equally across eligible confirmatory slice families within each question, equally across questions within each confirmatory suite, and equally across the two confirmatory suites."
+  },
+  "armSpecs": [
+    {
+      "comparisonId": "generic_persona",
+      "conditioningMode": "sparse_persona",
+      "populationSource": "none",
+      "locationContext": "none",
+      "contextFields": ["age_band", "sex", "race_ethnicity", "income_band"],
+      "promptTemplateId": "benchmark_generic_persona_v1"
+    },
+    {
+      "comparisonId": "geography_only",
+      "conditioningMode": "place_only",
+      "populationSource": "none",
+      "locationContext": "audience_label_only",
+      "contextFields": ["audience_geography"],
+      "promptTemplateId": "benchmark_geography_only_v1"
+    },
+    {
+      "comparisonId": "rich_nonlocal_microdata",
+      "conditioningMode": "calibrated_microdata_nonlocal",
+      "populationSource": "calibrated_microdata_nonlocal",
+      "locationContext": "audience_label_only",
+      "contextFields": [
+        "audience_geography",
+        "age_band",
+        "occupation_group",
+        "income_band",
+        "housing_tenure",
+        "children_count",
+        "college_status",
+        "sex_if_relevant",
+        "race_ethnicity_if_relevant",
+        "disability_if_relevant",
+        "insurance_if_relevant",
+        "benefits_if_relevant"
+      ],
+      "promptTemplateId": "benchmark_rich_nonlocal_microdata_v1"
+    },
+    {
+      "comparisonId": "hivesight_local_population",
+      "conditioningMode": "calibrated_local_population",
+      "populationSource": "geography_assigned_synthetic_population",
+      "locationContext": "audience_label_and_record_locality",
+      "contextFields": [
+        "audience_geography",
+        "age_band",
+        "occupation_group",
+        "income_band",
+        "housing_tenure",
+        "children_count",
+        "college_status",
+        "sex_if_relevant",
+        "race_ethnicity_if_relevant",
+        "disability_if_relevant",
+        "insurance_if_relevant",
+        "benefits_if_relevant",
+        "exact_zip_if_locally_relevant"
+      ],
+      "promptTemplateId": "benchmark_hivesight_local_population_v1"
+    },
+    {
+      "comparisonId": "synthetic_fallback",
+      "conditioningMode": "fallback_profiles",
+      "populationSource": "heuristic_synthetic_fallback",
+      "locationContext": "audience_label_only",
+      "contextFields": [
+        "audience_geography",
+        "age_band",
+        "income_band",
+        "occupation_group",
+        "housing_tenure",
+        "children_count",
+        "sex_if_available",
+        "race_ethnicity_if_available"
+      ],
+      "promptTemplateId": "benchmark_synthetic_fallback_v1"
+    }
+  ]
+}

@@ -156,9 +156,12 @@ async function loadRealPersons(
     // Filter to matching ZCTA if this is a ZIP lookup
     if (resolved.zcta) {
       const filtered = filterByZcta(persons, resolved.zcta);
-      if (filtered.length > 0) {
-        persons = filtered;
+      if (filtered.length === 0) {
+        throw new Error(
+          `No person records matched ZIP ${resolved.zcta} in district ${id}`
+        );
       }
+      persons = filtered;
     }
 
     districtData.push({ persons, share });

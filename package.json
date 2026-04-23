@@ -14,6 +14,10 @@
     "test:e2e:setup": "playwright test --project=setup --headed",
     "test:e2e:ui": "playwright test --ui",
     "test:e2e:headed": "playwright test --headed",
+    "benchmarks:check": "node scripts/check-benchmarks.mjs",
+    "benchmarks:plan": "node scripts/run-benchmarks.mjs --dry-run",
+    "benchmarks:normalize:shed": "node scripts/normalize-shed-2024.mjs",
+    "benchmarks:normalize:gss": "node scripts/normalize-gss-2024.mjs",
     "test": "vitest run",
     "test:watch": "vitest"
   },

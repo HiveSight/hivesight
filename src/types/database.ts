@@ -54,6 +54,11 @@ export type Database = {
           hive_size: number;
           demographic_filters: Json;
           location: Json | null;
+          persona_source:
+            | "microdata"
+            | "synthetic_fallback"
+            | "legacy_personas"
+            | null;
           status: "pending" | "processing" | "completed" | "failed";
           credits_used: number;
           created_at: string;
@@ -68,6 +73,11 @@ export type Database = {
           hive_size: number;
           demographic_filters?: Json;
           location?: Json | null;
+          persona_source?:
+            | "microdata"
+            | "synthetic_fallback"
+            | "legacy_personas"
+            | null;
           status?: "pending" | "processing" | "completed" | "failed";
           credits_used?: number;
           created_at?: string;
@@ -82,6 +92,11 @@ export type Database = {
           hive_size?: number;
           demographic_filters?: Json;
           location?: Json | null;
+          persona_source?:
+            | "microdata"
+            | "synthetic_fallback"
+            | "legacy_personas"
+            | null;
           status?: "pending" | "processing" | "completed" | "failed";
           credits_used?: number;
           created_at?: string;

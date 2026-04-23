@@ -1,0 +1,9 @@
+.benchmarks/
+.codex-artifacts/
+research/
+test-results/
+playwright-report/
+e2e/.auth/
+.env
+.env.*
+*.tsbuildinfo

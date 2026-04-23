@@ -7,6 +7,7 @@ import { LikertChart } from "@/components/survey/likert-chart";
 import { ResponseTable } from "@/components/survey/response-table";
 import type { Database } from "@/types/database";
 import { LIKERT_VALUES, type LocationFilter } from "@/types";
+import { getSurveyPersonaSourceMeta } from "@/lib/survey-source";
 import { MapPin } from "lucide-react";
 
 type Survey = Database["public"]["Tables"]["surveys"]["Row"];
@@ -54,6 +55,10 @@ export default async function SurveyResultsPage({
 
   const survey = data as unknown as SurveyWithData;
   const location = survey.location as LocationFilter | null;
+  const sourceMeta = getSurveyPersonaSourceMeta(survey.persona_source);
+  const respondentLabel = survey.hive_size === 1
+    ? "1 simulated respondent"
+    : `${survey.hive_size} simulated respondents`;
 
   // Create a map of respondent IDs to respondent data
   const respondentMap = new Map(
@@ -82,6 +87,7 @@ export default async function SurveyResultsPage({
           <h1 className="text-3xl font-bold font-serif">Survey results</h1>
           <p className="text-muted-foreground mt-1.5">
             {survey.hive_size} respondents &middot; {survey.model}
+            {sourceMeta ? ` · ${sourceMeta.label}` : ""}
           </p>
         </div>
         <div className="flex gap-2">
@@ -101,7 +107,25 @@ export default async function SurveyResultsPage({
         <div className="flex items-center gap-2.5 p-4 bg-amber-50 border border-amber-200/60 rounded-xl dark:bg-amber-900/10 dark:border-amber-700/20">
           <MapPin className="h-5 w-5 text-amber-600 dark:text-amber-400" />
           <span className="text-sm font-medium text-amber-900 dark:text-amber-200">
-            {survey.hive_size} people from {location.label}
+            {respondentLabel} for {location.label}
+          </span>
+        </div>
+      )}
+
+      {sourceMeta && (
+        <div className="flex items-start justify-between gap-4 rounded-xl border border-border/70 bg-background/80 p-4">
+          <div>
+            <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-muted-foreground">
+              Audience source
+            </p>
+            <p className="mt-2 text-sm text-muted-foreground">
+              {sourceMeta.description}
+            </p>
+          </div>
+          <span
+            className={`shrink-0 rounded-full px-2.5 py-1 text-xs font-medium ${sourceMeta.badgeClass}`}
+          >
+            {sourceMeta.label}
           </span>
         </div>
       )}

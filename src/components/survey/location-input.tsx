@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useEffect, useRef, useCallback, useId } from "react";
 import { Input } from "@/components/ui/input";
 import type { LocationFilter } from "@/types";
 import { MapPin } from "lucide-react";
@@ -21,9 +21,12 @@ const US_STATES: Record<string, string> = {
 };
 
 interface LocationInputProps {
+  id?: string;
   value: LocationFilter | null;
-  onSelect: (location: LocationFilter) => void;
+  onSelect: (location: LocationFilter | null) => void;
   placeholder?: string;
+  disabled?: boolean;
+  "aria-describedby"?: string;
 }
 
 type LocationType = "zip" | "state" | "district" | "national";
@@ -42,9 +45,12 @@ const LOCATION_TYPE_LABELS: Record<LocationType, string> = {
 };
 
 export function LocationInput({
+  id,
   value,
   onSelect,
   placeholder = "ZIP code, state, or district (e.g., 10001, NY, NY-17)",
+  disabled = false,
+  "aria-describedby": ariaDescribedBy,
 }: LocationInputProps) {
   const [input, setInput] = useState(value?.label ?? "");
   const [options, setOptions] = useState<LocationOption[]>([]);
@@ -52,6 +58,11 @@ export function LocationInput({
   const [highlightIndex, setHighlightIndex] = useState(0);
   const inputRef = useRef<HTMLInputElement>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const listboxId = useId();
+
+  useEffect(() => {
+    setInput(value?.label ?? "");
+  }, [value]);
 
   const parseInput = useCallback((text: string): LocationOption[] => {
     const trimmed = text.trim();
@@ -164,17 +175,23 @@ export function LocationInput({
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (!isOpen) return;
-
     if (e.key === "ArrowDown") {
       e.preventDefault();
+      if (!isOpen && options.length > 0) {
+        setIsOpen(true);
+        return;
+      }
       setHighlightIndex((i) => Math.min(i + 1, options.length - 1));
     } else if (e.key === "ArrowUp") {
       e.preventDefault();
+      if (!isOpen && options.length > 0) {
+        setIsOpen(true);
+        return;
+      }
       setHighlightIndex((i) => Math.max(i - 1, 0));
     } else if (e.key === "Enter") {
-      e.preventDefault();
-      if (options[highlightIndex]) {
+      if (isOpen && options[highlightIndex]) {
+        e.preventDefault();
         selectOption(options[highlightIndex]);
       }
     } else if (e.key === "Escape") {
@@ -185,13 +202,14 @@ export function LocationInput({
   return (
     <div className="relative">
       <Input
+        id={id}
         ref={inputRef}
         value={input}
         onChange={(e) => {
-          setInput(e.target.value);
-          // Clear selection when user edits
-          if (value) {
-            onSelect(null as unknown as LocationFilter);
+          const nextValue = e.target.value;
+          setInput(nextValue);
+          if (value && nextValue !== value.label) {
+            onSelect(null);
           }
         }}
         onFocus={() => {
@@ -200,17 +218,34 @@ export function LocationInput({
         onKeyDown={handleKeyDown}
         placeholder={placeholder}
         className="w-full"
+        disabled={disabled}
+        aria-describedby={ariaDescribedBy}
+        aria-autocomplete="list"
+        aria-controls={isOpen ? listboxId : undefined}
+        aria-activedescendant={
+          isOpen && options[highlightIndex]
+            ? `${listboxId}-${options[highlightIndex].type}-${options[highlightIndex].id}`
+            : undefined
+        }
+        aria-expanded={isOpen}
+        role="combobox"
       />
 
       {isOpen && options.length > 0 && (
         <div
           ref={dropdownRef}
+          id={listboxId}
+          role="listbox"
           className="absolute z-50 mt-1.5 w-full bg-card border border-amber-900/[0.06] rounded-xl shadow-warm-lg max-h-60 overflow-auto animate-slide-down dark:border-amber-100/[0.06]"
         >
           {options.map((option, i) => (
             <button
               key={`${option.type}-${option.id}`}
+              id={`${listboxId}-${option.type}-${option.id}`}
+              type="button"
               onClick={() => selectOption(option)}
+              role="option"
+              aria-selected={i === highlightIndex}
               className={`w-full text-left px-3 py-2.5 text-sm transition-colors duration-150 first:rounded-t-xl last:rounded-b-xl ${
                 i === highlightIndex ? "bg-amber-50 dark:bg-amber-950/20" : "hover:bg-amber-50/50 dark:hover:bg-amber-950/10"
               }`}

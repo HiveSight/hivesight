@@ -43,7 +43,10 @@ playwright-report/
 playwright/.cache/
 e2e/.auth/
 
-# Generated data (hosted on HuggingFace)
+# Generated data and local research artifacts
+.benchmarks/
+.codex-artifacts/
+research/
 scripts/output/
 
 # Misc

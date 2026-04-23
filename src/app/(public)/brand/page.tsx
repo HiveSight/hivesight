@@ -85,8 +85,8 @@ export default function BrandPage() {
                 Mission
               </h3>
               <p className="text-muted-foreground">
-                Make research accessible by simulating diverse public opinion at
-                scale using AI.
+                Make audience research accessible by simulating diverse human
+                responses at scale using AI.
               </p>
             </div>
             <div>
@@ -94,8 +94,8 @@ export default function BrandPage() {
                 Vision
               </h3>
               <p className="text-muted-foreground">
-                Every researcher, product team, and policymaker can instantly
-                understand how people think.
+                Every researcher, marketer, product team, and strategist can
+                instantly understand how people think.
               </p>
             </div>
             <div>

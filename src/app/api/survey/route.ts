@@ -131,6 +131,12 @@ export async function POST(request: Request) {
       );
     }
 
+    // Best-effort provenance flag for the legacy persona simulator.
+    await supabase
+      .from("surveys")
+      .update({ persona_source: "legacy_personas" } as never)
+      .eq("id", survey.id);
+
     // Run simulation
     const { personas, results } = await runSimulation({
       question,
@@ -227,6 +233,7 @@ export async function POST(request: Request) {
     return NextResponse.json({
       surveyId: survey.id,
       creditsUsed: creditsRequired,
+      personaSource: "legacy_personas",
       responseCount: results.length,
     });
   } catch (error) {

@@ -2,6 +2,10 @@ import { defineConfig, devices } from "@playwright/test";
 import path from "path";
 
 const authFile = path.join(__dirname, "e2e/.auth/user.json");
+const baseURL =
+  process.env.PLAYWRIGHT_BASE_URL ??
+  `http://localhost:${process.env.PLAYWRIGHT_PORT ?? "3000"}`;
+const devPort = (process.env.PLAYWRIGHT_PORT ?? new URL(baseURL).port) || "3000";
 
 export default defineConfig({
   testDir: "./e2e",
@@ -11,7 +15,7 @@ export default defineConfig({
   workers: process.env.CI ? 1 : undefined,
   reporter: "html",
   use: {
-    baseURL: "http://localhost:3000",
+    baseURL,
     trace: "on-first-retry",
     screenshot: "only-on-failure",
   },
@@ -26,7 +30,7 @@ export default defineConfig({
     // Public tests - no auth required
     {
       name: "public",
-      testMatch: /landing\.spec\.ts/,
+      testMatch: /(landing|results-provenance|benchmarks)\.spec\.ts/,
       use: { ...devices["Desktop Chrome"] },
     },
     // Auth tests - tests the auth flow itself
@@ -52,8 +56,8 @@ export default defineConfig({
     },
   ],
   webServer: {
-    command: "pnpm dev",
-    url: "http://localhost:3000",
+    command: `pnpm exec next dev --turbopack --port ${devPort}`,
+    url: baseURL,
     reuseExistingServer: !process.env.CI,
     timeout: 120000,
   },

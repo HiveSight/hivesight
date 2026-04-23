@@ -139,11 +139,17 @@ export default function NewSurveyPage() {
 
           {/* Location */}
           <div className="space-y-2">
-            <Label>Location</Label>
+            <Label htmlFor="survey-location">Location</Label>
             <LocationInput
+              id="survey-location"
               value={location}
               onSelect={setLocation}
+              disabled={loading}
             />
+            <p className="text-sm text-muted-foreground/70">
+              Search by ZIP code, state abbreviation, district like NY-17, or US. HiveSight will
+              run over the calibrated population for that geography.
+            </p>
           </div>
 
           {/* Response type */}

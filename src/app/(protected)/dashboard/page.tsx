@@ -3,6 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import type { Database } from "@/types/database";
+import { getSurveyPersonaSourceMeta } from "@/lib/survey-source";
 import { Plus } from "lucide-react";
 
 type Profile = Database["public"]["Tables"]["profiles"]["Row"];
@@ -94,39 +95,55 @@ export default async function DashboardPage() {
         <CardContent>
           {surveys.length > 0 ? (
             <div className="space-y-3">
-              {surveys.map((survey) => (
-                <div
-                  key={survey.id}
-                  className="flex items-center justify-between p-4 border border-amber-900/[0.04] rounded-xl bg-background/50 transition-all duration-200 hover:bg-amber-50/30 hover:border-amber-200/50 dark:border-amber-100/[0.04] dark:hover:bg-amber-950/20"
-                >
-                  <div className="min-w-0 flex-1">
-                    <p className="font-medium truncate max-w-md">
-                      {survey.question}
-                    </p>
-                    <p className="text-sm text-muted-foreground mt-0.5">
-                      {survey.hive_size} respondents
-                      {survey.location &&
-                        typeof survey.location === "object" &&
-                        "label" in (survey.location as Record<string, unknown>) &&
-                        ` in ${(survey.location as { label: string }).label}`}
-                      {" "}&middot;{" "}
-                      {new Date(survey.created_at).toLocaleDateString()}
-                    </p>
+              {surveys.map((survey) => {
+                const sourceMeta = getSurveyPersonaSourceMeta(
+                  survey.persona_source
+                );
+
+                return (
+                  <div
+                    key={survey.id}
+                    className="flex items-center justify-between p-4 border border-amber-900/[0.04] rounded-xl bg-background/50 transition-all duration-200 hover:bg-amber-50/30 hover:border-amber-200/50 dark:border-amber-100/[0.04] dark:hover:bg-amber-950/20"
+                  >
+                    <div className="min-w-0 flex-1">
+                      <p className="font-medium truncate max-w-md">
+                        {survey.question}
+                      </p>
+                      <p className="mt-0.5 text-sm text-muted-foreground">
+                        {survey.hive_size} respondents
+                        {survey.location &&
+                          typeof survey.location === "object" &&
+                          "label" in (survey.location as Record<string, unknown>) &&
+                          ` in ${(survey.location as { label: string }).label}`}
+                        {" "}&middot;{" "}
+                        {new Date(survey.created_at).toLocaleDateString()}
+                        {sourceMeta && (
+                          <>
+                            {" "}&middot;{" "}
+                            <span
+                              className={`rounded-full px-2 py-0.5 text-[11px] font-medium ${sourceMeta.badgeClass}`}
+                            >
+                              {sourceMeta.shortLabel}
+                            </span>
+                          </>
+                        )}
+                      </p>
+                    </div>
+                    <div className="ml-4 flex items-center gap-3">
+                      <span
+                        className={`px-2.5 py-1 text-xs font-medium rounded-full ${
+                          STATUS_STYLES[survey.status] ?? "bg-muted text-muted-foreground"
+                        }`}
+                      >
+                        {survey.status}
+                      </span>
+                      <Button variant="outline" size="sm" asChild>
+                        <Link href={`/survey/${survey.id}`}>View</Link>
+                      </Button>
+                    </div>
                   </div>
-                  <div className="flex items-center gap-3 ml-4">
-                    <span
-                      className={`px-2.5 py-1 text-xs font-medium rounded-full ${
-                        STATUS_STYLES[survey.status] ?? "bg-muted text-muted-foreground"
-                      }`}
-                    >
-                      {survey.status}
-                    </span>
-                    <Button variant="outline" size="sm" asChild>
-                      <Link href={`/survey/${survey.id}`}>View</Link>
-                    </Button>
-                  </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           ) : (
             <div className="text-center py-12">

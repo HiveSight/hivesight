@@ -1,0 +1,54 @@
+{
+  "version": 1,
+  "suiteId": "gss_2024_evergreen",
+  "datasetId": "gss_2024",
+  "datasetLabel": "GSS 2024 Cross-section",
+  "normalizationSpec": {
+    "envVar": "GSS_2024_DATA_PATH",
+    "defaultPath": ".benchmarks/input/gss-2024.json",
+    "expectedTopLevelKey": "rows",
+    "notes": "Generate with scripts/normalize-gss-2024.mjs from a GSS 2024 CSV export that uses numeric GSS codes (e.g., from the GSS Data Explorer or an SDA export). TRUST, HELPFUL, and FAIR are mapped to a binary positive share with 'Depends' (code 3) and missing codes (0/8/9) treated as null. CONINC is assumed to be constant 1986 dollars and is converted to current (2024) dollars for income-band mapping using a CPI-U multiplier; the default is 2.862 and may be overridden with --income-multiplier."
+  },
+  "questions": [
+    {
+      "id": "trust_people",
+      "prompt": "Most people can be trusted.",
+      "sourceVariable": "TRUST",
+      "benchmarkField": "trust_general",
+      "responseFormat": "ternary_trust",
+      "targetSlices": ["overall", "age_band", "sex", "race_ethnicity", "income_band"],
+      "confirmatorySlices": ["age_band", "income_band"],
+      "rationale": "Classic evergreen trust item with low dependence on the weekly news cycle."
+    },
+    {
+      "id": "helpfulness",
+      "prompt": "Most people are helpful rather than mostly looking out for themselves.",
+      "sourceVariable": "HELPFUL",
+      "benchmarkField": "helpfulness_general",
+      "responseFormat": "ternary_helpfulness",
+      "targetSlices": ["overall", "age_band", "sex", "tenure_type"],
+      "confirmatorySlices": ["age_band"],
+      "rationale": "General social perception item that should expose broad worldview differences without headline dependence."
+    },
+    {
+      "id": "fairness",
+      "prompt": "Most people try to be fair.",
+      "sourceVariable": "FAIR",
+      "benchmarkField": "fairness_general",
+      "responseFormat": "ternary_fairness",
+      "targetSlices": ["overall", "age_band", "race_ethnicity", "income_band"],
+      "confirmatorySlices": ["age_band", "income_band"],
+      "rationale": "Pairs naturally with trust and helpfulness as a durable social-attitudes battery."
+    },
+    {
+      "id": "income_redistribution",
+      "prompt": "The government should reduce income differences between rich and poor.",
+      "sourceVariable": "EQWLTH",
+      "benchmarkField": "redistribution_support",
+      "responseFormat": "seven_point_scale",
+      "targetSlices": ["overall", "age_band", "income_band", "race_ethnicity", "education_proxy"],
+      "confirmatorySlices": ["age_band", "income_band"],
+      "rationale": "Good test of whether richer household context improves class- and income-linked attitudes."
+    }
+  ]
+}

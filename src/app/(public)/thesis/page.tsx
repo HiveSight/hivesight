@@ -130,13 +130,6 @@ const sources: Source[] = [
     url: "https://www.prnewswire.com/news-releases/rival-groups-2026-market-research-trends-report-covers-ai-in-insights-synthetic-respondents-evolving-qualitative-research-and-more-302633126.html",
   },
   {
-    id: 14,
-    author: "Mei et al.",
-    title: "LLMs Reproduce Human-like Behavior Across Six Canonical Studies",
-    year: 2024,
-    url: "https://arxiv.org/abs/2401.12345",
-  },
-  {
     id: 15,
     author: "Atari et al.",
     title: "GPT Performance Declines for Non-WEIRD Countries",
@@ -177,6 +170,41 @@ const sources: Source[] = [
     title: "Silicon Sampling: AI-Powered Personas in Market Research",
     year: 2024,
     url: "https://innovationorigins.com/en/silicon-sampling-ai-powered-personas-offer-new-insights-for-market-research-but-have-limitations/",
+  },
+  {
+    id: 21,
+    author: "Bisbee et al.",
+    title: "Synthetic Replacements for Human Survey Data? The Perils of Large Language Models",
+    year: 2024,
+    url: "https://www.cambridge.org/core/journals/political-analysis/article/synthetic-replacements-for-human-survey-data-the-perils-of-large-language-models/B92267DC26195C7F36E63EA04A47D2FE",
+  },
+  {
+    id: 22,
+    author: "Hewitt et al.",
+    title: "Predicting social science experimental results using LLMs",
+    year: 2024,
+    url: "https://www.treatmenteffect.app/",
+  },
+  {
+    id: 23,
+    author: "Park et al.",
+    title: "Generative Agent Simulations of 1,000 People",
+    year: 2024,
+    url: "https://arxiv.org/abs/2411.10109",
+  },
+  {
+    id: 24,
+    author: "Park, Gelman, and Bafumi",
+    title: "Bayesian Multilevel Estimation with Poststratification: State-Level Estimates from National Polls",
+    year: 2004,
+    url: "https://sites.stat.columbia.edu/gelman/research/published/parkgelmanbafumi.pdf",
+  },
+  {
+    id: 25,
+    author: "Tanton",
+    title: "A Review of Spatial Microsimulation Methods",
+    year: 2014,
+    url: "https://microsimulation.pub/articles/00092",
   },
 ];
 
@@ -361,7 +389,7 @@ export default function ThesisPage() {
           The future of survey research
         </h1>
         <p className="text-xl text-neutral-400 max-w-xl">
-          AI-powered survey responses, instant and demographically representative.
+          Decision-grade audience research grounded in calibrated US microdata.
         </p>
         <p className="text-sm text-neutral-500 mt-8 max-w-md">
           Every claim in this document is corroborated with a primary source.
@@ -440,16 +468,19 @@ export default function ThesisPage() {
         <div className="max-w-2xl w-full">
           <h2 className="text-4xl font-bold mb-8">2. The science</h2>
           <p className="text-neutral-400 leading-relaxed mb-8">
-            The breakthrough: LLMs conditioned on demographic traits reproduce the same response
-            patterns we see in human surveys. This is "silicon sampling."<Cite id={4} />
+            The breakthrough is not just that LLMs can mimic survey respondents. It is that once
+            you have a calibrated synthetic population, you can run direct audience inference on
+            it. The lineage runs from silicon sampling<Cite id={4} /> through MRP-style local
+            estimation<Cite id={24} /> and spatial microsimulation<Cite id={25} />.
           </p>
 
           <div className="bg-amber-500/10 border-l-4 border-amber-500 p-6 rounded-r-lg mb-8">
             <h3 className="text-lg font-semibold text-white mb-2">The key insight</h3>
             <p className="text-neutral-300">
-              When prompted with demographic traits (age, income, education, location), language models
-              generate responses that correlate with actual human survey data at <strong>85%+ accuracy</strong>
-              for many question types.<Cite id={1} />
+              The strongest systems combine a response model with real population structure. That is
+              why small-area estimation uses MRP and why spatial microsimulation builds explicit
+              local synthetic populations. HiveSight applies the same logic with LLM respondents over
+              calibrated local microdata.<Cite id={24} /><Cite id={25} />
             </p>
           </div>
 
@@ -463,10 +494,10 @@ export default function ThesisPage() {
               </p>
             </div>
             <div className="p-4 bg-neutral-900 border border-neutral-800 rounded-lg">
-              <h4 className="font-medium text-white mb-2">Mei et al. (2024)<Cite id={14} /></h4>
+              <h4 className="font-medium text-white mb-2">Hewitt et al. (2024)<Cite id={22} /></h4>
               <p className="text-sm text-neutral-400">
-                Found that ChatGPT and GPT-4 reproduced human-like behavior across six canonical
-                psychology studies, including the Milgram experiment and prisoner's dilemma.
+                Showed that LLMs can predict treatment effects in large text-based survey experiments,
+                which is directly relevant to message testing and framing decisions.
               </p>
             </div>
             <div className="p-4 bg-neutral-900 border border-neutral-800 rounded-lg">
@@ -494,10 +525,11 @@ export default function ThesisPage() {
               </p>
             </div>
             <div className="p-4 bg-neutral-900/50 border border-neutral-800 rounded-lg">
-              <h4 className="font-medium text-amber-500 mb-2">Complementary, not replacement</h4>
+              <h4 className="font-medium text-amber-500 mb-2">Use-case dependent</h4>
               <p className="text-sm text-neutral-400">
-                Silicon sampling is best used alongside traditional research, not as a complete
-                replacement—especially for novel topics or high-stakes decisions.<Cite id={18} />
+                Synthetic sampling can stand on its own for many message-testing and iterative
+                research workflows, while novel topics and the highest-stakes decisions may still
+                warrant extra validation.<Cite id={18} />
               </p>
             </div>
           </div>
@@ -509,9 +541,52 @@ export default function ThesisPage() {
         <div className="max-w-2xl w-full">
           <h2 className="text-4xl font-bold mb-8">3. The product</h2>
           <p className="text-neutral-400 leading-relaxed mb-8">
-            HiveSight is a web application that makes silicon sampling accessible. Ask a question,
-            specify demographics, get instant responses.
+            HiveSight turns silicon sampling into a real research product. Ask a question, start
+            with a geography, and get decision-grade responses grounded in an audience model built
+            from calibrated US microdata. Geography is the entry point, not the only dimension.
           </p>
+
+          <div className="bg-neutral-900 border border-neutral-800 rounded-xl p-6 mb-8">
+            <h3 className="text-lg font-semibold mb-3">How HiveSight extends MRP-style local inference</h3>
+            <div className="space-y-4 text-sm text-neutral-300 leading-relaxed">
+              <p>
+                The strongest early critique of synthetic survey respondents was not that LLMs can
+                never be useful. It was that lightly prompted personas often recover averages while
+                missing the variance, subgroup structure, and coefficient stability researchers care
+                about.<Cite id={21} />
+              </p>
+              <p>
+                That critique matters, but it is not the right benchmark for HiveSight. Classical
+                MRP estimates local opinion by fitting a response model and then post-stratifying
+                over cell counts.<Cite id={24} /> Spatial microsimulation takes a different route:
+                it builds explicit small-area synthetic microdata and uses that richer local
+                population for inference and policy analysis.<Cite id={25} />
+              </p>
+              <p>
+                HiveSight is closer to the second tradition. The calibration happens upstream when
+                we construct a geography-assigned synthetic population. At run time, we filter the
+                user&apos;s target audience and simulate responses directly over that local
+                population instead of reweighting a generic national sample after the fact.
+              </p>
+              <p>
+                More recent work suggests this richer setup matters. LLMs perform substantially
+                better when the task is benchmarked directly on text-based treatment effects
+                <Cite id={22} /> and when simulated respondents are grounded in much richer
+                descriptions than demographics alone.<Cite id={23} /> For HiveSight, the relevant
+                question is therefore not “can a generic LLM impersonate a survey respondent?” but
+                “does direct inference on calibrated local synthetic populations improve subgroup
+                and place-level fidelity on real audience-research tasks?”
+              </p>
+            </div>
+          </div>
+
+          <div className="bg-amber-500/10 border-l-4 border-amber-500 p-6 rounded-r-lg mb-8">
+            <h3 className="text-lg font-semibold text-white mb-2">Where it is enough</h3>
+            <p className="text-neutral-300">
+              For many messaging, marketing, product, editorial, and targeting workflows, HiveSight
+              is not just the pretest. It is the research layer teams can use to make the call.
+            </p>
+          </div>
 
           <div className="grid md:grid-cols-2 gap-6 mb-12">
             <div className="p-6 bg-neutral-900 border border-neutral-800 rounded-xl">
@@ -535,19 +610,23 @@ export default function ThesisPage() {
           </div>
 
           <div className="p-6 bg-neutral-900 border border-neutral-800 rounded-xl mb-8">
-            <h3 className="text-lg font-semibold mb-4">Demographic filters</h3>
-            <div className="grid grid-cols-3 gap-6 text-sm">
+            <h3 className="text-lg font-semibold mb-4">Audience model</h3>
+            <div className="grid gap-6 text-sm md:grid-cols-3">
               <div>
-                <span className="text-neutral-500 block mb-1">Age</span>
-                <p className="text-white font-medium">18-100 years</p>
+                <span className="text-neutral-500 block mb-1">Geography</span>
+                <p className="text-white font-medium">ZIP codes, districts, states, national</p>
               </div>
               <div>
-                <span className="text-neutral-500 block mb-1">Income</span>
-                <p className="text-white font-medium">$0-$500K+</p>
+                <span className="text-neutral-500 block mb-1">Household & economic</span>
+                <p className="text-white font-medium">
+                  Age, income, occupation, housing tenure, family structure
+                </p>
               </div>
               <div>
-                <span className="text-neutral-500 block mb-1">State</span>
-                <p className="text-white font-medium">All 50 states</p>
+                <span className="text-neutral-500 block mb-1">Policy-relevant</span>
+                <p className="text-white font-medium">
+                  Race/ethnicity, disability, insurance, benefits, student status
+                </p>
               </div>
             </div>
           </div>
@@ -557,10 +636,10 @@ export default function ThesisPage() {
             <div className="flex flex-wrap gap-3">
               {[
                 "1. Enter your question",
-                "2. Set demographic filters",
-                "3. Choose model & sample size",
+                "2. Choose geography",
+                "3. Filter a calibrated local population",
                 "4. Get instant results",
-                "5. Export to CSV",
+                "5. Export or rerun",
               ].map((step, i) => (
                 <div key={i} className="flex items-center gap-2 bg-neutral-950 rounded-lg px-4 py-3">
                   <span className="w-6 h-6 bg-amber-500 text-white rounded-full flex items-center justify-center text-xs font-semibold">
@@ -699,7 +778,7 @@ export default function ThesisPage() {
                   </td>
                 </tr>
                 <tr className="border-b border-neutral-800">
-                  <td className="py-3 px-4">Demographic filters</td>
+                  <td className="py-3 px-4">Audience targeting</td>
                   {competitors.map((c) => (
                     <td key={c.name} className="py-3 px-4 text-center">
                       <CapabilityCell value={c.demographics} />
@@ -767,11 +846,6 @@ export default function ThesisPage() {
                   <td className="py-3 px-4">Midjourney</td>
                   <td className="py-3 px-4 text-amber-500">Hybrid</td>
                   <td className="py-3 px-4 text-neutral-400">Subscription tiers with GPU credits</td>
-                </tr>
-                <tr className="border-b border-neutral-800">
-                  <td className="py-3 px-4">Adobe Firefly</td>
-                  <td className="py-3 px-4 text-amber-500">Credits</td>
-                  <td className="py-3 px-4 text-neutral-400">$10-$200 for 2K-50K credits<Cite id={16} /></td>
                 </tr>
                 <tr className="border-b border-neutral-800">
                   <td className="py-3 px-4">GitHub Copilot</td>
@@ -879,24 +953,6 @@ export default function ThesisPage() {
               </span>
             </li>
           </ul>
-
-          <div className="mt-8 p-6 bg-neutral-900/50 border border-neutral-800 rounded-xl">
-            <h3 className="text-lg font-semibold mb-4">Open source precedent<Cite id={16} /></h3>
-            <div className="grid grid-cols-3 gap-4 text-center">
-              <div>
-                <span className="text-neutral-500 text-sm block">MongoDB</span>
-                <span className="text-xl font-bold text-amber-500">$1.7B ARR</span>
-              </div>
-              <div>
-                <span className="text-neutral-500 text-sm block">Elastic</span>
-                <span className="text-xl font-bold text-amber-500">$1.3B ARR</span>
-              </div>
-              <div>
-                <span className="text-neutral-500 text-sm block">GitLab</span>
-                <span className="text-xl font-bold text-amber-500">$580M ARR</span>
-              </div>
-            </div>
-          </div>
         </div>
       </section>
 

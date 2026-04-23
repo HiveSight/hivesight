@@ -2,7 +2,10 @@ import { createClient } from "@/lib/supabase/server";
 import { z } from "zod/v4";
 import { MODEL_CONFIG, LocationFilterSchema } from "@/types";
 import { loadAndSampleForLocation } from "@/lib/data/location-resolver";
-import { formatPersonDescription } from "@/lib/data/demographics";
+import {
+  createPersonDescriptionFormatter,
+  getInsuranceType,
+} from "@/lib/data/demographics";
 import { getRaceLabel } from "@/lib/data/race-codes";
 import { getOccupationLabel } from "@/lib/data/occupation-codes";
 import {
@@ -15,7 +18,6 @@ import type {
   Model,
   ResponseType,
   LikertScale,
-  PersonRecord,
   LocationFilter,
 } from "@/types";
 import type { Database } from "@/types/database";
@@ -173,6 +175,25 @@ function getStateFromDistrict(districtId: string): string {
   if (districtId.length === 2) return districtId;
   const parts = districtId.split("-");
   return parts[0] || "US";
+}
+
+async function updateSurveyWithFallback(
+  supabase: Awaited<ReturnType<typeof createClient>>,
+  surveyId: string,
+  values: Record<string, unknown>,
+  fallbackValues: Record<string, unknown>
+) {
+  const { error } = await supabase
+    .from("surveys")
+    .update(values as never)
+    .eq("id", surveyId);
+
+  if (error) {
+    await supabase
+      .from("surveys")
+      .update(fallbackValues as never)
+      .eq("id", surveyId);
+  }
 }
 
 export async function POST(request: Request) {
@@ -334,15 +355,16 @@ export async function POST(request: Request) {
 
         const survey = surveyData as unknown as Survey;
 
-        // Step 2: Load and sample real persons
+        // Step 2: Load and sample the calibrated local population
         sendEvent(controller, "progress", {
           stage: "loading",
-          message: `Loading population data for ${effectiveLocation.label}...`,
+          message: `Loading the calibrated population for ${effectiveLocation.label}...`,
           progress: 10,
         });
 
         const { persons: sampledPersons, synthetic } =
           await loadAndSampleForLocation(effectiveLocation, hiveSize);
+        const personaSource = synthetic ? "synthetic_fallback" : "microdata";
 
         if (synthetic) {
           sendEvent(controller, "progress", {
@@ -353,9 +375,11 @@ export async function POST(request: Request) {
         }
 
         // Step 3: Generate descriptions and process responses
-        const descriptions = sampledPersons.map((p) =>
-          formatPersonDescription(p)
-        );
+        const formatPersonDescription = createPersonDescriptionFormatter({
+          question,
+          location: effectiveLocation,
+        });
+        const descriptions = sampledPersons.map(formatPersonDescription);
 
         const BATCH_SIZE = 10;
         const results: SimulationResult[] = [];
@@ -433,11 +457,7 @@ export async function POST(request: Request) {
               : "Other",
           has_children: person.children_count > 0,
           children_count: person.children_count,
-          insurance_type: person.has_medicare
-            ? "Medicare"
-            : person.has_medicaid
-            ? "Medicaid"
-            : "Private/uninsured",
+          insurance_type: getInsuranceType(person),
           receives_benefits:
             person.receives_snap ||
             person.receives_ssi ||
@@ -481,10 +501,12 @@ export async function POST(request: Request) {
         }
 
         if (respondentError || !respondentsData) {
-          await supabase
-            .from("surveys")
-            .update({ status: "failed" } as never)
-            .eq("id", survey.id);
+          await updateSurveyWithFallback(supabase, survey.id, {
+              status: "failed",
+              persona_source: personaSource,
+            }, {
+              status: "failed",
+            });
           sendEvent(controller, "error", {
             message: `Failed to store respondents: ${respondentError?.message || "unknown"}`,
           });
@@ -508,10 +530,12 @@ export async function POST(request: Request) {
           .insert(responseInserts as never);
 
         if (responseError) {
-          await supabase
-            .from("surveys")
-            .update({ status: "failed" } as never)
-            .eq("id", survey.id);
+          await updateSurveyWithFallback(supabase, survey.id, {
+              status: "failed",
+              persona_source: personaSource,
+            }, {
+              status: "failed",
+            });
           sendEvent(controller, "error", { message: "Failed to store responses" });
           controller.close();
           return;
@@ -541,22 +565,16 @@ export async function POST(request: Request) {
         }
 
         // Update survey status (try with new fields, fall back to base)
-        const { error: statusError } = await supabase
-          .from("surveys")
-          .update({
+        await updateSurveyWithFallback(supabase, survey.id, {
             status: "completed",
             completed_at: new Date().toISOString(),
             credits_used: creditsRequired,
-          } as never)
-          .eq("id", survey.id);
-
-        if (statusError) {
-          // Fall back to just status update
-          await supabase
-            .from("surveys")
-            .update({ status: "completed" } as never)
-            .eq("id", survey.id);
-        }
+            persona_source: personaSource,
+          }, {
+            status: "completed",
+            completed_at: new Date().toISOString(),
+            credits_used: creditsRequired,
+          });
 
         // Send completion
         sendEvent(controller, "progress", {
@@ -568,6 +586,7 @@ export async function POST(request: Request) {
         sendEvent(controller, "complete", {
           surveyId: survey.id,
           creditsUsed: creditsRequired,
+          personaSource,
           responseCount: results.length,
         });
 

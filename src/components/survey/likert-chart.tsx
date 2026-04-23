@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useRef, useState } from "react";
 import {
   BarChart,
   Bar,
@@ -7,7 +8,6 @@ import {
   YAxis,
   CartesianGrid,
   Tooltip,
-  ResponsiveContainer,
   Cell,
 } from "recharts";
 
@@ -30,40 +30,62 @@ const COLORS = {
 };
 
 export function LikertChart({ data }: LikertChartProps) {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [chartWidth, setChartWidth] = useState(640);
+
+  useEffect(() => {
+    const element = containerRef.current;
+    if (!element) {
+      return;
+    }
+
+    const updateWidth = () => {
+      const nextWidth = Math.max(Math.floor(element.getBoundingClientRect().width), 320);
+      setChartWidth(nextWidth);
+    };
+
+    updateWidth();
+
+    const observer = new ResizeObserver(() => {
+      updateWidth();
+    });
+
+    observer.observe(element);
+    return () => observer.disconnect();
+  }, []);
+
   return (
-    <div className="h-64">
-      <ResponsiveContainer width="100%" height="100%">
-        <BarChart data={data} layout="vertical">
-          <CartesianGrid strokeDasharray="3 3" stroke="hsla(35, 15%, 88%, 0.6)" />
-          <XAxis type="number" domain={[0, "auto"]} tick={{ fontSize: 12, fill: "hsl(30, 5%, 45%)" }} />
-          <YAxis
-            type="category"
-            dataKey="name"
-            width={120}
-            tick={{ fontSize: 12, fill: "hsl(30, 5%, 45%)" }}
-          />
-          <Tooltip
-            formatter={(value, _name, props) => [
-              `${value} (${(props.payload as LikertData).percentage.toFixed(1)}%)`,
-              "Responses",
-            ]}
-            contentStyle={{
-              borderRadius: "10px",
-              border: "1px solid hsla(35, 15%, 88%, 0.8)",
-              boxShadow: "0 4px 12px hsla(30, 30%, 20%, 0.08)",
-              fontSize: "13px",
-            }}
-          />
-          <Bar dataKey="value" radius={[0, 6, 6, 0]}>
-            {data.map((entry, index) => (
-              <Cell
-                key={`cell-${index}`}
-                fill={COLORS[entry.name as keyof typeof COLORS] || "#8884d8"}
-              />
-            ))}
-          </Bar>
-        </BarChart>
-      </ResponsiveContainer>
+    <div ref={containerRef} className="h-64 w-full min-w-0">
+      <BarChart data={data} layout="vertical" width={chartWidth} height={256}>
+        <CartesianGrid strokeDasharray="3 3" stroke="hsla(35, 15%, 88%, 0.6)" />
+        <XAxis type="number" domain={[0, "auto"]} tick={{ fontSize: 12, fill: "hsl(30, 5%, 45%)" }} />
+        <YAxis
+          type="category"
+          dataKey="name"
+          width={120}
+          tick={{ fontSize: 12, fill: "hsl(30, 5%, 45%)" }}
+        />
+        <Tooltip
+          formatter={(value, _name, props) => [
+            `${value} (${(props.payload as LikertData).percentage.toFixed(1)}%)`,
+            "Responses",
+          ]}
+          contentStyle={{
+            borderRadius: "10px",
+            border: "1px solid hsla(35, 15%, 88%, 0.8)",
+            boxShadow: "0 4px 12px hsla(30, 30%, 20%, 0.08)",
+            fontSize: "13px",
+          }}
+        />
+        <Bar dataKey="value" radius={[0, 6, 6, 0]}>
+          {data.map((entry, index) => (
+            <Cell
+              key={`cell-${index}`}
+              fill={COLORS[entry.name as keyof typeof COLORS] || "#8884d8"}
+            />
+          ))}
+        </Bar>
+      </BarChart>
     </div>
   );
 }
