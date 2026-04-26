@@ -6,9 +6,20 @@ import Link from "next/link";
 import { LikertChart } from "@/components/survey/likert-chart";
 import { ResponseTable } from "@/components/survey/response-table";
 import type { Database } from "@/types/database";
-import { LIKERT_VALUES, type LocationFilter } from "@/types";
+import { LIKERT_VALUES, type AudienceFilters, type LocationFilter } from "@/types";
 import { getSurveyPersonaSourceMeta } from "@/lib/survey-source";
-import { MapPin } from "lucide-react";
+import {
+  FIELD_REGISTRY,
+  type FieldSelectionPlan,
+  type PromptFieldId,
+} from "@/lib/data/field-selection";
+import { getAudienceFilterSummary } from "@/lib/data/audience-filters";
+import {
+  Database as DatabaseIcon,
+  MapPin,
+  RotateCcw,
+  SplitSquareHorizontal,
+} from "lucide-react";
 
 type Survey = Database["public"]["Tables"]["surveys"]["Row"];
 type Respondent = Database["public"]["Tables"]["respondents"]["Row"];
@@ -79,6 +90,14 @@ export default async function SurveyResultsPage({
 
   // Calculate demographic breakdown
   const demoBreakdown = calculateDemoBreakdown(survey.respondents);
+  const audienceFilters = (survey.audience_filters ?? {}) as AudienceFilters;
+  const audienceFilterSummary = getAudienceFilterSummary(audienceFilters);
+  const selectedFields = getSelectedPromptFields(survey, survey.respondents);
+  const sampleFrameCount = survey.sample_frame_count ?? survey.respondents.length;
+  const sampleFrameWeight =
+    typeof survey.sample_frame_weight === "number"
+      ? Math.round(survey.sample_frame_weight).toLocaleString()
+      : null;
 
   return (
     <div className="space-y-8 animate-fade-in">
@@ -96,8 +115,17 @@ export default async function SurveyResultsPage({
               <Link href="/dashboard">Back to dashboard</Link>
             </Button>
           )}
+          <Button variant="outline" asChild className="gap-2">
+            <Link href={user ? "/survey/new" : "/"}>
+              <SplitSquareHorizontal className="h-4 w-4" />
+              Compare audience
+            </Link>
+          </Button>
           <Button asChild>
-            <Link href={user ? "/survey/new" : "/"}>New survey</Link>
+            <Link href={user ? "/survey/new" : "/"} className="gap-2">
+              <RotateCcw className="h-4 w-4" />
+              Rerun
+            </Link>
           </Button>
         </div>
       </div>
@@ -129,6 +157,92 @@ export default async function SurveyResultsPage({
           </span>
         </div>
       )}
+
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2 font-serif">
+            <DatabaseIcon className="h-5 w-5 text-amber-700 dark:text-amber-400" />
+            Run provenance
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-5">
+          <div className="grid gap-4 text-sm sm:grid-cols-2 lg:grid-cols-4">
+            <div>
+              <p className="text-muted-foreground">Model</p>
+              <p className="mt-1 font-medium">{survey.model}</p>
+            </div>
+            <div>
+              <p className="text-muted-foreground">Dataset</p>
+              <p className="mt-1 font-medium">
+                {survey.dataset_version ?? sourceMeta?.shortLabel ?? "Unknown"}
+              </p>
+            </div>
+            <div>
+              <p className="text-muted-foreground">Field selector</p>
+              <p className="mt-1 font-medium">
+                {survey.field_selection_version ?? "Not recorded"}
+              </p>
+            </div>
+            <div>
+              <p className="text-muted-foreground">Sample frame</p>
+              <p className="mt-1 font-medium">
+                {sampleFrameCount.toLocaleString()} records
+                {sampleFrameWeight ? ` · weight ${sampleFrameWeight}` : ""}
+              </p>
+            </div>
+          </div>
+
+          <div className="grid gap-5 lg:grid-cols-2">
+            <div>
+              <p className="text-sm font-medium">Audience filters</p>
+              {audienceFilterSummary.length > 0 ? (
+                <div className="mt-2 flex flex-wrap gap-2">
+                  {audienceFilterSummary.map((filter) => (
+                    <span
+                      key={filter}
+                      className="rounded-full border border-amber-900/10 bg-amber-50/60 px-3 py-1 text-xs font-medium text-foreground/80 dark:border-amber-100/10 dark:bg-amber-950/20"
+                    >
+                      {filter}
+                    </span>
+                  ))}
+                </div>
+              ) : (
+                <p className="mt-2 text-sm text-muted-foreground">
+                  No segment filters beyond the selected geography.
+                </p>
+              )}
+            </div>
+
+            <div>
+              <p className="text-sm font-medium">Prompt fields shown</p>
+              {selectedFields.length > 0 ? (
+                <div className="mt-2 flex flex-wrap gap-2">
+                  {selectedFields.map((field) => (
+                    <span
+                      key={field.id}
+                      title={field.reason}
+                      className="rounded-full border border-amber-900/10 bg-background px-3 py-1 text-xs font-medium text-foreground/80 dark:border-amber-100/10"
+                    >
+                      {field.label}
+                    </span>
+                  ))}
+                </div>
+              ) : (
+                <p className="mt-2 text-sm text-muted-foreground">
+                  Field selection was not recorded for this run.
+                </p>
+              )}
+            </div>
+          </div>
+
+          <div className="rounded-xl border border-amber-900/10 bg-amber-50/45 p-4 text-sm leading-6 text-muted-foreground dark:border-amber-100/10 dark:bg-amber-950/10">
+            Stability is shown as a single-run read: sample seed{" "}
+            {survey.sample_seed ?? "not recorded"}, {survey.responses.length} stored
+            responses, and no repeated-seed interval yet. Use rerun or compare audiences
+            when the decision needs a stability check.
+          </div>
+        </CardContent>
+      </Card>
 
       {/* Status */}
       {survey.status !== "completed" && (
@@ -270,6 +384,45 @@ export default async function SurveyResultsPage({
       </Card>
     </div>
   );
+}
+
+function getSelectedPromptFields(
+  survey: SurveyWithData,
+  respondents: Respondent[]
+) {
+  const fieldSelection = survey.field_selection as unknown;
+
+  if (
+    fieldSelection &&
+    typeof fieldSelection === "object" &&
+    "included" in fieldSelection &&
+    Array.isArray((fieldSelection as FieldSelectionPlan).included)
+  ) {
+    return (fieldSelection as FieldSelectionPlan).included.map((field) => ({
+      id: field.id,
+      label: field.label,
+      reason: field.reason,
+    }));
+  }
+
+  const fieldIds = new Set<PromptFieldId>();
+
+  for (const respondent of respondents) {
+    const selectedFields = respondent.selected_fields;
+    if (!Array.isArray(selectedFields)) continue;
+
+    for (const field of selectedFields) {
+      if (typeof field === "string" && field in FIELD_REGISTRY) {
+        fieldIds.add(field as PromptFieldId);
+      }
+    }
+  }
+
+  return Array.from(fieldIds).map((id) => ({
+    id,
+    label: FIELD_REGISTRY[id].label,
+    reason: "Recorded on respondent rows.",
+  }));
 }
 
 function calculateLikertDistribution(responses: Response[]) {

@@ -5,6 +5,7 @@ import { PublicFooter } from "@/components/public/public-footer";
 import { PublicHeader } from "@/components/public/public-header";
 import { benchmarkProgram } from "@/lib/benchmarks/report";
 import { benchmarkManifestBySuiteId } from "@/lib/benchmarks/manifests";
+import { benchmarkResultSnapshots } from "@/lib/benchmarks/results";
 
 export const metadata: Metadata = {
   title: "Benchmarks",
@@ -46,6 +47,8 @@ const methodCards = [
 ] as const;
 
 export default function BenchmarksPage() {
+  const firstResult = benchmarkResultSnapshots[0];
+
   return (
     <div className="min-h-screen bg-honeycomb">
       <PublicHeader
@@ -126,6 +129,70 @@ export default function BenchmarksPage() {
               </div>
             ))}
           </section>
+
+          {firstResult && (
+            <section className="rounded-[1.9rem] border border-amber-900/[0.06] bg-card/80 p-6 shadow-warm-sm md:p-8">
+              <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
+                <div className="space-y-2">
+                  <p className="text-sm font-medium uppercase tracking-[0.24em] text-emerald-700 dark:text-emerald-400">
+                    First measured result
+                  </p>
+                  <h2 className="text-3xl font-bold">
+                    {firstResult.datasetLabel} human target snapshot
+                  </h2>
+                  <p className="max-w-3xl text-sm leading-6 text-muted-foreground md:text-base">
+                    {firstResult.notes}
+                  </p>
+                </div>
+                <div className="rounded-2xl border border-amber-900/[0.06] bg-background/70 p-4 text-sm">
+                  <p className="text-muted-foreground">Rows normalized</p>
+                  <p className="mt-1 text-2xl font-bold">
+                    {firstResult.sourceRows.toLocaleString()}
+                  </p>
+                  <p className="mt-2 text-xs text-muted-foreground">
+                    Generated {new Date(firstResult.generatedAt).toLocaleDateString()}
+                  </p>
+                </div>
+              </div>
+
+              <div className="mt-6 grid gap-4 md:grid-cols-2">
+                {firstResult.questions.map((question) => (
+                  <div
+                    key={question.questionId}
+                    className="rounded-[1.5rem] border border-amber-900/[0.06] bg-background/70 p-5"
+                  >
+                    <p className="font-medium">{question.prompt}</p>
+                    <div className="mt-3 flex items-end gap-3">
+                      <p className="text-3xl font-bold text-amber-700 dark:text-amber-300">
+                        {(question.weightedMean * 100).toFixed(1)}%
+                      </p>
+                      <p className="pb-1 text-sm text-muted-foreground">
+                        weighted target mean
+                      </p>
+                    </div>
+                    <p className="mt-2 text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+                      {question.unweightedN.toLocaleString()} respondents · {question.benchmarkField}
+                    </p>
+                    <div className="mt-4 grid gap-2 sm:grid-cols-2">
+                      {question.sliceHighlights.slice(0, 4).map((slice) => (
+                        <div
+                          key={`${slice.family}-${slice.label}`}
+                          className="rounded-xl border border-amber-900/[0.06] bg-card/70 p-3"
+                        >
+                          <p className="text-xs font-medium text-muted-foreground">
+                            {slice.label}
+                          </p>
+                          <p className="mt-1 font-semibold">
+                            {(slice.weightedMean * 100).toFixed(1)}%
+                          </p>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </section>
+          )}
 
           <section className="grid gap-6 lg:grid-cols-[0.9fr_1.1fr]">
             <div className="rounded-[1.9rem] border border-amber-900/[0.06] bg-card/80 p-6 shadow-warm-sm">

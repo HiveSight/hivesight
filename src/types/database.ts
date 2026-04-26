@@ -47,13 +47,20 @@ export type Database = {
       surveys: {
         Row: {
           id: string;
-          user_id: string;
+          user_id: string | null;
           question: string;
           response_type: "likert" | "open_ended";
           model: string;
           hive_size: number;
           demographic_filters: Json;
           location: Json | null;
+          audience_filters: Json;
+          field_selection: Json | null;
+          field_selection_version: string | null;
+          dataset_version: string | null;
+          sample_seed: number | null;
+          sample_frame_count: number | null;
+          sample_frame_weight: number | null;
           persona_source:
             | "microdata"
             | "synthetic_fallback"
@@ -66,13 +73,20 @@ export type Database = {
         };
         Insert: {
           id?: string;
-          user_id: string;
+          user_id?: string | null;
           question: string;
           response_type: "likert" | "open_ended";
           model: string;
           hive_size: number;
           demographic_filters?: Json;
           location?: Json | null;
+          audience_filters?: Json;
+          field_selection?: Json | null;
+          field_selection_version?: string | null;
+          dataset_version?: string | null;
+          sample_seed?: number | null;
+          sample_frame_count?: number | null;
+          sample_frame_weight?: number | null;
           persona_source?:
             | "microdata"
             | "synthetic_fallback"
@@ -85,13 +99,20 @@ export type Database = {
         };
         Update: {
           id?: string;
-          user_id?: string;
+          user_id?: string | null;
           question?: string;
           response_type?: "likert" | "open_ended";
           model?: string;
           hive_size?: number;
           demographic_filters?: Json;
           location?: Json | null;
+          audience_filters?: Json;
+          field_selection?: Json | null;
+          field_selection_version?: string | null;
+          dataset_version?: string | null;
+          sample_seed?: number | null;
+          sample_frame_count?: number | null;
+          sample_frame_weight?: number | null;
           persona_source?:
             | "microdata"
             | "synthetic_fallback"
@@ -123,6 +144,8 @@ export type Database = {
           receives_benefits: boolean | null;
           zip_code: string | null;
           congressional_district: string | null;
+          selected_fields: Json | null;
+          synthetic_person_id: string | null;
           created_at: string;
         };
         Insert: {
@@ -144,6 +167,8 @@ export type Database = {
           receives_benefits?: boolean | null;
           zip_code?: string | null;
           congressional_district?: string | null;
+          selected_fields?: Json | null;
+          synthetic_person_id?: string | null;
           created_at?: string;
         };
         Update: {
@@ -165,6 +190,8 @@ export type Database = {
           receives_benefits?: boolean | null;
           zip_code?: string | null;
           congressional_district?: string | null;
+          selected_fields?: Json | null;
+          synthetic_person_id?: string | null;
           created_at?: string;
         };
       };

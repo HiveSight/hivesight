@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { benchmarkExecutionSpec } from "../execution";
 import { benchmarkProgram } from "../report";
+import { benchmarkResultSnapshots } from "../results";
 
 describe("benchmarkProgram", () => {
   it("contains starter suites, comparisons, and metrics", () => {
@@ -47,5 +48,18 @@ describe("benchmarkProgram", () => {
     for (const entry of files) {
       expect(entry.sha256).toMatch(/^[a-f0-9]{64}$/);
     }
+  });
+
+  it("publishes the first measured human target snapshot", () => {
+    const shedSnapshot = benchmarkResultSnapshots.find(
+      (snapshot) => snapshot.suiteId === "shed_2024_household_finance"
+    );
+
+    expect(shedSnapshot).toBeDefined();
+    expect(shedSnapshot?.resultType).toBe("human_targets");
+    expect(shedSnapshot?.sourceRows).toBeGreaterThan(10000);
+    expect(
+      shedSnapshot?.questions.map((question) => question.benchmarkField)
+    ).toContain("can_cover_400_expense");
   });
 });

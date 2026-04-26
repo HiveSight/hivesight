@@ -20,7 +20,7 @@ export const metadata: Metadata = {
     template: "%s | HiveSight",
   },
   description:
-    "AI-powered survey research for any US ZIP code, state, congressional district, or the full country.",
+    "Ask AI audiences anything you would ask humans, grounded in calibrated population microdata.",
 };
 
 export default function RootLayout({

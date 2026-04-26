@@ -1,12 +1,24 @@
 import { gunzipSync } from "zlib";
 import type { LocationFilter, PersonRecord } from "@/types";
+import type { AudienceFilters } from "@/types";
 import {
   loadDistrictPersons,
   loadStatePersons,
   loadNationalPersons,
 } from "./persona-loader";
-import { samplePersons, sampleAcrossDistricts, filterByZcta } from "./sampler";
+import {
+  samplePersons,
+  sampleAcrossDistricts,
+  filterByZcta,
+  type RandomSource,
+} from "./sampler";
 import { generateSyntheticPersons } from "./fallback";
+import {
+  AudienceFilterError,
+  calculatePersonWeight,
+  filterPersonsForAudience,
+  hasActiveAudienceFilters,
+} from "./audience-filters";
 
 const HF_BASE_URL =
   "https://huggingface.co/datasets/MaxGhenis/hivesight-persona-data/resolve/main";
@@ -57,6 +69,18 @@ export interface ResolvedLocation {
   districts: Array<{ id: string; share: number }>;
   label: string;
   zcta?: string; // for ZIP-level filtering
+}
+
+export interface AudienceSampleMetadata {
+  eligibleCount: number;
+  eligibleWeight: number;
+  filtersApplied: boolean;
+}
+
+export interface LocationSamplingOptions {
+  audienceFilters?: AudienceFilters;
+  random?: RandomSource;
+  allowSyntheticFallback?: boolean;
 }
 
 /**
@@ -112,24 +136,63 @@ export async function resolveLocation(
  */
 export async function loadAndSampleForLocation(
   location: LocationFilter,
-  count: number
-): Promise<{ persons: PersonRecord[]; synthetic: boolean }> {
+  count: number,
+  options: LocationSamplingOptions = {}
+): Promise<{
+  persons: PersonRecord[];
+  synthetic: boolean;
+  metadata: AudienceSampleMetadata;
+}> {
   try {
-    const persons = await loadRealPersons(location, count);
-    return { persons, synthetic: false };
+    return await loadRealPersons(location, count, options);
   } catch (error) {
+    if (
+      error instanceof AudienceFilterError ||
+      options.allowSyntheticFallback === false
+    ) {
+      throw error;
+    }
+
     console.warn(
       `Real persona data unavailable for ${location.label}, using synthetic fallback:`,
       error instanceof Error ? error.message : error
     );
-    return { persons: generateSyntheticPersons(count, location), synthetic: true };
+    const fallbackPoolSize = hasActiveAudienceFilters(options.audienceFilters)
+      ? Math.max(count * 20, 500)
+      : count;
+    const fallbackPool = generateSyntheticPersons(fallbackPoolSize, location);
+    const eligiblePersons = filterPersonsForAudience(
+      fallbackPool,
+      options.audienceFilters
+    );
+
+    if (eligiblePersons.length === 0) {
+      throw new AudienceFilterError(
+        `No fallback records matched the selected audience filters for ${location.label}.`
+      );
+    }
+
+    return {
+      persons: samplePersons(eligiblePersons, count, options.random),
+      synthetic: true,
+      metadata: {
+        eligibleCount: eligiblePersons.length,
+        eligibleWeight: calculatePersonWeight(eligiblePersons),
+        filtersApplied: hasActiveAudienceFilters(options.audienceFilters),
+      },
+    };
   }
 }
 
 async function loadRealPersons(
   location: LocationFilter,
-  count: number
-): Promise<PersonRecord[]> {
+  count: number,
+  options: LocationSamplingOptions
+): Promise<{
+  persons: PersonRecord[];
+  synthetic: boolean;
+  metadata: AudienceSampleMetadata;
+}> {
   const resolved = await resolveLocation(location);
 
   if (resolved.districts.length === 1 && !resolved.zcta) {
@@ -144,7 +207,26 @@ async function loadRealPersons(
       persons = await loadDistrictPersons(districtId);
     }
 
-    return samplePersons(persons, count);
+    const eligiblePersons = filterPersonsForAudience(
+      persons,
+      options.audienceFilters
+    );
+
+    if (eligiblePersons.length === 0) {
+      throw new AudienceFilterError(
+        `No calibrated records matched the selected audience filters for ${location.label}.`
+      );
+    }
+
+    return {
+      persons: samplePersons(eligiblePersons, count, options.random),
+      synthetic: false,
+      metadata: {
+        eligibleCount: eligiblePersons.length,
+        eligibleWeight: calculatePersonWeight(eligiblePersons),
+        filtersApplied: hasActiveAudienceFilters(options.audienceFilters),
+      },
+    };
   }
 
   // Multi-district (ZIP spanning districts) or ZIP-level filtering
@@ -164,8 +246,30 @@ async function loadRealPersons(
       persons = filtered;
     }
 
+    persons = filterPersonsForAudience(persons, options.audienceFilters);
+
+    if (persons.length === 0) {
+      continue;
+    }
+
     districtData.push({ persons, share });
   }
 
-  return sampleAcrossDistricts(districtData, count);
+  if (districtData.length === 0) {
+    throw new AudienceFilterError(
+      `No calibrated records matched the selected audience filters for ${location.label}.`
+    );
+  }
+
+  const eligiblePersons = districtData.flatMap((item) => item.persons);
+
+  return {
+    persons: sampleAcrossDistricts(districtData, count, options.random),
+    synthetic: false,
+    metadata: {
+      eligibleCount: eligiblePersons.length,
+      eligibleWeight: calculatePersonWeight(eligiblePersons),
+      filtersApplied: hasActiveAudienceFilters(options.audienceFilters),
+    },
+  };
 }

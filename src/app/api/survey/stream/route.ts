@@ -1,13 +1,18 @@
 import { createClient } from "@/lib/supabase/server";
 import { z } from "zod/v4";
-import { MODEL_CONFIG, LocationFilterSchema } from "@/types";
+import { AudienceFiltersSchema, MODEL_CONFIG, LocationFilterSchema } from "@/types";
 import { loadAndSampleForLocation } from "@/lib/data/location-resolver";
 import {
   createPersonDescriptionFormatter,
   getInsuranceType,
 } from "@/lib/data/demographics";
+import {
+  getSelectedFieldIds,
+  selectPromptFields,
+} from "@/lib/data/field-selection";
 import { getRaceLabel } from "@/lib/data/race-codes";
 import { getOccupationLabel } from "@/lib/data/occupation-codes";
+import { createSeededRandom } from "@/lib/data/sampler";
 import {
   buildSystemPrompt,
   buildUserPrompt,
@@ -19,6 +24,7 @@ import type {
   ResponseType,
   LikertScale,
   LocationFilter,
+  AudienceFilters,
 } from "@/types";
 import type { Database } from "@/types/database";
 
@@ -48,6 +54,7 @@ const CreateSurveySchema = z.object({
   model: z.enum(["gpt-5-mini", "gpt-5.2"]),
   hiveSize: z.number().min(1).max(1000),
   location: LocationFilterSchema.optional(),
+  audienceFilters: AudienceFiltersSchema.optional(),
   // Legacy support
   demographicFilters: z
     .object({
@@ -57,6 +64,8 @@ const CreateSurveySchema = z.object({
     })
     .optional(),
 });
+
+const DATASET_VERSION = "hivesight-persona-data:main";
 
 function sendEvent(
   controller: ReadableStreamDefaultController,
@@ -177,6 +186,30 @@ function getStateFromDistrict(districtId: string): string {
   return parts[0] || "US";
 }
 
+function resolveAudienceFilters(data: z.infer<typeof CreateSurveySchema>) {
+  const filters: AudienceFilters = { ...(data.audienceFilters ?? {}) };
+
+  if (data.demographicFilters) {
+    filters.ageRange ??= data.demographicFilters.ageRange;
+    filters.incomeRange ??= data.demographicFilters.incomeRange;
+  }
+
+  return filters;
+}
+
+function createSyntheticPersonId(
+  person: {
+    age: number;
+    occupation_code: number;
+    zcta: string;
+    weight: number;
+  },
+  index: number,
+  seed: number
+) {
+  return `${DATASET_VERSION}:${seed}:${index}:${person.zcta}:${person.age}:${person.occupation_code}:${Math.round(person.weight * 1000)}`;
+}
+
 async function updateSurveyWithFallback(
   supabase: Awaited<ReturnType<typeof createClient>>,
   surveyId: string,
@@ -283,6 +316,15 @@ export async function POST(request: Request) {
     value: "US",
     label: "United States",
   };
+  const audienceFilters = resolveAudienceFilters(parsed.data);
+  const fieldSelection = selectPromptFields({
+    question,
+    responseType,
+    location: effectiveLocation,
+    audienceFilters,
+  });
+  const selectedFieldIds = getSelectedFieldIds(fieldSelection);
+  const sampleSeed = Math.floor(Math.random() * 0xffffffff);
 
   // Create SSE stream
   const stream = new ReadableStream({
@@ -311,17 +353,42 @@ export async function POST(request: Request) {
               hive_size: hiveSize,
               demographic_filters: {},
               location: effectiveLocation,
+              audience_filters: audienceFilters,
+              field_selection: fieldSelection,
+              field_selection_version: fieldSelection.version,
+              dataset_version: DATASET_VERSION,
+              sample_seed: sampleSeed,
               status: "processing",
             },
           ] as never)
           .select()
           .single());
 
-        // If it failed (likely missing columns or NOT NULL on user_id), try base schema
+        // If it failed (likely missing new provenance columns), try the current
+        // production schema before falling back to the original signed-in schema.
         if (surveyError) {
-          console.warn("New schema insert failed, trying base schema:", surveyError.message);
+          console.warn("Provenance survey insert failed, trying current schema:", surveyError.message);
 
-          // If no user and insert failed, old schema requires user_id NOT NULL
+          ({ data: surveyData, error: surveyError } = await supabase
+            .from("surveys")
+            .insert([{
+              user_id: user?.id ?? null,
+              question,
+              response_type: responseType,
+              model,
+              hive_size: hiveSize,
+              demographic_filters: {},
+              location: effectiveLocation,
+              status: "processing",
+            }] as never)
+            .select()
+            .single());
+        }
+
+        if (surveyError) {
+          console.warn("Current schema insert failed, trying base schema:", surveyError.message);
+
+          // If no user and insert failed again, old schema requires user_id NOT NULL.
           if (!user?.id) {
             sendEvent(controller, "error", {
               message: "Please sign in to create surveys. Anonymous surveys will be available soon.",
@@ -362,8 +429,14 @@ export async function POST(request: Request) {
           progress: 10,
         });
 
-        const { persons: sampledPersons, synthetic } =
-          await loadAndSampleForLocation(effectiveLocation, hiveSize);
+        const {
+          persons: sampledPersons,
+          synthetic,
+          metadata: sampleMetadata,
+        } = await loadAndSampleForLocation(effectiveLocation, hiveSize, {
+          audienceFilters,
+          random: createSeededRandom(sampleSeed),
+        });
         const personaSource = synthetic ? "synthetic_fallback" : "microdata";
 
         if (synthetic) {
@@ -378,6 +451,8 @@ export async function POST(request: Request) {
         const formatPersonDescription = createPersonDescriptionFormatter({
           question,
           location: effectiveLocation,
+          audienceFilters,
+          fieldSelection,
         });
         const descriptions = sampledPersons.map(formatPersonDescription);
 
@@ -471,6 +546,16 @@ export async function POST(request: Request) {
               : null,
         }));
 
+        const provenanceInserts = richInserts.map((insert, index) => ({
+          ...insert,
+          selected_fields: selectedFieldIds,
+          synthetic_person_id: createSyntheticPersonId(
+            sampledPersons[index],
+            index,
+            sampleSeed
+          ),
+        }));
+
         // Base inserts (only columns from initial schema)
         const baseInserts = sampledPersons.map((person) => ({
           survey_id: survey.id,
@@ -485,13 +570,21 @@ export async function POST(request: Request) {
         let respondentsData;
         let respondentError;
 
-        // Try rich insert first
+        // Try provenance-rich insert first.
         ({ data: respondentsData, error: respondentError } = await supabase
           .from("respondents")
-          .insert(richInserts as never)
+          .insert(provenanceInserts as never)
           .select());
 
-        // Fall back to base columns if rich insert fails
+        if (respondentError) {
+          console.warn("Provenance respondent insert failed, using rich schema:", respondentError.message);
+          ({ data: respondentsData, error: respondentError } = await supabase
+            .from("respondents")
+            .insert(richInserts as never)
+            .select());
+        }
+
+        // Fall back to base columns if rich insert fails.
         if (respondentError) {
           console.warn("Rich respondent insert failed, using base schema:", respondentError.message);
           ({ data: respondentsData, error: respondentError } = await supabase
@@ -570,10 +663,18 @@ export async function POST(request: Request) {
             completed_at: new Date().toISOString(),
             credits_used: creditsRequired,
             persona_source: personaSource,
+            audience_filters: audienceFilters,
+            field_selection: fieldSelection,
+            field_selection_version: fieldSelection.version,
+            dataset_version: DATASET_VERSION,
+            sample_seed: sampleSeed,
+            sample_frame_count: sampleMetadata.eligibleCount,
+            sample_frame_weight: sampleMetadata.eligibleWeight,
           }, {
             status: "completed",
             completed_at: new Date().toISOString(),
             credits_used: creditsRequired,
+            persona_source: personaSource,
           });
 
         // Send completion
@@ -587,6 +688,7 @@ export async function POST(request: Request) {
           surveyId: survey.id,
           creditsUsed: creditsRequired,
           personaSource,
+          selectedFields: selectedFieldIds,
           responseCount: results.length,
         });
 

@@ -71,6 +71,102 @@ export const LocationFilterSchema = z.object({
 
 export type LocationFilter = z.infer<typeof LocationFilterSchema>;
 
+export const AudienceSexSchema = z.enum(["female", "male"]);
+export type AudienceSex = z.infer<typeof AudienceSexSchema>;
+
+export const AudienceRaceEthnicitySchema = z.enum([
+  "white",
+  "black",
+  "hispanic",
+  "asian",
+  "native",
+  "pacific",
+  "multiracial",
+  "other",
+]);
+export type AudienceRaceEthnicity = z.infer<
+  typeof AudienceRaceEthnicitySchema
+>;
+
+export const AudienceHousingTenureSchema = z.enum([
+  "owner",
+  "renter",
+  "other",
+]);
+export type AudienceHousingTenure = z.infer<
+  typeof AudienceHousingTenureSchema
+>;
+
+export const AudienceStudentStatusSchema = z.enum([
+  "student",
+  "not_student",
+]);
+export type AudienceStudentStatus = z.infer<
+  typeof AudienceStudentStatusSchema
+>;
+
+export const AudienceDisabilityStatusSchema = z.enum([
+  "disabled",
+  "not_disabled",
+]);
+export type AudienceDisabilityStatus = z.infer<
+  typeof AudienceDisabilityStatusSchema
+>;
+
+export const AudienceBenefitsStatusSchema = z.enum([
+  "receives_benefits",
+  "no_benefits",
+]);
+export type AudienceBenefitsStatus = z.infer<
+  typeof AudienceBenefitsStatusSchema
+>;
+
+export const AudienceInsuranceSchema = z.enum([
+  "medicare",
+  "medicaid",
+  "dual_medicare_medicaid",
+  "neither",
+]);
+export type AudienceInsurance = z.infer<typeof AudienceInsuranceSchema>;
+
+const AgeRangeSchema = z
+  .tuple([z.number().int().min(18).max(100), z.number().int().min(18).max(100)])
+  .refine(([min, max]) => min <= max, {
+    message: "Minimum age must be less than or equal to maximum age",
+  });
+
+const IncomeRangeSchema = z
+  .tuple([z.number().int().min(0), z.number().int().min(0).max(5_000_000)])
+  .refine(([min, max]) => min <= max, {
+    message: "Minimum income must be less than or equal to maximum income",
+  });
+
+const ChildrenCountRangeSchema = z
+  .tuple([z.number().int().min(0).max(20), z.number().int().min(0).max(20)])
+  .refine(([min, max]) => min <= max, {
+    message: "Minimum child count must be less than or equal to maximum child count",
+  });
+
+export const AudienceFiltersSchema = z
+  .object({
+    ageRange: AgeRangeSchema.optional(),
+    incomeRange: IncomeRangeSchema.optional(),
+    sex: AudienceSexSchema.optional(),
+    raceEthnicity: z.array(AudienceRaceEthnicitySchema).max(8).optional(),
+    housingTenure: z.array(AudienceHousingTenureSchema).max(3).optional(),
+    hasChildren: z.boolean().optional(),
+    childrenCountRange: ChildrenCountRangeSchema.optional(),
+    studentStatus: AudienceStudentStatusSchema.optional(),
+    disabilityStatus: AudienceDisabilityStatusSchema.optional(),
+    benefitsStatus: AudienceBenefitsStatusSchema.optional(),
+    insurance: z.array(AudienceInsuranceSchema).max(4).optional(),
+    occupationQuery: z.string().trim().min(1).max(80).optional(),
+    occupationCodes: z.array(z.number().int().min(0).max(9999)).max(25).optional(),
+  })
+  .strict();
+
+export type AudienceFilters = z.infer<typeof AudienceFiltersSchema>;
+
 // Legacy demographic filters (kept for backward compatibility with existing surveys)
 export const DemographicFiltersSchema = z.object({
   ageRange: z.tuple([z.number().min(18).max(100), z.number().min(18).max(100)]),

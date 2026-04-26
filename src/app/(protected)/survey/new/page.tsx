@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Slider } from "@/components/ui/slider";
 import {
@@ -17,10 +18,80 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Progress } from "@/components/ui/progress";
 import { MODEL_CONFIG } from "@/types";
 import { LocationInput } from "@/components/survey/location-input";
-import type { Model, ResponseType, LocationFilter } from "@/types";
+import type {
+  AudienceBenefitsStatus,
+  AudienceDisabilityStatus,
+  AudienceFilters,
+  AudienceHousingTenure,
+  AudienceInsurance,
+  AudienceRaceEthnicity,
+  AudienceSex,
+  AudienceStudentStatus,
+  Model,
+  ResponseType,
+  LocationFilter,
+} from "@/types";
 import type { ProgressState } from "@/lib/survey-stream";
 import { readSurveyStream } from "@/lib/survey-stream";
 import { ChevronDown, ChevronUp, ArrowRight } from "lucide-react";
+
+interface AudienceFilterState {
+  ageMin: string;
+  ageMax: string;
+  incomeMin: string;
+  incomeMax: string;
+  sex: AudienceSex | "any";
+  raceEthnicity: AudienceRaceEthnicity | "any";
+  housingTenure: AudienceHousingTenure | "any";
+  hasChildren: "any" | "yes" | "no";
+  studentStatus: AudienceStudentStatus | "any";
+  disabilityStatus: AudienceDisabilityStatus | "any";
+  benefitsStatus: AudienceBenefitsStatus | "any";
+  insurance: AudienceInsurance | "any";
+  occupationQuery: string;
+}
+
+function parseOptionalNumber(value: string) {
+  if (!value.trim()) return null;
+  const parsed = Number(value);
+  return Number.isFinite(parsed) ? parsed : null;
+}
+
+function buildAudienceFilters(state: AudienceFilterState): AudienceFilters {
+  const filters: AudienceFilters = {};
+  const minAge = parseOptionalNumber(state.ageMin);
+  const maxAge = parseOptionalNumber(state.ageMax);
+  const minIncome = parseOptionalNumber(state.incomeMin);
+  const maxIncome = parseOptionalNumber(state.incomeMax);
+
+  if (minAge !== null || maxAge !== null) {
+    const lower = Math.max(18, Math.round(minAge ?? 18));
+    const upper = Math.min(100, Math.round(maxAge ?? 100));
+    filters.ageRange = [Math.min(lower, upper), Math.max(lower, upper)];
+  }
+
+  if (minIncome !== null || maxIncome !== null) {
+    const lower = Math.max(0, Math.round(minIncome ?? 0));
+    const upper = Math.max(0, Math.round(maxIncome ?? 5_000_000));
+    filters.incomeRange = [Math.min(lower, upper), Math.max(lower, upper)];
+  }
+
+  if (state.sex !== "any") filters.sex = state.sex;
+  if (state.raceEthnicity !== "any") filters.raceEthnicity = [state.raceEthnicity];
+  if (state.housingTenure !== "any") filters.housingTenure = [state.housingTenure];
+  if (state.hasChildren !== "any") filters.hasChildren = state.hasChildren === "yes";
+  if (state.studentStatus !== "any") filters.studentStatus = state.studentStatus;
+  if (state.disabilityStatus !== "any") {
+    filters.disabilityStatus = state.disabilityStatus;
+  }
+  if (state.benefitsStatus !== "any") filters.benefitsStatus = state.benefitsStatus;
+  if (state.insurance !== "any") filters.insurance = [state.insurance];
+  if (state.occupationQuery.trim()) {
+    filters.occupationQuery = state.occupationQuery.trim();
+  }
+
+  return filters;
+}
 
 export default function NewSurveyPage() {
   const router = useRouter();
@@ -35,6 +106,29 @@ export default function NewSurveyPage() {
   const [location, setLocation] = useState<LocationFilter | null>(null);
   const [model, setModel] = useState<Model>("gpt-5-mini");
   const [credits, setCredits] = useState(25);
+  const [ageMin, setAgeMin] = useState("");
+  const [ageMax, setAgeMax] = useState("");
+  const [incomeMin, setIncomeMin] = useState("");
+  const [incomeMax, setIncomeMax] = useState("");
+  const [sex, setSex] = useState<AudienceSex | "any">("any");
+  const [raceEthnicity, setRaceEthnicity] = useState<
+    AudienceRaceEthnicity | "any"
+  >("any");
+  const [housingTenure, setHousingTenure] = useState<
+    AudienceHousingTenure | "any"
+  >("any");
+  const [hasChildren, setHasChildren] = useState<"any" | "yes" | "no">("any");
+  const [studentStatus, setStudentStatus] = useState<
+    AudienceStudentStatus | "any"
+  >("any");
+  const [disabilityStatus, setDisabilityStatus] = useState<
+    AudienceDisabilityStatus | "any"
+  >("any");
+  const [benefitsStatus, setBenefitsStatus] = useState<
+    AudienceBenefitsStatus | "any"
+  >("any");
+  const [insurance, setInsurance] = useState<AudienceInsurance | "any">("any");
+  const [occupationQuery, setOccupationQuery] = useState("");
 
   // Calculate respondents from credits
   const config = MODEL_CONFIG[model];
@@ -43,6 +137,22 @@ export default function NewSurveyPage() {
       ? config.respondentsPerCreditLikert
       : config.respondentsPerCreditOpenEnded;
   const hiveSize = credits * respondentsPerCredit;
+  const audienceFilters = buildAudienceFilters({
+    ageMin,
+    ageMax,
+    incomeMin,
+    incomeMax,
+    sex,
+    raceEthnicity,
+    housingTenure,
+    hasChildren,
+    studentStatus,
+    disabilityStatus,
+    benefitsStatus,
+    insurance,
+    occupationQuery,
+  });
+  const audienceFilterCount = Object.keys(audienceFilters).length;
 
   const canSubmit = question.length >= 10 && location !== null;
 
@@ -67,6 +177,7 @@ export default function NewSurveyPage() {
           model,
           hiveSize,
           location,
+          audienceFilters,
         }),
       });
 
@@ -214,6 +325,243 @@ export default function NewSurveyPage() {
                 {responseType === "likert" ? "likert" : "open-ended"} respondents
                 per credit
               </p>
+            </div>
+
+            <div className="space-y-4 rounded-xl border border-amber-900/10 bg-amber-50/35 p-4 dark:border-amber-100/10 dark:bg-amber-950/10">
+              <div>
+                <Label>Audience filters</Label>
+                <p className="mt-1 text-sm text-muted-foreground">
+                  Optional microdata filters for segment research inside the selected geography.
+                </p>
+              </div>
+
+              <div className="grid gap-4 sm:grid-cols-2">
+                <div className="space-y-2">
+                  <Label htmlFor="age-min">Age range</Label>
+                  <div className="grid grid-cols-2 gap-2">
+                    <Input
+                      id="age-min"
+                      type="number"
+                      min={18}
+                      max={100}
+                      inputMode="numeric"
+                      placeholder="Min"
+                      value={ageMin}
+                      onChange={(e) => setAgeMin(e.target.value)}
+                    />
+                    <Input
+                      type="number"
+                      min={18}
+                      max={100}
+                      inputMode="numeric"
+                      placeholder="Max"
+                      value={ageMax}
+                      onChange={(e) => setAgeMax(e.target.value)}
+                    />
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="income-min">Earned income</Label>
+                  <div className="grid grid-cols-2 gap-2">
+                    <Input
+                      id="income-min"
+                      type="number"
+                      min={0}
+                      inputMode="numeric"
+                      placeholder="Min"
+                      value={incomeMin}
+                      onChange={(e) => setIncomeMin(e.target.value)}
+                    />
+                    <Input
+                      type="number"
+                      min={0}
+                      inputMode="numeric"
+                      placeholder="Max"
+                      value={incomeMax}
+                      onChange={(e) => setIncomeMax(e.target.value)}
+                    />
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <Label>Sex</Label>
+                  <Select
+                    value={sex}
+                    onValueChange={(value) => setSex(value as AudienceSex | "any")}
+                  >
+                    <SelectTrigger><SelectValue /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="any">Any</SelectItem>
+                      <SelectItem value="female">Female</SelectItem>
+                      <SelectItem value="male">Male</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div className="space-y-2">
+                  <Label>Race/ethnicity</Label>
+                  <Select
+                    value={raceEthnicity}
+                    onValueChange={(value) =>
+                      setRaceEthnicity(value as AudienceRaceEthnicity | "any")
+                    }
+                  >
+                    <SelectTrigger><SelectValue /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="any">Any</SelectItem>
+                      <SelectItem value="white">White</SelectItem>
+                      <SelectItem value="black">Black</SelectItem>
+                      <SelectItem value="hispanic">Hispanic/Latino</SelectItem>
+                      <SelectItem value="asian">Asian</SelectItem>
+                      <SelectItem value="native">American Indian/Alaskan Native</SelectItem>
+                      <SelectItem value="pacific">Hawaiian/Pacific Islander</SelectItem>
+                      <SelectItem value="multiracial">Multiracial</SelectItem>
+                      <SelectItem value="other">Other</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div className="space-y-2">
+                  <Label>Housing tenure</Label>
+                  <Select
+                    value={housingTenure}
+                    onValueChange={(value) =>
+                      setHousingTenure(value as AudienceHousingTenure | "any")
+                    }
+                  >
+                    <SelectTrigger><SelectValue /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="any">Any</SelectItem>
+                      <SelectItem value="owner">Owner</SelectItem>
+                      <SelectItem value="renter">Renter</SelectItem>
+                      <SelectItem value="other">Other</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div className="space-y-2">
+                  <Label>Children</Label>
+                  <Select value={hasChildren} onValueChange={(value) => setHasChildren(value as "any" | "yes" | "no")}>
+                    <SelectTrigger><SelectValue /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="any">Any</SelectItem>
+                      <SelectItem value="yes">Has children</SelectItem>
+                      <SelectItem value="no">No children</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div className="space-y-2">
+                  <Label>College status</Label>
+                  <Select
+                    value={studentStatus}
+                    onValueChange={(value) =>
+                      setStudentStatus(value as AudienceStudentStatus | "any")
+                    }
+                  >
+                    <SelectTrigger><SelectValue /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="any">Any</SelectItem>
+                      <SelectItem value="student">Student</SelectItem>
+                      <SelectItem value="not_student">Not a student</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div className="space-y-2">
+                  <Label>Disability</Label>
+                  <Select
+                    value={disabilityStatus}
+                    onValueChange={(value) =>
+                      setDisabilityStatus(value as AudienceDisabilityStatus | "any")
+                    }
+                  >
+                    <SelectTrigger><SelectValue /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="any">Any</SelectItem>
+                      <SelectItem value="disabled">Disabled</SelectItem>
+                      <SelectItem value="not_disabled">Not disabled</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div className="space-y-2">
+                  <Label>Benefits</Label>
+                  <Select
+                    value={benefitsStatus}
+                    onValueChange={(value) =>
+                      setBenefitsStatus(value as AudienceBenefitsStatus | "any")
+                    }
+                  >
+                    <SelectTrigger><SelectValue /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="any">Any</SelectItem>
+                      <SelectItem value="receives_benefits">Receives benefits</SelectItem>
+                      <SelectItem value="no_benefits">No benefits recorded</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div className="space-y-2">
+                  <Label>Public coverage</Label>
+                  <Select
+                    value={insurance}
+                    onValueChange={(value) =>
+                      setInsurance(value as AudienceInsurance | "any")
+                    }
+                  >
+                    <SelectTrigger><SelectValue /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="any">Any</SelectItem>
+                      <SelectItem value="medicare">Medicare</SelectItem>
+                      <SelectItem value="medicaid">Medicaid</SelectItem>
+                      <SelectItem value="dual_medicare_medicaid">Medicare and Medicaid</SelectItem>
+                      <SelectItem value="neither">Neither Medicare nor Medicaid</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div className="space-y-2 sm:col-span-2">
+                  <Label htmlFor="occupation-query">Occupation contains</Label>
+                  <Input
+                    id="occupation-query"
+                    placeholder="software, nurse, teacher, driver"
+                    value={occupationQuery}
+                    onChange={(e) => setOccupationQuery(e.target.value)}
+                  />
+                </div>
+              </div>
+
+              <div className="flex items-center justify-between gap-3 text-sm text-muted-foreground">
+                <span>
+                  {audienceFilterCount === 0
+                    ? "No segment filters applied"
+                    : `${audienceFilterCount} segment filter${audienceFilterCount === 1 ? "" : "s"} applied`}
+                </span>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => {
+                    setAgeMin("");
+                    setAgeMax("");
+                    setIncomeMin("");
+                    setIncomeMax("");
+                    setSex("any");
+                    setRaceEthnicity("any");
+                    setHousingTenure("any");
+                    setHasChildren("any");
+                    setStudentStatus("any");
+                    setDisabilityStatus("any");
+                    setBenefitsStatus("any");
+                    setInsurance("any");
+                    setOccupationQuery("");
+                  }}
+                >
+                  Reset filters
+                </Button>
+              </div>
             </div>
 
             <div className="space-y-4">

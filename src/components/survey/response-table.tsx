@@ -31,8 +31,8 @@ export function ResponseTable({ responses, responseType }: ResponseTableProps) {
   const downloadCSV = () => {
     const headers =
       responseType === "likert"
-        ? ["Age", "Sex", "Race/Ethnicity", "Occupation", "Income", "State", "ZIP", "Response", "Reasoning"]
-        : ["Age", "Sex", "Race/Ethnicity", "Occupation", "Income", "State", "ZIP", "Response"];
+        ? ["Age", "Sex", "Race/Ethnicity", "Occupation", "Income", "State", "ZIP", "Selected Fields", "Response", "Reasoning"]
+        : ["Age", "Sex", "Race/Ethnicity", "Occupation", "Income", "State", "ZIP", "Selected Fields", "Response"];
 
     const rows = responses.map((r) => {
       const base = [
@@ -43,6 +43,9 @@ export function ResponseTable({ responses, responseType }: ResponseTableProps) {
         r.respondent.income,
         r.respondent.state,
         r.respondent.zip_code ?? "",
+        Array.isArray(r.respondent.selected_fields)
+          ? r.respondent.selected_fields.join(";")
+          : "",
       ];
       if (responseType === "likert") {
         return [

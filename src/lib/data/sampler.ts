@@ -1,12 +1,23 @@
 import type { PersonRecord } from "@/types";
 
+export type RandomSource = () => number;
+
+export function createSeededRandom(seed: number): RandomSource {
+  let state = seed >>> 0;
+  return () => {
+    state = (state * 1664525 + 1013904223) >>> 0;
+    return state / 0x100000000;
+  };
+}
+
 /**
  * Probability-proportional-to-weight sampling without replacement.
  * Uses systematic PPS sampling for stable, representative draws.
  */
 export function samplePersons(
   persons: PersonRecord[],
-  count: number
+  count: number,
+  random: RandomSource = Math.random
 ): PersonRecord[] {
   if (persons.length === 0) return [];
   if (count >= persons.length) return [...persons];
@@ -14,12 +25,12 @@ export function samplePersons(
   const totalWeight = persons.reduce((sum, p) => sum + p.weight, 0);
   if (totalWeight <= 0) {
     // Fallback to uniform random if weights are zero
-    return uniformSample(persons, count);
+    return uniformSample(persons, count, random);
   }
 
   // Systematic PPS sampling
   const interval = totalWeight / count;
-  const start = Math.random() * interval;
+  const start = random() * interval;
   const selected: PersonRecord[] = [];
   let cumWeight = 0;
   let nextThreshold = start;
@@ -36,7 +47,7 @@ export function samplePersons(
 
   // If systematic sampling didn't fill (rounding), fill remaining randomly
   while (selected.length < count) {
-    selected.push(persons[Math.floor(Math.random() * persons.length)]);
+    selected.push(persons[Math.floor(random() * persons.length)]);
   }
 
   return selected;
@@ -48,13 +59,14 @@ export function samplePersons(
  */
 export function sampleAcrossDistricts(
   districtData: Array<{ persons: PersonRecord[]; share: number }>,
-  totalCount: number
+  totalCount: number,
+  random: RandomSource = Math.random
 ): PersonRecord[] {
   const allSampled: PersonRecord[] = [];
 
   for (const { persons, share } of districtData) {
     const districtCount = Math.max(1, Math.round(totalCount * share));
-    const sampled = samplePersons(persons, districtCount);
+    const sampled = samplePersons(persons, districtCount, random);
     allSampled.push(...sampled);
   }
 
@@ -66,10 +78,10 @@ export function sampleAcrossDistricts(
   // Fill if we undersampled
   while (allSampled.length < totalCount) {
     const randomDistrict =
-      districtData[Math.floor(Math.random() * districtData.length)];
+      districtData[Math.floor(random() * districtData.length)];
     const randomPerson =
       randomDistrict.persons[
-        Math.floor(Math.random() * randomDistrict.persons.length)
+        Math.floor(random() * randomDistrict.persons.length)
       ];
     allSampled.push(randomPerson);
   }
@@ -77,8 +89,12 @@ export function sampleAcrossDistricts(
   return allSampled;
 }
 
-function uniformSample<T>(items: T[], count: number): T[] {
-  const shuffled = [...items].sort(() => Math.random() - 0.5);
+function uniformSample<T>(
+  items: T[],
+  count: number,
+  random: RandomSource = Math.random
+): T[] {
+  const shuffled = [...items].sort(() => random() - 0.5);
   return shuffled.slice(0, count);
 }
 

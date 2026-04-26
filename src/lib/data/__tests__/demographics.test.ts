@@ -1,5 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { formatPersonDescription, formatSexLabel, formatTenureLabel } from "../demographics";
+import { getSelectedFieldIds, selectPromptFields } from "../field-selection";
 import type { LocationFilter, PersonRecord } from "@/types";
 
 function makePerson(overrides: Partial<PersonRecord> = {}): PersonRecord {
@@ -230,6 +231,34 @@ describe("formatPersonDescription", () => {
 
     expect(desc).toContain("not enrolled in Medicare or Medicaid");
     expect(desc).not.toContain("Their health coverage is not enrolled");
+  });
+});
+
+describe("selectPromptFields", () => {
+  it("uses the typed registry to include targeted sensitive fields", () => {
+    const plan = selectPromptFields({
+      question: "Would this product be useful for your household?",
+      location: makeLocation(),
+      audienceFilters: {
+        sex: "female",
+        raceEthnicity: ["hispanic"],
+        benefitsStatus: "receives_benefits",
+      },
+    });
+
+    expect(getSelectedFieldIds(plan)).toEqual(
+      expect.arrayContaining(["sex", "race_ethnicity", "benefits"])
+    );
+    expect(plan.version).toBe("field-selector:v2");
+  });
+
+  it("keeps bare insurance language out of health coverage context", () => {
+    const plan = selectPromptFields({
+      question: "Should car insurance rates be regulated more tightly?",
+      location: makeLocation(),
+    });
+
+    expect(getSelectedFieldIds(plan)).not.toContain("insurance");
   });
 });
 

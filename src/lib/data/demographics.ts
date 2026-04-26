@@ -1,6 +1,11 @@
-import type { LocationFilter, PersonRecord } from "@/types";
+import type { AudienceFilters, LocationFilter, PersonRecord } from "@/types";
 import { getRaceLabel } from "./race-codes";
 import { getOccupationLabel } from "./occupation-codes";
+import {
+  type FieldSelectionPlan,
+  isPromptFieldSelected,
+  selectPromptFields,
+} from "./field-selection";
 
 const TENURE_LABELS: Record<number, string> = {
   1: "homeowner",
@@ -10,103 +15,13 @@ const TENURE_LABELS: Record<number, string> = {
 export interface PersonDescriptionOptions {
   question?: string;
   location?: LocationFilter;
-}
-
-interface QuestionContext {
-  includeRace: boolean;
-  includeSex: boolean;
-  includeDisability: boolean;
-  includeInsurance: boolean;
-  includeBenefits: boolean;
-  includeExactZip: boolean;
+  audienceFilters?: AudienceFilters;
+  fieldSelection?: FieldSelectionPlan;
 }
 
 interface ResolvedPersonDescriptionOptions extends PersonDescriptionOptions {
-  context: QuestionContext;
+  fieldSelection: FieldSelectionPlan;
 }
-
-const HEALTH_KEYWORDS = [
-  "abortion",
-  "clinic",
-  "doctor",
-  "health",
-  "healthcare",
-  "health coverage",
-  "health insurance",
-  "hospital",
-  "medicaid",
-  "medical",
-  "medical insurance",
-  "medicare",
-  "mental health",
-  "pregnancy",
-  "prescription",
-  "reproductive",
-];
-
-const BENEFITS_KEYWORDS = [
-  "benefit",
-  "benefits",
-  "food stamp",
-  "poverty",
-  "safety net",
-  "snap",
-  "social security",
-  "ssi",
-  "tanf",
-  "unemployment",
-  "welfare",
-];
-
-const HOUSING_LOCAL_KEYWORDS = [
-  "bus",
-  "city",
-  "commute",
-  "county",
-  "district",
-  "local",
-  "neighborhood",
-  "neighbourhood",
-  "roads",
-  "school board",
-  "train",
-  "transit",
-  "zip",
-  "zoning",
-];
-
-const RACE_KEYWORDS = [
-  "affirmative action",
-  "asian",
-  "black americans",
-  "black people",
-  "black voters",
-  "ethnic",
-  "ethnicity",
-  "hispanic",
-  "immigration",
-  "immigrant",
-  "latina",
-  "latino",
-  "race",
-  "racial",
-  "white americans",
-  "white people",
-  "white voters",
-];
-
-const SEX_KEYWORDS = [
-  "father",
-  "female",
-  "gender",
-  "male",
-  "man",
-  "maternal",
-  "men",
-  "mother",
-  "woman",
-  "women",
-];
 
 export function getInsuranceType(person: PersonRecord): string {
   if (person.has_medicare && person.has_medicaid) return "Medicare and Medicaid";
@@ -133,46 +48,18 @@ function formatIncome(amount: number): string {
   return "a high income";
 }
 
-function escapeRegex(text: string): string {
-  return text.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-}
-
-function hasAnyKeyword(text: string, keywords: string[]): boolean {
-  return keywords.some((keyword) =>
-    new RegExp(`\\b${escapeRegex(keyword).replace(/\\ /g, "\\s+")}\\b`, "i").test(text)
-  );
-}
-
-function getQuestionContext(
-  question: string | undefined,
-  location: LocationFilter | undefined
-): QuestionContext {
-  const normalizedQuestion = question?.toLowerCase() ?? "";
-  const isHealthQuestion = hasAnyKeyword(normalizedQuestion, HEALTH_KEYWORDS);
-  const isBenefitsQuestion = hasAnyKeyword(normalizedQuestion, BENEFITS_KEYWORDS);
-  const isLocalQuestion = hasAnyKeyword(normalizedQuestion, HOUSING_LOCAL_KEYWORDS);
-
-  return {
-    includeRace: hasAnyKeyword(normalizedQuestion, RACE_KEYWORDS),
-    includeSex: hasAnyKeyword(normalizedQuestion, SEX_KEYWORDS),
-    includeDisability:
-      normalizedQuestion.includes("disab") ||
-      isHealthQuestion ||
-      isBenefitsQuestion,
-    includeInsurance: isHealthQuestion,
-    includeBenefits: isBenefitsQuestion,
-    includeExactZip:
-      location?.type === "zip" ||
-      (isLocalQuestion && (!location || location.type === "national")),
-  };
-}
-
 function resolvePersonDescriptionOptions(
   options: PersonDescriptionOptions = {}
 ): ResolvedPersonDescriptionOptions {
   return {
     ...options,
-    context: getQuestionContext(options.question, options.location),
+    fieldSelection:
+      options.fieldSelection ??
+      selectPromptFields({
+        question: options.question,
+        location: options.location,
+        audienceFilters: options.audienceFilters,
+      }),
   };
 }
 
@@ -205,9 +92,9 @@ function getAgeBand(age: number): string {
 function getLocationPhrase(
   person: PersonRecord,
   location: LocationFilter | undefined,
-  context: QuestionContext
+  fieldSelection: FieldSelectionPlan
 ): string {
-  if (context.includeExactZip) {
+  if (isPromptFieldSelected(fieldSelection, "exact_zip")) {
     return `in ZIP ${location?.type === "zip" ? location.value : person.zcta}`;
   }
 
@@ -264,15 +151,15 @@ function buildHousingSentence(person: PersonRecord): string {
 
 function buildIdentitySentence(
   person: PersonRecord,
-  context: QuestionContext
+  fieldSelection: FieldSelectionPlan
 ): string | null {
   const parts: string[] = [];
 
-  if (context.includeSex) {
+  if (isPromptFieldSelected(fieldSelection, "sex")) {
     parts.push(`are ${person.is_female ? "a woman" : "a man"}`);
   }
 
-  if (context.includeRace) {
+  if (isPromptFieldSelected(fieldSelection, "race_ethnicity")) {
     parts.push(`identify as ${getRaceLabel(person.cps_race, person.is_hispanic)}`);
   }
 
@@ -285,15 +172,15 @@ function buildIdentitySentence(
 
 function buildConditionalDetails(
   person: PersonRecord,
-  context: QuestionContext
+  fieldSelection: FieldSelectionPlan
 ): string[] {
   const details: string[] = [];
 
-  if (context.includeDisability && person.is_disabled) {
+  if (isPromptFieldSelected(fieldSelection, "disability") && person.is_disabled) {
     details.push("They have a disability.");
   }
 
-  if (context.includeInsurance) {
+  if (isPromptFieldSelected(fieldSelection, "insurance")) {
     const insuranceType = getInsuranceType(person);
     details.push(
       insuranceType === "not enrolled in Medicare or Medicaid"
@@ -302,7 +189,7 @@ function buildConditionalDetails(
     );
   }
 
-  if (context.includeBenefits) {
+  if (isPromptFieldSelected(fieldSelection, "benefits")) {
     const benefits = getBenefitsList(person);
     if (benefits.length > 0) {
       details.push(`They receive ${joinWithAnd(benefits)}.`);
@@ -325,27 +212,27 @@ export function formatPersonDescription(
   options: PersonDescriptionOptions = {}
 ): string {
   const resolvedOptions =
-    "context" in options
+    "fieldSelection" in options
       ? (options as ResolvedPersonDescriptionOptions)
       : resolvePersonDescriptionOptions(options);
-  const context = resolvedOptions.context;
+  const { fieldSelection } = resolvedOptions;
   const opening = `${toSentenceCase(withArticle(getAgeBand(person.age)))} living ${getLocationPhrase(
     person,
     resolvedOptions.location,
-    context
+    fieldSelection
   )}.`;
   const sentences = [
     opening,
     buildWorkSentence(person),
     buildHousingSentence(person),
   ];
-  const identitySentence = buildIdentitySentence(person, context);
+  const identitySentence = buildIdentitySentence(person, fieldSelection);
 
   if (identitySentence) {
     sentences.push(identitySentence);
   }
 
-  sentences.push(...buildConditionalDetails(person, context));
+  sentences.push(...buildConditionalDetails(person, fieldSelection));
 
   return sentences.join(" ");
 }

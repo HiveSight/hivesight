@@ -1,10 +1,10 @@
 {
   "version": 1,
-  "updatedAt": "2026-04-12",
+  "updatedAt": "2026-04-25",
   "title": "HiveSight benchmark program",
   "subtitle": "A public benchmark plan for direct inference on calibrated local synthetic populations.",
   "thesis": "The goal is not to prove that LLM surveys work in the abstract. It is to test whether HiveSight's geography-assigned calibrated population outperforms weaker prompting baselines, including rich nonlocal microdata, on stable, recent, human-collected benchmarks.",
-  "currentStatus": "Benchmark scaffolding is live. The first execution pass is designed as contamination-resistant public benchmarking with frozen question manifests, preregistered comparison arms, and confirmatory subgroup-error endpoints.",
+  "currentStatus": "Benchmark scaffolding is live and the first measured human target snapshot is published for SHED 2024. The next execution pass compares synthetic-response arms against these frozen public targets.",
   "comparisons": [
     {
       "id": "generic_persona",
@@ -95,7 +95,7 @@
     {
       "id": "shed_2024_household_finance",
       "title": "SHED 2024 household finance",
-      "status": "planned",
+      "status": "in_progress",
       "focus": "Economic perceptions and household stress that map to real disposable-income context.",
       "whyThisSuite": "These questions should benefit from HiveSight's richer household and policy-linked attributes rather than pure demographics.",
       "questionFamilies": [

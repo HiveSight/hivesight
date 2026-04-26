@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-04-12",
+  "updatedAt": "2026-04-25",
   "model": {
     "id": "gpt-5-mini",
     "label": "GPT-5 Mini",
@@ -16,10 +16,14 @@
     "userLikertTemplateId": "buildUserPrompt:likert:v1",
     "sourceFile": "src/lib/simulation/prompts.ts",
     "sourceSha256": "941a892ffdfff3203464b4cb5a93edee97bea946a87a42d716bd794b75e3b9c6",
-    "personaFormatterId": "createPersonDescriptionFormatter:v1",
+    "personaFormatterId": "createPersonDescriptionFormatter:v2",
     "personaFormatterFile": "src/lib/data/demographics.ts",
-    "personaFormatterSha256": "ec6f623b5b5a50cac495f04e53a2e2cad1d6bed648b79be60a9291ee30de8740",
+    "personaFormatterSha256": "b7cd2b32531337e966d97a5acebb4b30561dd687fb998951c30265682121911f",
     "dependencyFiles": [
+      {
+        "file": "src/lib/data/field-selection.ts",
+        "sha256": "8cde17c5fcd8076e39053182577e3ee2a3b0844758b732d9e4304085970e63f2"
+      },
       {
         "file": "src/lib/data/race-codes.ts",
         "sha256": "c8b04e19d161671f236982eac1eb5bab5830d818280d871087e1102c05791ab9"
