@@ -47,7 +47,12 @@ const methodCards = [
 ] as const;
 
 export default function BenchmarksPage() {
-  const firstResult = benchmarkResultSnapshots[0];
+  const firstResult = benchmarkResultSnapshots.find(
+    (snapshot) => snapshot.resultType === "human_targets"
+  );
+  const miniComparison = benchmarkResultSnapshots.find(
+    (snapshot) => snapshot.resultType === "model_comparison"
+  );
 
   return (
     <div className="min-h-screen bg-honeycomb">
@@ -184,6 +189,62 @@ export default function BenchmarksPage() {
                           </p>
                           <p className="mt-1 font-semibold">
                             {(slice.weightedMean * 100).toFixed(1)}%
+                          </p>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </section>
+          )}
+
+          {miniComparison && (
+            <section className="rounded-[1.9rem] border border-amber-900/[0.06] bg-card/80 p-6 shadow-warm-sm md:p-8">
+              <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
+                <div className="space-y-2">
+                  <p className="text-sm font-medium uppercase tracking-[0.24em] text-sky-700 dark:text-sky-400">
+                    Tiny model comparison
+                  </p>
+                  <h2 className="text-3xl font-bold">
+                    First synthetic-response pass against SHED targets
+                  </h2>
+                  <p className="max-w-3xl text-sm leading-6 text-muted-foreground md:text-base">
+                    {miniComparison.notes}
+                  </p>
+                </div>
+                {miniComparison.execution && (
+                  <div className="rounded-2xl border border-amber-900/[0.06] bg-background/70 p-4 text-sm">
+                    <p className="text-muted-foreground">Execution</p>
+                    <p className="mt-1 font-semibold">{miniComparison.execution.model}</p>
+                    <p className="mt-2 text-xs text-muted-foreground">
+                      seed {miniComparison.execution.seed} · n=
+                      {miniComparison.execution.simulatedRespondentsPerPersonaArm}
+                    </p>
+                  </div>
+                )}
+              </div>
+
+              <div className="mt-6 grid gap-4 md:grid-cols-2">
+                {miniComparison.questions.map((question) => (
+                  <div
+                    key={question.questionId}
+                    className="rounded-[1.5rem] border border-amber-900/[0.06] bg-background/70 p-5"
+                  >
+                    <p className="font-medium">{question.prompt}</p>
+                    <p className="mt-2 text-sm text-muted-foreground">
+                      Human target: {(question.weightedMean * 100).toFixed(1)}%
+                    </p>
+                    <div className="mt-4 space-y-2">
+                      {(question.modelResults ?? []).map((arm) => (
+                        <div
+                          key={arm.comparisonId}
+                          className="grid grid-cols-[1fr_auto_auto] items-center gap-3 rounded-xl border border-amber-900/[0.06] bg-card/70 p-3 text-sm"
+                        >
+                          <p className="font-medium">{arm.label}</p>
+                          <p>{(arm.estimate * 100).toFixed(1)}%</p>
+                          <p className="text-muted-foreground">
+                            MAE {(arm.absoluteError * 100).toFixed(1)} pts
                           </p>
                         </div>
                       ))}

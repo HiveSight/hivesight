@@ -18,6 +18,7 @@
     "benchmarks:plan": "node scripts/run-benchmarks.mjs --dry-run",
     "benchmarks:normalize:shed": "node scripts/normalize-shed-2024.mjs",
     "benchmarks:normalize:gss": "node scripts/normalize-gss-2024.mjs",
+    "benchmarks:run:shed-mini": "node scripts/run-shed-mini-comparison.mjs",
     "health:prod": "node scripts/check-production-health.mjs",
     "test": "vitest run",
     "test:watch": "vitest"

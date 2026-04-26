@@ -62,4 +62,19 @@ describe("benchmarkProgram", () => {
       shedSnapshot?.questions.map((question) => question.benchmarkField)
     ).toContain("can_cover_400_expense");
   });
+
+  it("publishes a tiny first-pass model comparison snapshot", () => {
+    const comparisonSnapshot = benchmarkResultSnapshots.find(
+      (snapshot) => snapshot.resultType === "model_comparison"
+    );
+
+    expect(comparisonSnapshot).toBeDefined();
+    expect(comparisonSnapshot?.status).toBe("partial");
+    expect(comparisonSnapshot?.execution?.model).toBe("gpt-5-mini");
+    expect(
+      comparisonSnapshot?.questions.every(
+        (question) => (question.modelResults?.length ?? 0) >= 3
+      )
+    ).toBe(true);
+  });
 });

@@ -15,6 +15,18 @@ export const BenchmarkQuestionResultSchema = z.object({
   missingRows: z.number().int().nonnegative(),
   weightedMean: z.number().min(0).max(1),
   sliceHighlights: z.array(BenchmarkSliceResultSchema),
+  modelResults: z
+    .array(
+      z.object({
+        comparisonId: z.string().min(1),
+        label: z.string().min(1),
+        simulatedN: z.number().int().positive(),
+        estimate: z.number().min(0).max(1),
+        absoluteError: z.number().min(0),
+        parseFailures: z.number().int().nonnegative(),
+      })
+    )
+    .optional(),
 });
 
 export const BenchmarkResultSnapshotSchema = z.object({
@@ -27,6 +39,14 @@ export const BenchmarkResultSnapshotSchema = z.object({
   generatedAt: z.string().min(1),
   sourceRows: z.number().int().positive(),
   notes: z.string().min(1),
+  execution: z
+    .object({
+      model: z.string().min(1),
+      seed: z.number().int(),
+      simulatedRespondentsPerPersonaArm: z.number().int().positive(),
+      microdataStates: z.array(z.string().min(2)).optional(),
+    })
+    .optional(),
   questions: z.array(BenchmarkQuestionResultSchema).min(1),
 });
 

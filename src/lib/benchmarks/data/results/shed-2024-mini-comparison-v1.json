@@ -1,0 +1,94 @@
+{
+  "version": 1,
+  "suiteId": "shed_2024_household_finance",
+  "datasetId": "shed_2024",
+  "datasetLabel": "SHED 2024",
+  "resultType": "model_comparison",
+  "status": "partial",
+  "generatedAt": "2026-04-26T18:22:07.045Z",
+  "sourceRows": 12295,
+  "notes": "Tiny first-pass model comparison on two SHED 2024 household-finance questions. This is intentionally small and directional: 6 simulated respondents per persona arm, one direct naive estimate per question, and calibrated microdata sampled from CA, TX, NY, FL rather than the full national file.",
+  "execution": {
+    "model": "gpt-5-mini",
+    "seed": 20260426,
+    "simulatedRespondentsPerPersonaArm": 6,
+    "microdataStates": [
+      "CA",
+      "TX",
+      "NY",
+      "FL"
+    ]
+  },
+  "questions": [
+    {
+      "questionId": "doing_okay",
+      "benchmarkField": "financial_wellbeing",
+      "prompt": "I am doing okay financially.",
+      "unweightedN": 12295,
+      "missingRows": 0,
+      "weightedMean": 0.729,
+      "sliceHighlights": [],
+      "modelResults": [
+        {
+          "comparisonId": "naive_llm",
+          "label": "Naive LLM direct estimate",
+          "simulatedN": 1,
+          "estimate": 0.58,
+          "parseFailures": 0,
+          "absoluteError": 0.149
+        },
+        {
+          "comparisonId": "basic_persona",
+          "label": "Basic demographic persona",
+          "simulatedN": 6,
+          "estimate": 0.667,
+          "parseFailures": 0,
+          "absoluteError": 0.062
+        },
+        {
+          "comparisonId": "hivesight_microdata",
+          "label": "HiveSight microdata prompt",
+          "simulatedN": 6,
+          "estimate": 0.667,
+          "parseFailures": 0,
+          "absoluteError": 0.062
+        }
+      ]
+    },
+    {
+      "questionId": "expense_shock",
+      "benchmarkField": "can_cover_400_expense",
+      "prompt": "I could cover a $400 emergency expense using cash or its equivalent.",
+      "unweightedN": 12295,
+      "missingRows": 0,
+      "weightedMean": 0.627,
+      "sliceHighlights": [],
+      "modelResults": [
+        {
+          "comparisonId": "naive_llm",
+          "label": "Naive LLM direct estimate",
+          "simulatedN": 1,
+          "estimate": 0.61,
+          "parseFailures": 0,
+          "absoluteError": 0.017
+        },
+        {
+          "comparisonId": "basic_persona",
+          "label": "Basic demographic persona",
+          "simulatedN": 6,
+          "estimate": 0.667,
+          "parseFailures": 0,
+          "absoluteError": 0.04
+        },
+        {
+          "comparisonId": "hivesight_microdata",
+          "label": "HiveSight microdata prompt",
+          "simulatedN": 6,
+          "estimate": 0.667,
+          "parseFailures": 0,
+          "absoluteError": 0.04
+        }
+      ]
+    }
+  ]
+}
