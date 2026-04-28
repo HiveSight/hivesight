@@ -63,7 +63,7 @@ describe("benchmarkProgram", () => {
     ).toContain("can_cover_400_expense");
   });
 
-  it("publishes a tiny first-pass model comparison snapshot", () => {
+  it("publishes a small first-pass model comparison snapshot", () => {
     const comparisonSnapshot = benchmarkResultSnapshots.find(
       (snapshot) => snapshot.resultType === "model_comparison"
     );
@@ -71,6 +71,10 @@ describe("benchmarkProgram", () => {
     expect(comparisonSnapshot).toBeDefined();
     expect(comparisonSnapshot?.status).toBe("partial");
     expect(comparisonSnapshot?.execution?.model).toBe("gpt-5-mini");
+    expect(comparisonSnapshot?.execution?.questionCount).toBe(4);
+    expect(
+      comparisonSnapshot?.execution?.simulatedRespondentsPerPersonaArm
+    ).toBeGreaterThanOrEqual(12);
     expect(
       comparisonSnapshot?.questions.every(
         (question) => (question.modelResults?.length ?? 0) >= 3

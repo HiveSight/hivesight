@@ -5,25 +5,31 @@
   "datasetLabel": "SHED 2024",
   "resultType": "model_comparison",
   "status": "partial",
-  "generatedAt": "2026-04-26T18:22:07.045Z",
+  "generatedAt": "2026-04-28T00:38:35.048Z",
   "sourceRows": 12295,
-  "notes": "Tiny first-pass model comparison on two SHED 2024 household-finance questions. This is intentionally small and directional: 6 simulated respondents per persona arm, one direct naive estimate per question, and calibrated microdata sampled from CA, TX, NY, FL rather than the full national file.",
+  "notes": "Small first-pass model comparison on 4 SHED 2024 household-finance questions. This is intentionally directional: 12 simulated respondents per persona arm, one direct naive estimate per question, and calibrated microdata sampled from CA, TX, NY, FL rather than the full national file. Average absolute errors in this run: naive direct estimate 6.9 pts, basic persona 8.6 pts, HiveSight microdata 13.9 pts. HiveSight microdata does not yet beat the lowest-error arm, naive direct estimate.",
   "execution": {
     "model": "gpt-5-mini",
     "seed": 20260426,
-    "simulatedRespondentsPerPersonaArm": 6,
+    "simulatedRespondentsPerPersonaArm": 12,
     "microdataStates": [
       "CA",
       "TX",
       "NY",
       "FL"
-    ]
+    ],
+    "generatedBy": "scripts/run-shed-mini-comparison.mjs",
+    "sampleStrategy": "Weighted systematic sample with an even per-state allocation across configured microdata state files.",
+    "questionCount": 4,
+    "directEstimateCalls": 4,
+    "simulatedResponseCalls": 96
   },
   "questions": [
     {
       "questionId": "doing_okay",
       "benchmarkField": "financial_wellbeing",
       "prompt": "I am doing okay financially.",
+      "scoring": "positive_agreement",
       "unweightedN": 12295,
       "missingRows": 0,
       "weightedMean": 0.729,
@@ -33,25 +39,25 @@
           "comparisonId": "naive_llm",
           "label": "Naive LLM direct estimate",
           "simulatedN": 1,
-          "estimate": 0.58,
+          "estimate": 0.55,
           "parseFailures": 0,
-          "absoluteError": 0.149
+          "absoluteError": 0.179
         },
         {
           "comparisonId": "basic_persona",
           "label": "Basic demographic persona",
-          "simulatedN": 6,
-          "estimate": 0.667,
+          "simulatedN": 12,
+          "estimate": 0.75,
           "parseFailures": 0,
-          "absoluteError": 0.062
+          "absoluteError": 0.021
         },
         {
           "comparisonId": "hivesight_microdata",
           "label": "HiveSight microdata prompt",
-          "simulatedN": 6,
-          "estimate": 0.667,
+          "simulatedN": 12,
+          "estimate": 0.583,
           "parseFailures": 0,
-          "absoluteError": 0.062
+          "absoluteError": 0.146
         }
       ]
     },
@@ -59,6 +65,7 @@
       "questionId": "expense_shock",
       "benchmarkField": "can_cover_400_expense",
       "prompt": "I could cover a $400 emergency expense using cash or its equivalent.",
+      "scoring": "positive_agreement",
       "unweightedN": 12295,
       "missingRows": 0,
       "weightedMean": 0.627,
@@ -68,14 +75,14 @@
           "comparisonId": "naive_llm",
           "label": "Naive LLM direct estimate",
           "simulatedN": 1,
-          "estimate": 0.61,
+          "estimate": 0.6,
           "parseFailures": 0,
-          "absoluteError": 0.017
+          "absoluteError": 0.027
         },
         {
           "comparisonId": "basic_persona",
           "label": "Basic demographic persona",
-          "simulatedN": 6,
+          "simulatedN": 12,
           "estimate": 0.667,
           "parseFailures": 0,
           "absoluteError": 0.04
@@ -83,10 +90,82 @@
         {
           "comparisonId": "hivesight_microdata",
           "label": "HiveSight microdata prompt",
-          "simulatedN": 6,
-          "estimate": 0.667,
+          "simulatedN": 12,
+          "estimate": 0.5,
           "parseFailures": 0,
-          "absoluteError": 0.04
+          "absoluteError": 0.127
+        }
+      ]
+    },
+    {
+      "questionId": "better_worse_year",
+      "benchmarkField": "financial_change_vs_last_year",
+      "prompt": "My finances are better than they were a year ago.",
+      "scoring": "ordered_mean",
+      "unweightedN": 12295,
+      "missingRows": 0,
+      "weightedMean": 0.471,
+      "sliceHighlights": [],
+      "modelResults": [
+        {
+          "comparisonId": "naive_llm",
+          "label": "Naive LLM direct estimate",
+          "simulatedN": 1,
+          "estimate": 0.43,
+          "parseFailures": 0,
+          "absoluteError": 0.041
+        },
+        {
+          "comparisonId": "basic_persona",
+          "label": "Basic demographic persona",
+          "simulatedN": 12,
+          "estimate": 0.417,
+          "parseFailures": 0,
+          "absoluteError": 0.054
+        },
+        {
+          "comparisonId": "hivesight_microdata",
+          "label": "HiveSight microdata prompt",
+          "simulatedN": 12,
+          "estimate": 0.333,
+          "parseFailures": 0,
+          "absoluteError": 0.138
+        }
+      ]
+    },
+    {
+      "questionId": "housing_cost_stress",
+      "benchmarkField": "housing_cost_stress",
+      "prompt": "Housing costs caused a serious hardship for my household, such as falling behind on rent or mortgage, facing foreclosure or eviction risk, or needing housing assistance.",
+      "scoring": "positive_agreement",
+      "unweightedN": 12295,
+      "missingRows": 0,
+      "weightedMean": 0.187,
+      "sliceHighlights": [],
+      "modelResults": [
+        {
+          "comparisonId": "naive_llm",
+          "label": "Naive LLM direct estimate",
+          "simulatedN": 1,
+          "estimate": 0.16,
+          "parseFailures": 0,
+          "absoluteError": 0.027
+        },
+        {
+          "comparisonId": "basic_persona",
+          "label": "Basic demographic persona",
+          "simulatedN": 12,
+          "estimate": 0.417,
+          "parseFailures": 0,
+          "absoluteError": 0.23
+        },
+        {
+          "comparisonId": "hivesight_microdata",
+          "label": "HiveSight microdata prompt",
+          "simulatedN": 12,
+          "estimate": 0.333,
+          "parseFailures": 0,
+          "absoluteError": 0.146
         }
       ]
     }

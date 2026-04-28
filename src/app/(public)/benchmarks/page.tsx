@@ -6,6 +6,7 @@ import { PublicHeader } from "@/components/public/public-header";
 import { benchmarkProgram } from "@/lib/benchmarks/report";
 import { benchmarkManifestBySuiteId } from "@/lib/benchmarks/manifests";
 import { benchmarkResultSnapshots } from "@/lib/benchmarks/results";
+import type { BenchmarkResultSnapshot } from "@/lib/benchmarks/results-schema";
 
 export const metadata: Metadata = {
   title: "Benchmarks",
@@ -46,6 +47,32 @@ const methodCards = [
   },
 ] as const;
 
+function getComparisonAverages(snapshot: BenchmarkResultSnapshot) {
+  const summaries = new Map<
+    string,
+    { label: string; totalAbsoluteError: number; count: number }
+  >();
+
+  for (const question of snapshot.questions) {
+    for (const result of question.modelResults ?? []) {
+      const current = summaries.get(result.comparisonId) ?? {
+        label: result.label,
+        totalAbsoluteError: 0,
+        count: 0,
+      };
+      current.totalAbsoluteError += result.absoluteError;
+      current.count += 1;
+      summaries.set(result.comparisonId, current);
+    }
+  }
+
+  return Array.from(summaries.entries()).map(([comparisonId, summary]) => ({
+    comparisonId,
+    label: summary.label,
+    averageAbsoluteError: summary.totalAbsoluteError / Math.max(summary.count, 1),
+  }));
+}
+
 export default function BenchmarksPage() {
   const firstResult = benchmarkResultSnapshots.find(
     (snapshot) => snapshot.resultType === "human_targets"
@@ -53,6 +80,9 @@ export default function BenchmarksPage() {
   const miniComparison = benchmarkResultSnapshots.find(
     (snapshot) => snapshot.resultType === "model_comparison"
   );
+  const miniComparisonAverages = miniComparison
+    ? getComparisonAverages(miniComparison)
+    : [];
 
   return (
     <div className="min-h-screen bg-honeycomb">
@@ -204,7 +234,7 @@ export default function BenchmarksPage() {
               <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
                 <div className="space-y-2">
                   <p className="text-sm font-medium uppercase tracking-[0.24em] text-sky-700 dark:text-sky-400">
-                    Tiny model comparison
+                    Small model comparison
                   </p>
                   <h2 className="text-3xl font-bold">
                     First synthetic-response pass against SHED targets
@@ -221,9 +251,41 @@ export default function BenchmarksPage() {
                       seed {miniComparison.execution.seed} · n=
                       {miniComparison.execution.simulatedRespondentsPerPersonaArm}
                     </p>
+                    {miniComparison.execution.questionCount && (
+                      <p className="mt-1 text-xs text-muted-foreground">
+                        {miniComparison.execution.questionCount} questions ·{" "}
+                        {(miniComparison.execution.directEstimateCalls ?? 0) +
+                          (miniComparison.execution.simulatedResponseCalls ?? 0)}{" "}
+                        model calls
+                      </p>
+                    )}
+                    {miniComparison.execution.microdataStates && (
+                      <p className="mt-1 text-xs text-muted-foreground">
+                        Microdata states: {miniComparison.execution.microdataStates.join(", ")}
+                      </p>
+                    )}
                   </div>
                 )}
               </div>
+
+              {miniComparisonAverages.length > 0 && (
+                <div className="mt-6 grid gap-3 md:grid-cols-3">
+                  {miniComparisonAverages.map((summary) => (
+                    <div
+                      key={summary.comparisonId}
+                      className="rounded-2xl border border-amber-900/[0.06] bg-background/70 p-4"
+                    >
+                      <p className="text-sm font-medium">{summary.label}</p>
+                      <p className="mt-2 text-2xl font-bold text-amber-700 dark:text-amber-300">
+                        {(summary.averageAbsoluteError * 100).toFixed(1)} pts
+                      </p>
+                      <p className="mt-1 text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">
+                        average absolute error
+                      </p>
+                    </div>
+                  ))}
+                </div>
+              )}
 
               <div className="mt-6 grid gap-4 md:grid-cols-2">
                 {miniComparison.questions.map((question) => (

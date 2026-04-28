@@ -1,10 +1,10 @@
 {
   "version": 1,
-  "updatedAt": "2026-04-26",
+  "updatedAt": "2026-04-28",
   "title": "HiveSight benchmark program",
   "subtitle": "A public benchmark plan for direct inference on calibrated local synthetic populations.",
   "thesis": "The goal is not to prove that LLM surveys work in the abstract. It is to test whether HiveSight's geography-assigned calibrated population outperforms weaker prompting baselines, including rich nonlocal microdata, on stable, recent, human-collected benchmarks.",
-  "currentStatus": "Benchmark scaffolding is live, the first measured human target snapshot is published for SHED 2024, and a tiny first-pass synthetic-response comparison is posted as a directional smoke test.",
+  "currentStatus": "Benchmark scaffolding is live, the first measured human target snapshot is published for SHED 2024, and a small first-pass synthetic-response comparison now covers the starter SHED household-finance questions. The first expanded run is a useful miss: direct naive estimates beat the persona arms at n=12, so the next benchmark priority is larger samples and better respondent calibration.",
   "comparisons": [
     {
       "id": "generic_persona",

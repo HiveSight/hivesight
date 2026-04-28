@@ -42,7 +42,7 @@
     },
     {
       "id": "housing_cost_stress",
-      "prompt": "Housing costs put meaningful pressure on my household budget.",
+      "prompt": "Housing costs caused a serious hardship for my household, such as falling behind on rent or mortgage, facing foreclosure or eviction risk, or needing housing assistance.",
       "sourceVariable": "HOUSCOST",
       "benchmarkField": "housing_cost_stress",
       "responseFormat": "binary_or_ordered_affordability",

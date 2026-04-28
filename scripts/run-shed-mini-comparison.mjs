@@ -6,7 +6,7 @@ import OpenAI from "openai";
 const HF_BASE_URL =
   "https://huggingface.co/datasets/MaxGhenis/hivesight-persona-data/resolve/main";
 const MODEL = process.env.BENCHMARK_MODEL ?? "gpt-5-mini";
-const SAMPLE_SIZE = Number(process.env.BENCHMARK_SAMPLE_SIZE ?? 6);
+const SAMPLE_SIZE = Number(process.env.BENCHMARK_SAMPLE_SIZE ?? 12);
 const SEED = Number(process.env.BENCHMARK_SEED ?? 20260426);
 const MICRODATA_STATES = (process.env.BENCHMARK_MICRODATA_STATES ?? "CA,TX,NY,FL")
   .split(",")
@@ -16,17 +16,38 @@ const OUTPUT_PATH = path.resolve(
   process.cwd(),
   "src/lib/benchmarks/data/results/shed-2024-mini-comparison-v1.json"
 );
+const COMPARISON_LABELS = {
+  naive_llm: "naive direct estimate",
+  basic_persona: "basic persona",
+  hivesight_microdata: "HiveSight microdata",
+};
+const COMPARISON_ORDER = Object.keys(COMPARISON_LABELS);
 
 const QUESTIONS = [
   {
     questionId: "doing_okay",
     benchmarkField: "financial_wellbeing",
     prompt: "I am doing okay financially.",
+    scoring: "positive_agreement",
   },
   {
     questionId: "expense_shock",
     benchmarkField: "can_cover_400_expense",
     prompt: "I could cover a $400 emergency expense using cash or its equivalent.",
+    scoring: "positive_agreement",
+  },
+  {
+    questionId: "better_worse_year",
+    benchmarkField: "financial_change_vs_last_year",
+    prompt: "My finances are better than they were a year ago.",
+    scoring: "ordered_mean",
+  },
+  {
+    questionId: "housing_cost_stress",
+    benchmarkField: "housing_cost_stress",
+    prompt:
+      "Housing costs caused a serious hardship for my household, such as falling behind on rent or mortgage, facing foreclosure or eviction risk, or needing housing assistance.",
+    scoring: "positive_agreement",
   },
 ];
 
@@ -71,6 +92,21 @@ function incomeBand(person) {
   if (income < 75000) return "middle earned income";
   if (income < 150000) return "upper-middle earned income";
   return "high earned income";
+}
+
+function occupationGroup(person) {
+  const code = Number(person.occupation_code ?? 0);
+  if (code <= 0) return "no current occupation";
+  if (code < 1000) return "management, business, or finance";
+  if (code < 2000) return "professional, technical, or scientific work";
+  if (code < 3000) return "education, legal, community, arts, or media work";
+  if (code < 4000) return "healthcare or protective services";
+  if (code < 5000) return "service, sales, or personal care work";
+  if (code < 6000) return "office or administrative work";
+  if (code < 8000) return "construction, extraction, installation, or repair work";
+  if (code < 9000) return "production or manufacturing work";
+  if (code < 9800) return "transportation or material moving work";
+  return "military work";
 }
 
 function ageBand(age) {
@@ -132,10 +168,10 @@ function richMicrodataPersona(person) {
 
   return [
     `Age band: ${ageBand(person.age)}.`,
-    `Lives in the United States and ZIP ${person.zcta}.`,
+    "Lives in the United States.",
     `Income: ${incomeBand(person)}.`,
     `Housing: ${tenure}; ${children}.`,
-    `Education/work context: ${student}.`,
+    `Education/work context: ${student}; broad occupation group is ${occupationGroup(person)}.`,
     `Health/benefit context: ${person.is_disabled ? "has a disability" : "does not have a disability"}; ${publicCoverage}; ${
       benefits.length > 0 ? `receives ${benefits.join(", ")}` : "does not receive the tracked benefits"
     }.`,
@@ -152,6 +188,38 @@ function parseLikert(content) {
   if (/\bneutral\b/.test(normalized)) return "neutral";
   if (/\bagree\b/.test(normalized)) return "agree";
   return null;
+}
+
+function scoreLikert(response, scoring) {
+  if (response === null) return null;
+
+  if (scoring === "ordered_mean") {
+    if (response === "strongly_disagree" || response === "disagree") return 0;
+    if (response === "neutral") return 0.5;
+    if (response === "agree" || response === "strongly_agree") return 1;
+    return null;
+  }
+
+  return response === "agree" || response === "strongly_agree" ? 1 : 0;
+}
+
+function summarizeMeanAbsoluteErrors(questions) {
+  return Object.fromEntries(
+    COMPARISON_ORDER.map((comparisonId) => {
+      const errors = questions.flatMap((question) =>
+        (question.modelResults ?? [])
+          .filter((result) => result.comparisonId === comparisonId)
+          .map((result) => result.absoluteError)
+      );
+      const meanError =
+        errors.reduce((sum, error) => sum + error, 0) / Math.max(errors.length, 1);
+      return [comparisonId, Number(meanError.toFixed(3))];
+    })
+  );
+}
+
+function formatPoints(value) {
+  return (value * 100).toFixed(1);
 }
 
 async function loadStatePersons(state) {
@@ -227,29 +295,42 @@ async function runSimulatedRespondentArm(openai, question, persons, formatter) {
     )
   );
 
-  const positive = responses.filter(
-    (response) => response === "agree" || response === "strongly_agree"
-  ).length;
+  const scores = responses
+    .map((response) => scoreLikert(response, question.scoring))
+    .filter((score) => score !== null);
+  const estimate =
+    scores.length > 0
+      ? scores.reduce((sum, score) => sum + score, 0) / scores.length
+      : null;
+
+  if (estimate === null) {
+    throw new Error(`No parseable simulated responses for ${question.questionId}.`);
+  }
 
   return {
     simulatedN: responses.length,
-    estimate: Number((positive / responses.length).toFixed(3)),
+    estimate: Number(estimate.toFixed(3)),
     parseFailures: responses.filter((response) => response === null).length,
   };
 }
 
 async function runNaiveArm(openai, question) {
+  const estimatePrompt =
+    question.scoring === "ordered_mean"
+      ? `Estimate the normalized mean response among US adults for this statement: "${question.prompt}". Use 0 for disagree/strongly disagree, 0.5 for neutral or about the same, and 1 for agree/strongly agree.`
+      : `Estimate the share of US adults who would agree or strongly agree with this statement: "${question.prompt}"`;
+
   const completion = await openai.chat.completions.create({
     model: MODEL,
     messages: [
       {
         role: "system",
         content:
-          "You estimate current US adult survey toplines. Return only JSON with a positiveShare field between 0 and 1.",
+          "You estimate current US adult survey toplines. Return only JSON with an estimate field between 0 and 1.",
       },
       {
         role: "user",
-        content: `Estimate the share of US adults who would agree or strongly agree with this statement: "${question.prompt}"`,
+        content: estimatePrompt,
       },
     ],
     max_completion_tokens: 1000,
@@ -317,6 +398,22 @@ async function main() {
     });
   }
 
+  const averageErrors = summarizeMeanAbsoluteErrors(questions);
+  const bestComparisonId = COMPARISON_ORDER.reduce((bestId, comparisonId) =>
+    averageErrors[comparisonId] < averageErrors[bestId] ? comparisonId : bestId
+  );
+  const comparisonReadout = `Average absolute errors in this run: naive direct estimate ${formatPoints(
+    averageErrors.naive_llm
+  )} pts, basic persona ${formatPoints(
+    averageErrors.basic_persona
+  )} pts, HiveSight microdata ${formatPoints(
+    averageErrors.hivesight_microdata
+  )} pts. ${
+    bestComparisonId === "hivesight_microdata"
+      ? "HiveSight microdata has the lowest error in this run."
+      : `HiveSight microdata does not yet beat the lowest-error arm, ${COMPARISON_LABELS[bestComparisonId]}.`
+  }`;
+
   const snapshot = {
     version: 1,
     suiteId: "shed_2024_household_finance",
@@ -327,12 +424,18 @@ async function main() {
     generatedAt: new Date().toISOString(),
     sourceRows: loadHumanTarget(QUESTIONS[0].benchmarkField).unweightedN,
     notes:
-      `Tiny first-pass model comparison on two SHED 2024 household-finance questions. This is intentionally small and directional: ${SAMPLE_SIZE} simulated respondents per persona arm, one direct naive estimate per question, and calibrated microdata sampled from ${MICRODATA_STATES.join(", ")} rather than the full national file.`,
+      `Small first-pass model comparison on ${QUESTIONS.length} SHED 2024 household-finance questions. This is intentionally directional: ${SAMPLE_SIZE} simulated respondents per persona arm, one direct naive estimate per question, and calibrated microdata sampled from ${MICRODATA_STATES.join(", ")} rather than the full national file. ${comparisonReadout}`,
     execution: {
       model: MODEL,
       seed: SEED,
       simulatedRespondentsPerPersonaArm: SAMPLE_SIZE,
       microdataStates: MICRODATA_STATES,
+      generatedBy: "scripts/run-shed-mini-comparison.mjs",
+      sampleStrategy:
+        "Weighted systematic sample with an even per-state allocation across configured microdata state files.",
+      questionCount: QUESTIONS.length,
+      directEstimateCalls: QUESTIONS.length,
+      simulatedResponseCalls: QUESTIONS.length * 2 * SAMPLE_SIZE,
     },
     questions,
   };
@@ -340,6 +443,7 @@ async function main() {
   fs.mkdirSync(path.dirname(OUTPUT_PATH), { recursive: true });
   fs.writeFileSync(OUTPUT_PATH, `${JSON.stringify(snapshot, null, 2)}\n`);
   console.log(`Wrote ${OUTPUT_PATH}`);
+  console.log(JSON.stringify(averageErrors, null, 2));
 }
 
 main().catch((error) => {
