@@ -236,7 +236,7 @@ export default function NewSurveyPage() {
             <Label htmlFor="question">Your question or statement</Label>
             <textarea
               id="question"
-              className="w-full min-h-28 p-4 border border-amber-900/10 rounded-xl resize-none bg-white/80 text-base leading-relaxed placeholder:text-muted-foreground/50 focus:outline-hidden focus:ring-2 focus:ring-amber-500/30 focus:border-amber-300 transition-all duration-200 dark:bg-amber-950/20 dark:border-amber-100/10 dark:focus:ring-amber-500/30 dark:focus:border-amber-700"
+              className="w-full min-h-28 p-4 border border-[var(--color-border-strong)] rounded-xl resize-none bg-white/80 text-base leading-relaxed placeholder:text-muted-foreground/50 focus:outline-hidden focus:ring-2 focus:ring-amber-500/30 focus:border-amber-300 transition-all duration-200 dark:bg-amber-950/20 dark:border-[var(--color-border-strong)] dark:focus:ring-amber-500/30 dark:focus:border-amber-700"
               placeholder="e.g., I support increasing the minimum wage to $15/hour"
               value={question}
               onChange={(e) => setQuestion(e.target.value)}

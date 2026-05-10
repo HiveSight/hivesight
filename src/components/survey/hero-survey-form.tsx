@@ -141,7 +141,7 @@ export function HeroSurveyForm() {
             <textarea
               id={questionId}
               ref={textareaRef}
-              className="min-h-28 w-full resize-none rounded-2xl border border-amber-900/10 bg-background/80 p-4 text-base leading-relaxed placeholder:text-muted-foreground/50 transition-all duration-200 focus:outline-hidden focus:ring-2 focus:ring-amber-500/30 focus:border-amber-300 dark:border-amber-100/10 dark:bg-amber-950/20 dark:focus:border-amber-700 dark:focus:ring-amber-500/30"
+              className="min-h-28 w-full resize-none rounded-2xl border border-[var(--color-border-strong)] bg-background/80 p-4 text-base leading-relaxed placeholder:text-muted-foreground/50 transition-all duration-200 focus:outline-hidden focus:ring-2 focus:ring-amber-500/30 focus:border-amber-300 dark:border-[var(--color-border-strong)] dark:bg-amber-950/20 dark:focus:border-amber-700 dark:focus:ring-amber-500/30"
               placeholder="e.g., I support increasing the minimum wage to $15/hour"
               value={question}
               disabled={loading}
