@@ -7,6 +7,7 @@
   --font-serif: var(--font-newsreader), Georgia, 'Times New Roman', serif;
 
   --color-border: hsl(var(--border));
+  --color-border-strong: hsl(var(--border-strong));
   --color-input: hsl(var(--input));
   --color-ring: hsl(var(--ring));
   --color-background: hsl(var(--background));
@@ -56,7 +57,11 @@
     --card-foreground: 30 10% 12%;
     --popover: 40 50% 99%;
     --popover-foreground: 30 10% 12%;
-    --primary: 32 95% 44%;
+    /* Primary: amber. Bumped from L=44% (3.10:1 on bg, fails AA both as link
+       text and as fill behind white text) to L=35% so both
+       `primary` on background and `primary-foreground` (white) on `primary`
+       clear WCAG AA 4.5:1. Asserted in src/__tests__/contrast.test.ts. */
+    --primary: 32 95% 35%;
     --primary-foreground: 40 100% 98%;
     --secondary: 35 30% 95%;
     --secondary-foreground: 30 10% 15%;
@@ -64,11 +69,18 @@
     --muted-foreground: 30 5% 45%;
     --accent: 35 40% 94%;
     --accent-foreground: 30 10% 15%;
-    --destructive: 0 84.2% 60.2%;
+    /* Destructive: red. Bumped from red-500 (0 84.2% 60.2%, 3.61:1 with white)
+       to red-600-equivalent (0 73% 49%) so white-on-destructive clears AA. */
+    --destructive: 0 73% 49%;
     --destructive-foreground: 0 0% 98%;
+    /* `--border` is decorative (1.28:1 on bg — fine for hairlines, fails
+       SC 1.4.11 for interactive boundaries). Use `--border-strong` on form
+       inputs, dividers between actionable regions, and any border whose
+       absence would prevent perceiving the control. */
     --border: 35 15% 88%;
+    --border-strong: 35 15% 50%;
     --input: 35 15% 88%;
-    --ring: 32 95% 44%;
+    --ring: 32 95% 35%;
     --radius: 0.625rem;
   }
 
@@ -87,9 +99,15 @@
     --muted-foreground: 30 8% 55%;
     --accent: 30 10% 14%;
     --accent-foreground: 35 20% 95%;
-    --destructive: 0 62.8% 30.6%;
+    /* Dark destructive: was 0 62.8% 30.6% (#7f1d1d, 1.91:1 on dark bg —
+       fails SC 1.4.11 as a non-text indicator and only 9.6:1 for white-on-it,
+       which masks how dim the surface is). Aligned to red-600 hue at L=50%
+       so white-on-destructive stays well above AA and the surface itself
+       clears 3:1 against dark bg. */
+    --destructive: 0 73% 50%;
     --destructive-foreground: 0 0% 98%;
     --border: 30 8% 18%;
+    --border-strong: 30 8% 45%;
     --input: 30 8% 18%;
     --ring: 38 92% 50%;
   }

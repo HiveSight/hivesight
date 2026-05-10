@@ -16,7 +16,9 @@ const SelectTrigger = React.forwardRef<
   <SelectPrimitive.Trigger
     ref={ref}
     className={cn(
-      "flex h-10 w-full items-center justify-between whitespace-nowrap rounded-lg border border-amber-900/10 bg-white/80 px-3 py-2 text-sm shadow-warm-sm transition-all duration-200 placeholder:text-muted-foreground/60 focus:outline-hidden focus:ring-2 focus:ring-amber-500/30 focus:border-amber-300 disabled:cursor-not-allowed disabled:opacity-50 [&>span]:line-clamp-1 dark:border-amber-100/10 dark:bg-amber-950/20 dark:placeholder:text-amber-100/30 dark:focus:ring-amber-500/30 dark:focus:border-amber-700",
+      // Select trigger is an interactive boundary; uses --color-border-strong
+      // (SC 1.4.11 ≥3:1) instead of decorative `--border`.
+      "flex h-10 w-full items-center justify-between whitespace-nowrap rounded-lg border border-[var(--color-border-strong)] bg-white/80 px-3 py-2 text-sm shadow-warm-sm transition-all duration-200 placeholder:text-muted-foreground/60 focus:outline-hidden focus:ring-2 focus:ring-amber-500/30 focus:border-amber-300 disabled:cursor-not-allowed disabled:opacity-50 [&>span]:line-clamp-1 dark:border-[var(--color-border-strong)] dark:bg-amber-950/20 dark:placeholder:text-amber-100/30 dark:focus:ring-amber-500/30 dark:focus:border-amber-700",
       className
     )}
     {...props}
