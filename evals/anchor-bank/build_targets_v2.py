@@ -336,7 +336,11 @@ def main():
         if len(sub24) < MIN_ITEM_N:
             print(f"  drop {item_id}: n={len(sub24)}")
             continue
-        # DK rate: nonassigned ballots (-100) excluded from the denominator.
+        # DK rate: ballot nonassignment (-100 "iap") excluded from the
+        # denominator; the numerator keeps every other negative R2 code
+        # (-97 "skipped on web", -98 "don't know", -99 "no answer", and any
+        # year-specific refusals), so web-mode skips are conflated with DK —
+        # disclosed in Appendix A.
         raw = df24[spec["var"]]
         eligible = raw[raw != -100]
         dk_rate = float((~eligible.isin(codes)).mean()) if len(eligible) else None

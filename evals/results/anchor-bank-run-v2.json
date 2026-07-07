@@ -619,6 +619,15 @@
     "cellCount": 40,
     "failures": 0,
     "ms": 15276
+   },
+   "naive:openai:gpt-5-mini:order-reversed:g149": {
+    "topline": [
+     0.38,
+     0.58,
+     0.04
+    ],
+    "slices": {},
+    "ms": 1252
    }
   },
   "gss_happy": {
@@ -1226,6 +1235,15 @@
     "cellCount": 40,
     "failures": 0,
     "ms": 7043
+   },
+   "naive:openai:gpt-5-mini:order-reversed:g149": {
+    "topline": [
+     0.25,
+     0.55,
+     0.2
+    ],
+    "slices": {},
+    "ms": 1842
    }
   },
   "gss_health": {
@@ -1859,6 +1877,16 @@
     "cellCount": 40,
     "failures": 0,
     "ms": 5470
+   },
+   "naive:openai:gpt-5-mini:order-reversed:g149": {
+    "topline": [
+     0.25,
+     0.41,
+     0.22,
+     0.12
+    ],
+    "slices": {},
+    "ms": 1158
    }
   },
   "gss_satfin": {
@@ -2408,6 +2436,15 @@
     "cellCount": 40,
     "failures": 0,
     "ms": 3676
+   },
+   "naive:openai:gpt-5-mini:order-reversed:g149": {
+    "topline": [
+     0.35,
+     0.35,
+     0.3
+    ],
+    "slices": {},
+    "ms": 1390
    }
   },
   "gss_finrela": {
@@ -3522,6 +3559,14 @@
     "cellCount": 40,
     "failures": 0,
     "ms": 11764
+   },
+   "naive:openai:gpt-5-mini:order-reversed:g149": {
+    "topline": [
+     0.55,
+     0.45
+    ],
+    "slices": {},
+    "ms": 2277
    }
   },
   "gss_gunlaw": {
@@ -4115,6 +4160,14 @@
     "cellCount": 40,
     "failures": 0,
     "ms": 2548
+   },
+   "naive:openai:gpt-5-mini:order-reversed:g149": {
+    "topline": [
+     0.65,
+     0.35
+    ],
+    "slices": {},
+    "ms": 1347
    }
   },
   "gss_courts": {
@@ -6072,6 +6125,16 @@
     "cellCount": 40,
     "failures": 0,
     "ms": 5239
+   },
+   "naive:openai:gpt-5-mini:order-reversed:g149": {
+    "topline": [
+     0.13,
+     0.29,
+     0.3,
+     0.28
+    ],
+    "slices": {},
+    "ms": 1367
    }
   },
   "gss_fechld": {
@@ -8197,6 +8260,19 @@
     "cellCount": 40,
     "failures": 0,
     "ms": 4118
+   },
+   "naive:openai:gpt-5-mini:order-reversed:g149": {
+    "topline": [
+     0.08,
+     0.15,
+     0.15,
+     0.22,
+     0.18,
+     0.16,
+     0.06
+    ],
+    "slices": {},
+    "ms": 1508
    }
   },
   "gss_confinan": {
@@ -9698,6 +9774,15 @@
     "cellCount": 40,
     "failures": 0,
     "ms": 4651
+   },
+   "naive:openai:gpt-5-mini:order-reversed:g149": {
+    "topline": [
+     0.15,
+     0.45,
+     0.4
+    ],
+    "slices": {},
+    "ms": 1218
    }
   },
   "gss_conjudge": {
@@ -10396,6 +10481,15 @@
     "cellCount": 40,
     "failures": 0,
     "ms": 2702
+   },
+   "naive:openai:gpt-5-mini:order-reversed:g149": {
+    "topline": [
+     0.2,
+     0.5,
+     0.3
+    ],
+    "slices": {},
+    "ms": 1510
    }
   },
   "gss_conlegis": {
@@ -12046,6 +12140,15 @@
     "cellCount": 40,
     "failures": 0,
     "ms": 3281
+   },
+   "naive:openai:gpt-5-mini:order-reversed:g149": {
+    "topline": [
+     0.15,
+     0.5,
+     0.35
+    ],
+    "slices": {},
+    "ms": 1160
    }
   },
   "gss_natarms": {
@@ -13191,6 +13294,15 @@
     "cellCount": 40,
     "failures": 0,
     "ms": 6174
+   },
+   "naive:openai:gpt-5-mini:order-reversed:g149": {
+    "topline": [
+     0.22,
+     0.3,
+     0.48
+    ],
+    "slices": {},
+    "ms": 1536
    }
   },
   "gss_natchld": {
@@ -14598,6 +14710,16 @@
     "cellCount": 40,
     "failures": 0,
     "ms": 6874
+   },
+   "naive:openai:gpt-5-mini:order-reversed:g149": {
+    "topline": [
+     0.18,
+     0.33,
+     0.31,
+     0.18
+    ],
+    "slices": {},
+    "ms": 1267
    }
   },
   "shed_b3": {
@@ -15585,6 +15707,17 @@
     "cellCount": 40,
     "failures": 0,
     "ms": 3315
+   },
+   "naive:openai:gpt-5-mini:order-reversed:g149": {
+    "topline": [
+     0.1,
+     0.2,
+     0.3,
+     0.22,
+     0.18
+    ],
+    "slices": {},
+    "ms": 1186
    }
   },
   "shed_400cash": {
@@ -16212,6 +16345,14 @@
     "cellCount": 40,
     "failures": 0,
     "ms": 9115
+   },
+   "naive:openai:gpt-5-mini:order-reversed:g149": {
+    "topline": [
+     0.65,
+     0.35
+    ],
+    "slices": {},
+    "ms": 1072
    }
   },
   "shed_ef1": {
@@ -16839,6 +16980,14 @@
     "cellCount": 40,
     "failures": 0,
     "ms": 11896
+   },
+   "naive:openai:gpt-5-mini:order-reversed:g149": {
+    "topline": [
+     0.43,
+     0.57
+    ],
+    "slices": {},
+    "ms": 949
    }
   },
   "shed_ef2": {
@@ -18096,6 +18245,17 @@
     "cellCount": 40,
     "failures": 0,
     "ms": 11934
+   },
+   "naive:openai:gpt-5-mini:order-reversed:g149": {
+    "topline": [
+     0.17,
+     0.2,
+     0.19,
+     0.18,
+     0.26
+    ],
+    "slices": {},
+    "ms": 2494
    }
   },
   "shed_bk1": {
@@ -18790,6 +18950,14 @@
     "cellCount": 40,
     "failures": 0,
     "ms": 2759
+   },
+   "naive:openai:gpt-5-mini:order-reversed:g149": {
+    "topline": [
+     0.8,
+     0.2
+    ],
+    "slices": {},
+    "ms": 1028
    }
   },
   "shed_bnpl": {
@@ -19648,6 +19816,14 @@
     "cellCount": 40,
     "failures": 0,
     "ms": 3397
+   },
+   "naive:openai:gpt-5-mini:order-reversed:g149": {
+    "topline": [
+     0.4,
+     0.6
+    ],
+    "slices": {},
+    "ms": 1037
    }
   },
   "shed_i41d": {
@@ -20439,6 +20615,14 @@
     "cellCount": 40,
     "failures": 0,
     "ms": 3609
+   },
+   "naive:openai:gpt-5-mini:order-reversed:g149": {
+    "topline": [
+     0.24,
+     0.76
+    ],
+    "slices": {},
+    "ms": 1269
    }
   }
  },
@@ -20519,6 +20703,13 @@
    "tokOut": 80308,
    "at": "2026-07-07T14:46:49.052Z",
    "log": "v2-openai-gpt-5-mini-cells-all-default:g40.jsonl"
+  },
+  "openai:gpt-5-mini:naive:subset20:order-reversed:g149": {
+   "calls": 20,
+   "tokIn": 4069,
+   "tokOut": 612,
+   "at": "2026-07-07T14:55:34.775Z",
+   "log": "v2-openai-gpt-5-mini-naive-subset20-order-reversed:g149.jsonl"
   }
  }
 }

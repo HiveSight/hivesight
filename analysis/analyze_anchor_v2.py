@@ -207,6 +207,19 @@ def main():
             }
     out["h1_by_family"] = fam_block
 
+    # Sensitivity: undefined (constant-estimate) Spearmans counted as zero discrimination.
+    nanzero = {}
+    for arm in ["cells", "naive"]:
+        vals = []
+        for iid, it in items1.items():
+            res = r1(iid, arm)
+            if not res:
+                continue
+            sp = slice_spearman(it, res, families={"age_band"})
+            vals.append(0.0 if sp is None else sp)
+        nanzero[arm] = {"medianSpearmanAgeNaNAsZero": float(np.median(vals)) if vals else None, "items": len(vals)}
+    out["spearmanNaNAsZero"] = nanzero
+
     # ---------------- 4. valence: permutation + confound ------------------
     signed = {iid: arm_topline_err(items1[iid], r1(iid, "cells"), signed=True) for iid in items1}
     signed = {k: v for k, v in signed.items() if v is not None}
@@ -258,36 +271,40 @@ def main():
     out["contamination"] = cont
 
     # ---------------- 6. replicates ---------------------------------------
-    reps = {}
-    for tag in ["default:g149", "default:g149:rep1", "default:g149:rep2", "default:g149:rep3"]:
-        t = [arm_topline_err(items2[i], r2(i, "cells", tag)) for i in SUBSET20 if i in items2]
-        s = [pooled(slice_errs(items2[i], r2(i, "cells", tag))) for i in SUBSET20 if i in items2]
-        if any(x is not None for x in t):
-            reps[tag] = {"toplineMAE": pooled(t), "sliceMAE": pooled(s)}
-    if len(reps) >= 2:
-        out["replicates"] = {
-            "runs": reps,
-            "toplineSD": float(np.std([v["toplineMAE"] for v in reps.values()], ddof=1)),
-            "sliceSD": float(np.std([v["sliceMAE"] for v in reps.values() if v["sliceMAE"] is not None], ddof=1)),
-        }
-    else:
+    out["replicates"] = {}
+    for arm in ["cells", "naive"]:
+        reps = {}
+        for tag in ["default:g149", "default:g149:rep1", "default:g149:rep2", "default:g149:rep3"]:
+            t = [arm_topline_err(items2[i], r2(i, arm, tag)) for i in SUBSET20 if i in items2]
+            sl = [pooled(slice_errs(items2[i], r2(i, arm, tag))) for i in SUBSET20 if i in items2]
+            if any(x is not None for x in t):
+                reps[tag] = {"toplineMAE": pooled(t), "sliceMAE": pooled(sl)}
+        if len(reps) >= 2:
+            out["replicates"][arm] = {
+                "runs": reps,
+                "toplineSD": float(np.std([v["toplineMAE"] for v in reps.values()], ddof=1)),
+                "sliceSD": float(np.std([v["sliceMAE"] for v in reps.values() if v["sliceMAE"] is not None], ddof=1)),
+            }
+    if not out["replicates"]:
         out["notes"].append("replicates incomplete")
 
     # ---------------- 7. order-reversal + paraphrase ----------------------
-    for name, tag, ids in [
-        ("orderReversal", "order-reversed:g149", SUBSET20),
-        ("paraphrase", "paraphrase:g149", sorted(SUBSET20)[1::2]),
+    for name, tag, ids, arms_probe in [
+        ("orderReversal", "order-reversed:g149", SUBSET20, ["cells", "naive"]),
+        ("paraphrase", "paraphrase:g149", sorted(SUBSET20)[1::2], ["cells"]),
     ]:
-        deltas = []
-        for iid in ids:
-            a, b = r2(iid, "cells"), r2(iid, "cells", tag)
-            if a and b and a.get("topline") and b.get("topline"):
-                pa = pos_share(a["topline"], items2[iid]["positiveOptions"])
-                pb = pos_share(b["topline"], items2[iid]["positiveOptions"])
-                deltas.append(abs(pa - pb))
-        if deltas:
-            out[name] = {"n": len(deltas), "meanAbsDelta": float(np.mean(deltas)), "maxAbsDelta": float(np.max(deltas))}
-        else:
+        out[name] = {}
+        for arm in arms_probe:
+            deltas = []
+            for iid in ids:
+                a, b = r2(iid, arm), r2(iid, arm, tag)
+                if a and b and a.get("topline") and b.get("topline"):
+                    pa = pos_share(a["topline"], items2[iid]["positiveOptions"])
+                    pb = pos_share(b["topline"], items2[iid]["positiveOptions"])
+                    deltas.append(abs(pa - pb))
+            if deltas:
+                out[name][arm] = {"n": len(deltas), "meanAbsDelta": float(np.mean(deltas)), "maxAbsDelta": float(np.max(deltas))}
+        if not out[name]:
             out["notes"].append(f"{name} incomplete")
 
     # ---------------- 8. volunteered options ------------------------------
@@ -422,7 +439,7 @@ def main():
         arm: {
             "toplineMAE": pooled([arm_topline_err(items1[i], r1(i, arm)) for i in keep]),
             "sliceMAE": pooled([pooled(slice_errs(items1[i], r1(i, arm))) for i in keep]),
-            "items": len(keep),
+            "items": sum(1 for i in keep if arm_topline_err(items1[i], r1(i, arm)) is not None),
         }
         for arm in ["cells", "naive", "persona"]
         if any(r1(i, arm) for i in keep)
@@ -439,13 +456,17 @@ def main():
     per_call_in = main_u.get("tokIn", 0) / max(main_u.get("calls", 1), 1)
     per_call_out = main_u.get("tokOut", 0) / max(main_u.get("calls", 1), 1)
     naive_calls = round(np.mean([1 + len([1 for fam in (items1[i]["targets"].get("slices") or {}).values() for _ in fam]) for i in items1]), 1)
+    pu = u1.get(f"openai:{MINI}:persona:subset20", {})
+    p_in = pu.get("tokIn", 0) / max(pu.get("calls", 1), 1)
+    p_out = pu.get("tokOut", 0) / max(pu.get("calls", 1), 1)
     out["cost"] = {
         "prices": {k: {"inPerM": v[0], "outPerM": v[1]} for k, v in PRICE.items()},
-        "assumedTokensPerCall": {"in": round(per_call_in, 1), "out": round(per_call_out, 1)},
+        "assumedTokensPerCall": {"in": round(per_call_in, 1), "out": round(per_call_out, 1),
+                                 "personaIn": round(p_in, 1), "personaOut": round(p_out, 1)},
         "cells": cost_block(MINI, 149, per_call_in, per_call_out),
         "naive": cost_block(MINI, naive_calls, per_call_in, per_call_out),
-        "persona": cost_block(MINI, 150, 151, 43),
-        "note": "token averages from the registered v1 run's usage block; July 2026 list prices",
+        "persona": cost_block(MINI, 150, p_in, p_out),
+        "note": "token averages from the registered v1 run's usage blocks; July 2026 list prices",
     }
 
     # ---------------- 12. noise floors -------------------------------------
@@ -508,6 +529,14 @@ def main():
         "undetailedCells": sum(1 for c in us["table"]["cells"] if not c["detailed"]),
         "cells": len(us["table"]["cells"]),
     }
+    keep_dk = [i for i in items1 if (items2.get(i, {}).get("dkRate") or 0) <= 0.5]
+    out["highNonresponseSensitivity"] = {
+        "excludedItems": [i for i in items1 if i not in keep_dk],
+        **{arm: {
+            "toplineMAE": pooled([arm_topline_err(items1[i], r1(i, arm)) for i in keep_dk]),
+            "sliceMAE": pooled([pooled(slice_errs(items1[i], r1(i, arm))) for i in keep_dk]),
+        } for arm in ["cells", "naive"]},
+    }
     out["dkRates"] = {
         "mean": pooled([items2[i].get("dkRate") for i in items2]),
         "max": max((items2[i].get("dkRate") or 0) for i in items2),
@@ -526,13 +555,23 @@ def main():
             diffs_const = np.abs(arr[:, 0] - arr[:, 3]) - np.abs(arr[:, 2] - arr[:, 3])
             mean, lo, hi = boot_ci(list(diffs_const))
             bb[iid] = {"cellsMinusConstMAE": mean, "ci95": [lo, hi], "states": len(rows)}
-        alld = []
+        by_state = {}
         for iid, rec in brun["items"].items():
-            for r in rec["states"].values():
+            for st, r in rec["states"].items():
                 if r.get("cells") is not None:
-                    alld.append(abs(r["cells"] - r["human"]) - abs(rec["nationalCells"] - r["human"]))
-        mean, lo, hi = boot_ci(alld)
-        bb["pooled_cellsMinusConst"] = {"mean": mean, "ci95": [lo, hi], "n": len(alld)}
+                    by_state.setdefault(st, []).append(
+                        abs(r["cells"] - r["human"]) - abs(rec["nationalCells"] - r["human"]))
+        states = sorted(by_state)
+        state_means = np.array([np.mean(by_state[st]) for st in states])
+        idx = RNG.integers(0, len(states), (10000, len(states)))
+        boots = state_means[idx].mean(axis=1)
+        lo, hi = np.percentile(boots, [2.5, 97.5])
+        alln = sum(len(v) for v in by_state.values())
+        bb["pooled_cellsMinusConst"] = {
+            "mean": float(np.mean([d for v in by_state.values() for d in v])),
+            "ci95": [float(lo), float(hi)], "n": alln, "clusters": len(states),
+            "note": "bootstrap clustered by state",
+        }
         out["brfssInference"] = bb
 
     json.dump(out, open(OUT, "w"), indent=1)

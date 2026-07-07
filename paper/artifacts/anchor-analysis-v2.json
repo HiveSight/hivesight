@@ -125,6 +125,16 @@
    "naiveMAE": 0.09787693190982964
   }
  },
+ "spearmanNaNAsZero": {
+  "cells": {
+   "medianSpearmanAgeNaNAsZero": 0.7999999999999999,
+   "items": 63
+  },
+  "naive": {
+   "medianSpearmanAgeNaNAsZero": 0.6000000000000001,
+   "items": 63
+  }
+ },
  "valence": {
   "means": {
    "positive": {
@@ -684,36 +694,69 @@
   }
  },
  "replicates": {
-  "runs": {
-   "default:g149": {
-    "toplineMAE": 0.09431596180812848,
-    "sliceMAE": 0.0979608336330969
+  "cells": {
+   "runs": {
+    "default:g149": {
+     "toplineMAE": 0.09431596180812848,
+     "sliceMAE": 0.0979608336330969
+    },
+    "default:g149:rep1": {
+     "toplineMAE": 0.09483794623659499,
+     "sliceMAE": 0.09732747265154965
+    },
+    "default:g149:rep2": {
+     "toplineMAE": 0.09560874218541819,
+     "sliceMAE": 0.09821810081997484
+    },
+    "default:g149:rep3": {
+     "toplineMAE": 0.09572101378434765,
+     "sliceMAE": 0.09847410612131688
+    }
    },
-   "default:g149:rep1": {
-    "toplineMAE": 0.09483794623659499,
-    "sliceMAE": 0.09732747265154965
-   },
-   "default:g149:rep2": {
-    "toplineMAE": 0.09560874218541819,
-    "sliceMAE": 0.09821810081997484
-   },
-   "default:g149:rep3": {
-    "toplineMAE": 0.09572101378434765,
-    "sliceMAE": 0.09847410612131688
-   }
+   "toplineSD": 0.0006648596032175104,
+   "sliceSD": 0.0004919609358011575
   },
-  "toplineSD": 0.0006648596032175104,
-  "sliceSD": 0.0004919609358011575
+  "naive": {
+   "runs": {
+    "default:g149": {
+     "toplineMAE": 0.07950680316568384,
+     "sliceMAE": 0.09364483341313505
+    },
+    "default:g149:rep1": {
+     "toplineMAE": 0.08474343700580073,
+     "sliceMAE": 0.0951107527093901
+    },
+    "default:g149:rep2": {
+     "toplineMAE": 0.09304049431861285,
+     "sliceMAE": 0.09039340869159648
+    },
+    "default:g149:rep3": {
+     "toplineMAE": 0.09135673669372515,
+     "sliceMAE": 0.08933622885992931
+    }
+   },
+   "toplineSD": 0.006234420498136947,
+   "sliceSD": 0.0027080257994456444
+  }
  },
  "orderReversal": {
-  "n": 20,
-  "meanAbsDelta": 0.03491839809501589,
-  "maxAbsDelta": 0.07591642140840654
+  "cells": {
+   "n": 20,
+   "meanAbsDelta": 0.03491839809501589,
+   "maxAbsDelta": 0.07591642140840654
+  },
+  "naive": {
+   "n": 20,
+   "meanAbsDelta": 0.054500000000000014,
+   "maxAbsDelta": 0.17999999999999994
+  }
  },
  "paraphrase": {
-  "n": 10,
-  "meanAbsDelta": 0.01214017927264654,
-  "maxAbsDelta": 0.04833173827072601
+  "cells": {
+   "n": 10,
+   "meanAbsDelta": 0.01214017927264654,
+   "maxAbsDelta": 0.04833173827072601
+  }
  },
  "volunteered": {
   "massShiftV1": {
@@ -847,7 +890,7 @@
   "persona": {
    "toplineMAE": 0.2229614674850905,
    "sliceMAE": 0.23652481743411538,
-   "items": 59
+   "items": 16
   }
  },
  "cost": {
@@ -867,7 +910,9 @@
   },
   "assumedTokensPerCall": {
    "in": 224.2,
-   "out": 30.3
+   "out": 30.3,
+   "personaIn": 151.0,
+   "personaOut": 42.5
   },
   "cells": {
    "callsPerItem": 149,
@@ -879,9 +924,9 @@
   },
   "persona": {
    "callsPerItem": 150,
-   "usdPerItem": 0.0186
+   "usdPerItem": 0.0184
   },
-  "note": "token averages from the registered v1 run's usage block; July 2026 list prices"
+  "note": "token averages from the registered v1 run's usage blocks; July 2026 list prices"
  },
  "personaNoiseFloor": {
   "meanExpectedMAE": 0.028635878959813583,
@@ -908,6 +953,33 @@
   "detailedWeightShare": 0.8074275274286535,
   "undetailedCells": 40,
   "cells": 149
+ },
+ "highNonresponseSensitivity": {
+  "excludedItems": [
+   "gss_getahead",
+   "gss_grass",
+   "gss_courts",
+   "gss_trust",
+   "gss_fair",
+   "gss_helpful",
+   "gss_divlaw",
+   "gss_fepol",
+   "gss_natspac",
+   "gss_natcity",
+   "gss_natcrime",
+   "gss_natdrug",
+   "gss_natarms",
+   "gss_nataid",
+   "gss_natfare"
+  ],
+  "cells": {
+   "toplineMAE": 0.0862535060482188,
+   "sliceMAE": 0.09232462499217807
+  },
+  "naive": {
+   "toplineMAE": 0.08235071741715426,
+   "sliceMAE": 0.0915027786618432
+  }
  },
  "dkRates": {
   "mean": 0.3078794948113587,
@@ -970,12 +1042,14 @@
    "states": 49
   },
   "pooled_cellsMinusConst": {
-   "mean": 0.0030132073553013165,
+   "mean": 0.003013207355301315,
    "ci95": [
-    -0.0025931462584377336,
-    0.008560230123014557
+    -0.0029507701632800073,
+    0.008956069079406272
    ],
-   "n": 196
+   "n": 196,
+   "clusters": 49,
+   "note": "bootstrap clustered by state"
   }
  }
 }

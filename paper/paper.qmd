@@ -18,9 +18,10 @@ abstract: |
   role-play misses by roughly 25 points; cell-based estimation and direct
   expert estimation land near 9-10 points, and the registered hypothesis
   that cells beat direct estimation on subgroup margins fails — the paired
-  difference is near zero. In exploratory comparisons, cells order subgroups
-  better than independent direct asks and preserve coherence and
-  composability; a battery of referee-driven robustness checks —
+  difference is near zero. In exploratory comparisons, cells tend to order subgroups
+  better than independent direct asks (one-sided p = .04, with a
+  confidence interval marginally spanning zero) and preserve coherence and
+  composability on the frame's base dimensions; a battery of referee-driven robustness checks —
   instrument-corrected re-elicitation, replicate runs, option-order and
   paraphrase probes, a cell-granularity ablation, and a contamination
   regression against 2022/2023 anchor waves — bounds how far those claims
@@ -352,7 +353,7 @@ lines.append(
 lines.append(
     f"- **Toplines**: direct {pts(per[f'naive:{MINI}']['toplineMAE'])} vs cells {pts(per[f'cells:{MINI}']['toplineMAE'])} points "
     f"(paired difference {top.get('meanDiff', 0)*100:+.2f}, 95% CI [{top.get('ci95', [0,0])[0]*100:.2f}, {top.get('ci95', [0,0])[1]*100:.2f}]) — "
-    f"direct estimation is modestly better on famous marginals, exactly where training-data recall is most plausible (see the contamination test)."
+    f"direct estimation is directionally better on famous marginals (the interval includes zero), exactly where training-data recall is most plausible (see the contamination test)."
 )
 lines.append(
     f"- **H2/H3 (persona)**: on the 20-item subset, persona subgroup MAE {pts(H['H2_cells_vs_persona_subgroups']['personaSliceMAE'])} vs cells "
@@ -396,6 +397,10 @@ print(
     f"Excluding the six items with volunteered categories: cells {pts(ex6['cells']['toplineMAE'])}/{pts(ex6['cells']['sliceMAE'])}, "
     f"direct {pts(ex6['naive']['toplineMAE'])}/{pts(ex6['naive']['sliceMAE'])}. "
     f"Restricting subgroup MAE to bins with n $\\ge$ 100 human respondents: cells {pts(m100['cells'])}, direct {pts(m100['naive'])}. "
+    f"Excluding the {len(S2['highNonresponseSensitivity']['excludedItems'])} items with nonresponse above 50% (where "
+    f"the conditional estimand covers a minority of eligible respondents): cells "
+    f"{pts(S2['highNonresponseSensitivity']['cells']['toplineMAE'])}/{pts(S2['highNonresponseSensitivity']['cells']['sliceMAE'])}, "
+    f"direct {pts(S2['highNonresponseSensitivity']['naive']['toplineMAE'])}/{pts(S2['highNonresponseSensitivity']['naive']['sliceMAE'])}. "
     f"Human-target sampling noise is not negligible at bin level: under design-effect assumptions "
     f"(GSS {tn['deff']['gss2024']}, SHED {tn['deff']['shed2024']}), the expected MAE floor from target noise alone is "
     f"{pts(tn['toplineExpectedMAEFloor'])} points on toplines and {pts(tn['subgroupExpectedMAEFloor'])} on subgroup bins "
@@ -416,15 +421,19 @@ print(
     f"{pts(V4['cells']['toplineMAE'])}/{pts(V4['cells']['sliceMAE'])} points, direct "
     f"{pts(V4['naive']['toplineMAE'])}/{pts(V4['naive']['sliceMAE'])} — the registered-run conclusions are robust to "
     f"the instrument corrections (registered v1: cells {pts(V1['cells']['toplineMAE'])}/{pts(V1['cells']['sliceMAE'])}, "
-    f"direct {pts(V1['naive']['toplineMAE'])}/{pts(V1['naive']['sliceMAE'])})."
+    f"direct {pts(V1['naive']['toplineMAE'])}/{pts(V1['naive']['sliceMAE'])}). The persona arm was not re-elicited: "
+    f"the measured instrument effects (at most a few points) cannot plausibly account for its 25-point gap."
 )
 print()
 if rep:
-    print(
-        f"Across {len(rep.get('runs', {}))} independent runs of the 20-item subset, between-run SD of pooled MAEs is "
-        f"{pts(rep['toplineSD'], 2)} points (topline) and {pts(rep['sliceSD'], 2)} (subgroup) — run-to-run noise is an "
-        f"order of magnitude below the arm differences of interest. "
-    )
+    rc, rn = rep.get("cells"), rep.get("naive")
+    if rc:
+        print(
+            f"Across {len(rc['runs'])} independent runs of the 20-item subset, between-run SD of pooled MAEs is "
+            f"{pts(rc['toplineSD'], 2)} points topline / {pts(rc['sliceSD'], 2)} subgroup for the cells arm"
+            + (f" and {pts(rn['toplineSD'], 2)} / {pts(rn['sliceSD'], 2)} for the direct arm" if rn else "")
+            + " — run-to-run noise is far below the differences of interest. "
+        )
 if par:
     print(
         f"Paraphrasing question stems moves item toplines by only {pts(par['meanAbsDelta'])} points on average "
@@ -432,13 +441,15 @@ if par:
         f"perturbation at cell aggregation. "
     )
 if orv:
+    oc, on_ = orv.get("cells"), orv.get("naive")
     print(
-        f"Reversing option order is **not** second-order: it moves toplines by {pts(orv['meanAbsDelta'])} points on "
-        f"average (max {pts(orv['maxAbsDelta'])}; n = {orv['n']}) — roughly a third of total topline error, and the "
-        f"largest instrument sensitivity we measured, consistent with the LLM response-order artifacts documented by "
-        f"@tjuatja2024llms and @dominguezolmedo2024questioning. Canonical instrument order (which our default runs "
-        f"use, matching what humans saw) is therefore load-bearing, and order sensitivity belongs in any accuracy "
-        f"claim's error budget; we did not probe the direct arm's order sensitivity, which shares the exposure."
+        f"Reversing option order is **not** second-order: it moves cells toplines by {pts(oc['meanAbsDelta'])} points "
+        f"on average (max {pts(oc['maxAbsDelta'])}; n = {oc['n']})"
+        + (f" and direct toplines by {pts(on_['meanAbsDelta'])} (max {pts(on_['maxAbsDelta'])})" if on_ else "")
+        + f" — roughly a third of total topline error, the largest instrument sensitivity we measured, shared by both "
+        f"arms, and consistent with the LLM response-order artifacts documented by @tjuatja2024llms and "
+        f"@dominguezolmedo2024questioning. Canonical instrument order (which our default runs use, matching what "
+        f"humans saw) is load-bearing, and order sensitivity belongs in any accuracy claim's error budget."
     )
 ```
 
@@ -452,7 +463,7 @@ if ms1 and ms4:
     print(
         f"**Volunteered categories.** In the registered v1 instrument, which offered normally-volunteered options as "
         f"explicit choices, the model over-allocated mass to them on every affected item (points vs humans: {s1}). "
-        f"Marking those options as \"not read to respondents\" in v4 removes most of the artifact ({s4}) — a "
+        f"Marking those options as \"not read to respondents\" in v4 removes much of the artifact ({s4}; courts and divlaw retain sizable shifts) — a "
         f"measured, referee-identified instrument effect and its measured correction. The no-volunteered variant "
         f"appears in the released artifact."
     )
@@ -531,8 +542,12 @@ print(
     f"average, so the test has little leverage and the slopes are statistically distinguishable from neither −1 nor, "
     f"marginally, 0. Three sober conclusions: the pattern is consistent with training-window anchoring and affects "
     f"both arms equally; on items this stable, staleness costs at most about two points; and the regression cannot "
-    f"separate frozen knowledge from recall of published values, nor rule out recall of 2024 values published before "
-    f"the model cutoffs. Freshly fielded items remain the decisive test and are registered follow-up."
+    f"separate frozen knowledge from recall of published values. Documented cutoffs sharpen this: gpt-5-mini's "
+    f"knowledge cutoff (May 31, 2024) predates every 2024 target's release, so the primary model cannot have seen the "
+    f"2024 values at all — only earlier waves, which is precisely what the regression tests; gpt-5.2 (August 31, "
+    f"2025) and claude-haiku-4.5 (February 2025) postdate the SHED 2024 report, so their variant runs carry a recall "
+    f"exposure the primary runs do not. Freshly fielded items remain the decisive test and are registered follow-up, "
+    f"where an open-weights model with an auditable corpus will be included."
 )
 ```
 
@@ -620,7 +635,13 @@ if b:
 The right yardstick matters: these items vary modestly across states, state
 targets at $n \ge 300$ with BRFSS design effects carry several points of
 sampling noise themselves, and the shrinkage limit (the national constant)
-is therefore hard to beat on pooled error. The estimator's genuine
+is therefore hard to beat on pooled error. The self-rated-health contrast promised in the estimand
+section illustrates the instrument-and-mode floor directly: the same
+construct yields a 72.2% excellent-or-good share on the GSS's four-point
+mixed-mode item and a 47.2% excellent-or-very-good share on BRFSS's
+five-point telephone item — instrument and mode differences of the same
+order as the errors under study, which is why every target in this paper is
+defined relative to a named instrument. The estimator's genuine
 small-area signal is ordinal — it ranks states at median $\\rho$ = 0.66 from
 composition plus the state's name — and where state effects are
 compositional (smoking history, exercise) it captures them, while
@@ -636,8 +657,8 @@ print("| Cells arm model | Topline MAE | Subgroup MAE |")
 print("|---|---|---|")
 for k in keys:
     v = S["anchor"][k]
-    t = v.get("toplineMAE_subset20") or v.get("toplineMAE")
-    sl = v.get("sliceMAE_subset20") or v.get("sliceMAE")
+    t = v["toplineMAE_subset20"]  # all cells arms carry subset-20 values
+    sl = v["sliceMAE_subset20"]
     print(f"| {k.replace('cells:', '')} | {t*100:.1f} | {sl*100:.1f} |")
 print()
 print(": Cells-arm accuracy by model, 20-item subset (gpt-5-mini shown on the "
@@ -691,7 +712,9 @@ standard role-play implementation at one budget.
 
 **Inference.** The PPI study is a resampling design, not a field validation;
 registration is by public commit, verifiable as ordering but not
-third-party-timestamped; and the pilot-overlap and subset-composition flaws
+third-party-timestamped (annotated tags were attached at revision time,
+after their target commits; ordering is additionally auditable from
+provider response IDs and timestamps in the per-call logs); and the pilot-overlap and subset-composition flaws
 of the original design, while addressed by sensitivity analyses, should not
 recur in follow-ups.
 
@@ -709,7 +732,8 @@ measurement, equivalence testing, and valid inference.
 
 Against our own registration, cells did not beat direct per-subgroup
 estimation on marginal accuracy; the revision's equivalence test upgrades
-that null to a demonstrated tie within ±1.5 points. Three things follow.
+that null to a demonstrated tie within ±1.5 points on subgroup margins
+(toplines pass equivalence only in the corrected v4 run). Three things follow.
 First, on well-surveyed margins, elaborate machinery buys no marginal
 accuracy over simply asking the model — a deflationary finding vendors are
 unlikely to publish, and one that direct estimation's order-of-magnitude
@@ -778,7 +802,9 @@ for iid, src, flags, dk in rows:
 print()
 print(": Per-item provenance and instrument notes, bank v2. Nonresponse: "
       "GSS rates exclude ballot nonassignment but conflate web-mode skips "
-      "with don't-know; SHED rates are refusals. Bank v1's wording "
+      "with don't-know; the highest rates (led by gss_courts) exceed 50% and "
+      "carry a dedicated sensitivity in Results. SHED rates are refusals. "
+      "Bank v1's wording "
       "deviations (adapted stems on nine items, option-order mismatch on "
       "the spending battery, a narrowed definition on shed_400cash) are "
       "corrected in v2; both banks and both runs are released. {#tbl-fidelity}")
