@@ -18,7 +18,7 @@ import urllib.request
 
 import numpy as np
 
-HF_BASE = "https://huggingface.co/datasets/MaxGhenis/hivesight-persona-data/resolve/main"
+HF_BASE = "https://huggingface.co/datasets/MaxGhenis/hivesight-persona-data/resolve/f27f20ae7d9dd255bd9d93b4ffaf3f057685c813"
 DATASET_VERSION = "hivesight-cells:v1"
 REFINE_MIN_SHARE = 0.0025
 SAMPLE_N = 1200

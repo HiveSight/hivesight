@@ -1,7 +1,7 @@
 import type { Cell, GeographyRef, ResponseFormat, SampleRecord } from "./types";
 import { optionIds } from "./types";
 
-export const PROMPT_VERSION = "prompts:v3-expert-cell";
+export const PROMPT_VERSION = "prompts:v4-core-conditional";
 
 /**
  * Expert-predictor framing (not persona roleplay): the model estimates a
@@ -62,7 +62,7 @@ export function cellUserPrompt(
     format.kind === "likert5"
       ? `Survey statement: "${question}"\nEstimate the percentage of the group below choosing each response option.`
       : `Survey question: "${question}"\nEstimate the percentage of the group below choosing each response option.`;
-  return `${stem}
+  return `${stem} Estimate shares among respondents who give a substantive answer; do not allocate any share to don't know or refused.
 
 Group: ${describeCell(cell, geography)}
 

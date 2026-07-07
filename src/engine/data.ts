@@ -6,7 +6,7 @@ import { ageBand, earnedIncomeBand } from "./bands";
 
 export const DATASET_VERSION = "hivesight-cells:v1";
 const HF_BASE =
-  "https://huggingface.co/datasets/MaxGhenis/hivesight-persona-data/resolve/main";
+  "https://huggingface.co/datasets/MaxGhenis/hivesight-persona-data/resolve/f27f20ae7d9dd255bd9d93b4ffaf3f057685c813";
 
 export interface GeographyData {
   table: CellTable;
