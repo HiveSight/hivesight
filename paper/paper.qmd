@@ -247,9 +247,10 @@ for label, key, t, sl in rows:
 Persona is evaluated on its pre-registered 20-item subset; cells and direct
 on all 63 items. {#tbl-pooled}
 
-![Pooled accuracy by arm. Cells is the strongest subgroup estimator; the
-direct estimate remains competitive on toplines, where models can lean on
-memorized aggregates.](figures/fig1-arms.pdf){#fig-arms}
+![Pooled accuracy by arm. Persona role-play (asterisk: evaluated on its
+pre-registered 20-item subset) is not competitive; cells and direct
+estimation tie on marginal accuracy, and the structural comparison in the
+text separates them.](figures/fig1-arms.pdf){#fig-arms}
 
 Confirmatory results (@tbl-pooled, @fig-arms):
 
@@ -298,7 +299,7 @@ into arbitrary audience definitions (any filter over the frame reuses the
 same 149 auditable predictions, where direct estimation needs a fresh
 unverifiable call per audience and cannot credibly target intersections like
 "renting women 30--44 receiving benefits in Michigan"), and expose the
-per-cell predictions that valid-inference machinery consumes (§6.4). Direct
+per-cell predictions that valid-inference machinery consumes (below). Direct
 estimation's topline strength on famous items is also exactly where
 training-data memorization is most plausible, a point the small-area test
 below speaks to.
@@ -391,6 +392,20 @@ else:
 
 ![State-level estimates versus BRFSS 2023 weighted targets, four items,
 49 states.](figures/fig3-states.pdf){#fig-states}
+
+Interpretation requires the right yardstick. These full-sample BRFSS items
+vary only modestly across states, so the national-constant baseline is the
+shrinkage limit any small-area method must beat; cells beat it on two items
+of four and tie the pooled comparison, while per-state direct estimation is
+erratic (16.3 points on smoking history). The positive result is ordering:
+cells rank states with median $\rho = 0.66$ using only each state's
+demographic composition and the state's name in the prompt, at eight coarse
+cells per state. Where state effects are compositional (smoking, exercise),
+cells capture them; where they are contextual beyond demographics
+(health-care affordability), coarse composition is not enough. The full
+frame's income, tenure, and benefits composition — used at national level
+throughout this paper but reduced to age $\times$ sex here for cost —
+is the registered next step for the state experiment.
 
 ## Model variants
 

@@ -1,6 +1,7 @@
 {
  "version": "anchor-analysis-v1",
  "armKeys": [
+  "cells:anthropic:claude-haiku-4-5-20251001",
   "cells:openai:gpt-5-mini",
   "cells:openai:gpt-5.2",
   "naive:openai:gpt-5-mini",
@@ -61,6 +62,18 @@
      "sliceMAE": 0.05952754424949404,
      "sliceSpearman": 0.8333333333333335,
      "sliceN": 8
+    },
+    "cells:anthropic:claude-haiku-4-5-20251001": {
+     "topline": {
+      "estimate": 0.2988043061200396,
+      "human": 0.23616882990397142,
+      "absError": 0.06263547621606819,
+      "signedError": 0.06263547621606819,
+      "tv": 0.06263547621606838
+     },
+     "sliceMAE": 0.06390459290940835,
+     "sliceSpearman": 0.7619047619047621,
+     "sliceN": 8
     }
    }
   },
@@ -104,6 +117,30 @@
       "tv": 0.1512781676446712
      },
      "sliceMAE": 0.12596052291318743,
+     "sliceSpearman": 0.4285714285714286,
+     "sliceN": 8
+    },
+    "cells:openai:gpt-5.2": {
+     "topline": {
+      "estimate": 0.7373085694507665,
+      "human": 0.7222509749087858,
+      "absError": 0.015057594541980746,
+      "signedError": 0.015057594541980746,
+      "tv": 0.059903415598185794
+     },
+     "sliceMAE": 0.0393509935493466,
+     "sliceSpearman": 0.4761904761904762,
+     "sliceN": 8
+    },
+    "cells:anthropic:claude-haiku-4-5-20251001": {
+     "topline": {
+      "estimate": 0.6929890628691115,
+      "human": 0.7222509749087858,
+      "absError": 0.02926191203967421,
+      "signedError": -0.02926191203967421,
+      "tv": 0.10069307200392599
+     },
+     "sliceMAE": 0.05311213832889208,
      "sliceSpearman": 0.4285714285714286,
      "sliceN": 8
     }
@@ -150,6 +187,30 @@
      },
      "sliceMAE": 0.08603538452799543,
      "sliceSpearman": -0.4047619047619048,
+     "sliceN": 8
+    },
+    "cells:openai:gpt-5.2": {
+     "topline": {
+      "estimate": 0.4283762610054209,
+      "human": 0.2296470345555679,
+      "absError": 0.19872922644985302,
+      "signedError": 0.19872922644985302,
+      "tv": 0.19872922644985297
+     },
+     "sliceMAE": 0.1994680624128815,
+     "sliceSpearman": 0.9761904761904763,
+     "sliceN": 8
+    },
+    "cells:anthropic:claude-haiku-4-5-20251001": {
+     "topline": {
+      "estimate": 0.405776039958572,
+      "human": 0.2296470345555679,
+      "absError": 0.17612900540300408,
+      "signedError": 0.17612900540300408,
+      "tv": 0.1761290054030039
+     },
+     "sliceMAE": 0.17665276863173132,
+     "sliceSpearman": 0.9047619047619048,
      "sliceN": 8
     }
    }
@@ -328,6 +389,30 @@
      "sliceMAE": 0.5472568621508433,
      "sliceSpearman": 0.048795003647426664,
      "sliceN": 8
+    },
+    "cells:openai:gpt-5.2": {
+     "topline": {
+      "estimate": 0.5860792404739372,
+      "human": 0.6204515941226038,
+      "absError": 0.03437235364866653,
+      "signedError": -0.03437235364866653,
+      "tv": 0.03437235364866645
+     },
+     "sliceMAE": 0.040467120242352966,
+     "sliceSpearman": 0.6904761904761906,
+     "sliceN": 8
+    },
+    "cells:anthropic:claude-haiku-4-5-20251001": {
+     "topline": {
+      "estimate": 0.49795165851753154,
+      "human": 0.6204515941226038,
+      "absError": 0.12249993560507222,
+      "signedError": -0.12249993560507222,
+      "tv": 0.12249993560507214
+     },
+     "sliceMAE": 0.12819709458913886,
+     "sliceSpearman": 0.6904761904761906,
+     "sliceN": 8
     }
    }
   },
@@ -406,6 +491,30 @@
      "sliceMAE": 0.2403346333237169,
      "sliceSpearman": 0.7425282823862205,
      "sliceN": 8
+    },
+    "cells:openai:gpt-5.2": {
+     "topline": {
+      "estimate": 0.6444998355563417,
+      "human": 0.6684993352804133,
+      "absError": 0.02399949972407156,
+      "signedError": -0.02399949972407156,
+      "tv": 0.02399949972407156
+     },
+     "sliceMAE": 0.041130049632849885,
+     "sliceSpearman": 0.880952380952381,
+     "sliceN": 8
+    },
+    "cells:anthropic:claude-haiku-4-5-20251001": {
+     "topline": {
+      "estimate": 0.5423523191532815,
+      "human": 0.6684993352804133,
+      "absError": 0.12614701612713175,
+      "signedError": -0.12614701612713175,
+      "tv": 0.1261470161271319
+     },
+     "sliceMAE": 0.12409601092957664,
+     "sliceSpearman": 0.7857142857142858,
+     "sliceN": 8
     }
    }
   },
@@ -483,6 +592,30 @@
      },
      "sliceMAE": 0.22095606410217278,
      "sliceSpearman": 0.4637130167514838,
+     "sliceN": 8
+    },
+    "cells:openai:gpt-5.2": {
+     "topline": {
+      "estimate": 0.3216113370250661,
+      "human": 0.24472828806581792,
+      "absError": 0.07688304895924819,
+      "signedError": 0.07688304895924819,
+      "tv": 0.08989648666622302
+     },
+     "sliceMAE": 0.09774756492116177,
+     "sliceSpearman": 0.8571428571428572,
+     "sliceN": 8
+    },
+    "cells:anthropic:claude-haiku-4-5-20251001": {
+     "topline": {
+      "estimate": 0.34864259591414426,
+      "human": 0.24472828806581792,
+      "absError": 0.10391430784832634,
+      "signedError": 0.10391430784832634,
+      "tv": 0.12438626694457647
+     },
+     "sliceMAE": 0.1250327923141833,
+     "sliceSpearman": 0.7142857142857144,
      "sliceN": 8
     }
    }
@@ -760,6 +893,30 @@
      "sliceMAE": 0.32327847881718247,
      "sliceSpearman": 0.664052277510436,
      "sliceN": 8
+    },
+    "cells:openai:gpt-5.2": {
+     "topline": {
+      "estimate": 0.5733484313527225,
+      "human": 0.6801279305263601,
+      "absError": 0.1067794991736376,
+      "signedError": -0.1067794991736376,
+      "tv": 0.10677949917363727
+     },
+     "sliceMAE": 0.1020032711501259,
+     "sliceSpearman": 0.28571428571428575,
+     "sliceN": 8
+    },
+    "cells:anthropic:claude-haiku-4-5-20251001": {
+     "topline": {
+      "estimate": 0.6477316849561836,
+      "human": 0.6801279305263601,
+      "absError": 0.03239624557017651,
+      "signedError": -0.03239624557017651,
+      "tv": 0.1574873769097894
+     },
+     "sliceMAE": 0.058001321802377756,
+     "sliceSpearman": 0.4285714285714286,
+     "sliceN": 8
     }
    }
   },
@@ -1002,6 +1159,30 @@
      },
      "sliceMAE": 0.14939927341595852,
      "sliceSpearman": 0.8263621207201486,
+     "sliceN": 8
+    },
+    "cells:openai:gpt-5.2": {
+     "topline": {
+      "estimate": 0.3692075524704722,
+      "human": 0.2766106906461177,
+      "absError": 0.0925968618243545,
+      "signedError": 0.0925968618243545,
+      "tv": 0.11470465067478526
+     },
+     "sliceMAE": 0.09191526721849085,
+     "sliceSpearman": 0.7142857142857144,
+     "sliceN": 8
+    },
+    "cells:anthropic:claude-haiku-4-5-20251001": {
+     "topline": {
+      "estimate": 0.29617912215796455,
+      "human": 0.2766106906461177,
+      "absError": 0.01956843151184684,
+      "signedError": 0.01956843151184684,
+      "tv": 0.13840231497094369
+     },
+     "sliceMAE": 0.03177864628313476,
+     "sliceSpearman": 0.7857142857142858,
      "sliceN": 8
     }
    }
@@ -1246,6 +1427,30 @@
      "sliceMAE": 0.116256000821334,
      "sliceSpearman": NaN,
      "sliceN": 8
+    },
+    "cells:openai:gpt-5.2": {
+     "topline": {
+      "estimate": 0.1747622884006776,
+      "human": 0.12253698039499435,
+      "absError": 0.052225308005683244,
+      "signedError": 0.052225308005683244,
+      "tv": 0.11151369767176678
+     },
+     "sliceMAE": 0.058478878501757106,
+     "sliceSpearman": 0.3333333333333334,
+     "sliceN": 8
+    },
+    "cells:anthropic:claude-haiku-4-5-20251001": {
+     "topline": {
+      "estimate": 0.13078222922949106,
+      "human": 0.12253698039499435,
+      "absError": 0.008245248834496718,
+      "signedError": 0.008245248834496718,
+      "tv": 0.03429938983937738
+     },
+     "sliceMAE": 0.015087132703854776,
+     "sliceSpearman": 0.3333333333333334,
+     "sliceN": 8
     }
    }
   },
@@ -1323,6 +1528,30 @@
      },
      "sliceMAE": 0.2673038415335338,
      "sliceSpearman": 0.1666666666666667,
+     "sliceN": 8
+    },
+    "cells:openai:gpt-5.2": {
+     "topline": {
+      "estimate": 0.39766635148509305,
+      "human": 0.3697784519630929,
+      "absError": 0.02788789952200016,
+      "signedError": 0.02788789952200016,
+      "tv": 0.06296371667005017
+     },
+     "sliceMAE": 0.04092728974250067,
+     "sliceSpearman": -0.11904761904761905,
+     "sliceN": 8
+    },
+    "cells:anthropic:claude-haiku-4-5-20251001": {
+     "topline": {
+      "estimate": 0.3849882323686379,
+      "human": 0.3697784519630929,
+      "absError": 0.015209780405544993,
+      "signedError": 0.015209780405544993,
+      "tv": 0.05393098372993371
+     },
+     "sliceMAE": 0.031440973429420795,
+     "sliceSpearman": -0.023809523809523815,
      "sliceN": 8
     }
    }
@@ -1600,6 +1829,30 @@
      "sliceMAE": 0.248112940470195,
      "sliceSpearman": NaN,
      "sliceN": 8
+    },
+    "cells:openai:gpt-5.2": {
+     "topline": {
+      "estimate": 0.585569697978426,
+      "human": 0.7606007525790149,
+      "absError": 0.175031054600589,
+      "signedError": -0.175031054600589,
+      "tv": 0.17503105460058893
+     },
+     "sliceMAE": 0.16653101737235582,
+     "sliceSpearman": 0.3571428571428572,
+     "sliceN": 8
+    },
+    "cells:anthropic:claude-haiku-4-5-20251001": {
+     "topline": {
+      "estimate": 0.517843725497208,
+      "human": 0.7606007525790149,
+      "absError": 0.2427570270818069,
+      "signedError": -0.2427570270818069,
+      "tv": 0.24275702708180685
+     },
+     "sliceMAE": 0.2330213215904957,
+     "sliceSpearman": 0.2142857142857143,
+     "sliceN": 8
     }
    }
   },
@@ -1777,6 +2030,30 @@
      "sliceMAE": 0.39397937519020443,
      "sliceSpearman": NaN,
      "sliceN": 8
+    },
+    "cells:openai:gpt-5.2": {
+     "topline": {
+      "estimate": 0.5168492187954092,
+      "human": 0.6126896309760341,
+      "absError": 0.09584041218062489,
+      "signedError": -0.09584041218062489,
+      "tv": 0.09584041218062472
+     },
+     "sliceMAE": 0.1049630340174201,
+     "sliceSpearman": 0.5000000000000001,
+     "sliceN": 8
+    },
+    "cells:anthropic:claude-haiku-4-5-20251001": {
+     "topline": {
+      "estimate": 0.42275102027104283,
+      "human": 0.6126896309760341,
+      "absError": 0.1899386107049913,
+      "signedError": -0.1899386107049913,
+      "tv": 0.18993861070499124
+     },
+     "sliceMAE": 0.1832555421916377,
+     "sliceSpearman": 0.7619047619047621,
+     "sliceN": 8
     }
    }
   },
@@ -1921,6 +2198,30 @@
      "sliceMAE": 0.37765142096006005,
      "sliceSpearman": 0.143607926009361,
      "sliceN": 12
+    },
+    "cells:openai:gpt-5.2": {
+     "topline": {
+      "estimate": 0.5798375904873043,
+      "human": 0.728667221278241,
+      "absError": 0.1488296307909367,
+      "signedError": -0.1488296307909367,
+      "tv": 0.14882963079093658
+     },
+     "sliceMAE": 0.10650908690300197,
+     "sliceSpearman": 0.8461538461538463,
+     "sliceN": 12
+    },
+    "cells:anthropic:claude-haiku-4-5-20251001": {
+     "topline": {
+      "estimate": 0.6307938490819154,
+      "human": 0.728667221278241,
+      "absError": 0.09787337219632564,
+      "signedError": -0.09787337219632564,
+      "tv": 0.09787337219632558
+     },
+     "sliceMAE": 0.08733743100741394,
+     "sliceSpearman": 0.7762237762237763,
+     "sliceN": 12
     }
    }
   },
@@ -1966,6 +2267,30 @@
      "sliceMAE": 0.18111130544053772,
      "sliceSpearman": 0.5413071845204607,
      "sliceN": 11
+    },
+    "cells:openai:gpt-5.2": {
+     "topline": {
+      "estimate": 0.2249278010847642,
+      "human": 0.2306888689580664,
+      "absError": 0.005761067873302189,
+      "signedError": -0.005761067873302189,
+      "tv": 0.03573743974539015
+     },
+     "sliceMAE": 0.03131424407850618,
+     "sliceSpearman": 0.6853146853146854,
+     "sliceN": 12
+    },
+    "cells:anthropic:claude-haiku-4-5-20251001": {
+     "topline": {
+      "estimate": 0.3038298000669792,
+      "human": 0.2306888689580664,
+      "absError": 0.07314093110891279,
+      "signedError": 0.07314093110891279,
+      "tv": 0.14219760401675555
+     },
+     "sliceMAE": 0.10145523301143951,
+     "sliceSpearman": 0.6643356643356644,
+     "sliceN": 12
     }
    }
   },
@@ -2011,6 +2336,30 @@
      "sliceMAE": 0.23957852358149068,
      "sliceSpearman": 0.19965004347642867,
      "sliceN": 12
+    },
+    "cells:openai:gpt-5.2": {
+     "topline": {
+      "estimate": 0.6219079365028419,
+      "human": 0.6273650319733973,
+      "absError": 0.005457095470555395,
+      "signedError": -0.005457095470555395,
+      "tv": 0.0054570954705551455
+     },
+     "sliceMAE": 0.08010039665621055,
+     "sliceSpearman": 0.8531468531468532,
+     "sliceN": 12
+    },
+    "cells:anthropic:claude-haiku-4-5-20251001": {
+     "topline": {
+      "estimate": 0.6493648245321153,
+      "human": 0.6273650319733973,
+      "absError": 0.02199979255871798,
+      "signedError": 0.02199979255871798,
+      "tv": 0.021999792558717868
+     },
+     "sliceMAE": 0.10395531361514954,
+     "sliceSpearman": 0.8601398601398602,
+     "sliceN": 12
     }
    }
   },
@@ -2055,6 +2404,30 @@
      },
      "sliceMAE": 0.32785976550123486,
      "sliceSpearman": 0.6853146853146854,
+     "sliceN": 12
+    },
+    "cells:openai:gpt-5.2": {
+     "topline": {
+      "estimate": 0.4850035905833977,
+      "human": 0.5504060066444076,
+      "absError": 0.06540241606100994,
+      "signedError": -0.06540241606100994,
+      "tv": 0.06540241606100997
+     },
+     "sliceMAE": 0.07632731293185085,
+     "sliceSpearman": 0.8951048951048951,
+     "sliceN": 12
+    },
+    "cells:anthropic:claude-haiku-4-5-20251001": {
+     "topline": {
+      "estimate": 0.4819108121286406,
+      "human": 0.5504060066444076,
+      "absError": 0.06849519451576702,
+      "signedError": -0.06849519451576702,
+      "tv": 0.068495194515767
+     },
+     "sliceMAE": 0.06991996061736759,
+     "sliceSpearman": 0.9160839160839163,
      "sliceN": 12
     }
    }
@@ -2134,6 +2507,30 @@
      "sliceMAE": 0.2919499911024459,
      "sliceSpearman": 0.36363636363636365,
      "sliceN": 11
+    },
+    "cells:openai:gpt-5.2": {
+     "topline": {
+      "estimate": 0.40416468369964514,
+      "human": 0.48258037399876136,
+      "absError": 0.07841569029911621,
+      "signedError": -0.07841569029911621,
+      "tv": 0.1616143493455587
+     },
+     "sliceMAE": 0.09261689726349358,
+     "sliceSpearman": 0.8951048951048951,
+     "sliceN": 12
+    },
+    "cells:anthropic:claude-haiku-4-5-20251001": {
+     "topline": {
+      "estimate": 0.3749697649353646,
+      "human": 0.48258037399876136,
+      "absError": 0.10761060906339676,
+      "signedError": -0.10761060906339676,
+      "tv": 0.18169673664015046
+     },
+     "sliceMAE": 0.09835789929992088,
+     "sliceSpearman": 0.8111888111888113,
+     "sliceN": 12
     }
    }
   },
@@ -2178,6 +2575,30 @@
      },
      "sliceMAE": 0.06317897803194446,
      "sliceSpearman": 0.543835337859028,
+     "sliceN": 12
+    },
+    "cells:openai:gpt-5.2": {
+     "topline": {
+      "estimate": 0.8805159341448514,
+      "human": 0.9351636952187411,
+      "absError": 0.05464776107388969,
+      "signedError": -0.05464776107388969,
+      "tv": 0.054647761073889564
+     },
+     "sliceMAE": 0.04851928047613252,
+     "sliceSpearman": 0.9090909090909092,
+     "sliceN": 12
+    },
+    "cells:anthropic:claude-haiku-4-5-20251001": {
+     "topline": {
+      "estimate": 0.8727258377869023,
+      "human": 0.9351636952187411,
+      "absError": 0.06243785743183883,
+      "signedError": -0.06243785743183883,
+      "tv": 0.062437857431838835
+     },
+     "sliceMAE": 0.0496394915766146,
+     "sliceSpearman": 0.7132867132867133,
      "sliceN": 12
     }
    }
@@ -2257,6 +2678,30 @@
      "sliceMAE": 0.22795201132689544,
      "sliceSpearman": 0.1619758474969197,
      "sliceN": 12
+    },
+    "cells:openai:gpt-5.2": {
+     "topline": {
+      "estimate": 0.5440894584553068,
+      "human": 0.5959693016605033,
+      "absError": 0.05187984320519656,
+      "signedError": -0.05187984320519656,
+      "tv": 0.05187984320519662
+     },
+     "sliceMAE": 0.10822928315496157,
+     "sliceSpearman": 0.6433566433566434,
+     "sliceN": 12
+    },
+    "cells:anthropic:claude-haiku-4-5-20251001": {
+     "topline": {
+      "estimate": 0.5964877784460287,
+      "human": 0.5959693016605033,
+      "absError": 0.0005184767855254124,
+      "signedError": 0.0005184767855254124,
+      "tv": 0.0005184767855256622
+     },
+     "sliceMAE": 0.10216282232417646,
+     "sliceSpearman": 0.6573426573426573,
+     "sliceN": 12
     }
    }
   },
@@ -2335,11 +2780,43 @@
      "sliceMAE": 0.41001343123432027,
      "sliceSpearman": 0.5384615384615385,
      "sliceN": 12
+    },
+    "cells:openai:gpt-5.2": {
+     "topline": {
+      "estimate": 0.30226613315882844,
+      "human": 0.18737877157451166,
+      "absError": 0.11488736158431678,
+      "signedError": 0.11488736158431678,
+      "tv": 0.11488736158431662
+     },
+     "sliceMAE": 0.1169012689552567,
+     "sliceSpearman": 0.8391608391608393,
+     "sliceN": 12
+    },
+    "cells:anthropic:claude-haiku-4-5-20251001": {
+     "topline": {
+      "estimate": 0.300572905947618,
+      "human": 0.18737877157451166,
+      "absError": 0.11319413437310633,
+      "signedError": 0.11319413437310633,
+      "tv": 0.11319413437310638
+     },
+     "sliceMAE": 0.11802117680605634,
+     "sliceSpearman": 0.7832167832167832,
+     "sliceN": 12
     }
    }
   }
  },
  "pooled": {
+  "cells:anthropic:claude-haiku-4-5-20251001": {
+   "items": 20,
+   "toplineMAE": 0.08369866826908653,
+   "sliceMAE": 0.09772148319809953,
+   "toplineMAE_subset20": 0.08369866826908653,
+   "sliceMAE_subset20": 0.09772148319809953,
+   "medianSliceSpearman": 0.7380952380952382
+  },
   "cells:openai:gpt-5-mini": {
    "items": 63,
    "toplineMAE": 0.0917876385422794,
@@ -2349,12 +2826,12 @@
    "medianSliceSpearman": 0.6190476190476191
   },
   "cells:openai:gpt-5.2": {
-   "items": 1,
-   "toplineMAE": 0.05888215455963236,
-   "sliceMAE": 0.05952754424949404,
-   "toplineMAE_subset20": 0.05888215455963236,
-   "sliceMAE_subset20": 0.05952754424949404,
-   "medianSliceSpearman": 0.8333333333333335
+   "items": 20,
+   "toplineMAE": 0.07417828897743325,
+   "sliceMAE": 0.08515139317150756,
+   "toplineMAE_subset20": 0.07417828897743325,
+   "sliceMAE_subset20": 0.08515139317150756,
+   "medianSliceSpearman": 0.773809523809524
   },
   "naive:openai:gpt-5-mini": {
    "items": 63,

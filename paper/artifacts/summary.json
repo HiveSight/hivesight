@@ -1,0 +1,152 @@
+{
+ "generatedFrom": [
+  "anchor-analysis.json",
+  "brfss-state-targets.json",
+  "ppi.json",
+  "rf-baseline.json"
+ ],
+ "pilot": {
+  "naive": {
+   "topline": 0.09350000000000001,
+   "slice": 0.0675
+  },
+  "persona": {
+   "topline": 0.36552535929655705,
+   "slice": 0.23010027917800294
+  },
+  "cells": {
+   "topline": 0.17025075611215773,
+   "slice": 0.062057000362537876
+  }
+ },
+ "anchor": {
+  "cells:anthropic:claude-haiku-4-5-20251001": {
+   "items": 20,
+   "toplineMAE": 0.08369866826908653,
+   "sliceMAE": 0.09772148319809953,
+   "toplineMAE_subset20": 0.08369866826908653,
+   "sliceMAE_subset20": 0.09772148319809953,
+   "medianSliceSpearman": 0.7380952380952382
+  },
+  "cells:openai:gpt-5-mini": {
+   "items": 63,
+   "toplineMAE": 0.0917876385422794,
+   "sliceMAE": 0.09841447823621598,
+   "toplineMAE_subset20": 0.10067983674252856,
+   "sliceMAE_subset20": 0.10115552899324134,
+   "medianSliceSpearman": 0.6190476190476191
+  },
+  "cells:openai:gpt-5.2": {
+   "items": 20,
+   "toplineMAE": 0.07417828897743325,
+   "sliceMAE": 0.08515139317150756,
+   "toplineMAE_subset20": 0.07417828897743325,
+   "sliceMAE_subset20": 0.08515139317150756,
+   "medianSliceSpearman": 0.773809523809524
+  },
+  "naive:openai:gpt-5-mini": {
+   "items": 63,
+   "toplineMAE": 0.08618251989443453,
+   "sliceMAE": 0.09840935341300004,
+   "toplineMAE_subset20": 0.07521414378851345,
+   "sliceMAE_subset20": 0.08964783531287532,
+   "medianSliceSpearman": 0.48196269271187986
+  },
+  "persona:openai:gpt-5-mini": {
+   "items": 20,
+   "toplineMAE": 0.2503477121330608,
+   "sliceMAE": 0.2496375880081127,
+   "toplineMAE_subset20": 0.2503477121330608,
+   "sliceMAE_subset20": 0.2496375880081127,
+   "medianSliceSpearman": NaN
+  }
+ },
+ "hypotheses": {
+  "H1_cells_vs_naive_subgroups": {
+   "items": 63,
+   "cellsSliceMAE": 0.09841447823621598,
+   "naiveSliceMAE": 0.09840935341300004,
+   "wilcoxonP": 0.9726933289538101,
+   "supported": false
+  },
+  "H2_cells_vs_persona_subgroups": {
+   "items": 20,
+   "cellsSliceMAE": 0.10115552899324134,
+   "personaSliceMAE": 0.2496375880081127
+  },
+  "H3_persona_topline": {
+   "personaToplineMAE": 0.2503477121330608,
+   "cellsToplineMAE": 0.10067983674252856
+  },
+  "H4_valence_signed_error": {
+   "positive": {
+    "mean": -0.0363534058316828,
+    "n": 16
+   },
+   "neutral": {
+    "mean": -0.03433513392028573,
+    "n": 44
+   },
+   "negative": {
+    "mean": 0.08813002801003327,
+    "n": 3
+   }
+  },
+  "H5_rank_correlation": {
+   "median": 0.6190476190476191,
+   "items": 63
+  }
+ },
+ "nItems": 63,
+ "ppi": {
+  "items": 63,
+  "meanCoveragePPI": 0.9468571428571428,
+  "meanCoverageHuman": 0.9486349206349206,
+  "medianWidthRatio": 0.9982432301300138,
+  "shareItemsPPINarrower": 0.5714285714285714,
+  "meanLlmRawAbsError": 0.09164263698503626
+ },
+ "rf": {
+  "toplineMAE": 0.01014821580036343,
+  "sliceMAE": 0.017189708472248273,
+  "items": 63
+ },
+ "brfss": {
+  "items": {
+   "brfss_genhlth": {
+    "maeCells": 0.093457588786872,
+    "maeNaive": 0.060348480854075674,
+    "maeNationalConst": 0.06729159574555997,
+    "spearman": 0.6998979591836734,
+    "states": 49
+   },
+   "brfss_exerany": {
+    "maeCells": 0.08433489812738992,
+    "maeNaive": 0.10361049169148114,
+    "maeNationalConst": 0.08172693732150764,
+    "spearman": 0.7033673469387755,
+    "states": 49
+   },
+   "brfss_medcost": {
+    "maeCells": 0.09615944601812322,
+    "maeNaive": 0.06074454963054498,
+    "maeNationalConst": 0.1111029961972865,
+    "spearman": 0.46336734693877546,
+    "states": 49
+   },
+   "brfss_smoke100": {
+    "maeCells": 0.05101481270776523,
+    "maeNaive": 0.16325302792025667,
+    "maeNationalConst": 0.05279238695459104,
+    "spearman": 0.618469387755102,
+    "states": 49
+   }
+  },
+  "pooled": {
+   "maeCells": 0.0812416864100376,
+   "maeNaive": 0.09698913752408961,
+   "maeNationalConst": 0.07822847905473629,
+   "medianSpearman": 0.6591836734693877
+  }
+ }
+}
