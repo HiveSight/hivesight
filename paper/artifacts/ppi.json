@@ -1,0 +1,647 @@
+{
+ "version": "ppi-v1",
+ "anchorN": 200,
+ "replicates": 500,
+ "model": "gpt-5-mini",
+ "granularity": "age_band x sex groups from cell predictions",
+ "pooled": {
+  "items": 63,
+  "meanCoveragePPI": 0.9468571428571428,
+  "meanCoverageHuman": 0.9486349206349206,
+  "medianWidthRatio": 0.9982432301300138,
+  "shareItemsPPINarrower": 0.5714285714285714,
+  "meanLlmRawAbsError": 0.09164263698503626
+ },
+ "items": {
+  "gss_happy": {
+   "thetaTrue": 0.23571099798984876,
+   "llmRaw": 0.29079061561935354,
+   "llmRawAbsError": 0.05507961762950478,
+   "coveragePPI": 0.938,
+   "coverageHuman": 0.94,
+   "medianWidthPPI": 0.11860163940001082,
+   "medianWidthHuman": 0.11782139963120142,
+   "widthRatio": 1.0066222245810326
+  },
+  "gss_health": {
+   "thetaTrue": 0.722134409147569,
+   "llmRaw": 0.6204365117127635,
+   "llmRawAbsError": 0.1016978974348055,
+   "coveragePPI": 0.946,
+   "coverageHuman": 0.936,
+   "medianWidthPPI": 0.12603629409080364,
+   "medianWidthHuman": 0.12476845368592127,
+   "widthRatio": 1.0101615461875795
+  },
+  "gss_satfin": {
+   "thetaTrue": 0.23004958151489258,
+   "llmRaw": 0.36481696716142914,
+   "llmRawAbsError": 0.13476738564653656,
+   "coveragePPI": 0.958,
+   "coverageHuman": 0.952,
+   "medianWidthPPI": 0.11495464133744257,
+   "medianWidthHuman": 0.1160383752153272,
+   "widthRatio": 0.9906605562524157
+  },
+  "gss_finrela": {
+   "thetaTrue": 0.276959281197759,
+   "llmRaw": 0.22784957890139157,
+   "llmRawAbsError": 0.04910970229636741,
+   "coveragePPI": 0.952,
+   "coverageHuman": 0.954,
+   "medianWidthPPI": 0.12350525362819957,
+   "medianWidthHuman": 0.12407802699881876,
+   "widthRatio": 0.9953837646803922
+  },
+  "gss_getahead": {
+   "thetaTrue": 0.6480873414159972,
+   "llmRaw": 0.437396671970894,
+   "llmRawAbsError": 0.21069066944510323,
+   "coveragePPI": 0.966,
+   "coverageHuman": 0.966,
+   "medianWidthPPI": 0.13338732765326822,
+   "medianWidthHuman": 0.13254099583860635,
+   "widthRatio": 1.0063854342523006
+  },
+  "gss_class": {
+   "thetaTrue": 0.49672919603464366,
+   "llmRaw": 0.44312195392317916,
+   "llmRawAbsError": 0.053607242111464504,
+   "coveragePPI": 0.96,
+   "coverageHuman": 0.962,
+   "medianWidthPPI": 0.13635495788801041,
+   "medianWidthHuman": 0.138829519112055,
+   "widthRatio": 0.9821755399005073
+  },
+  "gss_fear": {
+   "thetaTrue": 0.3308113220945936,
+   "llmRaw": 0.3859002900538975,
+   "llmRawAbsError": 0.0550889679593039,
+   "coveragePPI": 0.944,
+   "coverageHuman": 0.954,
+   "medianWidthPPI": 0.12895112414735332,
+   "medianWidthHuman": 0.13066338354334384,
+   "widthRatio": 0.9868956447509832
+  },
+  "gss_cappun": {
+   "thetaTrue": 0.6207554036932019,
+   "llmRaw": 0.6125722929970502,
+   "llmRawAbsError": 0.00818311069615174,
+   "coveragePPI": 0.958,
+   "coverageHuman": 0.964,
+   "medianWidthPPI": 0.13454360534015308,
+   "medianWidthHuman": 0.13487988030300424,
+   "widthRatio": 0.9975068560107281
+  },
+  "gss_gunlaw": {
+   "thetaTrue": 0.6888058651328657,
+   "llmRaw": 0.6300865588597404,
+   "llmRawAbsError": 0.05871930627312527,
+   "coveragePPI": 0.938,
+   "coverageHuman": 0.936,
+   "medianWidthPPI": 0.12870845009314769,
+   "medianWidthHuman": 0.12851828487705053,
+   "widthRatio": 1.0014796744002543
+  },
+  "gss_grass": {
+   "thetaTrue": 0.6681332268321726,
+   "llmRaw": 0.6077041856288382,
+   "llmRawAbsError": 0.060429041203334366,
+   "coveragePPI": 0.938,
+   "coverageHuman": 0.94,
+   "medianWidthPPI": 0.13041686934376084,
+   "medianWidthHuman": 0.13066338354334373,
+   "widthRatio": 0.9981133643343844
+  },
+  "gss_courts": {
+   "thetaTrue": 0.6001262874319762,
+   "llmRaw": 0.3547099796343712,
+   "llmRawAbsError": 0.24541630779760498,
+   "coveragePPI": 0.964,
+   "coverageHuman": 0.966,
+   "medianWidthPPI": 0.13793418298814775,
+   "medianWidthHuman": 0.13613354365674435,
+   "widthRatio": 1.013227006974443
+  },
+  "gss_trust": {
+   "thetaTrue": 0.24497382064314163,
+   "llmRaw": 0.342652903235936,
+   "llmRawAbsError": 0.09767908259279437,
+   "coveragePPI": 0.962,
+   "coverageHuman": 0.95,
+   "medianWidthPPI": 0.11930329003315783,
+   "medianWidthHuman": 0.11951324730508761,
+   "widthRatio": 0.9982432301300138
+  },
+  "gss_fair": {
+   "thetaTrue": 0.4169293913852248,
+   "llmRaw": 0.4773999926516847,
+   "llmRawAbsError": 0.06047060126645992,
+   "coveragePPI": 0.948,
+   "coverageHuman": 0.948,
+   "medianWidthPPI": 0.13555859873960122,
+   "medianWidthHuman": 0.13715074492750978,
+   "widthRatio": 0.9883912683904846
+  },
+  "gss_helpful": {
+   "thetaTrue": 0.378785406291447,
+   "llmRaw": 0.49989895214654007,
+   "llmRawAbsError": 0.12111354585509304,
+   "coveragePPI": 0.942,
+   "coverageHuman": 0.942,
+   "medianWidthPPI": 0.13367416211071992,
+   "medianWidthHuman": 0.13487988030300424,
+   "widthRatio": 0.9910608002500024
+  },
+  "gss_satjob": {
+   "thetaTrue": 0.4516679121384121,
+   "llmRaw": 0.22896613614690428,
+   "llmRawAbsError": 0.22270177599150784,
+   "coveragePPI": 0.954,
+   "coverageHuman": 0.96,
+   "medianWidthPPI": 0.13734714185431288,
+   "medianWidthHuman": 0.1382442671033221,
+   "widthRatio": 0.9935105790076725
+  },
+  "gss_spanking": {
+   "thetaTrue": 0.541919479058689,
+   "llmRaw": 0.5116578448747998,
+   "llmRawAbsError": 0.030261634183889163,
+   "coveragePPI": 0.952,
+   "coverageHuman": 0.948,
+   "medianWidthPPI": 0.13825305435418545,
+   "medianWidthHuman": 0.1384953922278344,
+   "widthRatio": 0.9982502098463297
+  },
+  "gss_sexeduc": {
+   "thetaTrue": 0.8659995956930552,
+   "llmRaw": 0.7503922765426442,
+   "llmRawAbsError": 0.115607319150411,
+   "coveragePPI": 0.944,
+   "coverageHuman": 0.944,
+   "medianWidthPPI": 0.09354738648212202,
+   "medianWidthHuman": 0.09345248006420559,
+   "widthRatio": 1.0010155580445936
+  },
+  "gss_divlaw": {
+   "thetaTrue": 0.5122708062599522,
+   "llmRaw": 0.4094913831274866,
+   "llmRawAbsError": 0.10277942313246563,
+   "coveragePPI": 0.944,
+   "coverageHuman": 0.96,
+   "medianWidthPPI": 0.13535376054250692,
+   "medianWidthHuman": 0.13876693160307557,
+   "widthRatio": 0.9754035704246053
+  },
+  "gss_fepol": {
+   "thetaTrue": 0.8180509765270831,
+   "llmRaw": 0.7839383283096399,
+   "llmRawAbsError": 0.0341126482174432,
+   "coveragePPI": 0.942,
+   "coverageHuman": 0.936,
+   "medianWidthPPI": 0.10789539697397255,
+   "medianWidthHuman": 0.10790068390858187,
+   "widthRatio": 0.9999510018433821
+  },
+  "gss_fefam": {
+   "thetaTrue": 0.6801311454547548,
+   "llmRaw": 0.5646943499125512,
+   "llmRawAbsError": 0.11543679554220365,
+   "coveragePPI": 0.954,
+   "coverageHuman": 0.958,
+   "medianWidthPPI": 0.132644354014279,
+   "medianWidthHuman": 0.12962506116647377,
+   "widthRatio": 1.023292508567673
+  },
+  "gss_fechld": {
+   "thetaTrue": 0.7461410677083893,
+   "llmRaw": 0.6321800955570557,
+   "llmRawAbsError": 0.1139609721513336,
+   "coveragePPI": 0.952,
+   "coverageHuman": 0.96,
+   "medianWidthPPI": 0.12025007118008069,
+   "medianWidthHuman": 0.12111773913704105,
+   "widthRatio": 0.9928361612168254
+  },
+  "gss_fepresch": {
+   "thetaTrue": 0.6782060192559991,
+   "llmRaw": 0.6221566562002615,
+   "llmRawAbsError": 0.0560493630557376,
+   "coveragePPI": 0.95,
+   "coverageHuman": 0.946,
+   "medianWidthPPI": 0.129182407934468,
+   "medianWidthHuman": 0.12962506116647377,
+   "widthRatio": 0.9965851261475026
+  },
+  "gss_helppoor": {
+   "thetaTrue": 0.3858119089027311,
+   "llmRaw": 0.518996396903807,
+   "llmRawAbsError": 0.13318448800107585,
+   "coveragePPI": 0.92,
+   "coverageHuman": 0.924,
+   "medianWidthPPI": 0.13474547293645744,
+   "medianWidthHuman": 0.13521580294785873,
+   "widthRatio": 0.9965216342975631
+  },
+  "gss_helpsick": {
+   "thetaTrue": 0.5323356778361006,
+   "llmRaw": 0.5758380170239955,
+   "llmRawAbsError": 0.04350233918789492,
+   "coveragePPI": 0.962,
+   "coverageHuman": 0.964,
+   "medianWidthPPI": 0.13927515221136932,
+   "medianWidthHuman": 0.13859989340638512,
+   "widthRatio": 1.0048720008968859
+  },
+  "gss_helpnot": {
+   "thetaTrue": 0.3274184813732498,
+   "llmRaw": 0.4904252055112734,
+   "llmRawAbsError": 0.16300672413802358,
+   "coveragePPI": 0.938,
+   "coverageHuman": 0.944,
+   "medianWidthPPI": 0.129704743801822,
+   "medianWidthHuman": 0.13066338354334384,
+   "widthRatio": 0.9926632870240665
+  },
+  "gss_eqwlth": {
+   "thetaTrue": 0.5294947252374697,
+   "llmRaw": 0.5285250134857851,
+   "llmRawAbsError": 0.0009697117516845877,
+   "coveragePPI": 0.942,
+   "coverageHuman": 0.938,
+   "medianWidthPPI": 0.1365167567800591,
+   "medianWidthHuman": 0.13859989340638507,
+   "widthRatio": 0.9849701426521443
+  },
+  "gss_polviews": {
+   "thetaTrue": 0.27710760134231815,
+   "llmRaw": 0.3152926783227483,
+   "llmRawAbsError": 0.038185076980430166,
+   "coveragePPI": 0.942,
+   "coverageHuman": 0.954,
+   "medianWidthPPI": 0.1264853006749514,
+   "medianWidthHuman": 0.12407802699881876,
+   "widthRatio": 1.019401289127168
+  },
+  "gss_confinan": {
+   "thetaTrue": 0.17348825786830913,
+   "llmRaw": 0.23764546046444712,
+   "llmRawAbsError": 0.064157202596138,
+   "coveragePPI": 0.946,
+   "coverageHuman": 0.956,
+   "medianWidthPPI": 0.10594875323127526,
+   "medianWidthHuman": 0.10558580306577786,
+   "widthRatio": 1.003437490220833
+  },
+  "gss_conbus": {
+   "thetaTrue": 0.1509937994566376,
+   "llmRaw": 0.15631260551735288,
+   "llmRawAbsError": 0.005318806060715275,
+   "coveragePPI": 0.936,
+   "coverageHuman": 0.936,
+   "medianWidthPPI": 0.09936948399370579,
+   "medianWidthHuman": 0.09922351804216234,
+   "widthRatio": 1.0014710822033284
+  },
+  "gss_coneduc": {
+   "thetaTrue": 0.19936723699270695,
+   "llmRaw": 0.20904239383594198,
+   "llmRawAbsError": 0.009675156843235028,
+   "coveragePPI": 0.934,
+   "coverageHuman": 0.942,
+   "medianWidthPPI": 0.11136318050110461,
+   "medianWidthHuman": 0.11115257294530712,
+   "widthRatio": 1.0018947609597946
+  },
+  "gss_conpress": {
+   "thetaTrue": 0.07747643153696988,
+   "llmRaw": 0.08804849988520308,
+   "llmRawAbsError": 0.010572068348233196,
+   "coveragePPI": 0.954,
+   "coverageHuman": 0.954,
+   "medianWidthPPI": 0.07511195719575214,
+   "medianWidthHuman": 0.07538734281884743,
+   "widthRatio": 0.99634705757229
+  },
+  "gss_conmedic": {
+   "thetaTrue": 0.2650772326196418,
+   "llmRaw": 0.3563937344579516,
+   "llmRawAbsError": 0.0913165018383098,
+   "coveragePPI": 0.944,
+   "coverageHuman": 0.948,
+   "medianWidthPPI": 0.12304387741698544,
+   "medianWidthHuman": 0.12263830383627783,
+   "widthRatio": 1.0033070710212126
+  },
+  "gss_conarmy": {
+   "thetaTrue": 0.4343373345309055,
+   "llmRaw": 0.47447707406172895,
+   "llmRawAbsError": 0.04013973953082345,
+   "coveragePPI": 0.952,
+   "coverageHuman": 0.95,
+   "medianWidthPPI": 0.13736732223690276,
+   "medianWidthHuman": 0.13776166440960458,
+   "widthRatio": 0.9971375042948862
+  },
+  "gss_confed": {
+   "thetaTrue": 0.12268108793447538,
+   "llmRaw": 0.12341050537065976,
+   "llmRawAbsError": 0.0007294174361843764,
+   "coveragePPI": 0.944,
+   "coverageHuman": 0.96,
+   "medianWidthPPI": 0.09150752979146509,
+   "medianWidthHuman": 0.09190064549945275,
+   "widthRatio": 0.9957223836040412
+  },
+  "gss_conjudge": {
+   "thetaTrue": 0.18522179344438738,
+   "llmRaw": 0.13756679091341317,
+   "llmRawAbsError": 0.04765500253097421,
+   "coveragePPI": 0.946,
+   "coverageHuman": 0.942,
+   "medianWidthPPI": 0.10806491343708907,
+   "medianWidthHuman": 0.10790068390858187,
+   "widthRatio": 1.0015220434436387
+  },
+  "gss_consci": {
+   "thetaTrue": 0.36941002061453304,
+   "llmRaw": 0.31050086242545005,
+   "llmRawAbsError": 0.05890915818908299,
+   "coveragePPI": 0.952,
+   "coverageHuman": 0.95,
+   "medianWidthPPI": 0.13440271250657315,
+   "medianWidthHuman": 0.13416235270902976,
+   "widthRatio": 1.0017915592018924
+  },
+  "gss_conlegis": {
+   "thetaTrue": 0.05701560800281394,
+   "llmRaw": 0.06303297632985325,
+   "llmRawAbsError": 0.0060173683270393075,
+   "coveragePPI": 0.922,
+   "coverageHuman": 0.922,
+   "medianWidthPPI": 0.06338482167946752,
+   "medianWidthHuman": 0.06335148183946672,
+   "widthRatio": 1.0005262677214921
+  },
+  "gss_natspac": {
+   "thetaTrue": 0.19811769007771377,
+   "llmRaw": 0.2621132357473328,
+   "llmRawAbsError": 0.06399554566961904,
+   "coveragePPI": 0.946,
+   "coverageHuman": 0.956,
+   "medianWidthPPI": 0.11273642113390292,
+   "medianWidthHuman": 0.11115257294530712,
+   "widthRatio": 1.0142493164721895
+  },
+  "gss_natenvir": {
+   "thetaTrue": 0.6626658579279323,
+   "llmRaw": 0.491929060664175,
+   "llmRawAbsError": 0.1707367972637573,
+   "coveragePPI": 0.944,
+   "coverageHuman": 0.942,
+   "medianWidthPPI": 0.12976938488435585,
+   "medianWidthHuman": 0.13115738675538835,
+   "widthRatio": 0.9894172802205861
+  },
+  "gss_natheal": {
+   "thetaTrue": 0.7359303518234778,
+   "llmRaw": 0.5711449833573621,
+   "llmRawAbsError": 0.1647853684661157,
+   "coveragePPI": 0.948,
+   "coverageHuman": 0.952,
+   "medianWidthPPI": 0.12125471453109848,
+   "medianWidthHuman": 0.12188831200330519,
+   "widthRatio": 0.9948018192901915
+  },
+  "gss_natcity": {
+   "thetaTrue": 0.5706019680265717,
+   "llmRaw": 0.4203101041683974,
+   "llmRawAbsError": 0.15029186385817428,
+   "coveragePPI": 0.934,
+   "coverageHuman": 0.934,
+   "medianWidthPPI": 0.13890420208018373,
+   "medianWidthHuman": 0.13736874045528458,
+   "widthRatio": 1.0111776639999037
+  },
+  "gss_natcrime": {
+   "thetaTrue": 0.6894137904641083,
+   "llmRaw": 0.5204363161500518,
+   "llmRawAbsError": 0.16897747431405652,
+   "coveragePPI": 0.962,
+   "coverageHuman": 0.954,
+   "medianWidthPPI": 0.13102580708863643,
+   "medianWidthHuman": 0.12851828487705053,
+   "widthRatio": 1.0195110152145648
+  },
+  "gss_natdrug": {
+   "thetaTrue": 0.6805598149853732,
+   "llmRaw": 0.5363590754868471,
+   "llmRawAbsError": 0.14420073949852608,
+   "coveragePPI": 0.938,
+   "coverageHuman": 0.94,
+   "medianWidthPPI": 0.12978017102466355,
+   "medianWidthHuman": 0.12962506116647377,
+   "widthRatio": 1.001196603934409
+  },
+  "gss_nateduc": {
+   "thetaTrue": 0.7606018727402932,
+   "llmRaw": 0.5735859412885284,
+   "llmRawAbsError": 0.18701593145176487,
+   "coveragePPI": 0.956,
+   "coverageHuman": 0.95,
+   "medianWidthPPI": 0.11932805213213593,
+   "medianWidthHuman": 0.11867847192516612,
+   "widthRatio": 1.0054734459959966
+  },
+  "gss_natarms": {
+   "thetaTrue": 0.30212815875892907,
+   "llmRaw": 0.37248507257754826,
+   "llmRawAbsError": 0.0703569138186192,
+   "coveragePPI": 0.938,
+   "coverageHuman": 0.94,
+   "medianWidthPPI": 0.1305128755687487,
+   "medianWidthHuman": 0.12793867563648642,
+   "widthRatio": 1.0201205766704695
+  },
+  "gss_nataid": {
+   "thetaTrue": 0.09572104904333942,
+   "llmRaw": 0.20951317830135707,
+   "llmRawAbsError": 0.11379212925801765,
+   "coveragePPI": 0.95,
+   "coverageHuman": 0.944,
+   "medianWidthPPI": 0.08102307855973687,
+   "medianWidthHuman": 0.08147898702508005,
+   "widthRatio": 0.9944045884467998
+  },
+  "gss_natfare": {
+   "thetaTrue": 0.33650653406672265,
+   "llmRaw": 0.3331983248552878,
+   "llmRawAbsError": 0.003308209211434876,
+   "coveragePPI": 0.942,
+   "coverageHuman": 0.94,
+   "medianWidthPPI": 0.13056895621985554,
+   "medianWidthHuman": 0.13115738675538835,
+   "widthRatio": 0.9955135539820548
+  },
+  "gss_natroad": {
+   "thetaTrue": 0.5236812357579186,
+   "llmRaw": 0.520752987106119,
+   "llmRawAbsError": 0.0029282486517996364,
+   "coveragePPI": 0.958,
+   "coverageHuman": 0.96,
+   "medianWidthPPI": 0.14018607595462282,
+   "medianWidthHuman": 0.13869039740248157,
+   "widthRatio": 1.0107842978328252
+  },
+  "gss_natsoc": {
+   "thetaTrue": 0.6126793698491309,
+   "llmRaw": 0.4222002087849713,
+   "llmRawAbsError": 0.19047916106415957,
+   "coveragePPI": 0.95,
+   "coverageHuman": 0.948,
+   "medianWidthPPI": 0.13530437452588495,
+   "medianWidthHuman": 0.13521580294785873,
+   "widthRatio": 1.0006550386574296
+  },
+  "gss_natchld": {
+   "thetaTrue": 0.6267657720465012,
+   "llmRaw": 0.5223170943195484,
+   "llmRawAbsError": 0.10444867772695277,
+   "coveragePPI": 0.956,
+   "coverageHuman": 0.958,
+   "medianWidthPPI": 0.1365992591073939,
+   "medianWidthHuman": 0.13416235270902965,
+   "widthRatio": 1.0181638615390816
+  },
+  "gss_natsci": {
+   "thetaTrue": 0.4019043653096325,
+   "llmRaw": 0.5444440209828222,
+   "llmRawAbsError": 0.14253965567318966,
+   "coveragePPI": 0.938,
+   "coverageHuman": 0.948,
+   "medianWidthPPI": 0.13755931506325358,
+   "medianWidthHuman": 0.13613354365674435,
+   "widthRatio": 1.010473329116476
+  },
+  "gss_natenrgy": {
+   "thetaTrue": 0.48556563293014304,
+   "llmRaw": 0.558939005288221,
+   "llmRawAbsError": 0.073373372358078,
+   "coveragePPI": 0.938,
+   "coverageHuman": 0.926,
+   "medianWidthPPI": 0.14091277086349002,
+   "medianWidthHuman": 0.13876693160307557,
+   "widthRatio": 1.0154636211640993
+  },
+  "shed_b2": {
+   "thetaTrue": 0.728667221278241,
+   "llmRaw": 0.5156770808099712,
+   "llmRawAbsError": 0.2129901404682698,
+   "coveragePPI": 0.958,
+   "coverageHuman": 0.958,
+   "medianWidthPPI": 0.12125218204163446,
+   "medianWidthHuman": 0.12336808999145887,
+   "widthRatio": 0.9828488229819323
+  },
+  "shed_b3": {
+   "thetaTrue": 0.23068886895806637,
+   "llmRaw": 0.20552869486290276,
+   "llmRawAbsError": 0.025160174095163607,
+   "coveragePPI": 0.934,
+   "coverageHuman": 0.934,
+   "medianWidthPPI": 0.11667053299292506,
+   "medianWidthHuman": 0.11694154017754116,
+   "widthRatio": 0.9976825413432673
+  },
+  "shed_400cash": {
+   "thetaTrue": 0.6273650319733974,
+   "llmRaw": 0.5823550649451805,
+   "llmRawAbsError": 0.04500996702821691,
+   "coveragePPI": 0.94,
+   "coverageHuman": 0.942,
+   "medianWidthPPI": 0.13176421052623255,
+   "medianWidthHuman": 0.13416235270902965,
+   "widthRatio": 0.9821250735815719
+  },
+  "shed_ef1": {
+   "thetaTrue": 0.5504060066444075,
+   "llmRaw": 0.3779123611273834,
+   "llmRawAbsError": 0.17249364551702412,
+   "coveragePPI": 0.942,
+   "coverageHuman": 0.946,
+   "medianWidthPPI": 0.13417986769596668,
+   "medianWidthHuman": 0.13824426710332216,
+   "widthRatio": 0.9705998701246845
+  },
+  "shed_ef2": {
+   "thetaTrue": 0.3323190077574487,
+   "llmRaw": 0.414233140618068,
+   "llmRawAbsError": 0.08191413286061927,
+   "coveragePPI": 0.96,
+   "coverageHuman": 0.958,
+   "medianWidthPPI": 0.13017571572297199,
+   "medianWidthHuman": 0.13115738675538835,
+   "widthRatio": 0.9925153202827439
+  },
+  "shed_ef7": {
+   "thetaTrue": 0.48258037399876136,
+   "llmRaw": 0.24189013133321993,
+   "llmRawAbsError": 0.24069024266554143,
+   "coveragePPI": 0.94,
+   "coverageHuman": 0.946,
+   "medianWidthPPI": 0.13581509499974115,
+   "medianWidthHuman": 0.13876693160307552,
+   "widthRatio": 0.9787280977590705
+  },
+  "shed_bk1": {
+   "thetaTrue": 0.9351636952187411,
+   "llmRaw": 0.8917675515137996,
+   "llmRawAbsError": 0.04339614370494149,
+   "coveragePPI": 0.958,
+   "coverageHuman": 0.96,
+   "medianWidthPPI": 0.0680485749362274,
+   "medianWidthHuman": 0.06850495928935496,
+   "widthRatio": 0.9933379370214664
+  },
+  "shed_bnpl": {
+   "thetaTrue": 0.14683266602527706,
+   "llmRaw": 0.2359729365570997,
+   "llmRawAbsError": 0.08914027053182264,
+   "coveragePPI": 0.95,
+   "coverageHuman": 0.956,
+   "medianWidthPPI": 0.09919067514162228,
+   "medianWidthHuman": 0.09922351804216234,
+   "widthRatio": 0.9996690008458871
+  },
+  "shed_work": {
+   "thetaTrue": 0.5959693016605033,
+   "llmRaw": 0.5143567513456794,
+   "llmRawAbsError": 0.08161255031482395,
+   "coveragePPI": 0.956,
+   "coverageHuman": 0.972,
+   "medianWidthPPI": 0.12317685092962216,
+   "medianWidthHuman": 0.13613354365674435,
+   "widthRatio": 0.9048236578650152
+  },
+  "shed_i41d": {
+   "thetaTrue": 0.03155180225228994,
+   "llmRaw": 0.10217825147404117,
+   "llmRawAbsError": 0.07062644922175122,
+   "coveragePPI": 0.928,
+   "coverageHuman": 0.952,
+   "medianWidthPPI": 0.04738713121629058,
+   "medianWidthHuman": 0.04740302134000324,
+   "widthRatio": 0.9996647866894669
+  },
+  "shed_housing_stress": {
+   "thetaTrue": 0.18737877157451172,
+   "llmRaw": 0.33029992554686954,
+   "llmRawAbsError": 0.14292115397235783,
+   "coveragePPI": 0.948,
+   "coverageHuman": 0.942,
+   "medianWidthPPI": 0.10609253521951587,
+   "medianWidthHuman": 0.1090131373762035,
+   "widthRatio": 0.9732087138579577
+  }
+ }
+}

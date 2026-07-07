@@ -16,6 +16,8 @@ export interface LlmClient {
 export function openAiClient(apiKey: string, baseUrl = "https://api.openai.com/v1"): LlmClient {
   return {
     async complete({ system, user, model, json = true, maxTokens = 700 }) {
+      // gpt-5-mini supports 'minimal'; gpt-5.x point releases use 'none'.
+      let reasoningEffort: string | null = model.startsWith("gpt-5.") ? "none" : "minimal";
       for (let attempt = 0; attempt < 4; attempt++) {
         try {
           const body: Record<string, unknown> = {
@@ -25,8 +27,8 @@ export function openAiClient(apiKey: string, baseUrl = "https://api.openai.com/v
               { role: "user", content: user },
             ],
             max_completion_tokens: maxTokens,
-            reasoning_effort: "minimal",
           };
+          if (reasoningEffort) body.reasoning_effort = reasoningEffort;
           if (json) body.response_format = { type: "json_object" };
           const res = await fetch(`${baseUrl}/chat/completions`, {
             method: "POST",
@@ -42,13 +44,13 @@ export function openAiClient(apiKey: string, baseUrl = "https://api.openai.com/v
           }
           const data = await res.json();
           if (data.error) {
-            // Some models reject reasoning_effort; retry once without it.
+            // Models that reject the reasoning_effort value: drop it and retry.
             if (
-              attempt === 0 &&
+              reasoningEffort &&
               typeof data.error.message === "string" &&
               data.error.message.includes("reasoning_effort")
             ) {
-              delete body.reasoning_effort;
+              reasoningEffort = null;
               continue;
             }
             throw new Error(data.error.message);

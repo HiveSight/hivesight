@@ -15,17 +15,22 @@ abstract: |
   regression and post-stratification with a language model as the response
   model. Against a pre-registered 63-item anchor bank drawn from the 2024
   General Social Survey and the Federal Reserve's 2024 Survey of Household
-  Economics and Decisionmaking, cell-based estimation beats matched-budget
-  persona role-play on every pooled metric and is the most accurate method in
-  test on demographic subgroups, while a direct model estimate remains
-  competitive on national toplines. Errors are systematic rather than random:
-  signed topline error varies by item valence, subgroup rank ordering is
-  largely preserved, and prediction-powered inference with a 200-person human
-  anchor restores valid confidence intervals. State-level validation against
-  the 2023 Behavioral Risk Factor Surveillance System measures small-area
-  transfer. We release the estimator, anchor bank, raw elicitations, and this
-  evaluation harness; the public product renders its live benchmark page from
-  the same artifacts this paper reports.
+  Economics and Decisionmaking, persona role-play misses by roughly 25
+  points at matched budget while cell-based estimation and direct expert
+  estimation land near 9-10 points — a statistical tie on marginal accuracy
+  that the pre-registration called for cells and did not find. What cells
+  deliver beyond direct asking is structure: better subgroup rank ordering
+  (median within-item Spearman 0.62 versus 0.48), guaranteed coherence
+  between subgroups and toplines, composable audiences from one set of
+  auditable predictions, and per-cell outputs that plug into
+  prediction-powered inference, which restores exactly valid 95% confidence
+  intervals from a 200-person human anchor (94.7% empirical coverage) though
+  with negligible width gains at demographic granularity. Signed error varies
+  systematically with item valence. State-level validation against the 2023
+  Behavioral Risk Factor Surveillance System measures small-area transfer. We
+  release the estimator, anchor bank, raw elicitations, and this evaluation
+  harness; the public product renders its live benchmark page from the same
+  artifacts this paper reports.
 format:
   pdf:
     keep-tex: false
@@ -98,15 +103,18 @@ pre-registered hypotheses and disclosed misses remain rare
 
 Our contributions: (i) a pre-registered, 63-item evaluation against GSS 2024
 and SHED 2024 human targets comparing the cell estimator to matched-budget
-persona role-play and to direct model estimation; (ii) evidence that the
-estimator's residual error is *systematic* — signed by item valence, with
-subgroup structure largely preserved — which makes it correctable in
-principle and honestly reportable in practice; (iii) a prediction-powered
-inference [@angelopoulos2023prediction; @krsteski2025valid] evaluation
-showing valid coverage from small human anchors; (iv) a state-level
-small-area validation against BRFSS 2023 [@cdc2024brfss]; and (v) a fully
-released harness in which the production system's public benchmark page and
-this paper render from the same artifacts.
+persona role-play and to direct model estimation — including the
+pre-registered hypothesis this design *failed*: on marginal subgroup
+accuracy, cells tie rather than beat per-subgroup direct estimation; (ii)
+evidence for what cells do buy — better subgroup rank structure, coherence,
+composability, and systematic (valence-signed) rather than random error;
+(iii) a prediction-powered inference [@angelopoulos2023prediction;
+@krsteski2025valid] evaluation showing exactly valid coverage from small
+human anchors, with the honest caveat that demographic-granularity
+predictions yield no interval-width gains; (iv) a state-level small-area
+validation against BRFSS 2023 [@cdc2024brfss]; and (v) a fully released
+harness in which the production system's public benchmark page and this
+paper render from the same artifacts.
 
 # Related work
 
@@ -269,12 +277,31 @@ if h3:
         f"- **H3 (persona toplines).** Persona topline MAE is {pts(h3['personaToplineMAE'])} points "
         f"versus {pts(h3['cellsToplineMAE'])} for cells on the same items, replicating the pilot."
     )
+cells_sp = S["anchor"][f"cells:{MINI}"]["medianSliceSpearman"]
+naive_sp = S["anchor"][f"naive:{MINI}"]["medianSliceSpearman"]
 lines.append(
     f"- **H5 (structure).** Median within-item Spearman correlation between cell-estimated and "
-    f"human subgroup values is {h5['median']:.2f} across {h5['items']} items with at least four bins."
+    f"human subgroup values is {h5['median']:.2f} across {h5['items']} items — below the "
+    f"pre-registered 0.80 bar, but well above the direct arm's {naive_sp:.2f}: at equal marginal "
+    f"accuracy, cells order subgroups substantially better than independent per-subgroup asks."
 )
 print("\n".join(lines))
 ```
+
+The headline confirmatory result is therefore mixed, and we report it as
+registered. Persona role-play — the architecture most commercial synthetic-
+respondent products use — is not competitive at any level. Between the two
+viable methods, marginal accuracy on standard demographic breaks is a tie;
+the cells estimator's advantages are *structural*: subgroup estimates that
+rank correctly more often, cohere with the topline by construction, compose
+into arbitrary audience definitions (any filter over the frame reuses the
+same 149 auditable predictions, where direct estimation needs a fresh
+unverifiable call per audience and cannot credibly target intersections like
+"renting women 30--44 receiving benefits in Michigan"), and expose the
+per-cell predictions that valid-inference machinery consumes (§6.4). Direct
+estimation's topline strength on famous items is also exactly where
+training-data memorization is most plausible, a point the small-area test
+below speaks to.
 
 ## Error is systematic: valence
 
@@ -314,14 +341,18 @@ $n{=}200$ human anchors 500 times per item: prediction-powered inference
 achieves `{python} f"{ppi.get('meanCoveragePPI', 0)*100:.1f}"`% mean coverage
 of the full-sample target (nominal 95%;
 human-anchor-only: `{python} f"{ppi.get('meanCoverageHuman', 0)*100:.1f}"`%),
-with a median interval-width ratio of
-`{python} f"{ppi.get('medianWidthRatio', 0):.2f}"` versus the human-only
-interval; PPI intervals are narrower on
-`{python} f"{ppi.get('shareItemsPPINarrower', 0)*100:.0f}"`% of items. The
-practical reading: the estimator alone provides structure but not guarantees;
-200 real respondents turn it into a valid instrument whose intervals are
-typically tighter than those 200 respondents alone would support
-[@angelopoulos2023prediction; @krsteski2025valid].
+within the pre-registered [93%, 97%] band — the unrectified estimator has no
+such guarantee. The efficiency half of the registered hypothesis fails,
+honestly: the median interval-width ratio versus the human-only interval is
+`{python} f"{ppi.get('medianWidthRatio', 0):.2f}"` (narrower on only
+`{python} f"{ppi.get('shareItemsPPINarrower', 0)*100:.0f}"`% of items). PPI's
+width gain scales with how much of *individual* response variance the
+predictor explains, and demographic-cell predictions explain little of it on
+attitude items — group-level signal is not individual-level signal. Validity
+comes for free; precision gains await predictors of individual responses
+(e.g., survey-fine-tuned models [@suh2025language; @krsteski2025valid]),
+not richer demographic conditioning. This is itself a substantive finding
+about where the information in demographic conditioning runs out.
 
 ## Context: the in-survey demographic ceiling
 
@@ -408,16 +439,30 @@ follow-up with newly fielded items is the decisive contamination-robust test.
 The synthetic-respondent debate has largely been conducted over the wrong
 architecture. Role-playing individuals is both the dominant commercial
 pattern and the design the evidence most clearly condemns; our matched-budget
-replication quantifies the gap. Treating the model as a conditional response
-model over a calibrated population frame changes the question from "can an
-LLM impersonate a person?" to "how well does an LLM know conditional response
-distributions?" — a question that admits measurement, calibration, and valid
-inference. On subgroups, where fielding real surveys is most expensive, the
-cell estimator is the strongest method we tested; on toplines its error is
-systematic and sign-predictable, which is what makes the honest path —
-publish the misses, anchor with small human samples, never imply real people
-were surveyed [@esomar2025code; @aapor2026responsible] — also the technically
-correct one.
+replication quantifies the gap at roughly 15 points of MAE against either
+alternative. Treating the model as a conditional response model over a
+calibrated population frame changes the question from "can an LLM impersonate
+a person?" to "how well does an LLM know conditional response distributions?"
+— a question that admits measurement, calibration, and valid inference.
+
+Against our own pre-registration, the cells estimator did not beat direct
+per-subgroup estimation on marginal accuracy; it matched it. Three things
+follow. First, the accuracy case for *any* LLM audience estimation currently
+rests on group-level distributional knowledge that direct asking accesses
+too — on well-surveyed margins, elaborate machinery buys no marginal
+accuracy, a deflationary finding the field's vendors are unlikely to
+publish. Second, the machinery still earns its keep where direct asking
+structurally cannot go: coherent subgroup systems (rank correlation 0.62 vs
+0.48), arbitrary audience composition from one auditable prediction set,
+small-area targets with explicit population weights, and per-cell outputs
+that make prediction-powered validity possible at all. Third, the residual
+error is systematic — signed by item valence, stable under paraphrase — which
+is what makes the honest path (publish the misses, anchor with small human
+samples, never imply real people were surveyed [@esomar2025code;
+@aapor2026responsible]) also the technically correct one: systematic error is
+calibrable in principle, and our leave-one-out failure with a one-parameter
+correction defines exactly the anchor-bank breadth a valid calibration
+requires.
 
 All code, prompts, cell tables, elicitation logs, human-target construction,
 and this manuscript's source are public [@ghenis2026hivesight]; the

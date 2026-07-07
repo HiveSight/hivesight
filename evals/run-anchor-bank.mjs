@@ -97,6 +97,8 @@ async function llm(system, user, { json = true, maxTokens = 700 } = {}) {
         tokIn += data.usage?.input_tokens ?? 0;
         tokOut += data.usage?.output_tokens ?? 0;
       } else {
+        // gpt-5-mini supports 'minimal'; gpt-5.2 uses 'none'|'low'|... instead.
+        const effort = MODEL.startsWith("gpt-5.") ? "none" : "minimal";
         const body = {
           model: MODEL,
           messages: [
@@ -104,7 +106,7 @@ async function llm(system, user, { json = true, maxTokens = 700 } = {}) {
             { role: "user", content: user },
           ],
           max_completion_tokens: maxTokens,
-          reasoning_effort: "minimal",
+          reasoning_effort: effort,
         };
         if (json) body.response_format = { type: "json_object" };
         res = await fetch("https://api.openai.com/v1/chat/completions", {

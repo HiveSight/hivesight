@@ -2,9 +2,9 @@ import Link from "next/link";
 import { AskForm } from "@/components/ask-form";
 
 const BENCH = [
-  { arm: "Persona roleplay (typical AI-survey approach)", topline: 37, subgroup: 23 },
-  { arm: "Direct model estimate", topline: 9, subgroup: 7 },
-  { arm: "HiveSight population cells", topline: 17, subgroup: 6 },
+  { arm: "Persona roleplay (typical AI-survey approach)", topline: 25, subgroup: 25 },
+  { arm: "Direct model estimate", topline: 8.6, subgroup: 9.8 },
+  { arm: "HiveSight population cells", topline: 9.2, subgroup: 9.8 },
 ];
 
 export default function HomePage() {
@@ -58,11 +58,14 @@ export default function HomePage() {
           Benchmarked against real survey data — misses included
         </h2>
         <p className="mt-2 max-w-2xl text-sm text-muted">
-          Mean absolute error against the Federal Reserve&apos;s 2024 Survey of
-          Household Economics and Decisionmaking, four questions, national
-          audience. Lower is better. Subgroup accuracy is where cell-based
-          estimation earns its keep — and topline error is real, which is why
-          results ship with error context attached.
+          Mean absolute error against human targets from GSS 2024 and SHED
+          2024 — 63 questions, pre-registered before any model runs. Lower is
+          better. Persona roleplay, the standard synthetic-respondent
+          architecture, is not competitive. Cells match direct estimation on
+          margins and beat it on subgroup rank structure (Spearman 0.62 vs
+          0.48) — while staying coherent, composable across any audience
+          filter, and fully auditable. Error is real, which is why every
+          result ships with it attached.
         </p>
         <div className="mt-6 overflow-x-auto">
           <table className="w-full min-w-[28rem] text-sm">

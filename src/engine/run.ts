@@ -14,14 +14,15 @@ import type { CellEstimate, RunProgress, RunResult, RunSpec } from "./types";
 export const ENGINE_VERSION = "engine:v1-cells";
 
 /**
- * Benchmark-measured typical error, from evals/results (SHED 2024 powered
- * comparison). Surfaced with results so users see measured accuracy context,
- * not implied precision. Update when the eval artifact is regenerated.
+ * Benchmark-measured typical error, from the pre-registered 63-item anchor
+ * bank (GSS 2024 + SHED 2024; evals/results/anchor-bank-run-v1.json).
+ * Surfaced with results so users see measured accuracy context, not implied
+ * precision. Update when the eval artifact is regenerated.
  */
 export const BENCHMARK_ERROR = {
-  source: "SHED 2024 powered comparison (4 questions, national)",
-  topline: 0.17,
-  subgroup: 0.062,
+  source: "63-item anchor bank (GSS 2024 + SHED 2024, national)",
+  topline: 0.092,
+  subgroup: 0.098,
 };
 
 const ELICIT_CONCURRENCY = 16;
