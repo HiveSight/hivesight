@@ -1,0 +1,6976 @@
+{
+ "version": "anchor-bank-v2",
+ "amends": "anchor-bank-v1 (see paper/pap-v3-addendum.md)",
+ "minBinN": 30,
+ "minItemN": 600,
+ "items": [
+  {
+   "itemId": "gss_happy",
+   "source": "gss2024",
+   "variable": "happy",
+   "wording": "Taken all together, how would you say things are these days \u2014 would you say that you are very happy, pretty happy, or not too happy?",
+   "options": [
+    "Very happy",
+    "Pretty happy",
+    "Not too happy"
+   ],
+   "positiveOptions": [
+    0
+   ],
+   "valence": "positive",
+   "domain": "wellbeing",
+   "volunteered": [],
+   "provenance": "native",
+   "universeNote": null,
+   "dkRate": 0.007793017456359103,
+   "targets": {
+    "overall": {
+     "dist": [
+      0.23616882990397142,
+      0.5579684166181138,
+      0.20586275347791483
+     ],
+     "n": 3183
+    },
+    "slices": {
+     "age_band": {
+      "18-29": {
+       "dist": [
+        0.19598172126486038,
+        0.5039584743835172,
+        0.30005980435162233
+       ],
+       "n": 455
+      },
+      "30-44": {
+       "dist": [
+        0.24035102266507757,
+        0.573980692762392,
+        0.18566828457253037
+       ],
+       "n": 869
+      },
+      "45-64": {
+       "dist": [
+        0.2280672158177462,
+        0.5878893534360579,
+        0.18404343074619606
+       ],
+       "n": 1019
+      },
+      "65+": {
+       "dist": [
+        0.2791752633854562,
+        0.5460962265346574,
+        0.17472851007988652
+       ],
+       "n": 840
+      }
+     },
+     "sex": {
+      "men": {
+       "dist": [
+        0.23357986110942197,
+        0.5471015642939238,
+        0.21931857459665413
+       ],
+       "n": 1411
+      },
+      "women": {
+       "dist": [
+        0.23775858602572753,
+        0.5688382579609125,
+        0.1934031560133601
+       ],
+       "n": 1761
+      }
+     },
+     "tenure": {
+      "homeowners": {
+       "dist": [
+        0.24940920676465342,
+        0.6057655454941483,
+        0.14482524774119837
+       ],
+       "n": 1273
+      },
+      "renters or other housing": {
+       "dist": [
+        0.2100774525232575,
+        0.570554620195257,
+        0.21936792728148544
+       ],
+       "n": 807
+      }
+     }
+    }
+   }
+  },
+  {
+   "itemId": "gss_health",
+   "source": "gss2024",
+   "variable": "health",
+   "wording": "Would you say your own health, in general, is excellent, good, fair, or poor?",
+   "options": [
+    "Excellent",
+    "Good",
+    "Fair",
+    "Poor"
+   ],
+   "positiveOptions": [
+    0,
+    1
+   ],
+   "valence": "positive",
+   "domain": "health",
+   "volunteered": [],
+   "provenance": "native",
+   "universeNote": null,
+   "dkRate": 0.003117206982543641,
+   "targets": {
+    "overall": {
+     "dist": [
+      0.18842495824266126,
+      0.5338260166661245,
+      0.23570177814719948,
+      0.04204724694401479
+     ],
+     "n": 3198
+    },
+    "slices": {
+     "age_band": {
+      "18-29": {
+       "dist": [
+        0.25236182475624264,
+        0.541711095701956,
+        0.17732812973854617,
+        0.028598949803255187
+       ],
+       "n": 454
+      },
+      "30-44": {
+       "dist": [
+        0.20869720135520867,
+        0.49596736447162804,
+        0.26012986838114766,
+        0.03520556579201558
+       ],
+       "n": 875
+      },
+      "45-64": {
+       "dist": [
+        0.15178282464102624,
+        0.5434246663267586,
+        0.2584211479811234,
+        0.046371361051091735
+       ],
+       "n": 1025
+      },
+      "65+": {
+       "dist": [
+        0.15994593869568954,
+        0.5565327933858296,
+        0.22772851402944902,
+        0.05579275388903177
+       ],
+       "n": 844
+      }
+     },
+     "sex": {
+      "men": {
+       "dist": [
+        0.18528016222373925,
+        0.531715978412998,
+        0.24187434364933713,
+        0.04112951571392559
+       ],
+       "n": 1420
+      },
+      "women": {
+       "dist": [
+        0.18952173865264346,
+        0.5375427016872001,
+        0.2304424233407369,
+        0.04249313631941959
+       ],
+       "n": 1769
+      }
+     },
+     "tenure": {
+      "homeowners": {
+       "dist": [
+        0.1934508010285789,
+        0.5711086488629392,
+        0.20871367167349092,
+        0.02672687843499103
+       ],
+       "n": 1278
+      },
+      "renters or other housing": {
+       "dist": [
+        0.16497814543807499,
+        0.47072235352606306,
+        0.312689964163078,
+        0.051609536872783995
+       ],
+       "n": 810
+      }
+     }
+    }
+   }
+  },
+  {
+   "itemId": "gss_satfin",
+   "source": "gss2024",
+   "variable": "satfin",
+   "wording": "So far as you and your family are concerned, would you say that you are pretty well satisfied with your present financial situation, more or less satisfied, or not satisfied at all?",
+   "options": [
+    "Pretty well satisfied",
+    "More or less satisfied",
+    "Not satisfied at all"
+   ],
+   "positiveOptions": [
+    0
+   ],
+   "valence": "positive",
+   "domain": "finance",
+   "volunteered": [],
+   "provenance": "native",
+   "universeNote": null,
+   "dkRate": 0.004987531172069825,
+   "targets": {
+    "overall": {
+     "dist": [
+      0.2296470345555679,
+      0.46694582540222457,
+      0.30340714004220753
+     ],
+     "n": 3192
+    },
+    "slices": {
+     "age_band": {
+      "18-29": {
+       "dist": [
+        0.16649780714604712,
+        0.5188071386564748,
+        0.3146950541974783
+       ],
+       "n": 454
+      },
+      "30-44": {
+       "dist": [
+        0.18502719309559415,
+        0.4412435320344337,
+        0.37372927486997215
+       ],
+       "n": 874
+      },
+      "45-64": {
+       "dist": [
+        0.22068055222356658,
+        0.46059115113094934,
+        0.3187282966454841
+       ],
+       "n": 1024
+      },
+      "65+": {
+       "dist": [
+        0.350934191301142,
+        0.45929030196582654,
+        0.18977550673303145
+       ],
+       "n": 840
+      }
+     },
+     "sex": {
+      "men": {
+       "dist": [
+        0.23835738297546485,
+        0.4818741485765912,
+        0.2797684684479438
+       ],
+       "n": 1416
+      },
+      "women": {
+       "dist": [
+        0.22215256364414557,
+        0.45157032716669054,
+        0.3262771091891639
+       ],
+       "n": 1766
+      }
+     },
+     "tenure": {
+      "homeowners": {
+       "dist": [
+        0.3120345942356868,
+        0.4533651175854329,
+        0.23460028817888037
+       ],
+       "n": 1277
+      },
+      "renters or other housing": {
+       "dist": [
+        0.10806837606184679,
+        0.4563641102043788,
+        0.43556751373377467
+       ],
+       "n": 810
+      }
+     }
+    }
+   }
+  },
+  {
+   "itemId": "gss_finrela",
+   "source": "gss2024",
+   "variable": "finrela",
+   "wording": "Compared with American families in general, would you say your family income is far below average, below average, average, above average, or far above average?",
+   "options": [
+    "Far below average",
+    "Below average",
+    "Average",
+    "Above average",
+    "Far above average"
+   ],
+   "positiveOptions": [
+    3,
+    4
+   ],
+   "valence": "positive",
+   "domain": "finance",
+   "volunteered": [],
+   "provenance": "native",
+   "universeNote": null,
+   "dkRate": 0.009663341645885287,
+   "targets": {
+    "overall": {
+     "dist": [
+      0.06821024470275047,
+      0.24169055718832616,
+      0.4138594377546031,
+      0.23763563776009478,
+      0.03860412259422555
+     ],
+     "n": 3177
+    },
+    "slices": {
+     "age_band": {
+      "18-29": {
+       "dist": [
+        0.05957806785008876,
+        0.30352747981123185,
+        0.4398692398763021,
+        0.18641865445544314,
+        0.01060655800693407
+       ],
+       "n": 449
+      },
+      "30-44": {
+       "dist": [
+        0.06798050687834123,
+        0.20701768826469036,
+        0.4155822157808851,
+        0.2672984411541169,
+        0.042121147921966466
+       ],
+       "n": 870
+      },
+      "45-64": {
+       "dist": [
+        0.06913939756481396,
+        0.2398320874048932,
+        0.3925463328886486,
+        0.24014588741338094,
+        0.05833629472826338
+       ],
+       "n": 1019
+      },
+      "65+": {
+       "dist": [
+        0.07487601983501778,
+        0.22875009456275047,
+        0.4188637536046073,
+        0.24589341108423857,
+        0.03161672091338591
+       ],
+       "n": 839
+      }
+     },
+     "sex": {
+      "men": {
+       "dist": [
+        0.052547148516002354,
+        0.21861209256899716,
+        0.4194814453231909,
+        0.2644469044116245,
+        0.04491240918018511
+       ],
+       "n": 1413
+      },
+      "women": {
+       "dist": [
+        0.07813565745425692,
+        0.26542779478350265,
+        0.4107603274163192,
+        0.2131786616799566,
+        0.03249755866596478
+       ],
+       "n": 1754
+      }
+     },
+     "tenure": {
+      "homeowners": {
+       "dist": [
+        0.04252366238168751,
+        0.17954407225988028,
+        0.4224218415620159,
+        0.30734370389491067,
+        0.04816671990150562
+       ],
+       "n": 1270
+      },
+      "renters or other housing": {
+       "dist": [
+        0.10483013366971591,
+        0.3773870566926243,
+        0.3624701343105043,
+        0.13206842692500106,
+        0.023244248402154496
+       ],
+       "n": 803
+      }
+     }
+    }
+   }
+  },
+  {
+   "itemId": "gss_getahead",
+   "source": "gss2024",
+   "variable": "getahead",
+   "wording": "Some people say that people get ahead by their own hard work; others say that lucky breaks or help from other people are more important. Which do you think is most important?",
+   "options": [
+    "Hard work",
+    "Both equally",
+    "Luck or help from other people"
+   ],
+   "positiveOptions": [
+    0
+   ],
+   "valence": "neutral",
+   "domain": "beliefs",
+   "volunteered": [
+    1
+   ],
+   "provenance": "native",
+   "universeNote": null,
+   "dkRate": 0.7004364089775561,
+   "targets": {
+    "overall": {
+     "dist": [
+      0.6484153900605167,
+      0.23532909874576352,
+      0.11625551119371964
+     ],
+     "n": 961
+    },
+    "slices": {
+     "age_band": {
+      "18-29": {
+       "dist": [
+        0.6183970610031783,
+        0.23693830008924271,
+        0.14466463890757897
+       ],
+       "n": 134
+      },
+      "30-44": {
+       "dist": [
+        0.6097261030180752,
+        0.23480516489174696,
+        0.15546873209017814
+       ],
+       "n": 219
+      },
+      "45-64": {
+       "dist": [
+        0.6776682086435412,
+        0.2435227325715507,
+        0.07880905878490803
+       ],
+       "n": 310
+      },
+      "65+": {
+       "dist": [
+        0.6679156062971802,
+        0.22480365044411232,
+        0.10728074325870751
+       ],
+       "n": 298
+      }
+     },
+     "sex": {
+      "men": {
+       "dist": [
+        0.5983398353064768,
+        0.26450611782845596,
+        0.13715404686506716
+       ],
+       "n": 424
+      },
+      "women": {
+       "dist": [
+        0.6898193908756914,
+        0.21125693470477888,
+        0.09892367441952964
+       ],
+       "n": 536
+      }
+     },
+     "tenure": {
+      "homeowners": {
+       "dist": [
+        0.6414869989786381,
+        0.2602313704680282,
+        0.09828163055333375
+       ],
+       "n": 267
+      },
+      "renters or other housing": {
+       "dist": [
+        0.630033010108338,
+        0.18422518180565697,
+        0.18574180808600513
+       ],
+       "n": 224
+      }
+     }
+    }
+   }
+  },
+  {
+   "itemId": "gss_class",
+   "source": "gss2024",
+   "variable": "class",
+   "wording": "If you were asked to use one of four names for your social class, which would you say you belong in: the lower class, the working class, the middle class, or the upper class?",
+   "options": [
+    "Lower class",
+    "Working class",
+    "Middle class",
+    "Upper class"
+   ],
+   "positiveOptions": [
+    2,
+    3
+   ],
+   "valence": "positive",
+   "domain": "identity",
+   "volunteered": [],
+   "provenance": "native",
+   "universeNote": null,
+   "dkRate": 0.01059850374064838,
+   "targets": {
+    "overall": {
+     "dist": [
+      0.0966140995470784,
+      0.40803192413544187,
+      0.44277810487330327,
+      0.05257587144417635
+     ],
+     "n": 3174
+    },
+    "slices": {
+     "age_band": {
+      "18-29": {
+       "dist": [
+        0.09993414460741441,
+        0.53222969275051,
+        0.3248903368179107,
+        0.04294582582416485
+       ],
+       "n": 447
+      },
+      "30-44": {
+       "dist": [
+        0.12218577833959864,
+        0.44535682535858534,
+        0.39786620663789735,
+        0.03459118966391874
+       ],
+       "n": 872
+      },
+      "45-64": {
+       "dist": [
+        0.09866471826806734,
+        0.4004143302219522,
+        0.44675481754361235,
+        0.05416613396636802
+       ],
+       "n": 1021
+      },
+      "65+": {
+       "dist": [
+        0.06142731604954548,
+        0.2680542814617526,
+        0.5911570570507477,
+        0.07936134543795408
+       ],
+       "n": 834
+      }
+     },
+     "sex": {
+      "men": {
+       "dist": [
+        0.0790528653480823,
+        0.4120613560476777,
+        0.4497190136850937,
+        0.05916676491914633
+       ],
+       "n": 1417
+      },
+      "women": {
+       "dist": [
+        0.11060746176565296,
+        0.40448179331333434,
+        0.4384373211359988,
+        0.046473423785013936
+       ],
+       "n": 1748
+      }
+     },
+     "tenure": {
+      "homeowners": {
+       "dist": [
+        0.05454802536993795,
+        0.35363480509187734,
+        0.532416115093387,
+        0.059401054444797784
+       ],
+       "n": 1272
+      },
+      "renters or other housing": {
+       "dist": [
+        0.17490179991941282,
+        0.487583859965607,
+        0.30026126971329903,
+        0.03725307040168118
+       ],
+       "n": 796
+      }
+     }
+    }
+   }
+  },
+  {
+   "itemId": "gss_fear",
+   "source": "gss2024",
+   "variable": "fear",
+   "wording": "Is there any area right around here \u2014 that is, within a mile \u2014 where you would be afraid to walk alone at night?",
+   "options": [
+    "Yes",
+    "No"
+   ],
+   "positiveOptions": [
+    0
+   ],
+   "valence": "negative",
+   "domain": "safety",
+   "volunteered": [],
+   "provenance": "native",
+   "universeNote": null,
+   "dkRate": 0.32761845386533667,
+   "targets": {
+    "overall": {
+     "dist": [
+      0.33037776738944896,
+      0.669622232610551
+     ],
+     "n": 2157
+    },
+    "slices": {
+     "age_band": {
+      "18-29": {
+       "dist": [
+        0.38172691427382555,
+        0.6182730857261745
+       ],
+       "n": 326
+      },
+      "30-44": {
+       "dist": [
+        0.36349316513521424,
+        0.6365068348647858
+       ],
+       "n": 579
+      },
+      "45-64": {
+       "dist": [
+        0.27638123280308563,
+        0.7236187671969143
+       ],
+       "n": 686
+      },
+      "65+": {
+       "dist": [
+        0.32052290674971473,
+        0.6794770932502853
+       ],
+       "n": 566
+      }
+     },
+     "sex": {
+      "men": {
+       "dist": [
+        0.2315325509766249,
+        0.7684674490233749
+       ],
+       "n": 953
+      },
+      "women": {
+       "dist": [
+        0.42332820663106363,
+        0.5766717933689364
+       ],
+       "n": 1197
+      }
+     },
+     "tenure": {
+      "homeowners": {
+       "dist": [
+        0.24985726745370232,
+        0.7501427325462975
+       ],
+       "n": 635
+      },
+      "renters or other housing": {
+       "dist": [
+        0.46949987765910933,
+        0.5305001223408906
+       ],
+       "n": 425
+      }
+     }
+    }
+   }
+  },
+  {
+   "itemId": "gss_cappun",
+   "source": "gss2024",
+   "variable": "cappun",
+   "wording": "Do you favor or oppose the death penalty for persons convicted of murder?",
+   "options": [
+    "Favor",
+    "Oppose"
+   ],
+   "positiveOptions": [
+    0
+   ],
+   "valence": "neutral",
+   "domain": "policy",
+   "volunteered": [],
+   "provenance": "native",
+   "universeNote": null,
+   "dkRate": 0.3721945137157107,
+   "targets": {
+    "overall": {
+     "dist": [
+      0.6204515941226038,
+      0.3795484058773963
+     ],
+     "n": 2014
+    },
+    "slices": {
+     "age_band": {
+      "18-29": {
+       "dist": [
+        0.5542171114250007,
+        0.4457828885749992
+       ],
+       "n": 277
+      },
+      "30-44": {
+       "dist": [
+        0.580639131271639,
+        0.4193608687283608
+       ],
+       "n": 562
+      },
+      "45-64": {
+       "dist": [
+        0.6443949463964184,
+        0.3556050536035817
+       ],
+       "n": 642
+      },
+      "65+": {
+       "dist": [
+        0.6890706672093208,
+        0.31092933279067925
+       ],
+       "n": 533
+      }
+     },
+     "sex": {
+      "men": {
+       "dist": [
+        0.6455652112666875,
+        0.35443478873331247
+       ],
+       "n": 920
+      },
+      "women": {
+       "dist": [
+        0.5941769080659063,
+        0.4058230919340937
+       ],
+       "n": 1083
+      }
+     },
+     "tenure": {
+      "homeowners": {
+       "dist": [
+        0.6856347643510419,
+        0.3143652356489582
+       ],
+       "n": 609
+      },
+      "renters or other housing": {
+       "dist": [
+        0.592048974261937,
+        0.407951025738063
+       ],
+       "n": 359
+      }
+     }
+    }
+   }
+  },
+  {
+   "itemId": "gss_gunlaw",
+   "source": "gss2024",
+   "variable": "gunlaw",
+   "wording": "Would you favor or oppose a law which would require a person to obtain a police permit before he or she could buy a gun?",
+   "options": [
+    "Favor",
+    "Oppose"
+   ],
+   "positiveOptions": [
+    0
+   ],
+   "valence": "neutral",
+   "domain": "policy",
+   "volunteered": [],
+   "provenance": "native",
+   "universeNote": null,
+   "dkRate": 0.3385286783042394,
+   "targets": {
+    "overall": {
+     "dist": [
+      0.6884573103006131,
+      0.31154268969938687
+     ],
+     "n": 2122
+    },
+    "slices": {
+     "age_band": {
+      "18-29": {
+       "dist": [
+        0.6532169767553521,
+        0.346783023244648
+       ],
+       "n": 317
+      },
+      "30-44": {
+       "dist": [
+        0.6873565687414294,
+        0.3126434312585705
+       ],
+       "n": 571
+      },
+      "45-64": {
+       "dist": [
+        0.672507231756149,
+        0.3274927682438509
+       ],
+       "n": 678
+      },
+      "65+": {
+       "dist": [
+        0.7498321047002231,
+        0.2501678952997769
+       ],
+       "n": 556
+      }
+     },
+     "sex": {
+      "men": {
+       "dist": [
+        0.653048509468843,
+        0.34695149053115676
+       ],
+       "n": 950
+      },
+      "women": {
+       "dist": [
+        0.7229971162712137,
+        0.2770028837287861
+       ],
+       "n": 1165
+      }
+     },
+     "tenure": {
+      "homeowners": {
+       "dist": [
+        0.655747550619946,
+        0.34425244938005384
+       ],
+       "n": 630
+      },
+      "renters or other housing": {
+       "dist": [
+        0.7341358407843215,
+        0.2658641592156785
+       ],
+       "n": 414
+      }
+     }
+    }
+   }
+  },
+  {
+   "itemId": "gss_grass",
+   "source": "gss2024",
+   "variable": "grass",
+   "wording": "Do you think the use of marijuana should be made legal or not?",
+   "options": [
+    "Should be legal",
+    "Should not be legal"
+   ],
+   "positiveOptions": [
+    0
+   ],
+   "valence": "neutral",
+   "domain": "policy",
+   "volunteered": [],
+   "provenance": "native",
+   "universeNote": null,
+   "dkRate": 0.7359725685785536,
+   "targets": {
+    "overall": {
+     "dist": [
+      0.6684993352804133,
+      0.3315006647195866
+     ],
+     "n": 847
+    },
+    "slices": {
+     "age_band": {
+      "18-29": {
+       "dist": [
+        0.853143179355287,
+        0.146856820644713
+       ],
+       "n": 109
+      },
+      "30-44": {
+       "dist": [
+        0.6453388279900355,
+        0.35466117200996455
+       ],
+       "n": 202
+      },
+      "45-64": {
+       "dist": [
+        0.6517560992578683,
+        0.34824390074213163
+       ],
+       "n": 276
+      },
+      "65+": {
+       "dist": [
+        0.5926064400751903,
+        0.4073935599248096
+       ],
+       "n": 260
+      }
+     },
+     "sex": {
+      "men": {
+       "dist": [
+        0.72290739065465,
+        0.27709260934534985
+       ],
+       "n": 389
+      },
+      "women": {
+       "dist": [
+        0.6164646872598255,
+        0.38353531274017455
+       ],
+       "n": 457
+      }
+     },
+     "tenure": {
+      "homeowners": {
+       "dist": [
+        0.5971968331434373,
+        0.4028031668565628
+       ],
+       "n": 220
+      },
+      "renters or other housing": {
+       "dist": [
+        0.6728363703506858,
+        0.32716362964931406
+       ],
+       "n": 190
+      }
+     }
+    }
+   }
+  },
+  {
+   "itemId": "gss_courts",
+   "source": "gss2024",
+   "variable": "courts",
+   "wording": "In general, do you think the courts in this area deal too harshly or not harshly enough with criminals?",
+   "options": [
+    "Too harshly",
+    "Not harshly enough",
+    "About right"
+   ],
+   "positiveOptions": [
+    1
+   ],
+   "valence": "neutral",
+   "domain": "policy",
+   "volunteered": [
+    2
+   ],
+   "provenance": "native",
+   "universeNote": null,
+   "dkRate": 0.7549875311720698,
+   "targets": {
+    "overall": {
+     "dist": [
+      0.13692869133745122,
+      0.6001262874319762,
+      0.2629450212305727
+     ],
+     "n": 786
+    },
+    "slices": {
+     "age_band": {
+      "18-29": {
+       "dist": [
+        0.2123360955896327,
+        0.49779953165375546,
+        0.28986437275661187
+       ],
+       "n": 92
+      },
+      "30-44": {
+       "dist": [
+        0.1930973836633415,
+        0.48887393264403933,
+        0.3180286836926191
+       ],
+       "n": 187
+      },
+      "45-64": {
+       "dist": [
+        0.08755847961900623,
+        0.688281984936819,
+        0.22415953544417466
+       ],
+       "n": 261
+      },
+      "65+": {
+       "dist": [
+        0.11112642068188346,
+        0.6366621280264183,
+        0.2522114512916983
+       ],
+       "n": 246
+      }
+     },
+     "sex": {
+      "men": {
+       "dist": [
+        0.13780078760893372,
+        0.5593017503353913,
+        0.30289746205567525
+       ],
+       "n": 372
+      },
+      "women": {
+       "dist": [
+        0.13604648391669263,
+        0.6414241472593316,
+        0.22252936882397578
+       ],
+       "n": 414
+      }
+     },
+     "tenure": {
+      "homeowners": {
+       "dist": [
+        0.11712949135953638,
+        0.6138089980048554,
+        0.26906151063560835
+       ],
+       "n": 217
+      },
+      "renters or other housing": {
+       "dist": [
+        0.21595598941803734,
+        0.5672097834017693,
+        0.2168342271801933
+       ],
+       "n": 174
+      }
+     }
+    }
+   }
+  },
+  {
+   "itemId": "gss_trust",
+   "source": "gss2024",
+   "variable": "trust",
+   "wording": "Generally speaking, would you say that most people can be trusted or that you can't be too careful in dealing with people?",
+   "options": [
+    "Most people can be trusted",
+    "Can't be too careful",
+    "Depends"
+   ],
+   "positiveOptions": [
+    0
+   ],
+   "valence": "positive",
+   "domain": "social",
+   "volunteered": [
+    2
+   ],
+   "provenance": "native",
+   "universeNote": null,
+   "dkRate": 0.7116583541147132,
+   "targets": {
+    "overall": {
+     "dist": [
+      0.24472828806581792,
+      0.6492392433725855,
+      0.10603246856159664
+     ],
+     "n": 925
+    },
+    "slices": {
+     "age_band": {
+      "18-29": {
+       "dist": [
+        0.0541109556737188,
+        0.7185694227808025,
+        0.2273196215454787
+       ],
+       "n": 120
+      },
+      "30-44": {
+       "dist": [
+        0.2147202967808371,
+        0.7313094155945428,
+        0.05397028762462016
+       ],
+       "n": 220
+      },
+      "45-64": {
+       "dist": [
+        0.2927646323652585,
+        0.626967183732758,
+        0.08026818390198358
+       ],
+       "n": 302
+      },
+      "65+": {
+       "dist": [
+        0.3295429904005702,
+        0.565704878115098,
+        0.10475213148433189
+       ],
+       "n": 283
+      }
+     },
+     "sex": {
+      "men": {
+       "dist": [
+        0.31683600699606035,
+        0.5943768963686149,
+        0.08878709663532468
+       ],
+       "n": 423
+      },
+      "women": {
+       "dist": [
+        0.17579686155459837,
+        0.7033299914338431,
+        0.12087314701155845
+       ],
+       "n": 501
+      }
+     },
+     "tenure": {
+      "homeowners": {
+       "dist": [
+        0.2763779531579103,
+        0.5978945655508194,
+        0.12572748129127026
+       ],
+       "n": 243
+      },
+      "renters or other housing": {
+       "dist": [
+        0.1293679334987579,
+        0.7541060632148013,
+        0.11652600328644092
+       ],
+       "n": 202
+      }
+     }
+    }
+   }
+  },
+  {
+   "itemId": "gss_fair",
+   "source": "gss2024",
+   "variable": "fair",
+   "wording": "Do you think most people would try to take advantage of you if they got a chance, or would they try to be fair?",
+   "options": [
+    "Would take advantage of you",
+    "Would try to be fair",
+    "Depends"
+   ],
+   "positiveOptions": [
+    1
+   ],
+   "valence": "positive",
+   "domain": "social",
+   "volunteered": [
+    2
+   ],
+   "provenance": "native",
+   "universeNote": null,
+   "dkRate": 0.7141521197007481,
+   "targets": {
+    "overall": {
+     "dist": [
+      0.466943394272551,
+      0.4165099483878352,
+      0.11654665733961378
+     ],
+     "n": 917
+    },
+    "slices": {
+     "age_band": {
+      "18-29": {
+       "dist": [
+        0.5453320385439415,
+        0.244661552272145,
+        0.2100064091839134
+       ],
+       "n": 118
+      },
+      "30-44": {
+       "dist": [
+        0.5508314858857771,
+        0.34434611747758037,
+        0.10482239663664247
+       ],
+       "n": 218
+      },
+      "45-64": {
+       "dist": [
+        0.47804794716802795,
+        0.4536817684680279,
+        0.06827028436394424
+       ],
+       "n": 299
+      },
+      "65+": {
+       "dist": [
+        0.33534681186888754,
+        0.539499074199197,
+        0.12515411393191558
+       ],
+       "n": 282
+      }
+     },
+     "sex": {
+      "men": {
+       "dist": [
+        0.41371832491376415,
+        0.4817142250542481,
+        0.10456745003198763
+       ],
+       "n": 421
+      },
+      "women": {
+       "dist": [
+        0.5199295450392482,
+        0.3535675137493469,
+        0.1265029412114048
+       ],
+       "n": 495
+      }
+     },
+     "tenure": {
+      "homeowners": {
+       "dist": [
+        0.3829731843339142,
+        0.5047391467142143,
+        0.11228766895187152
+       ],
+       "n": 244
+      },
+      "renters or other housing": {
+       "dist": [
+        0.5386301389767778,
+        0.3231692532922108,
+        0.13820060773101125
+       ],
+       "n": 198
+      }
+     }
+    }
+   }
+  },
+  {
+   "itemId": "gss_helpful",
+   "source": "gss2024",
+   "variable": "helpful",
+   "wording": "Would you say that most of the time people try to be helpful, or that they are mostly just looking out for themselves?",
+   "options": [
+    "Try to be helpful",
+    "Just look out for themselves",
+    "Depends"
+   ],
+   "positiveOptions": [
+    0
+   ],
+   "valence": "positive",
+   "domain": "social",
+   "volunteered": [
+    2
+   ],
+   "provenance": "native",
+   "universeNote": null,
+   "dkRate": 0.7135286783042394,
+   "targets": {
+    "overall": {
+     "dist": [
+      0.3784001283573921,
+      0.45803207944264,
+      0.16356779219996787
+     ],
+     "n": 919
+    },
+    "slices": {
+     "age_band": {
+      "18-29": {
+       "dist": [
+        0.25446054520233097,
+        0.43964879051003086,
+        0.30589066428763806
+       ],
+       "n": 117
+      },
+      "30-44": {
+       "dist": [
+        0.2756961649612478,
+        0.5885639988302284,
+        0.13573983620852367
+       ],
+       "n": 218
+      },
+      "45-64": {
+       "dist": [
+        0.4135718226210163,
+        0.4406202518281827,
+        0.14580792555080094
+       ],
+       "n": 300
+      },
+      "65+": {
+       "dist": [
+        0.49397049074181765,
+        0.38223092189782665,
+        0.12379858736035561
+       ],
+       "n": 284
+      }
+     },
+     "sex": {
+      "men": {
+       "dist": [
+        0.3779885997187937,
+        0.46833011889581844,
+        0.15368128138538809
+       ],
+       "n": 416
+      },
+      "women": {
+       "dist": [
+        0.37953246203389046,
+        0.4492806229108701,
+        0.1711869150552393
+       ],
+       "n": 502
+      }
+     },
+     "tenure": {
+      "homeowners": {
+       "dist": [
+        0.37382652694255014,
+        0.4200460610607279,
+        0.20612741199672202
+       ],
+       "n": 244
+      },
+      "renters or other housing": {
+       "dist": [
+        0.35552097227166796,
+        0.5198183056734033,
+        0.12466072205492884
+       ],
+       "n": 198
+      }
+     }
+    }
+   }
+  },
+  {
+   "itemId": "gss_satjob",
+   "source": "gss2024",
+   "variable": "satjob",
+   "wording": "On the whole, how satisfied are you with the work you do \u2014 would you say you are very satisfied, moderately satisfied, a little dissatisfied, or very dissatisfied?",
+   "options": [
+    "Very satisfied",
+    "Moderately satisfied",
+    "A little dissatisfied",
+    "Very dissatisfied"
+   ],
+   "positiveOptions": [
+    0
+   ],
+   "valence": "positive",
+   "domain": "work",
+   "volunteered": [],
+   "provenance": "native",
+   "universeNote": "Asked of respondents who work for pay; estimate among employed members of this group.",
+   "dkRate": 0.31889027431421446,
+   "targets": {
+    "overall": {
+     "dist": [
+      0.4514311658895291,
+      0.41393257536611966,
+      0.09217745093233477,
+      0.04245880781201667
+     ],
+     "n": 2185
+    },
+    "slices": {
+     "age_band": {
+      "18-29": {
+       "dist": [
+        0.32366797000193415,
+        0.49362375427556715,
+        0.10426211880441585,
+        0.0784461569180828
+       ],
+       "n": 377
+      },
+      "30-44": {
+       "dist": [
+        0.4345619823141808,
+        0.4318137178770194,
+        0.09951075896383428,
+        0.034113540844965574
+       ],
+       "n": 809
+      },
+      "45-64": {
+       "dist": [
+        0.5046521558018522,
+        0.3735144424667909,
+        0.08999613496614019,
+        0.03183726676521684
+       ],
+       "n": 809
+      },
+      "65+": {
+       "dist": [
+        0.6455147692637643,
+        0.2961330113311592,
+        0.03781463800026088,
+        0.0205375814048156
+       ],
+       "n": 190
+      }
+     },
+     "sex": {
+      "men": {
+       "dist": [
+        0.44562340006772155,
+        0.41542304614909964,
+        0.09339774465638248,
+        0.045555809126796215
+       ],
+       "n": 981
+      },
+      "women": {
+       "dist": [
+        0.45773749806201935,
+        0.41180762759104433,
+        0.09100806509959132,
+        0.03944680924734503
+       ],
+       "n": 1194
+      }
+     },
+     "tenure": {
+      "homeowners": {
+       "dist": [
+        0.48837702986922416,
+        0.3892056030834576,
+        0.08002356691081865,
+        0.04239380013649966
+       ],
+       "n": 847
+      },
+      "renters or other housing": {
+       "dist": [
+        0.429828772652337,
+        0.41304619698693773,
+        0.11310976311267162,
+        0.044015267248053686
+       ],
+       "n": 609
+      }
+     }
+    }
+   }
+  },
+  {
+   "itemId": "gss_spanking",
+   "source": "gss2024",
+   "variable": "spanking",
+   "wording": "Now I'm going to read several statements. As I read each one, please tell me whether you strongly agree, agree, disagree, or strongly disagree with it. \u2014 It is sometimes necessary to discipline a child with a good, hard spanking.",
+   "options": [
+    "Strongly agree",
+    "Agree",
+    "Disagree",
+    "Strongly disagree"
+   ],
+   "positiveOptions": [
+    0,
+    1
+   ],
+   "valence": "neutral",
+   "domain": "family",
+   "volunteered": [],
+   "provenance": "native",
+   "universeNote": null,
+   "dkRate": 0.35567331670822944,
+   "targets": {
+    "overall": {
+     "dist": [
+      0.17176452228617448,
+      0.37008221857237683,
+      0.29024000396956684,
+      0.16791325517188188
+     ],
+     "n": 2067
+    },
+    "slices": {
+     "age_band": {
+      "18-29": {
+       "dist": [
+        0.15610344150994732,
+        0.41723740894463707,
+        0.3222880050989299,
+        0.1043711444464857
+       ],
+       "n": 292
+      },
+      "30-44": {
+       "dist": [
+        0.18223731259802256,
+        0.3019619438003068,
+        0.2823290019235898,
+        0.23347174167808085
+       ],
+       "n": 570
+      },
+      "45-64": {
+       "dist": [
+        0.20730066148733467,
+        0.39425900987032714,
+        0.247110567892077,
+        0.15132976075026133
+       ],
+       "n": 670
+      },
+      "65+": {
+       "dist": [
+        0.12253203484457907,
+        0.37699145078534896,
+        0.3327506450779487,
+        0.16772586929212327
+       ],
+       "n": 535
+      }
+     },
+     "sex": {
+      "men": {
+       "dist": [
+        0.20257935788050843,
+        0.393897756517579,
+        0.2798576957286292,
+        0.12366518987328338
+       ],
+       "n": 914
+      },
+      "women": {
+       "dist": [
+        0.1427760234870571,
+        0.3475727168383056,
+        0.2997762353263622,
+        0.20987502434827524
+       ],
+       "n": 1150
+      }
+     },
+     "tenure": {
+      "homeowners": {
+       "dist": [
+        0.16579189429434485,
+        0.37406077065346155,
+        0.29616632864433406,
+        0.16398100640785968
+       ],
+       "n": 1251
+      },
+      "renters or other housing": {
+       "dist": [
+        0.18466947656911964,
+        0.3664867221904916,
+        0.2761025917545664,
+        0.17274120948582228
+       ],
+       "n": 798
+      }
+     }
+    }
+   }
+  },
+  {
+   "itemId": "gss_sexeduc",
+   "source": "gss2024",
+   "variable": "sexeduc",
+   "wording": "Would you be for or against sex education in the public schools?",
+   "options": [
+    "For",
+    "Against",
+    "Depends"
+   ],
+   "positiveOptions": [
+    0
+   ],
+   "valence": "neutral",
+   "domain": "policy",
+   "volunteered": [
+    2
+   ],
+   "provenance": "native",
+   "universeNote": null,
+   "dkRate": 0.3550498753117207,
+   "targets": {
+    "overall": {
+     "dist": [
+      0.8660820397592018,
+      0.13391796024079813,
+      0.0
+     ],
+     "n": 2069
+    },
+    "slices": {
+     "age_band": {
+      "18-29": {
+       "dist": [
+        0.9403977589448251,
+        0.05960224105517493,
+        0.0
+       ],
+       "n": 290
+      },
+      "30-44": {
+       "dist": [
+        0.8596891915491868,
+        0.1403108084508133,
+        0.0
+       ],
+       "n": 576
+      },
+      "45-64": {
+       "dist": [
+        0.8605713551190998,
+        0.13942864488090023,
+        0.0
+       ],
+       "n": 669
+      },
+      "65+": {
+       "dist": [
+        0.8174186927520226,
+        0.18258130724797758,
+        0.0
+       ],
+       "n": 534
+      }
+     },
+     "sex": {
+      "men": {
+       "dist": [
+        0.852274932549712,
+        0.14772506745028807,
+        0.0
+       ],
+       "n": 913
+      },
+      "women": {
+       "dist": [
+        0.8789533301148138,
+        0.12104666988518617,
+        0.0
+       ],
+       "n": 1152
+      }
+     },
+     "tenure": {
+      "homeowners": {
+       "dist": [
+        0.8555794632070107,
+        0.14442053679298938,
+        0.0
+       ],
+       "n": 1258
+      },
+      "renters or other housing": {
+       "dist": [
+        0.8925064687799836,
+        0.10749353122001645,
+        0.0
+       ],
+       "n": 792
+      }
+     }
+    }
+   }
+  },
+  {
+   "itemId": "gss_divlaw",
+   "source": "gss2024",
+   "variable": "divlaw",
+   "wording": "Should divorce in this country be easier or more difficult to obtain than it is now?",
+   "options": [
+    "Easier",
+    "More difficult",
+    "Stay as is"
+   ],
+   "positiveOptions": [
+    0
+   ],
+   "valence": "neutral",
+   "domain": "family",
+   "volunteered": [
+    2
+   ],
+   "provenance": "native",
+   "universeNote": null,
+   "dkRate": 0.7253740648379052,
+   "targets": {
+    "overall": {
+     "dist": [
+      0.5122708062599521,
+      0.2441326295072125,
+      0.24359656423283532
+     ],
+     "n": 881
+    },
+    "slices": {
+     "age_band": {
+      "18-29": {
+       "dist": [
+        0.6464807658862204,
+        0.18512736658986317,
+        0.16839186752391663
+       ],
+       "n": 121
+      },
+      "30-44": {
+       "dist": [
+        0.5933693285328249,
+        0.16428225727772935,
+        0.24234841418944578
+       ],
+       "n": 226
+      },
+      "45-64": {
+       "dist": [
+        0.4884999736616876,
+        0.25157984137188366,
+        0.2599201849664286
+       ],
+       "n": 278
+      },
+      "65+": {
+       "dist": [
+        0.3503296981489714,
+        0.3698363298544682,
+        0.27983397199656035
+       ],
+       "n": 256
+      }
+     },
+     "sex": {
+      "men": {
+       "dist": [
+        0.47357502438818716,
+        0.26990554542224393,
+        0.25651943018956885
+       ],
+       "n": 389
+      },
+      "women": {
+       "dist": [
+        0.5445025140134977,
+        0.22266504173542667,
+        0.2328324442510756
+       ],
+       "n": 492
+      }
+     },
+     "tenure": {
+      "homeowners": {
+       "dist": [
+        0.43709394301079807,
+        0.2881245909840227,
+        0.27478146600517905
+       ],
+       "n": 468
+      },
+      "renters or other housing": {
+       "dist": [
+        0.6171353261135565,
+        0.18564746907290466,
+        0.19721720481353888
+       ],
+       "n": 405
+      }
+     }
+    }
+   }
+  },
+  {
+   "itemId": "gss_fepol",
+   "source": "gss2024",
+   "variable": "fepol",
+   "wording": "Tell me if you agree or disagree with this statement: Most men are better suited emotionally for politics than are most women.",
+   "options": [
+    "Agree",
+    "Disagree"
+   ],
+   "positiveOptions": [
+    1
+   ],
+   "valence": "neutral",
+   "domain": "gender",
+   "volunteered": [],
+   "provenance": "native",
+   "universeNote": null,
+   "dkRate": 0.7284912718204489,
+   "targets": {
+    "overall": {
+     "dist": [
+      0.18194902347291667,
+      0.8180509765270831
+     ],
+     "n": 871
+    },
+    "slices": {
+     "age_band": {
+      "18-29": {
+       "dist": [
+        0.09379574780429337,
+        0.9062042521957064
+       ],
+       "n": 115
+      },
+      "30-44": {
+       "dist": [
+        0.19796941677877525,
+        0.8020305832212247
+       ],
+       "n": 213
+      },
+      "45-64": {
+       "dist": [
+        0.17254630902108656,
+        0.8274536909789136
+       ],
+       "n": 281
+      },
+      "65+": {
+       "dist": [
+        0.23810425501555682,
+        0.761895744984443
+       ],
+       "n": 262
+      }
+     },
+     "sex": {
+      "men": {
+       "dist": [
+        0.2029080346162655,
+        0.7970919653837344
+       ],
+       "n": 375
+      },
+      "women": {
+       "dist": [
+        0.1650831112263906,
+        0.8349168887736093
+       ],
+       "n": 496
+      }
+     },
+     "tenure": {
+      "homeowners": {
+       "dist": [
+        0.19977165175089057,
+        0.8002283482491096
+       ],
+       "n": 479
+      },
+      "renters or other housing": {
+       "dist": [
+        0.161288371231105,
+        0.838711628768895
+       ],
+       "n": 381
+      }
+     }
+    }
+   }
+  },
+  {
+   "itemId": "gss_fefam",
+   "source": "gss2024",
+   "variable": "fefam",
+   "wording": "Now I'm going to read several statements. As I read each one, please tell me whether you strongly agree, agree, disagree, or strongly disagree with it. \u2014 It is much better for everyone involved if the man is the achiever outside the home and the woman takes care of the home and family.",
+   "options": [
+    "Strongly agree",
+    "Agree",
+    "Disagree",
+    "Strongly disagree"
+   ],
+   "positiveOptions": [
+    2,
+    3
+   ],
+   "valence": "neutral",
+   "domain": "gender",
+   "volunteered": [],
+   "provenance": "native",
+   "universeNote": null,
+   "dkRate": 0.34663341645885287,
+   "targets": {
+    "overall": {
+     "dist": [
+      0.08647807981892654,
+      0.23339398965471342,
+      0.4113761154717478,
+      0.26875181505461226
+     ],
+     "n": 2096
+    },
+    "slices": {
+     "age_band": {
+      "18-29": {
+       "dist": [
+        0.12261973065194039,
+        0.2176042481462864,
+        0.4431973608876419,
+        0.2165786603141313
+       ],
+       "n": 295
+      },
+      "30-44": {
+       "dist": [
+        0.07554261690241405,
+        0.22263152562690247,
+        0.3905379177375548,
+        0.3112879397331287
+       ],
+       "n": 585
+      },
+      "45-64": {
+       "dist": [
+        0.06835574189094455,
+        0.2303146684148533,
+        0.42263681876313564,
+        0.27869277093106637
+       ],
+       "n": 675
+      },
+      "65+": {
+       "dist": [
+        0.09374377579132737,
+        0.2642924346481638,
+        0.39345371433953213,
+        0.24851007522097676
+       ],
+       "n": 541
+      }
+     },
+     "sex": {
+      "men": {
+       "dist": [
+        0.09874993377900418,
+        0.24213514195619443,
+        0.43442416939704903,
+        0.22469075486775247
+       ],
+       "n": 921
+      },
+      "women": {
+       "dist": [
+        0.07478372034495166,
+        0.22553777592886487,
+        0.3896296252044191,
+        0.31004887852176444
+       ],
+       "n": 1171
+      }
+     },
+     "tenure": {
+      "homeowners": {
+       "dist": [
+        0.06411940327430092,
+        0.24024628717353178,
+        0.4143648543379883,
+        0.28126945521417884
+       ],
+       "n": 1267
+      },
+      "renters or other housing": {
+       "dist": [
+        0.12442722067080468,
+        0.2211236053369741,
+        0.40664238885245907,
+        0.2478067851397621
+       ],
+       "n": 807
+      }
+     }
+    }
+   }
+  },
+  {
+   "itemId": "gss_fechld",
+   "source": "gss2024",
+   "variable": "fechld",
+   "wording": "Now I'm going to read several statements. As I read each one, please tell me whether you strongly agree, agree, disagree, or strongly disagree with it. \u2014 A working mother can establish just as warm and secure a relationship with her children as a mother who does not work.",
+   "options": [
+    "Strongly agree",
+    "Agree",
+    "Disagree",
+    "Strongly disagree"
+   ],
+   "positiveOptions": [
+    0,
+    1
+   ],
+   "valence": "neutral",
+   "domain": "gender",
+   "volunteered": [],
+   "provenance": "native",
+   "universeNote": null,
+   "dkRate": 0.345074812967581,
+   "targets": {
+    "overall": {
+     "dist": [
+      0.32056262567008953,
+      0.42560919500171707,
+      0.20740547474970913,
+      0.04642270457848428
+     ],
+     "n": 2101
+    },
+    "slices": {
+     "age_band": {
+      "18-29": {
+       "dist": [
+        0.3265753506126994,
+        0.46401695212415683,
+        0.16003555257381175,
+        0.04937214468933215
+       ],
+       "n": 298
+      },
+      "30-44": {
+       "dist": [
+        0.3570364106265154,
+        0.37091522878738664,
+        0.2142580673280323,
+        0.057790293258065645
+       ],
+       "n": 582
+      },
+      "45-64": {
+       "dist": [
+        0.3261915988727129,
+        0.42639910553175087,
+        0.21046312409112305,
+        0.03694617150441307
+       ],
+       "n": 677
+      },
+      "65+": {
+       "dist": [
+        0.2633335989868706,
+        0.45704758316206867,
+        0.2362106291874622,
+        0.04340818866359845
+       ],
+       "n": 544
+      }
+     },
+     "sex": {
+      "men": {
+       "dist": [
+        0.23264200662870252,
+        0.4648517984988543,
+        0.2492662459184109,
+        0.0532399489540322
+       ],
+       "n": 923
+      },
+      "women": {
+       "dist": [
+        0.40222283922687624,
+        0.3890388923775397,
+        0.16858429451896548,
+        0.0401539738766185
+       ],
+       "n": 1174
+      }
+     },
+     "tenure": {
+      "homeowners": {
+       "dist": [
+        0.31335783133980616,
+        0.44302374075199513,
+        0.20276782269769503,
+        0.0408506052105036
+       ],
+       "n": 1270
+      },
+      "renters or other housing": {
+       "dist": [
+        0.3295565739205428,
+        0.3972385364135004,
+        0.21505839560540257,
+        0.058146494060554235
+       ],
+       "n": 809
+      }
+     }
+    }
+   }
+  },
+  {
+   "itemId": "gss_fepresch",
+   "source": "gss2024",
+   "variable": "fepresch",
+   "wording": "Now I'm going to read several statements. As I read each one, please tell me whether you strongly agree, agree, disagree, or strongly disagree with it. \u2014 A preschool child is likely to suffer if his or her mother works.",
+   "options": [
+    "Strongly agree",
+    "Agree",
+    "Disagree",
+    "Strongly disagree"
+   ],
+   "positiveOptions": [
+    2,
+    3
+   ],
+   "valence": "neutral",
+   "domain": "gender",
+   "volunteered": [],
+   "provenance": "native",
+   "universeNote": null,
+   "dkRate": 0.34943890274314215,
+   "targets": {
+    "overall": {
+     "dist": [
+      0.05591563984532184,
+      0.2661553078107675,
+      0.49309558326366204,
+      0.18483346908024847
+     ],
+     "n": 2087
+    },
+    "slices": {
+     "age_band": {
+      "18-29": {
+       "dist": [
+        0.04412640886528656,
+        0.2322704506450709,
+        0.5242376926091837,
+        0.199365447880459
+       ],
+       "n": 296
+      },
+      "30-44": {
+       "dist": [
+        0.06143553261346847,
+        0.2451003333158656,
+        0.43847824475346353,
+        0.25498588931720245
+       ],
+       "n": 577
+      },
+      "45-64": {
+       "dist": [
+        0.04921913243178218,
+        0.25986890288906067,
+        0.5256281168743131,
+        0.16528384780484393
+       ],
+       "n": 675
+      },
+      "65+": {
+       "dist": [
+        0.06888307232853594,
+        0.3291261555751966,
+        0.48561145637303266,
+        0.11637931572323477
+       ],
+       "n": 539
+      }
+     },
+     "sex": {
+      "men": {
+       "dist": [
+        0.054120423115277434,
+        0.3149448892289986,
+        0.5068655160609044,
+        0.12406917159481945
+       ],
+       "n": 914
+      },
+      "women": {
+       "dist": [
+        0.05764395004514542,
+        0.22036994650955258,
+        0.4806590033219288,
+        0.24132710012337324
+       ],
+       "n": 1169
+      }
+     },
+     "tenure": {
+      "homeowners": {
+       "dist": [
+        0.04019863514854359,
+        0.2660258208915267,
+        0.5117603507937218,
+        0.18201519316620762
+       ],
+       "n": 1266
+      },
+      "renters or other housing": {
+       "dist": [
+        0.08192282788668691,
+        0.26586167386158555,
+        0.4585486715871925,
+        0.19366682666453494
+       ],
+       "n": 799
+      }
+     }
+    }
+   }
+  },
+  {
+   "itemId": "gss_helppoor",
+   "source": "gss2024",
+   "variable": "helppoor",
+   "wording": "Some people think that the government in Washington should do everything possible to improve the standard of living of all poor Americans; they are at Point 1 on this card. Other people think it is not the government's responsibility, and that each person should take care of himself; they are at Point 5 on this card. Where would you place yourself on this scale?",
+   "options": [
+    "1 \u2014 Government should do everything possible to improve the standard of living of all poor Americans",
+    "2",
+    "3 \u2014 Agree with both answers",
+    "4",
+    "5 \u2014 Each person should take care of himself"
+   ],
+   "positiveOptions": [
+    0,
+    1
+   ],
+   "valence": "neutral",
+   "domain": "policy",
+   "volunteered": [],
+   "provenance": "native",
+   "universeNote": null,
+   "dkRate": 0.35380299251870323,
+   "targets": {
+    "overall": {
+     "dist": [
+      0.2678103229905465,
+      0.11736254396347519,
+      0.42743697767436944,
+      0.09506752480029182,
+      0.09232263057131698
+     ],
+     "n": 2073
+    },
+    "slices": {
+     "age_band": {
+      "18-29": {
+       "dist": [
+        0.3883061263559905,
+        0.13231518356803298,
+        0.38775102877743145,
+        0.057515732422877074,
+        0.03411192887566791
+       ],
+       "n": 279
+      },
+      "30-44": {
+       "dist": [
+        0.2878102319670705,
+        0.150808197255223,
+        0.4179737488620756,
+        0.07450400140993974,
+        0.06890382050569133
+       ],
+       "n": 576
+      },
+      "45-64": {
+       "dist": [
+        0.2558681390239924,
+        0.11747142709144028,
+        0.41637026187813914,
+        0.11464024788642328,
+        0.0956499241200049
+       ],
+       "n": 667
+      },
+      "65+": {
+       "dist": [
+        0.16373445882682583,
+        0.06843319778577318,
+        0.48549986609932283,
+        0.12134275879103774,
+        0.16098971849704047
+       ],
+       "n": 551
+      }
+     },
+     "sex": {
+      "men": {
+       "dist": [
+        0.2457917513127132,
+        0.1261335581923121,
+        0.41783535336469735,
+        0.0925844053795029,
+        0.1176549317507744
+       ],
+       "n": 936
+      },
+      "women": {
+       "dist": [
+        0.291039378716706,
+        0.10903430298019573,
+        0.43796010678329267,
+        0.09777396737593544,
+        0.06419224414387016
+       ],
+       "n": 1130
+      }
+     },
+     "tenure": {
+      "homeowners": {
+       "dist": [
+        0.2053298634451937,
+        0.1144084943670438,
+        0.44204532081794123,
+        0.11443422980305097,
+        0.1237820915667703
+       ],
+       "n": 625
+      },
+      "renters or other housing": {
+       "dist": [
+        0.411889713468809,
+        0.09106941242665952,
+        0.3922650253241356,
+        0.03681485385950411,
+        0.06796099492089173
+       ],
+       "n": 374
+      }
+     }
+    }
+   }
+  },
+  {
+   "itemId": "gss_helpsick",
+   "source": "gss2024",
+   "variable": "helpsick",
+   "wording": "In general, some people think that it is the responsibility of the government in Washington to help people pay for doctors and hospital bills; they are at Point 1. Others think that these matters are not the responsibility of the federal government and that people should take care of these things themselves; they are at Point 5. Where would you place yourself on this scale?",
+   "options": [
+    "1 \u2014 Government should help people pay for doctors and hospital bills",
+    "2",
+    "3 \u2014 Agree with both answers",
+    "4",
+    "5 \u2014 People should take care of these things themselves"
+   ],
+   "positiveOptions": [
+    0,
+    1
+   ],
+   "valence": "neutral",
+   "domain": "policy",
+   "volunteered": [],
+   "provenance": "native",
+   "universeNote": null,
+   "dkRate": 0.35099750623441395,
+   "targets": {
+    "overall": {
+     "dist": [
+      0.37254284379953057,
+      0.1587388326368528,
+      0.3209734341072464,
+      0.07765658565568574,
+      0.07008830380068454
+     ],
+     "n": 2082
+    },
+    "slices": {
+     "age_band": {
+      "18-29": {
+       "dist": [
+        0.44025377585197756,
+        0.13219050691746298,
+        0.35651401229014335,
+        0.04690243984802817,
+        0.024139265092387972
+       ],
+       "n": 280
+      },
+      "30-44": {
+       "dist": [
+        0.38658895051502423,
+        0.19026153069187943,
+        0.3012956295869256,
+        0.07346102006711215,
+        0.048392869139058554
+       ],
+       "n": 575
+      },
+      "45-64": {
+       "dist": [
+        0.3459977063380648,
+        0.1752562075540676,
+        0.3081460199349249,
+        0.0869054757875807,
+        0.0836945903853621
+       ],
+       "n": 668
+      },
+      "65+": {
+       "dist": [
+        0.3386739519138856,
+        0.12377461885809295,
+        0.33078598617560323,
+        0.09454769701937205,
+        0.11221774603304625
+       ],
+       "n": 559
+      }
+     },
+     "sex": {
+      "men": {
+       "dist": [
+        0.3350576659221982,
+        0.15836990588092925,
+        0.33444464782402883,
+        0.08691976891916794,
+        0.08520801145367574
+       ],
+       "n": 939
+      },
+      "women": {
+       "dist": [
+        0.4124735494893856,
+        0.1600395231274224,
+        0.30697034464509576,
+        0.06828453819065114,
+        0.052232044547445025
+       ],
+       "n": 1136
+      }
+     },
+     "tenure": {
+      "homeowners": {
+       "dist": [
+        0.28055791987305606,
+        0.17987955353174398,
+        0.3428010614591439,
+        0.10397259356387317,
+        0.0927888715721829
+       ],
+       "n": 630
+      },
+      "renters or other housing": {
+       "dist": [
+        0.4912617808618088,
+        0.12069246920709767,
+        0.30476179483838056,
+        0.04611462391320928,
+        0.03716933117950368
+       ],
+       "n": 375
+      }
+     }
+    }
+   }
+  },
+  {
+   "itemId": "gss_helpnot",
+   "source": "gss2024",
+   "variable": "helpnot",
+   "wording": "Some people think that the government in Washington is trying to do too many things that should be left to individuals and private business; they are at Point 5 on this card. Others disagree and think that the government should do even more to solve our country's problems; they are at Point 1. Where would you place yourself on this scale?",
+   "options": [
+    "1 \u2014 Government should do even more to solve our country's problems",
+    "2",
+    "3 \u2014 Agree with both answers",
+    "4",
+    "5 \u2014 Government is trying to do too many things that should be left to individuals and private business"
+   ],
+   "positiveOptions": [
+    0,
+    1
+   ],
+   "valence": "neutral",
+   "domain": "policy",
+   "volunteered": [],
+   "provenance": "native",
+   "universeNote": null,
+   "dkRate": 0.36034912718204487,
+   "targets": {
+    "overall": {
+     "dist": [
+      0.2111687392509343,
+      0.11530427382547123,
+      0.4001380558852682,
+      0.12542876073510603,
+      0.14796017030322037
+     ],
+     "n": 2052
+    },
+    "slices": {
+     "age_band": {
+      "18-29": {
+       "dist": [
+        0.3010645776940758,
+        0.13502003053033929,
+        0.3689662046119412,
+        0.11824248072471788,
+        0.07670670643892581
+       ],
+       "n": 270
+      },
+      "30-44": {
+       "dist": [
+        0.20530296153104166,
+        0.11261372870428864,
+        0.4493340826995512,
+        0.13200257085893327,
+        0.10074665620618518
+       ],
+       "n": 567
+      },
+      "45-64": {
+       "dist": [
+        0.19875766169297002,
+        0.1310794660079979,
+        0.3741805386267366,
+        0.11768768732747496,
+        0.17829464634482062
+       ],
+       "n": 665
+      },
+      "65+": {
+       "dist": [
+        0.1631313020429702,
+        0.08061872991801133,
+        0.4082104781310071,
+        0.1348373958211903,
+        0.21320209408682095
+       ],
+       "n": 550
+      }
+     },
+     "sex": {
+      "men": {
+       "dist": [
+        0.18503926886616295,
+        0.12063961091316043,
+        0.38049915134150797,
+        0.13472106730666844,
+        0.1791009015725001
+       ],
+       "n": 932
+      },
+      "women": {
+       "dist": [
+        0.23938138551168722,
+        0.11047591805734358,
+        0.4195694241943131,
+        0.11657574992214813,
+        0.11399752231450783
+       ],
+       "n": 1113
+      }
+     },
+     "tenure": {
+      "homeowners": {
+       "dist": [
+        0.1768746709664337,
+        0.10615298872645682,
+        0.41169254863338756,
+        0.11175301838873587,
+        0.19352677328498596
+       ],
+       "n": 618
+      },
+      "renters or other housing": {
+       "dist": [
+        0.26845815328382655,
+        0.12132274742122628,
+        0.43207853834866006,
+        0.08317093723945525,
+        0.09496962370683187
+       ],
+       "n": 365
+      }
+     }
+    }
+   }
+  },
+  {
+   "itemId": "gss_eqwlth",
+   "source": "gss2024",
+   "variable": "eqwlth",
+   "wording": "Some people think that the government in Washington ought to reduce the income differences between the rich and the poor, perhaps by raising the taxes of wealthy families or by giving income assistance to the poor. Others think that the government should not concern itself with reducing this income difference between the rich and the poor. Think of a score of 1 as meaning that the government ought to reduce the income differences between rich and poor, and a score of 7 meaning that the government should not concern itself with reducing income differences. What score between 1 and 7 comes closest to the way you feel?",
+   "options": [
+    "1 \u2014 Government ought to reduce income differences",
+    "2",
+    "3",
+    "4",
+    "5",
+    "6",
+    "7 \u2014 Government should not concern itself with reducing income differences"
+   ],
+   "positiveOptions": [
+    0,
+    1,
+    2
+   ],
+   "valence": "neutral",
+   "domain": "policy",
+   "volunteered": [],
+   "provenance": "native",
+   "universeNote": null,
+   "dkRate": 0.345074812967581,
+   "targets": {
+    "overall": {
+     "dist": [
+      0.31146122949812305,
+      0.07913851980529407,
+      0.1391635328598692,
+      0.15519998012915073,
+      0.09332379704784212,
+      0.057698237581453544,
+      0.16401470307826735
+     ],
+     "n": 2101
+    },
+    "slices": {
+     "age_band": {
+      "18-29": {
+       "dist": [
+        0.370111765821834,
+        0.06666525068465312,
+        0.17451285255675383,
+        0.12386308382355188,
+        0.12884515469368243,
+        0.03306761050171054,
+        0.10293428191781413
+       ],
+       "n": 285
+      },
+      "30-44": {
+       "dist": [
+        0.3425503163842218,
+        0.09571795852168158,
+        0.14665718772296069,
+        0.16666531647631574,
+        0.08859462255480294,
+        0.02968523131503792,
+        0.13012936702497946
+       ],
+       "n": 581
+      },
+      "45-64": {
+       "dist": [
+        0.31509132062298223,
+        0.07921782127747984,
+        0.12177570246915098,
+        0.15229515926631057,
+        0.06670183156246763,
+        0.07814278868343881,
+        0.18677537611817005
+       ],
+       "n": 675
+      },
+      "65+": {
+       "dist": [
+        0.2241944943534683,
+        0.07165122724495099,
+        0.12562119794812057,
+        0.17304601486111287,
+        0.1054808314047271,
+        0.08009222178312354,
+        0.21991401240449662
+       ],
+       "n": 560
+      }
+     },
+     "sex": {
+      "men": {
+       "dist": [
+        0.27047429956488317,
+        0.07535122230714027,
+        0.13812267606786943,
+        0.15088914831457234,
+        0.08776461412686072,
+        0.06535119068276005,
+        0.212046848935914
+       ],
+       "n": 948
+      },
+      "women": {
+       "dist": [
+        0.35204509513081755,
+        0.0829123763171505,
+        0.14162759831449293,
+        0.16120479498785675,
+        0.09974685232890161,
+        0.0503613301261754,
+        0.11210195279460528
+       ],
+       "n": 1143
+      }
+     },
+     "tenure": {
+      "homeowners": {
+       "dist": [
+        0.24678715750420466,
+        0.07267004813850925,
+        0.14223444401088572,
+        0.1572612389803507,
+        0.0968169100355752,
+        0.07135166339363642,
+        0.21287853793683803
+       ],
+       "n": 631
+      },
+      "renters or other housing": {
+       "dist": [
+        0.4427750424951999,
+        0.07786598156874087,
+        0.1525153329293292,
+        0.0869356775127838,
+        0.10500488115435311,
+        0.035626954876989615,
+        0.09927612946260368
+       ],
+       "n": 378
+      }
+     }
+    }
+   }
+  },
+  {
+   "itemId": "gss_polviews",
+   "source": "gss2024",
+   "variable": "polviews",
+   "wording": "We hear a lot of talk these days about liberals and conservatives. I'm going to show you a seven-point scale on which the political views that people might hold are arranged from extremely liberal \u2014 point 1 \u2014 to extremely conservative \u2014 point 7. Where would you place yourself on this scale?",
+   "options": [
+    "1 \u2014 Extremely liberal",
+    "2 \u2014 Liberal",
+    "3 \u2014 Slightly liberal",
+    "4 \u2014 Moderate, middle of the road",
+    "5 \u2014 Slightly conservative",
+    "6 \u2014 Conservative",
+    "7 \u2014 Extremely conservative"
+   ],
+   "positiveOptions": [
+    0,
+    1,
+    2
+   ],
+   "valence": "neutral",
+   "domain": "identity",
+   "volunteered": [],
+   "provenance": "native",
+   "universeNote": null,
+   "dkRate": 0.04239401496259352,
+   "targets": {
+    "overall": {
+     "dist": [
+      0.03753472159465799,
+      0.12784590705547427,
+      0.11123006199598545,
+      0.36674797931185593,
+      0.11880442257708522,
+      0.1710312218319131,
+      0.06680568563302813
+     ],
+     "n": 3072
+    },
+    "slices": {
+     "age_band": {
+      "18-29": {
+       "dist": [
+        0.052982924202656566,
+        0.1338738022353363,
+        0.12829793301701756,
+        0.4354658656564525,
+        0.09613627220039726,
+        0.12601353440788482,
+        0.027229668280255206
+       ],
+       "n": 427
+      },
+      "30-44": {
+       "dist": [
+        0.03665900845294582,
+        0.14591915485238194,
+        0.14028664014348366,
+        0.36956286823330314,
+        0.12323136518575831,
+        0.12427085728936439,
+        0.060070105842762685
+       ],
+       "n": 846
+      },
+      "45-64": {
+       "dist": [
+        0.03941045572095572,
+        0.11803485359861485,
+        0.07593169197850597,
+        0.3623719678267416,
+        0.13492073735697316,
+        0.20567318502583215,
+        0.06365710849237657
+       ],
+       "n": 978
+      },
+      "65+": {
+       "dist": [
+        0.022850190471653126,
+        0.11567443687431815,
+        0.11236302189522845,
+        0.3113355970381624,
+        0.11072216237917008,
+        0.21467901902326533,
+        0.11237557231820247
+       ],
+       "n": 821
+      }
+     },
+     "sex": {
+      "men": {
+       "dist": [
+        0.03091662621040587,
+        0.12020715465783258,
+        0.11343045436798095,
+        0.3476128920706435,
+        0.13733548531226344,
+        0.17983416640292363,
+        0.07066322097795008
+       ],
+       "n": 1381
+      },
+      "women": {
+       "dist": [
+        0.04416685620065284,
+        0.13580179675191556,
+        0.10946545624320485,
+        0.3846601216042377,
+        0.10045963591247777,
+        0.1629962973030971,
+        0.062449835984414184
+       ],
+       "n": 1685
+      }
+     },
+     "tenure": {
+      "homeowners": {
+       "dist": [
+        0.021886191756620328,
+        0.12802817004567973,
+        0.10740890761117781,
+        0.3452490523607623,
+        0.1126348514176849,
+        0.2134974312064837,
+        0.07129539560159118
+       ],
+       "n": 1238
+      },
+      "renters or other housing": {
+       "dist": [
+        0.08246197456320724,
+        0.11591139854664531,
+        0.11699493434819394,
+        0.3763744323140684,
+        0.13203146461410672,
+        0.1040683150209824,
+        0.07215748059279585
+       ],
+       "n": 770
+      }
+     }
+    }
+   }
+  },
+  {
+   "itemId": "gss_confinan",
+   "source": "gss2024",
+   "variable": "confinan",
+   "wording": "I am going to name some institutions in this country. As far as the people running these institutions are concerned, would you say you have a great deal of confidence, only some confidence, or hardly any confidence at all in them? Banks and financial institutions",
+   "options": [
+    "A great deal",
+    "Only some",
+    "Hardly any"
+   ],
+   "positiveOptions": [
+    0
+   ],
+   "valence": "neutral",
+   "domain": "institutions",
+   "volunteered": [],
+   "provenance": "native",
+   "universeNote": null,
+   "dkRate": 0.3444513715710723,
+   "targets": {
+    "overall": {
+     "dist": [
+      0.17306366653822422,
+      0.5807727662888945,
+      0.24616356717288135
+     ],
+     "n": 2103
+    },
+    "slices": {
+     "age_band": {
+      "18-29": {
+       "dist": [
+        0.14179839661884355,
+        0.6187857270680456,
+        0.23941587631311081
+       ],
+       "n": 285
+      },
+      "30-44": {
+       "dist": [
+        0.17726858795532457,
+        0.502158589496279,
+        0.32057282254839636
+       ],
+       "n": 581
+      },
+      "45-64": {
+       "dist": [
+        0.15870544407032386,
+        0.6092279399684364,
+        0.23206661596123968
+       ],
+       "n": 676
+      },
+      "65+": {
+       "dist": [
+        0.21415937082669095,
+        0.5950485092965326,
+        0.1907921198767764
+       ],
+       "n": 561
+      }
+     },
+     "sex": {
+      "men": {
+       "dist": [
+        0.15302217636139812,
+        0.5792775913392165,
+        0.2677002322993855
+       ],
+       "n": 950
+      },
+      "women": {
+       "dist": [
+        0.194540916980523,
+        0.5842181769825269,
+        0.22124090603695018
+       ],
+       "n": 1143
+      }
+     },
+     "tenure": {
+      "homeowners": {
+       "dist": [
+        0.1373627920571087,
+        0.5988385510188378,
+        0.2637986569240533
+       ],
+       "n": 633
+      },
+      "renters or other housing": {
+       "dist": [
+        0.16960475265409364,
+        0.5060930899591702,
+        0.32430215738673607
+       ],
+       "n": 379
+      }
+     }
+    }
+   }
+  },
+  {
+   "itemId": "gss_conbus",
+   "source": "gss2024",
+   "variable": "conbus",
+   "wording": "I am going to name some institutions in this country. As far as the people running these institutions are concerned, would you say you have a great deal of confidence, only some confidence, or hardly any confidence at all in them? Major companies",
+   "options": [
+    "A great deal",
+    "Only some",
+    "Hardly any"
+   ],
+   "positiveOptions": [
+    0
+   ],
+   "valence": "neutral",
+   "domain": "institutions",
+   "volunteered": [],
+   "provenance": "native",
+   "universeNote": null,
+   "dkRate": 0.35037406483790523,
+   "targets": {
+    "overall": {
+     "dist": [
+      0.15025298859540837,
+      0.6119629792827245,
+      0.23778403212186716
+     ],
+     "n": 2084
+    },
+    "slices": {
+     "age_band": {
+      "18-29": {
+       "dist": [
+        0.1427938013148177,
+        0.6352778209980676,
+        0.22192837768711465
+       ],
+       "n": 282
+      },
+      "30-44": {
+       "dist": [
+        0.14368320856071226,
+        0.5488952662740549,
+        0.30742152516523275
+       ],
+       "n": 583
+      },
+      "45-64": {
+       "dist": [
+        0.15130957373508833,
+        0.6249398660805222,
+        0.2237505601843895
+       ],
+       "n": 667
+      },
+      "65+": {
+       "dist": [
+        0.16229204560414962,
+        0.6438154965961833,
+        0.19389245779966688
+       ],
+       "n": 552
+      }
+     },
+     "sex": {
+      "men": {
+       "dist": [
+        0.1661295899910098,
+        0.5937931770982523,
+        0.2400772329107379
+       ],
+       "n": 941
+      },
+      "women": {
+       "dist": [
+        0.1353105952005438,
+        0.6320516639581076,
+        0.2326377408413485
+       ],
+       "n": 1133
+      }
+     },
+     "tenure": {
+      "homeowners": {
+       "dist": [
+        0.10038694064685014,
+        0.6766550615909948,
+        0.2229579977621553
+       ],
+       "n": 626
+      },
+      "renters or other housing": {
+       "dist": [
+        0.1441587964113964,
+        0.5527804253329726,
+        0.303060778255631
+       ],
+       "n": 375
+      }
+     }
+    }
+   }
+  },
+  {
+   "itemId": "gss_coneduc",
+   "source": "gss2024",
+   "variable": "coneduc",
+   "wording": "I am going to name some institutions in this country. As far as the people running these institutions are concerned, would you say you have a great deal of confidence, only some confidence, or hardly any confidence at all in them? Education",
+   "options": [
+    "A great deal",
+    "Only some",
+    "Hardly any"
+   ],
+   "positiveOptions": [
+    0
+   ],
+   "valence": "neutral",
+   "domain": "institutions",
+   "volunteered": [],
+   "provenance": "native",
+   "universeNote": null,
+   "dkRate": 0.34351620947630923,
+   "targets": {
+    "overall": {
+     "dist": [
+      0.19839388212344825,
+      0.5427519694461498,
+      0.25885414843040205
+     ],
+     "n": 2106
+    },
+    "slices": {
+     "age_band": {
+      "18-29": {
+       "dist": [
+        0.28344276652913336,
+        0.5135876273132818,
+        0.20296960615758486
+       ],
+       "n": 287
+      },
+      "30-44": {
+       "dist": [
+        0.2092343685601113,
+        0.49775375054766535,
+        0.2930118808922234
+       ],
+       "n": 584
+      },
+      "45-64": {
+       "dist": [
+        0.16230520880592358,
+        0.5642380470344278,
+        0.2734567441596485
+       ],
+       "n": 673
+      },
+      "65+": {
+       "dist": [
+        0.16482772442552593,
+        0.5863069060846506,
+        0.24886536948982335
+       ],
+       "n": 562
+      }
+     },
+     "sex": {
+      "men": {
+       "dist": [
+        0.2017191913385469,
+        0.5014186459967299,
+        0.29686216266472315
+       ],
+       "n": 948
+      },
+      "women": {
+       "dist": [
+        0.19695947266796052,
+        0.5830026321434048,
+        0.22003789518863476
+       ],
+       "n": 1148
+      }
+     },
+     "tenure": {
+      "homeowners": {
+       "dist": [
+        0.13336988008887526,
+        0.5943843811672295,
+        0.2722457387438952
+       ],
+       "n": 629
+      },
+      "renters or other housing": {
+       "dist": [
+        0.2429767785954082,
+        0.4755870002103315,
+        0.28143622119426037
+       ],
+       "n": 383
+      }
+     }
+    }
+   }
+  },
+  {
+   "itemId": "gss_conpress",
+   "source": "gss2024",
+   "variable": "conpress",
+   "wording": "I am going to name some institutions in this country. As far as the people running these institutions are concerned, would you say you have a great deal of confidence, only some confidence, or hardly any confidence at all in them? The press",
+   "options": [
+    "A great deal",
+    "Only some",
+    "Hardly any"
+   ],
+   "positiveOptions": [
+    0
+   ],
+   "valence": "neutral",
+   "domain": "institutions",
+   "volunteered": [],
+   "provenance": "native",
+   "universeNote": null,
+   "dkRate": 0.3497506234413965,
+   "targets": {
+    "overall": {
+     "dist": [
+      0.07728112536877942,
+      0.37296898421823915,
+      0.5497498904129813
+     ],
+     "n": 2086
+    },
+    "slices": {
+     "age_band": {
+      "18-29": {
+       "dist": [
+        0.06149906179754463,
+        0.44378168911822,
+        0.4947192490842353
+       ],
+       "n": 274
+      },
+      "30-44": {
+       "dist": [
+        0.09905570427128588,
+        0.3341994981415506,
+        0.5667447975871635
+       ],
+       "n": 579
+      },
+      "45-64": {
+       "dist": [
+        0.06589843396028056,
+        0.3514995473119314,
+        0.582602018727788
+       ],
+       "n": 675
+      },
+      "65+": {
+       "dist": [
+        0.08193814299302693,
+        0.38855403437291225,
+        0.5295078226340608
+       ],
+       "n": 558
+      }
+     },
+     "sex": {
+      "men": {
+       "dist": [
+        0.07716105613705708,
+        0.32892051864494964,
+        0.5939184252179933
+       ],
+       "n": 942
+      },
+      "women": {
+       "dist": [
+        0.07780124496343464,
+        0.4204432761218331,
+        0.5017554789147323
+       ],
+       "n": 1133
+      }
+     },
+     "tenure": {
+      "homeowners": {
+       "dist": [
+        0.0820515897166711,
+        0.3577504702015267,
+        0.560197940081802
+       ],
+       "n": 628
+      },
+      "renters or other housing": {
+       "dist": [
+        0.07769938489384443,
+        0.3756333497714724,
+        0.5466672653346831
+       ],
+       "n": 374
+      }
+     }
+    }
+   }
+  },
+  {
+   "itemId": "gss_conmedic",
+   "source": "gss2024",
+   "variable": "conmedic",
+   "wording": "I am going to name some institutions in this country. As far as the people running these institutions are concerned, would you say you have a great deal of confidence, only some confidence, or hardly any confidence at all in them? Medicine",
+   "options": [
+    "A great deal",
+    "Only some",
+    "Hardly any"
+   ],
+   "positiveOptions": [
+    0
+   ],
+   "valence": "neutral",
+   "domain": "institutions",
+   "volunteered": [],
+   "provenance": "native",
+   "universeNote": null,
+   "dkRate": 0.34538653366583544,
+   "targets": {
+    "overall": {
+     "dist": [
+      0.26547287763263866,
+      0.5377333391417914,
+      0.1967937832255699
+     ],
+     "n": 2100
+    },
+    "slices": {
+     "age_band": {
+      "18-29": {
+       "dist": [
+        0.2968294790117959,
+        0.5404595994812569,
+        0.16271092150694727
+       ],
+       "n": 283
+      },
+      "30-44": {
+       "dist": [
+        0.24860987936243967,
+        0.5060533354229766,
+        0.24533678521458382
+       ],
+       "n": 584
+      },
+      "45-64": {
+       "dist": [
+        0.23466962440215602,
+        0.5324547783543068,
+        0.2328755972435372
+       ],
+       "n": 671
+      },
+      "65+": {
+       "dist": [
+        0.30014691262880167,
+        0.5770244125194278,
+        0.12282867485177043
+       ],
+       "n": 562
+      }
+     },
+     "sex": {
+      "men": {
+       "dist": [
+        0.2831563149866115,
+        0.5202805901659764,
+        0.19656309484741213
+       ],
+       "n": 946
+      },
+      "women": {
+       "dist": [
+        0.24644716428602378,
+        0.5596723881152669,
+        0.19388044759870948
+       ],
+       "n": 1144
+      }
+     },
+     "tenure": {
+      "homeowners": {
+       "dist": [
+        0.25703276082390186,
+        0.5474633965780522,
+        0.19550384259804612
+       ],
+       "n": 628
+      },
+      "renters or other housing": {
+       "dist": [
+        0.1980040607953339,
+        0.5992946836955071,
+        0.20270125550915902
+       ],
+       "n": 378
+      }
+     }
+    }
+   }
+  },
+  {
+   "itemId": "gss_conarmy",
+   "source": "gss2024",
+   "variable": "conarmy",
+   "wording": "I am going to name some institutions in this country. As far as the people running these institutions are concerned, would you say you have a great deal of confidence, only some confidence, or hardly any confidence at all in them? The military",
+   "options": [
+    "A great deal",
+    "Only some",
+    "Hardly any"
+   ],
+   "positiveOptions": [
+    0
+   ],
+   "valence": "neutral",
+   "domain": "institutions",
+   "volunteered": [],
+   "provenance": "native",
+   "universeNote": null,
+   "dkRate": 0.34663341645885287,
+   "targets": {
+    "overall": {
+     "dist": [
+      0.4345348912681044,
+      0.45240229345083166,
+      0.11306281528106384
+     ],
+     "n": 2096
+    },
+    "slices": {
+     "age_band": {
+      "18-29": {
+       "dist": [
+        0.4327019843770562,
+        0.4176758400922942,
+        0.14962217553064963
+       ],
+       "n": 283
+      },
+      "30-44": {
+       "dist": [
+        0.35924481336804276,
+        0.47532602932827667,
+        0.16542915730368044
+       ],
+       "n": 581
+      },
+      "45-64": {
+       "dist": [
+        0.47043896176124206,
+        0.45343372512306607,
+        0.07612731311569185
+       ],
+       "n": 674
+      },
+      "65+": {
+       "dist": [
+        0.46794597526066245,
+        0.4549364923173608,
+        0.07711753242197675
+       ],
+       "n": 558
+      }
+     },
+     "sex": {
+      "men": {
+       "dist": [
+        0.47524214788686675,
+        0.4192449557443434,
+        0.10551289636878974
+       ],
+       "n": 949
+      },
+      "women": {
+       "dist": [
+        0.392016907127358,
+        0.4895170936529879,
+        0.118465999219654
+       ],
+       "n": 1137
+      }
+     },
+     "tenure": {
+      "homeowners": {
+       "dist": [
+        0.38770393244574364,
+        0.5163740760706502,
+        0.0959219914836062
+       ],
+       "n": 631
+      },
+      "renters or other housing": {
+       "dist": [
+        0.3952957968203398,
+        0.45534679446723575,
+        0.1493574087124244
+       ],
+       "n": 378
+      }
+     }
+    }
+   }
+  },
+  {
+   "itemId": "gss_confed",
+   "source": "gss2024",
+   "variable": "confed",
+   "wording": "I am going to name some institutions in this country. As far as the people running these institutions are concerned, would you say you have a great deal of confidence, only some confidence, or hardly any confidence at all in them? The executive branch of the federal government",
+   "options": [
+    "A great deal",
+    "Only some",
+    "Hardly any"
+   ],
+   "positiveOptions": [
+    0
+   ],
+   "valence": "neutral",
+   "domain": "institutions",
+   "volunteered": [],
+   "provenance": "native",
+   "universeNote": null,
+   "dkRate": 0.3497506234413965,
+   "targets": {
+    "overall": {
+     "dist": [
+      0.12253698039499435,
+      0.4129384549848695,
+      0.4645245646201361
+     ],
+     "n": 2086
+    },
+    "slices": {
+     "age_band": {
+      "18-29": {
+       "dist": [
+        0.10476039091586017,
+        0.49506144223552767,
+        0.4001781668486122
+       ],
+       "n": 277
+      },
+      "30-44": {
+       "dist": [
+        0.12341601943022415,
+        0.43571416984761496,
+        0.44086981072216075
+       ],
+       "n": 578
+      },
+      "45-64": {
+       "dist": [
+        0.12814778790034406,
+        0.36652402020230684,
+        0.505328191897349
+       ],
+       "n": 673
+      },
+      "65+": {
+       "dist": [
+        0.12841131614114887,
+        0.3848759135726267,
+        0.48671277028622434
+       ],
+       "n": 558
+      }
+     },
+     "sex": {
+      "men": {
+       "dist": [
+        0.12089490960858175,
+        0.3871077205957684,
+        0.4919973697956499
+       ],
+       "n": 945
+      },
+      "women": {
+       "dist": [
+        0.12453761356433124,
+        0.4409688015490262,
+        0.43449358488664264
+       ],
+       "n": 1131
+      }
+     },
+     "tenure": {
+      "homeowners": {
+       "dist": [
+        0.09572891314603643,
+        0.4012228081322934,
+        0.5030482787216702
+       ],
+       "n": 627
+      },
+      "renters or other housing": {
+       "dist": [
+        0.10415105586414528,
+        0.4459005163805248,
+        0.44994842775532995
+       ],
+       "n": 372
+      }
+     }
+    }
+   }
+  },
+  {
+   "itemId": "gss_conjudge",
+   "source": "gss2024",
+   "variable": "conjudge",
+   "wording": "I am going to name some institutions in this country. As far as the people running these institutions are concerned, would you say you have a great deal of confidence, only some confidence, or hardly any confidence at all in them? The U.S. Supreme Court",
+   "options": [
+    "A great deal",
+    "Only some",
+    "Hardly any"
+   ],
+   "positiveOptions": [
+    0
+   ],
+   "valence": "neutral",
+   "domain": "institutions",
+   "volunteered": [],
+   "provenance": "native",
+   "universeNote": null,
+   "dkRate": 0.3491271820448878,
+   "targets": {
+    "overall": {
+     "dist": [
+      0.18508820495504322,
+      0.44669114213411604,
+      0.3682206529108406
+     ],
+     "n": 2088
+    },
+    "slices": {
+     "age_band": {
+      "18-29": {
+       "dist": [
+        0.18576022882000717,
+        0.45414400248018655,
+        0.3600957686998063
+       ],
+       "n": 280
+      },
+      "30-44": {
+       "dist": [
+        0.16168336759051863,
+        0.44553627544063257,
+        0.3927803569688487
+       ],
+       "n": 578
+      },
+      "45-64": {
+       "dist": [
+        0.1940040309100236,
+        0.463027669430734,
+        0.34296829965924236
+       ],
+       "n": 669
+      },
+      "65+": {
+       "dist": [
+        0.1975299784362463,
+        0.41968428166120764,
+        0.38278573990254616
+       ],
+       "n": 561
+      }
+     },
+     "sex": {
+      "men": {
+       "dist": [
+        0.21666990521352703,
+        0.43330460242101265,
+        0.35002549236546043
+       ],
+       "n": 946
+      },
+      "women": {
+       "dist": [
+        0.15245422619197152,
+        0.4630470473969633,
+        0.38449872641106486
+       ],
+       "n": 1131
+      }
+     },
+     "tenure": {
+      "homeowners": {
+       "dist": [
+        0.1523242375505733,
+        0.46176408712339617,
+        0.3859116753260305
+       ],
+       "n": 626
+      },
+      "renters or other housing": {
+       "dist": [
+        0.181988662229025,
+        0.46458094265027794,
+        0.35343039512069707
+       ],
+       "n": 375
+      }
+     }
+    }
+   }
+  },
+  {
+   "itemId": "gss_consci",
+   "source": "gss2024",
+   "variable": "consci",
+   "wording": "I am going to name some institutions in this country. As far as the people running these institutions are concerned, would you say you have a great deal of confidence, only some confidence, or hardly any confidence at all in them? The scientific community",
+   "options": [
+    "A great deal",
+    "Only some",
+    "Hardly any"
+   ],
+   "positiveOptions": [
+    0
+   ],
+   "valence": "neutral",
+   "domain": "institutions",
+   "volunteered": [],
+   "provenance": "native",
+   "universeNote": null,
+   "dkRate": 0.35629675810473815,
+   "targets": {
+    "overall": {
+     "dist": [
+      0.3697784519630929,
+      0.5136423391577677,
+      0.11657920887913964
+     ],
+     "n": 2065
+    },
+    "slices": {
+     "age_band": {
+      "18-29": {
+       "dist": [
+        0.3987722824512148,
+        0.4972083538692003,
+        0.10401936367958482
+       ],
+       "n": 279
+      },
+      "30-44": {
+       "dist": [
+        0.3532388481940979,
+        0.5141002704378206,
+        0.1326608813680816
+       ],
+       "n": 574
+      },
+      "45-64": {
+       "dist": [
+        0.34485584815602516,
+        0.5241251010648315,
+        0.1310190507791433
+       ],
+       "n": 665
+      },
+      "65+": {
+       "dist": [
+        0.3984756248159541,
+        0.5122123210626942,
+        0.08931205412135157
+       ],
+       "n": 547
+      }
+     },
+     "sex": {
+      "men": {
+       "dist": [
+        0.40436294877220713,
+        0.49251944690130184,
+        0.10311760432649109
+       ],
+       "n": 939
+      },
+      "women": {
+       "dist": [
+        0.33306193595113226,
+        0.537707427744033,
+        0.12923063630483478
+       ],
+       "n": 1116
+      }
+     },
+     "tenure": {
+      "homeowners": {
+       "dist": [
+        0.3532058674718146,
+        0.5288540648804763,
+        0.1179400676477091
+       ],
+       "n": 620
+      },
+      "renters or other housing": {
+       "dist": [
+        0.3557279625717728,
+        0.5083579036509434,
+        0.1359141337772838
+       ],
+       "n": 365
+      }
+     }
+    }
+   }
+  },
+  {
+   "itemId": "gss_conlegis",
+   "source": "gss2024",
+   "variable": "conlegis",
+   "wording": "I am going to name some institutions in this country. As far as the people running these institutions are concerned, would you say you have a great deal of confidence, only some confidence, or hardly any confidence at all in them? Congress",
+   "options": [
+    "A great deal",
+    "Only some",
+    "Hardly any"
+   ],
+   "positiveOptions": [
+    0
+   ],
+   "valence": "neutral",
+   "domain": "institutions",
+   "volunteered": [],
+   "provenance": "native",
+   "universeNote": null,
+   "dkRate": 0.3491271820448878,
+   "targets": {
+    "overall": {
+     "dist": [
+      0.05673518143717846,
+      0.41915299068435685,
+      0.5241118278784647
+     ],
+     "n": 2088
+    },
+    "slices": {
+     "age_band": {
+      "18-29": {
+       "dist": [
+        0.07661933227366827,
+        0.5205778414205886,
+        0.4028028263057433
+       ],
+       "n": 278
+      },
+      "30-44": {
+       "dist": [
+        0.07295523231701465,
+        0.4210928739067657,
+        0.5059518937762194
+       ],
+       "n": 578
+      },
+      "45-64": {
+       "dist": [
+        0.043929148409340354,
+        0.3893414103173487,
+        0.5667294412733108
+       ],
+       "n": 674
+      },
+      "65+": {
+       "dist": [
+        0.04120137810368663,
+        0.37822420252439937,
+        0.5805744193719139
+       ],
+       "n": 558
+      }
+     },
+     "sex": {
+      "men": {
+       "dist": [
+        0.051957430254446865,
+        0.3744907831853319,
+        0.5735517865602213
+       ],
+       "n": 943
+      },
+      "women": {
+       "dist": [
+        0.0622146423137057,
+        0.4666841011480345,
+        0.47110125653825974
+       ],
+       "n": 1135
+      }
+     },
+     "tenure": {
+      "homeowners": {
+       "dist": [
+        0.023873087141229345,
+        0.38844640433778593,
+        0.5876805085209846
+       ],
+       "n": 626
+      },
+      "renters or other housing": {
+       "dist": [
+        0.09545115434818849,
+        0.41016584319855925,
+        0.49438300245325223
+       ],
+       "n": 374
+      }
+     }
+    }
+   }
+  },
+  {
+   "itemId": "gss_natspac",
+   "source": "gss2024",
+   "variable": "natspac",
+   "wording": "We are faced with many problems in this country, none of which can be solved easily or inexpensively. I'm going to name some of these problems, and for each one I'd like you to tell me whether you think we're spending too much money on it, too little money, or about the right amount. Space exploration",
+   "options": [
+    "Too much money",
+    "Too little money",
+    "About the right amount"
+   ],
+   "positiveOptions": [
+    1
+   ],
+   "valence": "neutral",
+   "domain": "spending",
+   "volunteered": [],
+   "provenance": "native",
+   "universeNote": null,
+   "dkRate": 0.5187032418952618,
+   "targets": {
+    "overall": {
+     "dist": [
+      0.2902407924425403,
+      0.19912540933831696,
+      0.5106337982191428
+     ],
+     "n": 1544
+    },
+    "slices": {
+     "age_band": {
+      "18-29": {
+       "dist": [
+        0.280219908617642,
+        0.21436440430573492,
+        0.5054156870766232
+       ],
+       "n": 219
+      },
+      "30-44": {
+       "dist": [
+        0.2654615649078438,
+        0.16901484170348013,
+        0.5655235933886761
+       ],
+       "n": 433
+      },
+      "45-64": {
+       "dist": [
+        0.3302744425052627,
+        0.21260156867822042,
+        0.4571239888165168
+       ],
+       "n": 490
+      },
+      "65+": {
+       "dist": [
+        0.27118917281605676,
+        0.20047994170087233,
+        0.5283308854830707
+       ],
+       "n": 402
+      }
+     },
+     "sex": {
+      "men": {
+       "dist": [
+        0.24678787180079256,
+        0.26048505137328826,
+        0.49272707682591915
+       ],
+       "n": 696
+      },
+      "women": {
+       "dist": [
+        0.33706785476252593,
+        0.13245002921186164,
+        0.5304821160256123
+       ],
+       "n": 844
+      }
+     },
+     "tenure": {
+      "homeowners": {
+       "dist": [
+        0.27147444369553475,
+        0.19146529697090922,
+        0.537060259333556
+       ],
+       "n": 617
+      },
+      "renters or other housing": {
+       "dist": [
+        0.33251468849358884,
+        0.1980670403911398,
+        0.4694182711152713
+       ],
+       "n": 389
+      }
+     }
+    }
+   }
+  },
+  {
+   "itemId": "gss_natenvir",
+   "source": "gss2024",
+   "variable": "natenvir",
+   "wording": "We are faced with many problems in this country, none of which can be solved easily or inexpensively. I'm going to name some of these problems, and for each one I'd like you to tell me whether you think we're spending too much money on it, too little money, or about the right amount. Improving and protecting the environment",
+   "options": [
+    "Too much money",
+    "Too little money",
+    "About the right amount"
+   ],
+   "positiveOptions": [
+    1
+   ],
+   "valence": "neutral",
+   "domain": "spending",
+   "volunteered": [],
+   "provenance": "native",
+   "universeNote": null,
+   "dkRate": 0.5,
+   "targets": {
+    "overall": {
+     "dist": [
+      0.1064465134001004,
+      0.6631519792388899,
+      0.23040150736100956
+     ],
+     "n": 1604
+    },
+    "slices": {
+     "age_band": {
+      "18-29": {
+       "dist": [
+        0.04045510161501005,
+        0.7891890782759894,
+        0.17035582010900038
+       ],
+       "n": 233
+      },
+      "30-44": {
+       "dist": [
+        0.07237495183001495,
+        0.6975425826145298,
+        0.23008246555545517
+       ],
+       "n": 454
+      },
+      "45-64": {
+       "dist": [
+        0.13925597528362524,
+        0.6095351427186808,
+        0.25120888199769387
+       ],
+       "n": 505
+      },
+      "65+": {
+       "dist": [
+        0.16364906241579816,
+        0.5773629252015834,
+        0.2589880123826184
+       ],
+       "n": 412
+      }
+     },
+     "sex": {
+      "men": {
+       "dist": [
+        0.12937899115919885,
+        0.6421142524131214,
+        0.2285067564276799
+       ],
+       "n": 710
+      },
+      "women": {
+       "dist": [
+        0.08243629915052471,
+        0.6836989110497201,
+        0.2338647897997551
+       ],
+       "n": 889
+      }
+     },
+     "tenure": {
+      "homeowners": {
+       "dist": [
+        0.13127920591559294,
+        0.6385157648749997,
+        0.23020502920940747
+       ],
+       "n": 634
+      },
+      "renters or other housing": {
+       "dist": [
+        0.07323136475418854,
+        0.7003691264044718,
+        0.22639950884133944
+       ],
+       "n": 411
+      }
+     }
+    }
+   }
+  },
+  {
+   "itemId": "gss_natheal",
+   "source": "gss2024",
+   "variable": "natheal",
+   "wording": "We are faced with many problems in this country, none of which can be solved easily or inexpensively. I'm going to name some of these problems, and for each one I'd like you to tell me whether you think we're spending too much money on it, too little money, or about the right amount. Improving and protecting the nation's health",
+   "options": [
+    "Too much money",
+    "Too little money",
+    "About the right amount"
+   ],
+   "positiveOptions": [
+    1
+   ],
+   "valence": "neutral",
+   "domain": "spending",
+   "volunteered": [],
+   "provenance": "native",
+   "universeNote": null,
+   "dkRate": 0.49968827930174564,
+   "targets": {
+    "overall": {
+     "dist": [
+      0.0739972124272651,
+      0.7353385530623898,
+      0.1906642345103452
+     ],
+     "n": 1605
+    },
+    "slices": {
+     "age_band": {
+      "18-29": {
+       "dist": [
+        0.043466994088970874,
+        0.7811886042868701,
+        0.17534440162415912
+       ],
+       "n": 233
+      },
+      "30-44": {
+       "dist": [
+        0.0795378263302995,
+        0.7503379710004401,
+        0.17012420266926037
+       ],
+       "n": 457
+      },
+      "45-64": {
+       "dist": [
+        0.09407263021086293,
+        0.7518501549532062,
+        0.15407721483593106
+       ],
+       "n": 507
+      },
+      "65+": {
+       "dist": [
+        0.06850718141805896,
+        0.6482376562651481,
+        0.28325516231679293
+       ],
+       "n": 408
+      }
+     },
+     "sex": {
+      "men": {
+       "dist": [
+        0.10174571865948122,
+        0.7166218557195014,
+        0.1816324256210172
+       ],
+       "n": 710
+      },
+      "women": {
+       "dist": [
+        0.046677834672725925,
+        0.7552752205845459,
+        0.1980469447427283
+       ],
+       "n": 890
+      }
+     },
+     "tenure": {
+      "homeowners": {
+       "dist": [
+        0.07961504251744587,
+        0.7460073000865008,
+        0.1743776573960532
+       ],
+       "n": 637
+      },
+      "renters or other housing": {
+       "dist": [
+        0.07370687109610927,
+        0.7184292794968243,
+        0.2078638494070664
+       ],
+       "n": 409
+      }
+     }
+    }
+   }
+  },
+  {
+   "itemId": "gss_natcity",
+   "source": "gss2024",
+   "variable": "natcity",
+   "wording": "We are faced with many problems in this country, none of which can be solved easily or inexpensively. I'm going to name some of these problems, and for each one I'd like you to tell me whether you think we're spending too much money on it, too little money, or about the right amount. Solving the problems of the big cities",
+   "options": [
+    "Too much money",
+    "Too little money",
+    "About the right amount"
+   ],
+   "positiveOptions": [
+    1
+   ],
+   "valence": "neutral",
+   "domain": "spending",
+   "volunteered": [],
+   "provenance": "native",
+   "universeNote": null,
+   "dkRate": 0.516209476309227,
+   "targets": {
+    "overall": {
+     "dist": [
+      0.17997443449625747,
+      0.5712372364532359,
+      0.24878832905050663
+     ],
+     "n": 1552
+    },
+    "slices": {
+     "age_band": {
+      "18-29": {
+       "dist": [
+        0.14901063614601096,
+        0.5550581209632358,
+        0.29593124289075323
+       ],
+       "n": 225
+      },
+      "30-44": {
+       "dist": [
+        0.19286521354589742,
+        0.5559964095396562,
+        0.2511383769144464
+       ],
+       "n": 441
+      },
+      "45-64": {
+       "dist": [
+        0.1887154627863841,
+        0.6212323399367006,
+        0.1900521972769154
+       ],
+       "n": 494
+      },
+      "65+": {
+       "dist": [
+        0.18223629540581784,
+        0.5311587282778504,
+        0.28660497631633164
+       ],
+       "n": 392
+      }
+     },
+     "sex": {
+      "men": {
+       "dist": [
+        0.2382114438490587,
+        0.5146041993315995,
+        0.2471843568193418
+       ],
+       "n": 687
+      },
+      "women": {
+       "dist": [
+        0.12200077467220112,
+        0.6275193166014218,
+        0.250479908726377
+       ],
+       "n": 860
+      }
+     },
+     "tenure": {
+      "homeowners": {
+       "dist": [
+        0.2184298997937632,
+        0.527090403646721,
+        0.25447969655951597
+       ],
+       "n": 620
+      },
+      "renters or other housing": {
+       "dist": [
+        0.1142530574894184,
+        0.6107612896293763,
+        0.27498565288120547
+       ],
+       "n": 394
+      }
+     }
+    }
+   }
+  },
+  {
+   "itemId": "gss_natcrime",
+   "source": "gss2024",
+   "variable": "natcrime",
+   "wording": "We are faced with many problems in this country, none of which can be solved easily or inexpensively. I'm going to name some of these problems, and for each one I'd like you to tell me whether you think we're spending too much money on it, too little money, or about the right amount. Halting the rising crime rate",
+   "options": [
+    "Too much money",
+    "Too little money",
+    "About the right amount"
+   ],
+   "positiveOptions": [
+    1
+   ],
+   "valence": "neutral",
+   "domain": "spending",
+   "volunteered": [],
+   "provenance": "native",
+   "universeNote": null,
+   "dkRate": 0.5012468827930174,
+   "targets": {
+    "overall": {
+     "dist": [
+      0.06329414305378178,
+      0.6902550528552962,
+      0.2464508040909221
+     ],
+     "n": 1600
+    },
+    "slices": {
+     "age_band": {
+      "18-29": {
+       "dist": [
+        0.12651556164126945,
+        0.5988805387016178,
+        0.27460389965711246
+       ],
+       "n": 228
+      },
+      "30-44": {
+       "dist": [
+        0.06880989375441172,
+        0.6857404622816613,
+        0.24544964396392718
+       ],
+       "n": 452
+      },
+      "45-64": {
+       "dist": [
+        0.035990648706957985,
+        0.7533780238443306,
+        0.21063132744871124
+       ],
+       "n": 510
+      },
+      "65+": {
+       "dist": [
+        0.03522813870206803,
+        0.6925980666609742,
+        0.2721737946369578
+       ],
+       "n": 410
+      }
+     },
+     "sex": {
+      "men": {
+       "dist": [
+        0.06272414323251337,
+        0.6792227938059342,
+        0.25805306296155256
+       ],
+       "n": 707
+      },
+      "women": {
+       "dist": [
+        0.06428346924564823,
+        0.6996940828113001,
+        0.23602244794305147
+       ],
+       "n": 888
+      }
+     },
+     "tenure": {
+      "homeowners": {
+       "dist": [
+        0.03367623752443179,
+        0.7244385230556486,
+        0.2418852394199194
+       ],
+       "n": 632
+      },
+      "renters or other housing": {
+       "dist": [
+        0.09848148962573357,
+        0.6535284160001608,
+        0.2479900943741056
+       ],
+       "n": 407
+      }
+     }
+    }
+   }
+  },
+  {
+   "itemId": "gss_natdrug",
+   "source": "gss2024",
+   "variable": "natdrug",
+   "wording": "We are faced with many problems in this country, none of which can be solved easily or inexpensively. I'm going to name some of these problems, and for each one I'd like you to tell me whether you think we're spending too much money on it, too little money, or about the right amount. Dealing with drug addiction",
+   "options": [
+    "Too much money",
+    "Too little money",
+    "About the right amount"
+   ],
+   "positiveOptions": [
+    1
+   ],
+   "valence": "neutral",
+   "domain": "spending",
+   "volunteered": [],
+   "provenance": "native",
+   "universeNote": null,
+   "dkRate": 0.5018703241895262,
+   "targets": {
+    "overall": {
+     "dist": [
+      0.08595948561888091,
+      0.6814317707124571,
+      0.23260874366866222
+     ],
+     "n": 1598
+    },
+    "slices": {
+     "age_band": {
+      "18-29": {
+       "dist": [
+        0.06619970052853318,
+        0.7417466246825294,
+        0.19205367478893742
+       ],
+       "n": 232
+      },
+      "30-44": {
+       "dist": [
+        0.08397177982518965,
+        0.7173171907065287,
+        0.19871102946828173
+       ],
+       "n": 458
+      },
+      "45-64": {
+       "dist": [
+        0.0818290393362858,
+        0.6521592328467412,
+        0.266011727816973
+       ],
+       "n": 504
+      },
+      "65+": {
+       "dist": [
+        0.11375447620268322,
+        0.6201913470916203,
+        0.26605417670569637
+       ],
+       "n": 404
+      }
+     },
+     "sex": {
+      "men": {
+       "dist": [
+        0.1126251947248227,
+        0.6499507699979531,
+        0.23742403527722414
+       ],
+       "n": 708
+      },
+      "women": {
+       "dist": [
+        0.059391928216218456,
+        0.711706384376953,
+        0.22890168740682862
+       ],
+       "n": 885
+      }
+     },
+     "tenure": {
+      "homeowners": {
+       "dist": [
+        0.08342677440346082,
+        0.6872956606224888,
+        0.22927756497405022
+       ],
+       "n": 633
+      },
+      "renters or other housing": {
+       "dist": [
+        0.06987538087301227,
+        0.6892577552457608,
+        0.24086686388122688
+       ],
+       "n": 410
+      }
+     }
+    }
+   }
+  },
+  {
+   "itemId": "gss_nateduc",
+   "source": "gss2024",
+   "variable": "nateduc",
+   "wording": "We are faced with many problems in this country, none of which can be solved easily or inexpensively. I'm going to name some of these problems, and for each one I'd like you to tell me whether you think we're spending too much money on it, too little money, or about the right amount. Improving the nation's education system",
+   "options": [
+    "Too much money",
+    "Too little money",
+    "About the right amount"
+   ],
+   "positiveOptions": [
+    1
+   ],
+   "valence": "neutral",
+   "domain": "spending",
+   "volunteered": [],
+   "provenance": "native",
+   "universeNote": null,
+   "dkRate": 0.49438902743142144,
+   "targets": {
+    "overall": {
+     "dist": [
+      0.06330453836091662,
+      0.7606007525790149,
+      0.17609470906006847
+     ],
+     "n": 1622
+    },
+    "slices": {
+     "age_band": {
+      "18-29": {
+       "dist": [
+        0.04971794869080491,
+        0.7227036468371223,
+        0.22757840447207295
+       ],
+       "n": 235
+      },
+      "30-44": {
+       "dist": [
+        0.05797230528972828,
+        0.8040422317705236,
+        0.13798546293974814
+       ],
+       "n": 462
+      },
+      "45-64": {
+       "dist": [
+        0.07106340129308188,
+        0.7964045312913463,
+        0.13253206741557189
+       ],
+       "n": 511
+      },
+      "65+": {
+       "dist": [
+        0.07186341694409945,
+        0.6945524429012827,
+        0.23358414015461787
+       ],
+       "n": 414
+      }
+     },
+     "sex": {
+      "men": {
+       "dist": [
+        0.08743182196439937,
+        0.7647964620789162,
+        0.14777171595668448
+       ],
+       "n": 714
+      },
+      "women": {
+       "dist": [
+        0.03857314120337705,
+        0.7564411497022516,
+        0.20498570909437147
+       ],
+       "n": 903
+      }
+     },
+     "tenure": {
+      "homeowners": {
+       "dist": [
+        0.09218626989838269,
+        0.7788407176886233,
+        0.12897301241299408
+       ],
+       "n": 646
+      },
+      "renters or other housing": {
+       "dist": [
+        0.06258418140351485,
+        0.697315293968374,
+        0.2401005246281112
+       ],
+       "n": 415
+      }
+     }
+    }
+   }
+  },
+  {
+   "itemId": "gss_natarms",
+   "source": "gss2024",
+   "variable": "natarms",
+   "wording": "We are faced with many problems in this country, none of which can be solved easily or inexpensively. I'm going to name some of these problems, and for each one I'd like you to tell me whether you think we're spending too much money on it, too little money, or about the right amount. The military, armaments and defense",
+   "options": [
+    "Too much money",
+    "Too little money",
+    "About the right amount"
+   ],
+   "positiveOptions": [
+    1
+   ],
+   "valence": "neutral",
+   "domain": "spending",
+   "volunteered": [],
+   "provenance": "native",
+   "universeNote": null,
+   "dkRate": 0.5049875311720698,
+   "targets": {
+    "overall": {
+     "dist": [
+      0.2851969219801493,
+      0.3019571314296528,
+      0.4128459465901978
+     ],
+     "n": 1588
+    },
+    "slices": {
+     "age_band": {
+      "18-29": {
+       "dist": [
+        0.39930975658096324,
+        0.16556964397713808,
+        0.4351205994418987
+       ],
+       "n": 230
+      },
+      "30-44": {
+       "dist": [
+        0.3555188364142883,
+        0.2314937341924029,
+        0.4129874293933088
+       ],
+       "n": 449
+      },
+      "45-64": {
+       "dist": [
+        0.2445374396155503,
+        0.3579000047858883,
+        0.3975625555985616
+       ],
+       "n": 499
+      },
+      "65+": {
+       "dist": [
+        0.1455619232020538,
+        0.4416618206396024,
+        0.4127762561583439
+       ],
+       "n": 410
+      }
+     },
+     "sex": {
+      "men": {
+       "dist": [
+        0.3103806598995667,
+        0.29208507581661636,
+        0.39753426428381705
+       ],
+       "n": 706
+      },
+      "women": {
+       "dist": [
+        0.2566313315839871,
+        0.3125737696930043,
+        0.43079489872300863
+       ],
+       "n": 877
+      }
+     },
+     "tenure": {
+      "homeowners": {
+       "dist": [
+        0.26117129245843534,
+        0.33848422869368705,
+        0.4003444788478778
+       ],
+       "n": 635
+      },
+      "renters or other housing": {
+       "dist": [
+        0.3736612247218439,
+        0.22465468827737908,
+        0.401684087000777
+       ],
+       "n": 396
+      }
+     }
+    }
+   }
+  },
+  {
+   "itemId": "gss_nataid",
+   "source": "gss2024",
+   "variable": "nataid",
+   "wording": "We are faced with many problems in this country, none of which can be solved easily or inexpensively. I'm going to name some of these problems, and for each one I'd like you to tell me whether you think we're spending too much money on it, too little money, or about the right amount. Foreign aid",
+   "options": [
+    "Too much money",
+    "Too little money",
+    "About the right amount"
+   ],
+   "positiveOptions": [
+    1
+   ],
+   "valence": "neutral",
+   "domain": "spending",
+   "volunteered": [],
+   "provenance": "native",
+   "universeNote": null,
+   "dkRate": 0.5071695760598504,
+   "targets": {
+    "overall": {
+     "dist": [
+      0.629019768619266,
+      0.09687332179596246,
+      0.2741069095847715
+     ],
+     "n": 1581
+    },
+    "slices": {
+     "age_band": {
+      "18-29": {
+       "dist": [
+        0.5845163035864364,
+        0.15711490193907748,
+        0.2583687944744862
+       ],
+       "n": 227
+      },
+      "30-44": {
+       "dist": [
+        0.6125058806835669,
+        0.10868540368787505,
+        0.27880871562855813
+       ],
+       "n": 448
+      },
+      "45-64": {
+       "dist": [
+        0.7307941085596223,
+        0.06409920583021764,
+        0.20510668561016007
+       ],
+       "n": 502
+      },
+      "65+": {
+       "dist": [
+        0.5452030914760583,
+        0.0712137503252355,
+        0.38358315819870614
+       ],
+       "n": 404
+      }
+     },
+     "sex": {
+      "men": {
+       "dist": [
+        0.671534094801064,
+        0.0896978128753985,
+        0.23876809232353757
+       ],
+       "n": 702
+      },
+      "women": {
+       "dist": [
+        0.5867024447582098,
+        0.10183614337639833,
+        0.31146141186539206
+       ],
+       "n": 874
+      }
+     },
+     "tenure": {
+      "homeowners": {
+       "dist": [
+        0.6406698447876348,
+        0.07842681268062383,
+        0.28090334253174143
+       ],
+       "n": 633
+      },
+      "renters or other housing": {
+       "dist": [
+        0.5391176979222588,
+        0.139063430893199,
+        0.3218188711845423
+       ],
+       "n": 396
+      }
+     }
+    }
+   }
+  },
+  {
+   "itemId": "gss_natfare",
+   "source": "gss2024",
+   "variable": "natfare",
+   "wording": "We are faced with many problems in this country, none of which can be solved easily or inexpensively. I'm going to name some of these problems, and for each one I'd like you to tell me whether you think we're spending too much money on it, too little money, or about the right amount. Welfare",
+   "options": [
+    "Too much money",
+    "Too little money",
+    "About the right amount"
+   ],
+   "positiveOptions": [
+    1
+   ],
+   "valence": "neutral",
+   "domain": "spending",
+   "volunteered": [],
+   "provenance": "native",
+   "universeNote": null,
+   "dkRate": 0.5028054862842892,
+   "targets": {
+    "overall": {
+     "dist": [
+      0.3150723723514958,
+      0.337072312735011,
+      0.34785531491349314
+     ],
+     "n": 1595
+    },
+    "slices": {
+     "age_band": {
+      "18-29": {
+       "dist": [
+        0.2499657707535904,
+        0.387521762397246,
+        0.3625124668491636
+       ],
+       "n": 231
+      },
+      "30-44": {
+       "dist": [
+        0.282138916147557,
+        0.37367840162514365,
+        0.34418268222729953
+       ],
+       "n": 453
+      },
+      "45-64": {
+       "dist": [
+        0.33093695584366933,
+        0.3056470019732905,
+        0.36341604218304013
+       ],
+       "n": 503
+      },
+      "65+": {
+       "dist": [
+        0.3947928278545966,
+        0.28920890366103996,
+        0.3159982684843635
+       ],
+       "n": 408
+      }
+     },
+     "sex": {
+      "men": {
+       "dist": [
+        0.3489568237193744,
+        0.28684049084367064,
+        0.3642026854369547
+       ],
+       "n": 699
+      },
+      "women": {
+       "dist": [
+        0.2808059069237415,
+        0.3855525141677739,
+        0.33364157890848467
+       ],
+       "n": 891
+      }
+     },
+     "tenure": {
+      "homeowners": {
+       "dist": [
+        0.35052118236338664,
+        0.27183315777492095,
+        0.3776456598616926
+       ],
+       "n": 631
+      },
+      "renters or other housing": {
+       "dist": [
+        0.22924629980659908,
+        0.4486414959328996,
+        0.3221122042605014
+       ],
+       "n": 407
+      }
+     }
+    }
+   }
+  },
+  {
+   "itemId": "gss_natroad",
+   "source": "gss2024",
+   "variable": "natroad",
+   "wording": "We are faced with many problems in this country, none of which can be solved easily or inexpensively. I'm going to name some of these problems, and for each one I'd like you to tell me whether you think we're spending too much money on it, too little money, or about the right amount. Highways and bridges",
+   "options": [
+    "Too much money",
+    "Too little money",
+    "About the right amount"
+   ],
+   "positiveOptions": [
+    1
+   ],
+   "valence": "neutral",
+   "domain": "spending",
+   "volunteered": [],
+   "provenance": "native",
+   "universeNote": null,
+   "dkRate": 0.019326683291770574,
+   "targets": {
+    "overall": {
+     "dist": [
+      0.10725533412098785,
+      0.5233941909299238,
+      0.36935047494908846
+     ],
+     "n": 3146
+    },
+    "slices": {
+     "age_band": {
+      "18-29": {
+       "dist": [
+        0.19746030395654912,
+        0.34609433053351735,
+        0.45644536550993364
+       ],
+       "n": 449
+      },
+      "30-44": {
+       "dist": [
+        0.11477960301577016,
+        0.47820594898263613,
+        0.40701444800159386
+       ],
+       "n": 860
+      },
+      "45-64": {
+       "dist": [
+        0.08461826665172442,
+        0.5889784866036948,
+        0.32640324674458077
+       ],
+       "n": 1007
+      },
+      "65+": {
+       "dist": [
+        0.048984188562142435,
+        0.6428011198486877,
+        0.3082146915891699
+       ],
+       "n": 830
+      }
+     },
+     "sex": {
+      "men": {
+       "dist": [
+        0.09673068649279384,
+        0.575237074177205,
+        0.32803223933000114
+       ],
+       "n": 1403
+      },
+      "women": {
+       "dist": [
+        0.11594164642949596,
+        0.47382737169153866,
+        0.4102309818789653
+       ],
+       "n": 1732
+      }
+     },
+     "tenure": {
+      "homeowners": {
+       "dist": [
+        0.09153145291654641,
+        0.5640473827663391,
+        0.3444211643171144
+       ],
+       "n": 1261
+      },
+      "renters or other housing": {
+       "dist": [
+        0.17243694263330064,
+        0.460613738841951,
+        0.36694931852474855
+       ],
+       "n": 790
+      }
+     }
+    }
+   }
+  },
+  {
+   "itemId": "gss_natsoc",
+   "source": "gss2024",
+   "variable": "natsoc",
+   "wording": "We are faced with many problems in this country, none of which can be solved easily or inexpensively. I'm going to name some of these problems, and for each one I'd like you to tell me whether you think we're spending too much money on it, too little money, or about the right amount. Social Security",
+   "options": [
+    "Too much money",
+    "Too little money",
+    "About the right amount"
+   ],
+   "positiveOptions": [
+    1
+   ],
+   "valence": "neutral",
+   "domain": "spending",
+   "volunteered": [],
+   "provenance": "native",
+   "universeNote": null,
+   "dkRate": 0.032418952618453865,
+   "targets": {
+    "overall": {
+     "dist": [
+      0.06354507770027656,
+      0.6126896309760341,
+      0.32376529132368925
+     ],
+     "n": 3104
+    },
+    "slices": {
+     "age_band": {
+      "18-29": {
+       "dist": [
+        0.12096601888828215,
+        0.4467632861955079,
+        0.4322706949162099
+       ],
+       "n": 428
+      },
+      "30-44": {
+       "dist": [
+        0.07825375277997856,
+        0.6119817185505084,
+        0.309764528669513
+       ],
+       "n": 844
+      },
+      "45-64": {
+       "dist": [
+        0.045755295407209434,
+        0.7003816617098466,
+        0.25386304288294387
+       ],
+       "n": 1003
+      },
+      "65+": {
+       "dist": [
+        0.022877238046959052,
+        0.63161904178444,
+        0.3455037201686009
+       ],
+       "n": 829
+      }
+     },
+     "sex": {
+      "men": {
+       "dist": [
+        0.07657428480130148,
+        0.5763118823237505,
+        0.3471138328749479
+       ],
+       "n": 1385
+      },
+      "women": {
+       "dist": [
+        0.04916661174448019,
+        0.6482817590983375,
+        0.3025516291571823
+       ],
+       "n": 1708
+      }
+     },
+     "tenure": {
+      "homeowners": {
+       "dist": [
+        0.0657065715896859,
+        0.6095438795814614,
+        0.3247495488288527
+       ],
+       "n": 1244
+      },
+      "renters or other housing": {
+       "dist": [
+        0.05164588537335077,
+        0.6232817692345124,
+        0.32507234539213675
+       ],
+       "n": 785
+      }
+     }
+    }
+   }
+  },
+  {
+   "itemId": "gss_natchld",
+   "source": "gss2024",
+   "variable": "natchld",
+   "wording": "We are faced with many problems in this country, none of which can be solved easily or inexpensively. I'm going to name some of these problems, and for each one I'd like you to tell me whether you think we're spending too much money on it, too little money, or about the right amount. Assistance for childcare",
+   "options": [
+    "Too much money",
+    "Too little money",
+    "About the right amount"
+   ],
+   "positiveOptions": [
+    1
+   ],
+   "valence": "neutral",
+   "domain": "spending",
+   "volunteered": [],
+   "provenance": "native",
+   "universeNote": null,
+   "dkRate": 0.03460099750623442,
+   "targets": {
+    "overall": {
+     "dist": [
+      0.07858154903557645,
+      0.6270097439931619,
+      0.2944087069712616
+     ],
+     "n": 3097
+    },
+    "slices": {
+     "age_band": {
+      "18-29": {
+       "dist": [
+        0.07692934707422085,
+        0.6194200112935975,
+        0.3036506416321817
+       ],
+       "n": 449
+      },
+      "30-44": {
+       "dist": [
+        0.05619787887556401,
+        0.6792118275744886,
+        0.26459029354994734
+       ],
+       "n": 857
+      },
+      "45-64": {
+       "dist": [
+        0.10041355022289294,
+        0.6095343802974121,
+        0.290052069479695
+       ],
+       "n": 995
+      },
+      "65+": {
+       "dist": [
+        0.0748783465678871,
+        0.5973887749427736,
+        0.32773287848933935
+       ],
+       "n": 796
+      }
+     },
+     "sex": {
+      "men": {
+       "dist": [
+        0.1084046949351656,
+        0.5785938047577943,
+        0.31300150030704005
+       ],
+       "n": 1372
+      },
+      "women": {
+       "dist": [
+        0.04958317595984743,
+        0.6730778368401785,
+        0.2773389871999741
+       ],
+       "n": 1714
+      }
+     },
+     "tenure": {
+      "homeowners": {
+       "dist": [
+        0.09776103501390292,
+        0.6036301588998224,
+        0.29860880608627455
+       ],
+       "n": 1231
+      },
+      "renters or other housing": {
+       "dist": [
+        0.03728722486514923,
+        0.6737237345530207,
+        0.28898904058182995
+       ],
+       "n": 791
+      }
+     }
+    }
+   }
+  },
+  {
+   "itemId": "gss_natsci",
+   "source": "gss2024",
+   "variable": "natsci",
+   "wording": "We are faced with many problems in this country, none of which can be solved easily or inexpensively. I'm going to name some of these problems, and for each one I'd like you to tell me whether you think we're spending too much money on it, too little money, or about the right amount. Supporting scientific research",
+   "options": [
+    "Too much money",
+    "Too little money",
+    "About the right amount"
+   ],
+   "positiveOptions": [
+    1
+   ],
+   "valence": "neutral",
+   "domain": "spending",
+   "volunteered": [],
+   "provenance": "native",
+   "universeNote": null,
+   "dkRate": 0.05049875311720698,
+   "targets": {
+    "overall": {
+     "dist": [
+      0.11430916308856745,
+      0.4026846244507256,
+      0.4830062124607068
+     ],
+     "n": 3046
+    },
+    "slices": {
+     "age_band": {
+      "18-29": {
+       "dist": [
+        0.10256899679736924,
+        0.3741961285333965,
+        0.5232348746692342
+       ],
+       "n": 435
+      },
+      "30-44": {
+       "dist": [
+        0.13160455908566374,
+        0.4028860231831551,
+        0.46550941773118126
+       ],
+       "n": 843
+      },
+      "45-64": {
+       "dist": [
+        0.116779950511255,
+        0.4388897645573613,
+        0.4443302849313837
+       ],
+       "n": 970
+      },
+      "65+": {
+       "dist": [
+        0.10097160001514796,
+        0.37666015965225796,
+        0.522368240332594
+       ],
+       "n": 798
+      }
+     },
+     "sex": {
+      "men": {
+       "dist": [
+        0.11510227484822579,
+        0.427468513571644,
+        0.45742921158013033
+       ],
+       "n": 1383
+      },
+      "women": {
+       "dist": [
+        0.11431078037530652,
+        0.37626983150854865,
+        0.5094193881161448
+       ],
+       "n": 1652
+      }
+     },
+     "tenure": {
+      "homeowners": {
+       "dist": [
+        0.11667546453580199,
+        0.4386634579249433,
+        0.44466107753925466
+       ],
+       "n": 1216
+      },
+      "renters or other housing": {
+       "dist": [
+        0.12255479194653013,
+        0.36894878596508857,
+        0.5084964220883812
+       ],
+       "n": 778
+      }
+     }
+    }
+   }
+  },
+  {
+   "itemId": "gss_natenrgy",
+   "source": "gss2024",
+   "variable": "natenrgy",
+   "wording": "We are faced with many problems in this country, none of which can be solved easily or inexpensively. I'm going to name some of these problems, and for each one I'd like you to tell me whether you think we're spending too much money on it, too little money, or about the right amount. Developing alternative energy sources",
+   "options": [
+    "Too much money",
+    "Too little money",
+    "About the right amount"
+   ],
+   "positiveOptions": [
+    1
+   ],
+   "valence": "neutral",
+   "domain": "spending",
+   "volunteered": [],
+   "provenance": "native",
+   "universeNote": null,
+   "dkRate": 0.03771820448877806,
+   "targets": {
+    "overall": {
+     "dist": [
+      0.15280046099607034,
+      0.48617546759230096,
+      0.3610240714116287
+     ],
+     "n": 3087
+    },
+    "slices": {
+     "age_band": {
+      "18-29": {
+       "dist": [
+        0.12840623774451526,
+        0.46663580872273924,
+        0.40495795353274555
+       ],
+       "n": 442
+      },
+      "30-44": {
+       "dist": [
+        0.12538503383162927,
+        0.4922952789666685,
+        0.3823196872017022
+       ],
+       "n": 845
+      },
+      "45-64": {
+       "dist": [
+        0.1672358041340844,
+        0.4980145367751479,
+        0.33474965909076776
+       ],
+       "n": 987
+      },
+      "65+": {
+       "dist": [
+        0.1851967896702401,
+        0.47971988075434124,
+        0.33508332957541853
+       ],
+       "n": 813
+      }
+     },
+     "sex": {
+      "men": {
+       "dist": [
+        0.16884012955715536,
+        0.48698202334973817,
+        0.34417784709310656
+       ],
+       "n": 1395
+      },
+      "women": {
+       "dist": [
+        0.1376259260417522,
+        0.48415107381032696,
+        0.3782230001479211
+       ],
+       "n": 1681
+      }
+     },
+     "tenure": {
+      "homeowners": {
+       "dist": [
+        0.1757562431371407,
+        0.4750269503976867,
+        0.34921680646517256
+       ],
+       "n": 1243
+      },
+      "renters or other housing": {
+       "dist": [
+        0.1069609794842899,
+        0.4942414493268704,
+        0.39879757118883963
+       ],
+       "n": 766
+      }
+     }
+    }
+   }
+  },
+  {
+   "itemId": "shed_b2",
+   "source": "shed2024",
+   "variable": "B2",
+   "wording": "Overall, which one of the following best describes how well you are managing financially these days?",
+   "options": [
+    "Living comfortably",
+    "Doing okay",
+    "Just getting by",
+    "Finding it difficult to get by"
+   ],
+   "positiveOptions": [
+    0,
+    1
+   ],
+   "valence": "positive",
+   "domain": "finance",
+   "volunteered": [],
+   "provenance": "native",
+   "universeNote": null,
+   "dkRate": 0.0,
+   "targets": {
+    "overall": {
+     "dist": [
+      0.34234652782269226,
+      0.38632069345554876,
+      0.19308686953248008,
+      0.07824590918927894
+     ],
+     "n": 12295
+    },
+    "slices": {
+     "age_band": {
+      "18-29": {
+       "dist": [
+        0.2385598350684864,
+        0.4257934039670682,
+        0.24683924314442426,
+        0.08880751782002104
+       ],
+       "n": 1887
+      },
+      "30-44": {
+       "dist": [
+        0.28692887226338687,
+        0.3799480456533674,
+        0.22064794902752682,
+        0.11247513305571881
+       ],
+       "n": 2813
+      },
+      "45-64": {
+       "dist": [
+        0.3407342248647341,
+        0.38081125258352977,
+        0.19962774681542625,
+        0.07882677573630985
+       ],
+       "n": 4076
+      },
+      "65+": {
+       "dist": [
+        0.49859136481580024,
+        0.3669345902706313,
+        0.10554092103949819,
+        0.028933123874070085
+       ],
+       "n": 3519
+      }
+     },
+     "income_band": {
+      "$150k+": {
+       "dist": [
+        0.5808157392590226,
+        0.314534587463305,
+        0.0794776714546737,
+        0.0251720018229988
+       ],
+       "n": 3310
+      },
+      "$25k-$74,999": {
+       "dist": [
+        0.18239358761360064,
+        0.4170581937610991,
+        0.28739179720640506,
+        0.11315642141889524
+       ],
+       "n": 3653
+      },
+      "$75k-$149,999": {
+       "dist": [
+        0.34705923074407075,
+        0.4477332952600414,
+        0.1587194679395544,
+        0.04648800605633349
+       ],
+       "n": 4024
+      },
+      "<$25k": {
+       "dist": [
+        0.08821330282834311,
+        0.31073460658509894,
+        0.364664279319606,
+        0.23638781126695182
+       ],
+       "n": 1308
+      }
+     },
+     "sex": {
+      "men": {
+       "dist": [
+        0.3457560505401552,
+        0.3938027763440311,
+        0.18414277349714198,
+        0.07629839961867159
+       ],
+       "n": 6230
+      },
+      "women": {
+       "dist": [
+        0.3391002364720208,
+        0.3791968163094945,
+        0.20160276574586491,
+        0.08010018147261977
+       ],
+       "n": 6065
+      }
+     },
+     "tenure": {
+      "homeowners": {
+       "dist": [
+        0.4068430384205082,
+        0.389525276591218,
+        0.15001712350965254,
+        0.05361456147862131
+       ],
+       "n": 9013
+      },
+      "renters or other housing": {
+       "dist": [
+        0.1768058651995178,
+        0.3780956156832373,
+        0.3036322964020098,
+        0.14146622271523515
+       ],
+       "n": 3282
+      }
+     }
+    }
+   }
+  },
+  {
+   "itemId": "shed_b3",
+   "source": "shed2024",
+   "variable": "B3",
+   "wording": "Compared to 12 months ago, would you say that you (and your family living with you) are better off, the same, or worse off financially?",
+   "options": [
+    "Much better off",
+    "Somewhat better off",
+    "About the same",
+    "Somewhat worse off",
+    "Much worse off"
+   ],
+   "positiveOptions": [
+    0,
+    1
+   ],
+   "valence": "positive",
+   "domain": "finance",
+   "volunteered": [],
+   "provenance": "native",
+   "universeNote": null,
+   "dkRate": 0.0,
+   "targets": {
+    "overall": {
+     "dist": [
+      0.05373012992498917,
+      0.1769587390330772,
+      0.48107684058666195,
+      0.22281892779057505,
+      0.06541536266469661
+     ],
+     "n": 12295
+    },
+    "slices": {
+     "age_band": {
+      "18-29": {
+       "dist": [
+        0.054316362526196385,
+        0.22720060797197822,
+        0.44613350724205675,
+        0.20909331375418372,
+        0.06325620850558497
+       ],
+       "n": 1887
+      },
+      "30-44": {
+       "dist": [
+        0.06297019214613674,
+        0.1804469772726279,
+        0.4551478712646492,
+        0.228144821335885,
+        0.07329013798070105
+       ],
+       "n": 2813
+      },
+      "45-64": {
+       "dist": [
+        0.04825106100875115,
+        0.15709480545714113,
+        0.4769419003183078,
+        0.24448723189011937,
+        0.07322500132568063
+       ],
+       "n": 4076
+      },
+      "65+": {
+       "dist": [
+        0.05022736391528957,
+        0.15683349010738237,
+        0.5470270680106232,
+        0.1985205627453715,
+        0.0473915152213333
+       ],
+       "n": 3519
+      }
+     },
+     "income_band": {
+      "$150k+": {
+       "dist": [
+        0.06425124873476061,
+        0.19372263733447173,
+        0.5044709239735715,
+        0.19776976679096456,
+        0.03978542316623158
+       ],
+       "n": 3310
+      },
+      "$25k-$74,999": {
+       "dist": [
+        0.04351035112830637,
+        0.16502897465150027,
+        0.4688643081241108,
+        0.238521027104624,
+        0.08407533899145851
+       ],
+       "n": 3653
+      },
+      "$75k-$149,999": {
+       "dist": [
+        0.05549067223526922,
+        0.19238019117815128,
+        0.48307512005247,
+        0.21571105337889343,
+        0.05334296315521615
+       ],
+       "n": 4024
+      },
+      "<$25k": {
+       "dist": [
+        0.0468531781557744,
+        0.11220987101694352,
+        0.44086259491362445,
+        0.27420562684439137,
+        0.12586872906926622
+       ],
+       "n": 1308
+      }
+     },
+     "sex": {
+      "men": {
+       "dist": [
+        0.056753651095445355,
+        0.18724722018073608,
+        0.47035571507681323,
+        0.21579178740487634,
+        0.06985162624212886
+       ],
+       "n": 6230
+      },
+      "women": {
+       "dist": [
+        0.05085136024442598,
+        0.16716282032864238,
+        0.49128469074522657,
+        0.2295096428684385,
+        0.0611914858132665
+       ],
+       "n": 6065
+      }
+     },
+     "tenure": {
+      "homeowners": {
+       "dist": [
+        0.05111377520770103,
+        0.17179403916506805,
+        0.5013337756591139,
+        0.21798508649172263,
+        0.05777332347639446
+       ],
+       "n": 9013
+      },
+      "renters or other housing": {
+       "dist": [
+        0.06044542490052562,
+        0.19021477149863836,
+        0.4290841603078957,
+        0.23522575855103484,
+        0.08502988474190559
+       ],
+       "n": 3282
+      }
+     }
+    }
+   }
+  },
+  {
+   "itemId": "shed_400cash",
+   "source": "shed2024",
+   "variable": "pay_casheqv",
+   "wording": "Suppose that you have an emergency expense that costs $400. Would you pay for it with cash or its equivalent \u2014 that is, with cash, money currently in your checking or savings account, or a credit card that you pay in full at your next statement?",
+   "options": [
+    "Yes",
+    "No"
+   ],
+   "positiveOptions": [
+    0
+   ],
+   "valence": "positive",
+   "domain": "finance",
+   "volunteered": [],
+   "provenance": "derived",
+   "universeNote": null,
+   "dkRate": 0.0,
+   "targets": {
+    "overall": {
+     "dist": [
+      0.6273650319733973,
+      0.3726349680266027
+     ],
+     "n": 12295
+    },
+    "slices": {
+     "age_band": {
+      "18-29": {
+       "dist": [
+        0.47183513703489166,
+        0.5281648629651083
+       ],
+       "n": 1887
+      },
+      "30-44": {
+       "dist": [
+        0.5621428450969724,
+        0.4378571549030274
+       ],
+       "n": 2813
+      },
+      "45-64": {
+       "dist": [
+        0.6502509147196356,
+        0.34974908528036447
+       ],
+       "n": 4076
+      },
+      "65+": {
+       "dist": [
+        0.8058516560873622,
+        0.19414834391263766
+       ],
+       "n": 3519
+      }
+     },
+     "income_band": {
+      "$150k+": {
+       "dist": [
+        0.836430489571709,
+        0.16356951042829096
+       ],
+       "n": 3310
+      },
+      "$25k-$74,999": {
+       "dist": [
+        0.47732429346781935,
+        0.5226757065321808
+       ],
+       "n": 3653
+      },
+      "$75k-$149,999": {
+       "dist": [
+        0.6940133047333557,
+        0.30598669526664435
+       ],
+       "n": 4024
+      },
+      "<$25k": {
+       "dist": [
+        0.23098047017474058,
+        0.7690195298252593
+       ],
+       "n": 1308
+      }
+     },
+     "sex": {
+      "men": {
+       "dist": [
+        0.6473132282563496,
+        0.35268677174365026
+       ],
+       "n": 6230
+      },
+      "women": {
+       "dist": [
+        0.6083718583179862,
+        0.39162814168201376
+       ],
+       "n": 6065
+      }
+     },
+     "tenure": {
+      "homeowners": {
+       "dist": [
+        0.7136553719542648,
+        0.2863446280457353
+       ],
+       "n": 9013
+      },
+      "renters or other housing": {
+       "dist": [
+        0.4058870027589687,
+        0.5941129972410314
+       ],
+       "n": 3282
+      }
+     }
+    }
+   }
+  },
+  {
+   "itemId": "shed_ef1",
+   "source": "shed2024",
+   "variable": "EF1",
+   "wording": "Have you set aside emergency or rainy day funds that would cover your expenses for 3 months in case of sickness, job loss, economic downturn, or other emergencies?",
+   "options": [
+    "Yes",
+    "No"
+   ],
+   "positiveOptions": [
+    0
+   ],
+   "valence": "positive",
+   "domain": "finance",
+   "volunteered": [],
+   "provenance": "native",
+   "universeNote": null,
+   "dkRate": 0.0,
+   "targets": {
+    "overall": {
+     "dist": [
+      0.5504060066444076,
+      0.4495939933555924
+     ],
+     "n": 12295
+    },
+    "slices": {
+     "age_band": {
+      "18-29": {
+       "dist": [
+        0.36340352587001423,
+        0.6365964741299857
+       ],
+       "n": 1887
+      },
+      "30-44": {
+       "dist": [
+        0.5013541046619625,
+        0.4986458953380373
+       ],
+       "n": 2813
+      },
+      "45-64": {
+       "dist": [
+        0.5718084832005831,
+        0.428191516799417
+       ],
+       "n": 4076
+      },
+      "65+": {
+       "dist": [
+        0.7397859468452586,
+        0.2602140531547413
+       ],
+       "n": 3519
+      }
+     },
+     "income_band": {
+      "$150k+": {
+       "dist": [
+        0.7546962607165671,
+        0.24530373928343277
+       ],
+       "n": 3310
+      },
+      "$25k-$74,999": {
+       "dist": [
+        0.41254449256333836,
+        0.5874555074366616
+       ],
+       "n": 3653
+      },
+      "$75k-$149,999": {
+       "dist": [
+        0.5949738498013236,
+        0.4050261501986765
+       ],
+       "n": 4024
+      },
+      "<$25k": {
+       "dist": [
+        0.20378949898869325,
+        0.7962105010113066
+       ],
+       "n": 1308
+      }
+     },
+     "sex": {
+      "men": {
+       "dist": [
+        0.5704620265128901,
+        0.42953797348710976
+       ],
+       "n": 6230
+      },
+      "women": {
+       "dist": [
+        0.5313101714723822,
+        0.4686898285276177
+       ],
+       "n": 6065
+      }
+     },
+     "tenure": {
+      "homeowners": {
+       "dist": [
+        0.6263507898192691,
+        0.37364921018073094
+       ],
+       "n": 9013
+      },
+      "renters or other housing": {
+       "dist": [
+        0.35548151207856343,
+        0.6445184879214367
+       ],
+       "n": 3282
+      }
+     }
+    }
+   }
+  },
+  {
+   "itemId": "shed_ef2",
+   "source": "shed2024",
+   "variable": "EF2",
+   "wording": "If you were to lose your main source of income (for example, job or government benefits), could you cover your expenses for 3 months by borrowing money, using savings, or selling assets?",
+   "options": [
+    "Yes",
+    "No"
+   ],
+   "positiveOptions": [
+    0
+   ],
+   "valence": "positive",
+   "domain": "finance",
+   "volunteered": [],
+   "provenance": "native",
+   "universeNote": null,
+   "dkRate": 0.0,
+   "targets": {
+    "overall": {
+     "dist": [
+      0.3323190077574487,
+      0.6676809922425512
+     ],
+     "n": 5144
+    },
+    "slices": {
+     "age_band": {
+      "18-29": {
+       "dist": [
+        0.28307804945159126,
+        0.7169219505484088
+       ],
+       "n": 1161
+      },
+      "30-44": {
+       "dist": [
+        0.2901268384104042,
+        0.7098731615895959
+       ],
+       "n": 1358
+      },
+      "45-64": {
+       "dist": [
+        0.35317123990133514,
+        0.6468287600986647
+       ],
+       "n": 1716
+      },
+      "65+": {
+       "dist": [
+        0.48233657823630693,
+        0.5176634217636932
+       ],
+       "n": 909
+      }
+     },
+     "income_band": {
+      "$150k+": {
+       "dist": [
+        0.5426438260743702,
+        0.45735617392562977
+       ],
+       "n": 716
+      },
+      "$25k-$74,999": {
+       "dist": [
+        0.25191129386019234,
+        0.7480887061398076
+       ],
+       "n": 1944
+      },
+      "$75k-$149,999": {
+       "dist": [
+        0.43221967286046026,
+        0.5677803271395397
+       ],
+       "n": 1467
+      },
+      "<$25k": {
+       "dist": [
+        0.149672285692125,
+        0.850327714307875
+       ],
+       "n": 1017
+      }
+     },
+     "sex": {
+      "men": {
+       "dist": [
+        0.35002831914490273,
+        0.6499716808550973
+       ],
+       "n": 2336
+      },
+      "women": {
+       "dist": [
+        0.3168660500590479,
+        0.6831339499409521
+       ],
+       "n": 2808
+      }
+     },
+     "tenure": {
+      "homeowners": {
+       "dist": [
+        0.41571341499380665,
+        0.5842865850061932
+       ],
+       "n": 3101
+      },
+      "renters or other housing": {
+       "dist": [
+        0.20822977898533793,
+        0.791770221014662
+       ],
+       "n": 2043
+      }
+     }
+    }
+   }
+  },
+  {
+   "itemId": "shed_ef7",
+   "source": "shed2024",
+   "variable": "EF7",
+   "wording": "Based on your current financial situation, what is the largest emergency expense that you could handle right now using only your savings?",
+   "options": [
+    "Under $100",
+    "$100 to $499",
+    "$500 to $999",
+    "$1,000 to $1,999",
+    "$2,000 or more"
+   ],
+   "positiveOptions": [
+    4
+   ],
+   "valence": "positive",
+   "domain": "finance",
+   "volunteered": [],
+   "provenance": "native",
+   "universeNote": null,
+   "dkRate": 0.0,
+   "targets": {
+    "overall": {
+     "dist": [
+      0.1824892684579855,
+      0.1291886230689178,
+      0.10257800359873963,
+      0.1031637308755957,
+      0.48258037399876136
+     ],
+     "n": 12295
+    },
+    "slices": {
+     "age_band": {
+      "18-29": {
+       "dist": [
+        0.283520776667065,
+        0.19694734494858723,
+        0.125667961136492,
+        0.10178010507438516,
+        0.29208381217347057
+       ],
+       "n": 1887
+      },
+      "30-44": {
+       "dist": [
+        0.22398725563249947,
+        0.13459636069733,
+        0.09773569490968574,
+        0.10309771077331277,
+        0.4405829779871719
+       ],
+       "n": 2813
+      },
+      "45-64": {
+       "dist": [
+        0.1580190163470349,
+        0.11941140502132747,
+        0.10582890425325803,
+        0.1086539967362465,
+        0.5080866776421331
+       ],
+       "n": 4076
+      },
+      "65+": {
+       "dist": [
+        0.08089921104163685,
+        0.07758176050293177,
+        0.08351559878176396,
+        0.09680943081713106,
+        0.6611939988565363
+       ],
+       "n": 3519
+      }
+     },
+     "income_band": {
+      "$150k+": {
+       "dist": [
+        0.04063944761915858,
+        0.050734622469763936,
+        0.0727635047401575,
+        0.0881496756354768,
+        0.7477127495354432
+       ],
+       "n": 3310
+      },
+      "$25k-$74,999": {
+       "dist": [
+        0.26974155867435146,
+        0.19029124936559136,
+        0.13443415506423567,
+        0.11037141818860609,
+        0.2951616187072155
+       ],
+       "n": 3653
+      },
+      "$75k-$149,999": {
+       "dist": [
+        0.11092856150801947,
+        0.12050132971381329,
+        0.1085541465351706,
+        0.1290216864581039,
+        0.5309942757848927
+       ],
+       "n": 4024
+      },
+      "<$25k": {
+       "dist": [
+        0.5799099771212572,
+        0.21081302430451934,
+        0.07794621837594083,
+        0.042865065154680186,
+        0.08846571504360223
+       ],
+       "n": 1308
+      }
+     },
+     "sex": {
+      "men": {
+       "dist": [
+        0.15938345837278264,
+        0.11999323030013336,
+        0.10027898914353323,
+        0.10676583442070536,
+        0.5135784877628452
+       ],
+       "n": 6230
+      },
+      "women": {
+       "dist": [
+        0.2044888847226525,
+        0.13794378515023792,
+        0.10476695242221555,
+        0.09973407853076151,
+        0.45306629917413255
+       ],
+       "n": 6065
+      }
+     },
+     "tenure": {
+      "homeowners": {
+       "dist": [
+        0.1148097500148427,
+        0.10630013257679984,
+        0.10273134926214746,
+        0.1114530086556315,
+        0.5647057594905787
+       ],
+       "n": 9013
+      },
+      "renters or other housing": {
+       "dist": [
+        0.35619963240245933,
+        0.18793561336947134,
+        0.10218441730243258,
+        0.08188796690548798,
+        0.2717923700201489
+       ],
+       "n": 3282
+      }
+     }
+    }
+   }
+  },
+  {
+   "itemId": "shed_bk1",
+   "source": "shed2024",
+   "variable": "BK1",
+   "wording": "Do you (and/or your spouse or partner) currently have a checking, savings, or money market account?",
+   "options": [
+    "Yes",
+    "No"
+   ],
+   "positiveOptions": [
+    0
+   ],
+   "valence": "positive",
+   "domain": "finance",
+   "volunteered": [],
+   "provenance": "native",
+   "universeNote": null,
+   "dkRate": 0.0,
+   "targets": {
+    "overall": {
+     "dist": [
+      0.9351636952187411,
+      0.06483630478125886
+     ],
+     "n": 12295
+    },
+    "slices": {
+     "age_band": {
+      "18-29": {
+       "dist": [
+        0.8707391363793973,
+        0.1292608636206028
+       ],
+       "n": 1887
+      },
+      "30-44": {
+       "dist": [
+        0.9208875149045516,
+        0.07911248509544845
+       ],
+       "n": 2813
+      },
+      "45-64": {
+       "dist": [
+        0.9545866950771547,
+        0.045413304922845385
+       ],
+       "n": 4076
+      },
+      "65+": {
+       "dist": [
+        0.9806391252434864,
+        0.01936087475651365
+       ],
+       "n": 3519
+      }
+     },
+     "income_band": {
+      "$150k+": {
+       "dist": [
+        0.9841529199741806,
+        0.015847080025819343
+       ],
+       "n": 3310
+      },
+      "$25k-$74,999": {
+       "dist": [
+        0.9211746190644573,
+        0.0788253809355427
+       ],
+       "n": 3653
+      },
+      "$75k-$149,999": {
+       "dist": [
+        0.9695814139732204,
+        0.03041858602677963
+       ],
+       "n": 4024
+      },
+      "<$25k": {
+       "dist": [
+        0.7186378858715473,
+        0.28136211412845247
+       ],
+       "n": 1308
+      }
+     },
+     "sex": {
+      "men": {
+       "dist": [
+        0.933829118741029,
+        0.06617088125897072
+       ],
+       "n": 6230
+      },
+      "women": {
+       "dist": [
+        0.9364343786649066,
+        0.06356562133509332
+       ],
+       "n": 6065
+      }
+     },
+     "tenure": {
+      "homeowners": {
+       "dist": [
+        0.9669819221150605,
+        0.03301807788493954
+       ],
+       "n": 9013
+      },
+      "renters or other housing": {
+       "dist": [
+        0.8534971009318624,
+        0.14650289906813774
+       ],
+       "n": 3282
+      }
+     }
+    }
+   }
+  },
+  {
+   "itemId": "shed_bnpl",
+   "source": "shed2024",
+   "variable": "BNPL1",
+   "wording": "In the past year, have you used a \u201cBuy Now, Pay Later\u201d service to buy something?",
+   "options": [
+    "Yes",
+    "No"
+   ],
+   "positiveOptions": [
+    0
+   ],
+   "valence": "neutral",
+   "domain": "finance",
+   "volunteered": [],
+   "provenance": "native",
+   "universeNote": null,
+   "dkRate": 0.0,
+   "targets": {
+    "overall": {
+     "dist": [
+      0.14683266602527706,
+      0.8531673339747229
+     ],
+     "n": 12295
+    },
+    "slices": {
+     "age_band": {
+      "18-29": {
+       "dist": [
+        0.18932812760622605,
+        0.8106718723937738
+       ],
+       "n": 1887
+      },
+      "30-44": {
+       "dist": [
+        0.18771255967285871,
+        0.8122874403271412
+       ],
+       "n": 2813
+      },
+      "45-64": {
+       "dist": [
+        0.14307715131143342,
+        0.8569228486885666
+       ],
+       "n": 4076
+      },
+      "65+": {
+       "dist": [
+        0.0681097195738046,
+        0.9318902804261954
+       ],
+       "n": 3519
+      }
+     },
+     "income_band": {
+      "$150k+": {
+       "dist": [
+        0.09994704648952066,
+        0.9000529535104792
+       ],
+       "n": 3310
+      },
+      "$25k-$74,999": {
+       "dist": [
+        0.1829357892393379,
+        0.8170642107606622
+       ],
+       "n": 3653
+      },
+      "$75k-$149,999": {
+       "dist": [
+        0.14822992821082354,
+        0.8517700717891764
+       ],
+       "n": 4024
+      },
+      "<$25k": {
+       "dist": [
+        0.1754784641400577,
+        0.8245215358599421
+       ],
+       "n": 1308
+      }
+     },
+     "sex": {
+      "men": {
+       "dist": [
+        0.12292136395611412,
+        0.8770786360438857
+       ],
+       "n": 6230
+      },
+      "women": {
+       "dist": [
+        0.16959921123491692,
+        0.8304007887650829
+       ],
+       "n": 6065
+      }
+     },
+     "tenure": {
+      "homeowners": {
+       "dist": [
+        0.12021820440711138,
+        0.8797817955928887
+       ],
+       "n": 9013
+      },
+      "renters or other housing": {
+       "dist": [
+        0.21514296019147633,
+        0.7848570398085237
+       ],
+       "n": 3282
+      }
+     }
+    }
+   }
+  },
+  {
+   "itemId": "shed_work",
+   "source": "shed2024",
+   "variable": "D1A",
+   "wording": "Last month, did you do any work for either pay or profit?",
+   "options": [
+    "Yes",
+    "No"
+   ],
+   "positiveOptions": [
+    0
+   ],
+   "valence": "neutral",
+   "domain": "work",
+   "volunteered": [],
+   "provenance": "native",
+   "universeNote": null,
+   "dkRate": 0.0,
+   "targets": {
+    "overall": {
+     "dist": [
+      0.5959693016605033,
+      0.40403069833949673
+     ],
+     "n": 12295
+    },
+    "slices": {
+     "age_band": {
+      "18-29": {
+       "dist": [
+        0.6939479179295501,
+        0.30605208207044976
+       ],
+       "n": 1887
+      },
+      "30-44": {
+       "dist": [
+        0.7371540410775373,
+        0.2628459589224626
+       ],
+       "n": 2813
+      },
+      "45-64": {
+       "dist": [
+        0.6911593814755889,
+        0.30884061852441125
+       ],
+       "n": 4076
+      },
+      "65+": {
+       "dist": [
+        0.2161549085173481,
+        0.7838450914826519
+       ],
+       "n": 3519
+      }
+     },
+     "income_band": {
+      "$150k+": {
+       "dist": [
+        0.7056280511027728,
+        0.29437194889722723
+       ],
+       "n": 3310
+      },
+      "$25k-$74,999": {
+       "dist": [
+        0.5227796746874204,
+        0.47722032531257963
+       ],
+       "n": 3653
+      },
+      "$75k-$149,999": {
+       "dist": [
+        0.6386566357556442,
+        0.36134336424435576
+       ],
+       "n": 4024
+      },
+      "<$25k": {
+       "dist": [
+        0.346685649391558,
+        0.6533143506084419
+       ],
+       "n": 1308
+      }
+     },
+     "sex": {
+      "men": {
+       "dist": [
+        0.6379172763887889,
+        0.36208272361121097
+       ],
+       "n": 6230
+      },
+      "women": {
+       "dist": [
+        0.5560295919641429,
+        0.4439704080358571
+       ],
+       "n": 6065
+      }
+     },
+     "tenure": {
+      "homeowners": {
+       "dist": [
+        0.5986716121347223,
+        0.40132838786527775
+       ],
+       "n": 9013
+      },
+      "renters or other housing": {
+       "dist": [
+        0.5890333874169364,
+        0.41096661258306355
+       ],
+       "n": 3282
+      }
+     }
+    }
+   }
+  },
+  {
+   "itemId": "shed_i41d",
+   "source": "shed2024",
+   "variable": "I41_d",
+   "wording": "In the past 12 months, have you (and/or your spouse or partner) received housing assistance from a government program?",
+   "options": [
+    "Yes",
+    "No"
+   ],
+   "positiveOptions": [
+    0
+   ],
+   "valence": "negative",
+   "domain": "benefits",
+   "volunteered": [],
+   "provenance": "derived",
+   "universeNote": null,
+   "dkRate": 0.0,
+   "targets": {
+    "overall": {
+     "dist": [
+      0.03155180225228994,
+      0.9684481977477101
+     ],
+     "n": 12295
+    },
+    "slices": {
+     "age_band": {
+      "18-29": {
+       "dist": [
+        0.03755742116630153,
+        0.9624425788336985
+       ],
+       "n": 1887
+      },
+      "30-44": {
+       "dist": [
+        0.04309359464991401,
+        0.956906405350086
+       ],
+       "n": 2813
+      },
+      "45-64": {
+       "dist": [
+        0.02878235769772707,
+        0.9712176423022729
+       ],
+       "n": 4076
+      },
+      "65+": {
+       "dist": [
+        0.016919403027470848,
+        0.983080596972529
+       ],
+       "n": 3519
+      }
+     },
+     "income_band": {
+      "$150k+": {
+       "dist": [
+        0.005603280288284569,
+        0.9943967197117154
+       ],
+       "n": 3310
+      },
+      "$25k-$74,999": {
+       "dist": [
+        0.03392860116374369,
+        0.9660713988362564
+       ],
+       "n": 3653
+      },
+      "$75k-$149,999": {
+       "dist": [
+        0.00460311418967399,
+        0.9953968858103263
+       ],
+       "n": 4024
+      },
+      "<$25k": {
+       "dist": [
+        0.18940830266255512,
+        0.8105916973374448
+       ],
+       "n": 1308
+      }
+     },
+     "sex": {
+      "men": {
+       "dist": [
+        0.024523336153986018,
+        0.975476663846014
+       ],
+       "n": 6230
+      },
+      "women": {
+       "dist": [
+        0.03824377957408616,
+        0.9617562204259138
+       ],
+       "n": 6065
+      }
+     },
+     "tenure": {
+      "homeowners": {
+       "dist": [
+        0.005443525347320846,
+        0.9945564746526792
+       ],
+       "n": 9013
+      },
+      "renters or other housing": {
+       "dist": [
+        0.09856289198005369,
+        0.9014371080199464
+       ],
+       "n": 3282
+      }
+     }
+    }
+   }
+  },
+  {
+   "itemId": "shed_housing_stress",
+   "source": "shed2024",
+   "variable": "housing_cost_stress",
+   "wording": "Housing costs caused a serious hardship for my household, such as falling behind on rent or mortgage, facing foreclosure or eviction risk, or needing housing assistance.",
+   "options": [
+    "Yes",
+    "No"
+   ],
+   "positiveOptions": [
+    0
+   ],
+   "valence": "negative",
+   "domain": "housing",
+   "volunteered": [],
+   "provenance": "composite",
+   "universeNote": null,
+   "dkRate": null,
+   "targets": {
+    "overall": {
+     "dist": [
+      0.18737877157451166,
+      0.8126212284254883
+     ],
+     "n": 12295
+    },
+    "slices": {
+     "age_band": {
+      "18-29": {
+       "dist": [
+        0.2892707306419747,
+        0.7107292693580253
+       ],
+       "n": 1887
+      },
+      "30-44": {
+       "dist": [
+        0.2572901292362811,
+        0.7427098707637186
+       ],
+       "n": 2813
+      },
+      "45-64": {
+       "dist": [
+        0.15141996386308082,
+        0.8485800361369191
+       ],
+       "n": 4076
+      },
+      "65+": {
+       "dist": [
+        0.06838480790782481,
+        0.931615192092175
+       ],
+       "n": 3519
+      }
+     },
+     "income_band": {
+      "$150k+": {
+       "dist": [
+        0.054396958266031886,
+        0.9456030417339683
+       ],
+       "n": 3310
+      },
+      "$25k-$74,999": {
+       "dist": [
+        0.29007417561158955,
+        0.7099258243884106
+       ],
+       "n": 3653
+      },
+      "$75k-$149,999": {
+       "dist": [
+        0.1247719675005275,
+        0.8752280324994725
+       ],
+       "n": 4024
+      },
+      "<$25k": {
+       "dist": [
+        0.483532859179681,
+        0.516467140820319
+       ],
+       "n": 1308
+      }
+     },
+     "sex": {
+      "men": {
+       "dist": [
+        0.16936811532062654,
+        0.8306318846793733
+       ],
+       "n": 6230
+      },
+      "women": {
+       "dist": [
+        0.20452716519495637,
+        0.7954728348050437
+       ],
+       "n": 6065
+      }
+     },
+     "tenure": {
+      "homeowners": {
+       "dist": [
+        0.005692096251111564,
+        0.9943079037488884
+       ],
+       "n": 9013
+      },
+      "renters or other housing": {
+       "dist": [
+        0.6537068309386369,
+        0.34629316906136326
+       ],
+       "n": 3282
+      }
+     }
+    }
+   }
+  }
+ ]
+}

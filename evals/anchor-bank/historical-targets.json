@@ -1,0 +1,320 @@
+{
+ "version": "historical-v1",
+ "items": {
+  "gss_happy": {
+   "year": 2022,
+   "positiveShare": 0.24783766324006326,
+   "n": 3315
+  },
+  "gss_health": {
+   "year": 2022,
+   "positiveShare": 0.7264772308871795,
+   "n": 3333
+  },
+  "gss_satfin": {
+   "year": 2022,
+   "positiveShare": 0.2690662426894201,
+   "n": 3321
+  },
+  "gss_finrela": {
+   "year": 2022,
+   "positiveShare": 0.2475336826977383,
+   "n": 3303
+  },
+  "gss_getahead": {
+   "year": 2022,
+   "positiveShare": 0.5827984754119883,
+   "n": 1120
+  },
+  "gss_class": {
+   "year": 2022,
+   "positiveShare": 0.4695758217016329,
+   "n": 3309
+  },
+  "gss_fear": {
+   "year": 2022,
+   "positiveShare": 0.37306064026057895,
+   "n": 2194
+  },
+  "gss_cappun": {
+   "year": 2022,
+   "positiveShare": 0.6159134197750005,
+   "n": 3155
+  },
+  "gss_gunlaw": {
+   "year": 2022,
+   "positiveShare": 0.6926458071277637,
+   "n": 2183
+  },
+  "gss_grass": {
+   "year": 2022,
+   "positiveShare": 0.7137149206717951,
+   "n": 1052
+  },
+  "gss_courts": {
+   "year": 2022,
+   "positiveShare": 0.6083435842267368,
+   "n": 1450
+  },
+  "gss_trust": {
+   "year": 2022,
+   "positiveShare": 0.2689379537063969,
+   "n": 1131
+  },
+  "gss_fair": {
+   "year": 2022,
+   "positiveShare": 0.45332545708539307,
+   "n": 1122
+  },
+  "gss_helpful": {
+   "year": 2022,
+   "positiveShare": 0.4274627701301931,
+   "n": 1125
+  },
+  "gss_satjob": {
+   "year": 2022,
+   "positiveShare": 0.45842369243393116,
+   "n": 2321
+  },
+  "gss_spanking": {
+   "year": 2022,
+   "positiveShare": 0.5592596870894516,
+   "n": 2200
+  },
+  "gss_sexeduc": {
+   "year": 2022,
+   "positiveShare": 0.8682396562302019,
+   "n": 2192
+  },
+  "gss_divlaw": {
+   "year": 2022,
+   "positiveShare": 0.5522839172403382,
+   "n": 1055
+  },
+  "gss_fepol": {
+   "year": 2022,
+   "positiveShare": 0.8648441296189637,
+   "n": 1065
+  },
+  "gss_fefam": {
+   "year": 2022,
+   "positiveShare": 0.7484507985233881,
+   "n": 2202
+  },
+  "gss_fechld": {
+   "year": 2022,
+   "positiveShare": 0.7563854116375875,
+   "n": 2215
+  },
+  "gss_fepresch": {
+   "year": 2022,
+   "positiveShare": 0.7311338440965472,
+   "n": 2202
+  },
+  "gss_helppoor": {
+   "year": 2022,
+   "positiveShare": 0.3674257825690408,
+   "n": 2188
+  },
+  "gss_helpsick": {
+   "year": 2022,
+   "positiveShare": 0.5534570704093371,
+   "n": 2192
+  },
+  "gss_helpnot": {
+   "year": 2022,
+   "positiveShare": 0.3125554350122457,
+   "n": 2152
+  },
+  "gss_eqwlth": {
+   "year": 2022,
+   "positiveShare": 0.5270310354688491,
+   "n": 2211
+  },
+  "gss_polviews": {
+   "year": 2022,
+   "positiveShare": 0.2935080660304238,
+   "n": 3235
+  },
+  "gss_confinan": {
+   "year": 2022,
+   "positiveShare": 0.1820325476711806,
+   "n": 2214
+  },
+  "gss_conbus": {
+   "year": 2022,
+   "positiveShare": 0.15047969658962118,
+   "n": 2181
+  },
+  "gss_coneduc": {
+   "year": 2022,
+   "positiveShare": 0.18707853162982255,
+   "n": 2211
+  },
+  "gss_conpress": {
+   "year": 2022,
+   "positiveShare": 0.07167188779905177,
+   "n": 2203
+  },
+  "gss_conmedic": {
+   "year": 2022,
+   "positiveShare": 0.339887121803741,
+   "n": 2217
+  },
+  "gss_conarmy": {
+   "year": 2022,
+   "positiveShare": 0.46887967227584326,
+   "n": 2209
+  },
+  "gss_confed": {
+   "year": 2022,
+   "positiveShare": 0.10097805604158563,
+   "n": 2193
+  },
+  "gss_conjudge": {
+   "year": 2022,
+   "positiveShare": 0.1790989617608221,
+   "n": 2192
+  },
+  "gss_consci": {
+   "year": 2022,
+   "positiveShare": 0.3941435703460474,
+   "n": 2178
+  },
+  "gss_conlegis": {
+   "year": 2022,
+   "positiveShare": 0.057438100625790564,
+   "n": 2194
+  },
+  "gss_natspac": {
+   "year": 2022,
+   "positiveShare": 0.21331662534400248,
+   "n": 1577
+  },
+  "gss_natenvir": {
+   "year": 2022,
+   "positiveShare": 0.6667540633711648,
+   "n": 1639
+  },
+  "gss_natheal": {
+   "year": 2022,
+   "positiveShare": 0.6773936108496087,
+   "n": 1632
+  },
+  "gss_natcity": {
+   "year": 2022,
+   "positiveShare": 0.5799435194127507,
+   "n": 1570
+  },
+  "gss_natcrime": {
+   "year": 2022,
+   "positiveShare": 0.7163115176402626,
+   "n": 1629
+  },
+  "gss_natdrug": {
+   "year": 2022,
+   "positiveShare": 0.7111828518891944,
+   "n": 1627
+  },
+  "gss_nateduc": {
+   "year": 2022,
+   "positiveShare": 0.7418496888020891,
+   "n": 1646
+  },
+  "gss_natarms": {
+   "year": 2022,
+   "positiveShare": 0.28663740268778515,
+   "n": 1625
+  },
+  "gss_nataid": {
+   "year": 2022,
+   "positiveShare": 0.11255845695885923,
+   "n": 1590
+  },
+  "gss_natfare": {
+   "year": 2022,
+   "positiveShare": 0.30185275938357775,
+   "n": 1607
+  },
+  "gss_natroad": {
+   "year": 2022,
+   "positiveShare": 0.4977465467567773,
+   "n": 3287
+  },
+  "gss_natsoc": {
+   "year": 2022,
+   "positiveShare": 0.5985679570676861,
+   "n": 3223
+  },
+  "gss_natchld": {
+   "year": 2022,
+   "positiveShare": 0.6592330880639814,
+   "n": 3215
+  },
+  "gss_natsci": {
+   "year": 2022,
+   "positiveShare": 0.42499287704569133,
+   "n": 3191
+  },
+  "gss_natenrgy": {
+   "year": 2022,
+   "positiveShare": 0.5554941152888662,
+   "n": 3222
+  },
+  "shed_b2": {
+   "year": 2023,
+   "positiveShare": 0.7218890202990946,
+   "n": 11400
+  },
+  "shed_b3": {
+   "year": 2023,
+   "positiveShare": 0.20456651493201644,
+   "n": 11400
+  },
+  "shed_400cash": {
+   "year": 2023,
+   "positiveShare": 0.6331686314440279,
+   "n": 11400
+  },
+  "shed_ef1": {
+   "year": 2023,
+   "positiveShare": 0.5382642835894131,
+   "n": 11400
+  },
+  "shed_ef2": {
+   "year": 2023,
+   "positiveShare": 0.33004032719984655,
+   "n": 4918
+  },
+  "shed_ef7": {
+   "year": 2023,
+   "positiveShare": 0.4782866918136017,
+   "n": 11400
+  },
+  "shed_bk1": {
+   "year": 2023,
+   "positiveShare": 0.935688149210454,
+   "n": 11400
+  },
+  "shed_bnpl": {
+   "year": 2023,
+   "positiveShare": 0.13623841359660455,
+   "n": 11400
+  },
+  "shed_work": {
+   "year": 2023,
+   "positiveShare": 0.6010489691724769,
+   "n": 11400
+  },
+  "shed_i41d": {
+   "year": 2023,
+   "positiveShare": 0.02966849794854143,
+   "n": 11400
+  },
+  "shed_housing_stress": {
+   "year": 2023,
+   "positiveShare": 0.1805097133722916,
+   "n": 11400
+  }
+ }
+}
