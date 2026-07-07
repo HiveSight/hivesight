@@ -608,6 +608,17 @@
     "cellCount": 8,
     "failures": 0,
     "ms": 5048
+   },
+   "cells:openai:gpt-5-mini:default:g40": {
+    "topline": [
+     0.3395211143179295,
+     0.5714031246178859,
+     0.0890757610641846
+    ],
+    "slices": {},
+    "cellCount": 40,
+    "failures": 0,
+    "ms": 15276
    }
   },
   "gss_happy": {
@@ -1204,6 +1215,17 @@
     "cellCount": 8,
     "failures": 0,
     "ms": 2094
+   },
+   "cells:openai:gpt-5-mini:default:g40": {
+    "topline": [
+     0.28779775408194486,
+     0.47934504845814396,
+     0.2328571974599113
+    ],
+    "slices": {},
+    "cellCount": 40,
+    "failures": 0,
+    "ms": 7043
    }
   },
   "gss_health": {
@@ -1825,6 +1847,18 @@
     "cellCount": 8,
     "failures": 0,
     "ms": 2861
+   },
+   "cells:openai:gpt-5-mini:default:g40": {
+    "topline": [
+     0.14624553413272662,
+     0.4344046539044176,
+     0.2829248114551979,
+     0.1364250005076581
+    ],
+    "slices": {},
+    "cellCount": 40,
+    "failures": 0,
+    "ms": 5470
    }
   },
   "gss_satfin": {
@@ -2363,6 +2397,17 @@
     "cellCount": 8,
     "failures": 0,
     "ms": 1884
+   },
+   "cells:openai:gpt-5-mini:default:g40": {
+    "topline": [
+     0.35148753600771915,
+     0.3703460744797399,
+     0.2781663895125408
+    ],
+    "slices": {},
+    "cellCount": 40,
+    "failures": 0,
+    "ms": 3676
    }
   },
   "gss_finrela": {
@@ -2541,6 +2586,19 @@
     "cellCount": 8,
     "failures": 0,
     "ms": 3905
+   },
+   "cells:openai:gpt-5-mini:default:g40": {
+    "topline": [
+     0.23634947702506615,
+     0.2754827592699648,
+     0.2983528119906647,
+     0.1470775255297522,
+     0.04273742618455225
+    ],
+    "slices": {},
+    "cellCount": 40,
+    "failures": 0,
+    "ms": 22363
    }
   },
   "gss_getahead": {
@@ -2690,6 +2748,17 @@
     "cellCount": 8,
     "failures": 0,
     "ms": 1717
+   },
+   "cells:openai:gpt-5-mini:default:g40": {
+    "topline": [
+     0.4919457019959647,
+     0.20877363436905996,
+     0.2992806636349753
+    ],
+    "slices": {},
+    "cellCount": 40,
+    "failures": 0,
+    "ms": 6783
    }
   },
   "gss_class": {
@@ -2848,6 +2917,18 @@
     "cellCount": 8,
     "failures": 0,
     "ms": 2161
+   },
+   "cells:openai:gpt-5-mini:default:g40": {
+    "topline": [
+     0.2614432974312091,
+     0.3387038685332414,
+     0.3704073641426375,
+     0.02944546989291194
+    ],
+    "slices": {},
+    "cellCount": 40,
+    "failures": 0,
+    "ms": 4813
    }
   },
   "gss_fear": {
@@ -2966,6 +3047,16 @@
     "cellCount": 8,
     "failures": 0,
     "ms": 1989
+   },
+   "cells:openai:gpt-5-mini:default:g40": {
+    "topline": [
+     0.44874569314531765,
+     0.5512543068546825
+    ],
+    "slices": {},
+    "cellCount": 40,
+    "failures": 0,
+    "ms": 8289
    }
   },
   "gss_cappun": {
@@ -3421,6 +3512,16 @@
     "cellCount": 8,
     "failures": 0,
     "ms": 3835
+   },
+   "cells:openai:gpt-5-mini:default:g40": {
+    "topline": [
+     0.5856166675954876,
+     0.41438333240451264
+    ],
+    "slices": {},
+    "cellCount": 40,
+    "failures": 0,
+    "ms": 11764
    }
   },
   "gss_gunlaw": {
@@ -3539,6 +3640,16 @@
     "cellCount": 8,
     "failures": 0,
     "ms": 4278
+   },
+   "cells:openai:gpt-5-mini:default:g40": {
+    "topline": [
+     0.6092554648725222,
+     0.39074453512747803
+    ],
+    "slices": {},
+    "cellCount": 40,
+    "failures": 0,
+    "ms": 6989
    }
   },
   "gss_grass": {
@@ -3994,6 +4105,16 @@
     "cellCount": 8,
     "failures": 0,
     "ms": 1957
+   },
+   "cells:openai:gpt-5-mini:default:g40": {
+    "topline": [
+     0.6304086581864464,
+     0.36959134181355363
+    ],
+    "slices": {},
+    "cellCount": 40,
+    "failures": 0,
+    "ms": 2548
    }
   },
   "gss_courts": {
@@ -4143,6 +4264,17 @@
     "cellCount": 8,
     "failures": 0,
     "ms": 1654
+   },
+   "cells:openai:gpt-5-mini:default:g40": {
+    "topline": [
+     0.3181131137044546,
+     0.35489772559826127,
+     0.3269891606972841
+    ],
+    "slices": {},
+    "cellCount": 40,
+    "failures": 0,
+    "ms": 5041
    }
   },
   "gss_fair": {
@@ -4292,6 +4424,17 @@
     "cellCount": 8,
     "failures": 0,
     "ms": 1548
+   },
+   "cells:openai:gpt-5-mini:default:g40": {
+    "topline": [
+     0.41137368347615905,
+     0.4777443512866501,
+     0.11088196523719064
+    ],
+    "slices": {},
+    "cellCount": 40,
+    "failures": 0,
+    "ms": 2870
    }
   },
   "gss_helpful": {
@@ -4441,6 +4584,17 @@
     "cellCount": 8,
     "failures": 0,
     "ms": 2284
+   },
+   "cells:openai:gpt-5-mini:default:g40": {
+    "topline": [
+     0.4859860262836152,
+     0.40187160485681417,
+     0.11214236885957073
+    ],
+    "slices": {},
+    "cellCount": 40,
+    "failures": 0,
+    "ms": 2913
    }
   },
   "gss_satjob": {
@@ -4599,6 +4753,18 @@
     "cellCount": 8,
     "failures": 0,
     "ms": 1507
+   },
+   "cells:openai:gpt-5-mini:default:g40": {
+    "topline": [
+     0.2663052452276461,
+     0.4271243763601487,
+     0.19874225888127164,
+     0.10782811953093374
+    ],
+    "slices": {},
+    "cellCount": 40,
+    "failures": 0,
+    "ms": 16590
    }
   },
   "gss_spanking": {
@@ -4757,6 +4923,18 @@
     "cellCount": 8,
     "failures": 0,
     "ms": 1771
+   },
+   "cells:openai:gpt-5-mini:default:g40": {
+    "topline": [
+     0.192960737728563,
+     0.3629708019928498,
+     0.2990341889980557,
+     0.14503427128053145
+    ],
+    "slices": {},
+    "cellCount": 40,
+    "failures": 0,
+    "ms": 4107
    }
   },
   "gss_sexeduc": {
@@ -4895,6 +5073,17 @@
     "cellCount": 8,
     "failures": 0,
     "ms": 1747
+   },
+   "cells:openai:gpt-5-mini:default:g40": {
+    "topline": [
+     0.6852760157079592,
+     0.18922581942501243,
+     0.1254981648670287
+    ],
+    "slices": {},
+    "cellCount": 40,
+    "failures": 0,
+    "ms": 3457
    }
   },
   "gss_divlaw": {
@@ -5044,6 +5233,17 @@
     "cellCount": 8,
     "failures": 0,
     "ms": 2608
+   },
+   "cells:openai:gpt-5-mini:default:g40": {
+    "topline": [
+     0.4368420411403484,
+     0.24036923434504912,
+     0.32278872451460267
+    ],
+    "slices": {},
+    "cellCount": 40,
+    "failures": 0,
+    "ms": 5037
    }
   },
   "gss_fepol": {
@@ -5162,6 +5362,16 @@
     "cellCount": 8,
     "failures": 0,
     "ms": 1633
+   },
+   "cells:openai:gpt-5-mini:default:g40": {
+    "topline": [
+     0.2378375722287791,
+     0.7621624277712212
+    ],
+    "slices": {},
+    "cellCount": 40,
+    "failures": 0,
+    "ms": 5042
    }
   },
   "gss_fefam": {
@@ -5850,6 +6060,18 @@
     "cellCount": 8,
     "failures": 0,
     "ms": 1587
+   },
+   "cells:openai:gpt-5-mini:default:g40": {
+    "topline": [
+     0.1338183939342028,
+     0.30230855359144543,
+     0.3744030926678826,
+     0.18946995980646897
+    ],
+    "slices": {},
+    "cellCount": 40,
+    "failures": 0,
+    "ms": 5239
    }
   },
   "gss_fechld": {
@@ -6008,6 +6230,18 @@
     "cellCount": 8,
     "failures": 0,
     "ms": 1710
+   },
+   "cells:openai:gpt-5-mini:default:g40": {
+    "topline": [
+     0.2342189824113283,
+     0.4527804941151651,
+     0.22618051995604418,
+     0.08682000351746252
+    ],
+    "slices": {},
+    "cellCount": 40,
+    "failures": 0,
+    "ms": 3907
    }
   },
   "gss_fepresch": {
@@ -6166,6 +6400,18 @@
     "cellCount": 8,
     "failures": 0,
     "ms": 2109
+   },
+   "cells:openai:gpt-5-mini:default:g40": {
+    "topline": [
+     0.14265363323067484,
+     0.34303812060526245,
+     0.36279908301041314,
+     0.15150916315364935
+    ],
+    "slices": {},
+    "cellCount": 40,
+    "failures": 0,
+    "ms": 8749
    }
   },
   "gss_helppoor": {
@@ -6344,6 +6590,19 @@
     "cellCount": 8,
     "failures": 0,
     "ms": 2455
+   },
+   "cells:openai:gpt-5-mini:default:g40": {
+    "topline": [
+     0.25763867467937773,
+     0.2186909151309679,
+     0.17872873809649237,
+     0.18084511140518805,
+     0.16409656068797385
+    ],
+    "slices": {},
+    "cellCount": 40,
+    "failures": 0,
+    "ms": 3222
    }
   },
   "gss_helpsick": {
@@ -6522,6 +6781,19 @@
     "cellCount": 8,
     "failures": 0,
     "ms": 1745
+   },
+   "cells:openai:gpt-5-mini:default:g40": {
+    "topline": [
+     0.3768646559376721,
+     0.21210383085615633,
+     0.1608530324847256,
+     0.13853242638618504,
+     0.11164605433526094
+    ],
+    "slices": {},
+    "cellCount": 40,
+    "failures": 0,
+    "ms": 3325
    }
   },
   "gss_helpnot": {
@@ -6700,6 +6972,19 @@
     "cellCount": 8,
     "failures": 0,
     "ms": 1758
+   },
+   "cells:openai:gpt-5-mini:default:g40": {
+    "topline": [
+     0.26000212695125907,
+     0.20248767623030836,
+     0.1350292506162868,
+     0.19314151166572757,
+     0.2093394345364182
+    ],
+    "slices": {},
+    "cellCount": 40,
+    "failures": 0,
+    "ms": 19919
    }
   },
   "gss_eqwlth": {
@@ -6918,6 +7203,21 @@
     "cellCount": 8,
     "failures": 0,
     "ms": 1536
+   },
+   "cells:openai:gpt-5-mini:default:g40": {
+    "topline": [
+     0.2699354953296305,
+     0.17120254084498823,
+     0.13172288310349978,
+     0.13367720937872146,
+     0.11100009861457522,
+     0.09481147407585358,
+     0.08765029865273138
+    ],
+    "slices": {},
+    "cellCount": 40,
+    "failures": 0,
+    "ms": 3965
    }
   },
   "gss_polviews": {
@@ -7882,6 +8182,21 @@
     "cellCount": 8,
     "failures": 0,
     "ms": 3792
+   },
+   "cells:openai:gpt-5-mini:default:g40": {
+    "topline": [
+     0.060581340870324366,
+     0.1279297270803807,
+     0.15725315289314934,
+     0.26616058246778296,
+     0.17531958378675494,
+     0.15860484158334903,
+     0.054150771318258704
+    ],
+    "slices": {},
+    "cellCount": 40,
+    "failures": 0,
+    "ms": 4118
    }
   },
   "gss_confinan": {
@@ -8020,6 +8335,17 @@
     "cellCount": 8,
     "failures": 0,
     "ms": 1551
+   },
+   "cells:openai:gpt-5-mini:default:g40": {
+    "topline": [
+     0.20984147525857302,
+     0.54480868178496,
+     0.24534984295646692
+    ],
+    "slices": {},
+    "cellCount": 40,
+    "failures": 0,
+    "ms": 2758
    }
   },
   "gss_conbus": {
@@ -8158,6 +8484,17 @@
     "cellCount": 8,
     "failures": 0,
     "ms": 1461
+   },
+   "cells:openai:gpt-5-mini:default:g40": {
+    "topline": [
+     0.13785860203644446,
+     0.5525201246832049,
+     0.3096212732803508
+    ],
+    "slices": {},
+    "cellCount": 40,
+    "failures": 0,
+    "ms": 8666
    }
   },
   "gss_coneduc": {
@@ -8296,6 +8633,17 @@
     "cellCount": 8,
     "failures": 0,
     "ms": 1723
+   },
+   "cells:openai:gpt-5-mini:default:g40": {
+    "topline": [
+     0.21209151688736136,
+     0.5563562975944002,
+     0.23155218551823858
+    ],
+    "slices": {},
+    "cellCount": 40,
+    "failures": 0,
+    "ms": 5112
    }
   },
   "gss_conpress": {
@@ -8434,6 +8782,17 @@
     "cellCount": 8,
     "failures": 0,
     "ms": 2064
+   },
+   "cells:openai:gpt-5-mini:default:g40": {
+    "topline": [
+     0.09400829995719553,
+     0.45041574102934956,
+     0.4555759590134551
+    ],
+    "slices": {},
+    "cellCount": 40,
+    "failures": 0,
+    "ms": 5664
    }
   },
   "gss_conmedic": {
@@ -8572,6 +8931,17 @@
     "cellCount": 8,
     "failures": 0,
     "ms": 1878
+   },
+   "cells:openai:gpt-5-mini:default:g40": {
+    "topline": [
+     0.3381831860219433,
+     0.5044756109974041,
+     0.1573412029806525
+    ],
+    "slices": {},
+    "cellCount": 40,
+    "failures": 0,
+    "ms": 3675
    }
   },
   "gss_conarmy": {
@@ -8710,6 +9080,17 @@
     "cellCount": 8,
     "failures": 0,
     "ms": 1997
+   },
+   "cells:openai:gpt-5-mini:default:g40": {
+    "topline": [
+     0.4630277279002458,
+     0.40927245450433336,
+     0.127699817595421
+    ],
+    "slices": {},
+    "cellCount": 40,
+    "failures": 0,
+    "ms": 23352
    }
   },
   "gss_confed": {
@@ -9306,6 +9687,17 @@
     "cellCount": 8,
     "failures": 0,
     "ms": 2898
+   },
+   "cells:openai:gpt-5-mini:default:g40": {
+    "topline": [
+     0.12836233084124946,
+     0.4521495204732291,
+     0.4194881486855213
+    ],
+    "slices": {},
+    "cellCount": 40,
+    "failures": 0,
+    "ms": 4651
    }
   },
   "gss_conjudge": {
@@ -9444,6 +9836,17 @@
     "cellCount": 8,
     "failures": 0,
     "ms": 2272
+   },
+   "cells:openai:gpt-5-mini:default:g40": {
+    "topline": [
+     0.13745578869809216,
+     0.4651061439879704,
+     0.3974380673139373
+    ],
+    "slices": {},
+    "cellCount": 40,
+    "failures": 0,
+    "ms": 4370
    }
   },
   "gss_consci": {
@@ -9982,6 +10385,17 @@
     "cellCount": 8,
     "failures": 0,
     "ms": 3128
+   },
+   "cells:openai:gpt-5-mini:default:g40": {
+    "topline": [
+     0.30264343741548366,
+     0.4989841069282564,
+     0.19837245565626002
+    ],
+    "slices": {},
+    "cellCount": 40,
+    "failures": 0,
+    "ms": 2702
    }
   },
   "gss_conlegis": {
@@ -10120,6 +10534,17 @@
     "cellCount": 8,
     "failures": 0,
     "ms": 1467
+   },
+   "cells:openai:gpt-5-mini:default:g40": {
+    "topline": [
+     0.05967630129006073,
+     0.4233261460695272,
+     0.5169975526404121
+    ],
+    "slices": {},
+    "cellCount": 40,
+    "failures": 0,
+    "ms": 3805
    }
   },
   "gss_natspac": {
@@ -10258,6 +10683,17 @@
     "cellCount": 8,
     "failures": 0,
     "ms": 16965
+   },
+   "cells:openai:gpt-5-mini:default:g40": {
+    "topline": [
+     0.454840264325947,
+     0.1964345245880381,
+     0.3487252110860149
+    ],
+    "slices": {},
+    "cellCount": 40,
+    "failures": 0,
+    "ms": 103667
    }
   },
   "gss_natenvir": {
@@ -10396,6 +10832,17 @@
     "cellCount": 8,
     "failures": 0,
     "ms": 2334
+   },
+   "cells:openai:gpt-5-mini:default:g40": {
+    "topline": [
+     0.24355969635568991,
+     0.44277391758410467,
+     0.3136663860602056
+    ],
+    "slices": {},
+    "cellCount": 40,
+    "failures": 0,
+    "ms": 2897
    }
   },
   "gss_natheal": {
@@ -10534,6 +10981,17 @@
     "cellCount": 8,
     "failures": 0,
     "ms": 1402
+   },
+   "cells:openai:gpt-5-mini:default:g40": {
+    "topline": [
+     0.17717962019070105,
+     0.605613124911994,
+     0.21720725489730502
+    ],
+    "slices": {},
+    "cellCount": 40,
+    "failures": 0,
+    "ms": 3251
    }
   },
   "gss_natcity": {
@@ -10672,6 +11130,17 @@
     "cellCount": 8,
     "failures": 0,
     "ms": 1965
+   },
+   "cells:openai:gpt-5-mini:default:g40": {
+    "topline": [
+     0.2964917971605466,
+     0.4191260714961235,
+     0.28438213134332985
+    ],
+    "slices": {},
+    "cellCount": 40,
+    "failures": 0,
+    "ms": 3539
    }
   },
   "gss_natcrime": {
@@ -10810,6 +11279,17 @@
     "cellCount": 8,
     "failures": 0,
     "ms": 2689
+   },
+   "cells:openai:gpt-5-mini:default:g40": {
+    "topline": [
+     0.19750444647926327,
+     0.5533791235395821,
+     0.24911642998115488
+    ],
+    "slices": {},
+    "cellCount": 40,
+    "failures": 0,
+    "ms": 5863
    }
   },
   "gss_natdrug": {
@@ -10948,6 +11428,17 @@
     "cellCount": 8,
     "failures": 0,
     "ms": 2229
+   },
+   "cells:openai:gpt-5-mini:default:g40": {
+    "topline": [
+     0.218379252049971,
+     0.5149265966357903,
+     0.26669415131423874
+    ],
+    "slices": {},
+    "cellCount": 40,
+    "failures": 0,
+    "ms": 4509
    }
   },
   "gss_nateduc": {
@@ -11544,6 +12035,17 @@
     "cellCount": 8,
     "failures": 0,
     "ms": 1881
+   },
+   "cells:openai:gpt-5-mini:default:g40": {
+    "topline": [
+     0.18117749041765988,
+     0.5577423999260201,
+     0.26108010965632017
+    ],
+    "slices": {},
+    "cellCount": 40,
+    "failures": 0,
+    "ms": 3281
    }
   },
   "gss_natarms": {
@@ -11682,6 +12184,17 @@
     "cellCount": 8,
     "failures": 0,
     "ms": 3842
+   },
+   "cells:openai:gpt-5-mini:default:g40": {
+    "topline": [
+     0.31558564236288805,
+     0.30862295797255934,
+     0.3757913996645527
+    ],
+    "slices": {},
+    "cellCount": 40,
+    "failures": 0,
+    "ms": 2796
    }
   },
   "gss_nataid": {
@@ -11820,6 +12333,17 @@
     "cellCount": 8,
     "failures": 0,
     "ms": 9746
+   },
+   "cells:openai:gpt-5-mini:default:g40": {
+    "topline": [
+     0.4932944460183382,
+     0.1835603151264492,
+     0.32314523885521257
+    ],
+    "slices": {},
+    "cellCount": 40,
+    "failures": 0,
+    "ms": 3572
    }
   },
   "gss_natfare": {
@@ -11947,6 +12471,28 @@
     "cellCount": 1,
     "failures": 0,
     "ms": 1357
+   },
+   "cells:openai:gpt-5-mini:default:g8": {
+    "topline": [
+     0.43222046139002024,
+     0.24125794530134714,
+     0.32652159330863273
+    ],
+    "slices": {},
+    "cellCount": 8,
+    "failures": 0,
+    "ms": 4160
+   },
+   "cells:openai:gpt-5-mini:default:g40": {
+    "topline": [
+     0.3838393038486757,
+     0.3378609593547667,
+     0.27829973679655756
+    ],
+    "slices": {},
+    "cellCount": 40,
+    "failures": 0,
+    "ms": 3638
    }
   },
   "gss_natroad": {
@@ -12074,6 +12620,28 @@
     "cellCount": 1,
     "failures": 0,
     "ms": 1447
+   },
+   "cells:openai:gpt-5-mini:default:g8": {
+    "topline": [
+     0.1822635979440591,
+     0.5054625487499879,
+     0.31227385330595314
+    ],
+    "slices": {},
+    "cellCount": 8,
+    "failures": 0,
+    "ms": 2206
+   },
+   "cells:openai:gpt-5-mini:default:g40": {
+    "topline": [
+     0.1813498751084436,
+     0.5216973324804376,
+     0.2969527924111188
+    ],
+    "slices": {},
+    "cellCount": 40,
+    "failures": 0,
+    "ms": 6430
    }
   },
   "gss_natsoc": {
@@ -12601,6 +13169,28 @@
     "cellCount": 1,
     "failures": 0,
     "ms": 1291
+   },
+   "cells:openai:gpt-5-mini:default:g8": {
+    "topline": [
+     0.1718863426303052,
+     0.5375708353410303,
+     0.2905428220286646
+    ],
+    "slices": {},
+    "cellCount": 8,
+    "failures": 0,
+    "ms": 2201
+   },
+   "cells:openai:gpt-5-mini:default:g40": {
+    "topline": [
+     0.1966458667462703,
+     0.5425026133397567,
+     0.26085151991397304
+    ],
+    "slices": {},
+    "cellCount": 40,
+    "failures": 0,
+    "ms": 6174
    }
   },
   "gss_natchld": {
@@ -12728,6 +13318,28 @@
     "cellCount": 1,
     "failures": 0,
     "ms": 1041
+   },
+   "cells:openai:gpt-5-mini:default:g8": {
+    "topline": [
+     0.20963166083625254,
+     0.5266797728340735,
+     0.26368856632967397
+    ],
+    "slices": {},
+    "cellCount": 8,
+    "failures": 0,
+    "ms": 2024
+   },
+   "cells:openai:gpt-5-mini:default:g40": {
+    "topline": [
+     0.18390457730752197,
+     0.57744878280622,
+     0.23864663988625795
+    ],
+    "slices": {},
+    "cellCount": 40,
+    "failures": 0,
+    "ms": 2674
    }
   },
   "gss_natsci": {
@@ -12855,6 +13467,28 @@
     "cellCount": 1,
     "failures": 0,
     "ms": 1113
+   },
+   "cells:openai:gpt-5-mini:default:g8": {
+    "topline": [
+     0.20108214184102327,
+     0.4935272210085967,
+     0.3053906371503802
+    ],
+    "slices": {},
+    "cellCount": 8,
+    "failures": 0,
+    "ms": 2968
+   },
+   "cells:openai:gpt-5-mini:default:g40": {
+    "topline": [
+     0.20012027067559357,
+     0.5097703203730775,
+     0.29010940895132914
+    ],
+    "slices": {},
+    "cellCount": 40,
+    "failures": 0,
+    "ms": 8134
    }
   },
   "gss_natenrgy": {
@@ -12982,6 +13616,28 @@
     "cellCount": 1,
     "failures": 0,
     "ms": 2690
+   },
+   "cells:openai:gpt-5-mini:default:g8": {
+    "topline": [
+     0.2056712790074559,
+     0.5067024573200366,
+     0.28762626367250743
+    ],
+    "slices": {},
+    "cellCount": 8,
+    "failures": 0,
+    "ms": 1588
+   },
+   "cells:openai:gpt-5-mini:default:g40": {
+    "topline": [
+     0.20073945699784712,
+     0.5246100620734012,
+     0.274650480928752
+    ],
+    "slices": {},
+    "cellCount": 40,
+    "failures": 0,
+    "ms": 11199
    }
   },
   "shed_b2": {
@@ -13918,6 +14574,30 @@
     "cellCount": 1,
     "failures": 0,
     "ms": 1294
+   },
+   "cells:openai:gpt-5-mini:default:g8": {
+    "topline": [
+     0.240462643728573,
+     0.4096791243606651,
+     0.24118441561213083,
+     0.10867381629863104
+    ],
+    "slices": {},
+    "cellCount": 8,
+    "failures": 0,
+    "ms": 1580
+   },
+   "cells:openai:gpt-5-mini:default:g40": {
+    "topline": [
+     0.16400967811347963,
+     0.33835743869713786,
+     0.3180420005801486,
+     0.17959088260923398
+    ],
+    "slices": {},
+    "cellCount": 40,
+    "failures": 0,
+    "ms": 6874
    }
   },
   "shed_b3": {
@@ -14879,6 +15559,32 @@
     "cellCount": 1,
     "failures": 0,
     "ms": 5641
+   },
+   "cells:openai:gpt-5-mini:default:g8": {
+    "topline": [
+     0.07989517689702774,
+     0.20908107217538652,
+     0.35345439835901216,
+     0.243615776187605,
+     0.1139535763809686
+    ],
+    "slices": {},
+    "cellCount": 8,
+    "failures": 0,
+    "ms": 1685
+   },
+   "cells:openai:gpt-5-mini:default:g40": {
+    "topline": [
+     0.055709222646861595,
+     0.14413259949041243,
+     0.31750170015935353,
+     0.30421471227843794,
+     0.1784417654249346
+    ],
+    "slices": {},
+    "cellCount": 40,
+    "failures": 0,
+    "ms": 3315
    }
   },
   "shed_400cash": {
@@ -15486,6 +16192,26 @@
     "cellCount": 1,
     "failures": 0,
     "ms": 1125
+   },
+   "cells:openai:gpt-5-mini:default:g8": {
+    "topline": [
+     0.7321887548859701,
+     0.26781124511402987
+    ],
+    "slices": {},
+    "cellCount": 8,
+    "failures": 0,
+    "ms": 4238
+   },
+   "cells:openai:gpt-5-mini:default:g40": {
+    "topline": [
+     0.5901390349771146,
+     0.4098609650228856
+    ],
+    "slices": {},
+    "cellCount": 40,
+    "failures": 0,
+    "ms": 9115
    }
   },
   "shed_ef1": {
@@ -16093,6 +16819,26 @@
     "cellCount": 1,
     "failures": 0,
     "ms": 1191
+   },
+   "cells:openai:gpt-5-mini:default:g8": {
+    "topline": [
+     0.49192516344879283,
+     0.5080748365512072
+    ],
+    "slices": {},
+    "cellCount": 8,
+    "failures": 0,
+    "ms": 1819
+   },
+   "cells:openai:gpt-5-mini:default:g40": {
+    "topline": [
+     0.37502682268130744,
+     0.6249731773186926
+    ],
+    "slices": {},
+    "cellCount": 40,
+    "failures": 0,
+    "ms": 11896
    }
   },
   "shed_ef2": {
@@ -16237,6 +16983,26 @@
     "cellCount": 1,
     "failures": 0,
     "ms": 1079
+   },
+   "cells:openai:gpt-5-mini:default:g8": {
+    "topline": [
+     0.5778511376075213,
+     0.4221488623924788
+    ],
+    "slices": {},
+    "cellCount": 8,
+    "failures": 0,
+    "ms": 1340
+   },
+   "cells:openai:gpt-5-mini:default:g40": {
+    "topline": [
+     0.4364643504362009,
+     0.5635356495637991
+    ],
+    "slices": {},
+    "cellCount": 40,
+    "failures": 0,
+    "ms": 3300
    }
   },
   "shed_ef7": {
@@ -17304,6 +18070,32 @@
     "cellCount": 1,
     "failures": 0,
     "ms": 1338
+   },
+   "cells:openai:gpt-5-mini:default:g8": {
+    "topline": [
+     0.09423949906336097,
+     0.17242010099467228,
+     0.20115213995528644,
+     0.25024300908101854,
+     0.2819452509056618
+    ],
+    "slices": {},
+    "cellCount": 8,
+    "failures": 0,
+    "ms": 1804
+   },
+   "cells:openai:gpt-5-mini:default:g40": {
+    "topline": [
+     0.14931319428039108,
+     0.21297524475380586,
+     0.20526240697624867,
+     0.22357346400138214,
+     0.20887568998817233
+    ],
+    "slices": {},
+    "cellCount": 40,
+    "failures": 0,
+    "ms": 11934
    }
   },
   "shed_bk1": {
@@ -17978,6 +18770,26 @@
     "cellCount": 1,
     "failures": 0,
     "ms": 1702
+   },
+   "cells:openai:gpt-5-mini:default:g8": {
+    "topline": [
+     0.950574448556369,
+     0.04942555144363107
+    ],
+    "slices": {},
+    "cellCount": 8,
+    "failures": 0,
+    "ms": 1745
+   },
+   "cells:openai:gpt-5-mini:default:g40": {
+    "topline": [
+     0.8823980300032916,
+     0.11760196999670812
+    ],
+    "slices": {},
+    "cellCount": 40,
+    "failures": 0,
+    "ms": 2759
    }
   },
   "shed_bnpl": {
@@ -18122,6 +18934,26 @@
     "cellCount": 1,
     "failures": 0,
     "ms": 2671
+   },
+   "cells:openai:gpt-5-mini:default:g8": {
+    "topline": [
+     0.25225165348185236,
+     0.7477483465181476
+    ],
+    "slices": {},
+    "cellCount": 8,
+    "failures": 0,
+    "ms": 1569
+   },
+   "cells:openai:gpt-5-mini:default:g40": {
+    "topline": [
+     0.26314012835721046,
+     0.7368598716427893
+    ],
+    "slices": {},
+    "cellCount": 40,
+    "failures": 0,
+    "ms": 14116
    }
   },
   "shed_work": {
@@ -18796,6 +19628,26 @@
     "cellCount": 1,
     "failures": 0,
     "ms": 1898
+   },
+   "cells:openai:gpt-5-mini:default:g8": {
+    "topline": [
+     0.5969068626751958,
+     0.40309313732480423
+    ],
+    "slices": {},
+    "cellCount": 8,
+    "failures": 0,
+    "ms": 2021
+   },
+   "cells:openai:gpt-5-mini:default:g40": {
+    "topline": [
+     0.5051355150470109,
+     0.49486448495298907
+    ],
+    "slices": {},
+    "cellCount": 40,
+    "failures": 0,
+    "ms": 3397
    }
   },
   "shed_i41d": {
@@ -18940,6 +19792,26 @@
     "cellCount": 1,
     "failures": 0,
     "ms": 1951
+   },
+   "cells:openai:gpt-5-mini:default:g8": {
+    "topline": [
+     0.13091520875577115,
+     0.8690847912442288
+    ],
+    "slices": {},
+    "cellCount": 8,
+    "failures": 0,
+    "ms": 1280
+   },
+   "cells:openai:gpt-5-mini:default:g40": {
+    "topline": [
+     0.1794604429300169,
+     0.8205395570699829
+    ],
+    "slices": {},
+    "cellCount": 40,
+    "failures": 0,
+    "ms": 2373
    }
   },
   "shed_housing_stress": {
@@ -19547,6 +20419,26 @@
     "cellCount": 1,
     "failures": 0,
     "ms": 1316
+   },
+   "cells:openai:gpt-5-mini:default:g8": {
+    "topline": [
+     0.2996996680125195,
+     0.7003003319874807
+    ],
+    "slices": {},
+    "cellCount": 8,
+    "failures": 0,
+    "ms": 1259
+   },
+   "cells:openai:gpt-5-mini:default:g40": {
+    "topline": [
+     0.3631106860364608,
+     0.6368893139635396
+    ],
+    "slices": {},
+    "cellCount": 40,
+    "failures": 0,
+    "ms": 3609
    }
   }
  },
@@ -19613,6 +20505,20 @@
    "tokOut": 1400,
    "at": "2026-07-07T14:35:45.068Z",
    "log": "v2-openai-gpt-5-mini-cells-all-default:g1.jsonl"
+  },
+  "openai:gpt-5-mini:cells:all:default:g8": {
+   "calls": 504,
+   "tokIn": 115636,
+   "tokOut": 15785,
+   "at": "2026-07-07T14:38:27.325Z",
+   "log": "v2-openai-gpt-5-mini-cells-all-default:g8.jsonl"
+  },
+  "openai:gpt-5-mini:cells:all:default:g40": {
+   "calls": 2520,
+   "tokIn": 611948,
+   "tokOut": 80308,
+   "at": "2026-07-07T14:46:49.052Z",
+   "log": "v2-openai-gpt-5-mini-cells-all-default:g40.jsonl"
   }
  }
 }

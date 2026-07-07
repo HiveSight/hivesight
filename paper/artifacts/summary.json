@@ -1,9 +1,12 @@
 {
  "generatedFrom": [
+  "anchor-analysis-v2.json",
   "anchor-analysis.json",
   "brfss-state-targets.json",
+  "ppi-richer.json",
   "ppi.json",
-  "rf-baseline.json"
+  "rf-baseline.json",
+  "summary.json"
  ],
  "pilot": {
   "naive": {
@@ -58,7 +61,7 @@
    "sliceMAE": 0.2496375880081127,
    "toplineMAE_subset20": 0.2503477121330608,
    "sliceMAE_subset20": 0.2496375880081127,
-   "medianSliceSpearman": NaN
+   "medianSliceSpearman": 0.4285714285714286
   }
  },
  "hypotheses": {

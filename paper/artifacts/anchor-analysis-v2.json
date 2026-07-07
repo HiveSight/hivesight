@@ -716,7 +716,39 @@
   "maxAbsDelta": 0.04833173827072601
  },
  "volunteered": {
-  "massShift": {
+  "massShiftV1": {
+   "gss_trust": {
+    "model": 0.1653192974856713,
+    "human": 0.10603246856159664,
+    "shift": 0.05928682892407468
+   },
+   "gss_fair": {
+    "model": 0.1885208110701731,
+    "human": 0.11654665733961378,
+    "shift": 0.07197415373055932
+   },
+   "gss_helpful": {
+    "model": 0.2131697368859046,
+    "human": 0.16356779219996787,
+    "shift": 0.04960194468593673
+   },
+   "gss_getahead": {
+    "model": 0.3253371793027014,
+    "human": 0.23532909874576352,
+    "shift": 0.09000808055693788
+   },
+   "gss_courts": {
+    "model": 0.3688010984778563,
+    "human": 0.2629450212305727,
+    "shift": 0.10585607724728363
+   },
+   "gss_divlaw": {
+    "model": 0.39024616126663697,
+    "human": 0.24359656423283532,
+    "shift": 0.14664959703380165
+   }
+  },
+  "massShiftV4": {
    "gss_trust": {
     "model": 0.08929683586553475,
     "human": 0.10603246856159664,
@@ -781,19 +813,19 @@
  },
  "granularity": {
   "1": {
-   "toplineMAE": 0.08376645135556872,
+   "toplineMAE": 0.08322784712669924,
    "medianSpearmanAge": null,
-   "nItems": 29
+   "nItems": 63
   },
   "8": {
-   "toplineMAE": null,
-   "medianSpearmanAge": null,
-   "nItems": 0
+   "toplineMAE": 0.08935396240772622,
+   "medianSpearmanAge": 0.39999999999999997,
+   "nItems": 63
   },
   "40": {
-   "toplineMAE": null,
-   "medianSpearmanAge": null,
-   "nItems": 0
+   "toplineMAE": 0.09187352318073055,
+   "medianSpearmanAge": 0.7999999999999999,
+   "nItems": 63
   },
   "149": {
    "toplineMAE": 0.0925032157109228,

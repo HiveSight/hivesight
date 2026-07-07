@@ -363,8 +363,8 @@ lines.append(
     f"(expected MAE {pts(S2['personaNoiseFloor']['meanExpectedMAE'])} points from binomial noise alone) explains only a small fraction of it."
 )
 lines.append(
-    f"- **H5 (registered): median pooled-family Spearman ≥ 0.80 — fails** at {num(per[f'cells:{MINI}']['medianSliceSpearman'])}. "
-    f"**Exploratory**: on the age family alone, cells reach median ρ = {num(V1['cells']['medianSpearmanAge'])} "
+    f"- **H5 (registered): median pooled-family Spearman $\\ge 0.80$ — fails** at {num(per[f'cells:{MINI}']['medianSliceSpearman'])}. "
+    f"**Exploratory**: on the age family alone, cells reach median $\\rho$ = {num(V1['cells']['medianSpearmanAge'])} "
     f"(n = {V1['cells']['nSpearmanAge']} items) vs direct {num(V1['naive']['medianSpearmanAge'])} "
     f"(n = {V1['naive']['nSpearmanAge']}); the paired difference is {spd.get('meanDiff', 0):+.2f} "
     f"(95% CI [{spd.get('ci95', [0,0])[0]:.2f}, {spd.get('ci95', [0,0])[1]:.2f}], one-sided Wilcoxon p = {spd.get('wilcoxonOneSidedP', float('nan')):.3f}). "
@@ -395,11 +395,11 @@ print(
     f"direct {pts(po['naive']['toplineMAE'])}/{pts(po['naive']['sliceMAE'])} (59 items) — conclusions unchanged. "
     f"Excluding the six items with volunteered categories: cells {pts(ex6['cells']['toplineMAE'])}/{pts(ex6['cells']['sliceMAE'])}, "
     f"direct {pts(ex6['naive']['toplineMAE'])}/{pts(ex6['naive']['sliceMAE'])}. "
-    f"Restricting subgroup MAE to bins with n ≥ 100 human respondents: cells {pts(m100['cells'])}, direct {pts(m100['naive'])}. "
+    f"Restricting subgroup MAE to bins with n $\\ge$ 100 human respondents: cells {pts(m100['cells'])}, direct {pts(m100['naive'])}. "
     f"Human-target sampling noise is not negligible at bin level: under design-effect assumptions "
     f"(GSS {tn['deff']['gss2024']}, SHED {tn['deff']['shed2024']}), the expected MAE floor from target noise alone is "
     f"{pts(tn['toplineExpectedMAEFloor'])} points on toplines and {pts(tn['subgroupExpectedMAEFloor'])} on subgroup bins "
-    f"({pts(tn['subgroupExpectedMAEFloor_nMin100'])} for bins with n ≥ 100) — a floor all arms share."
+    f"({pts(tn['subgroupExpectedMAEFloor_nMin100'])} for bins with n $\\ge$ 100) — a floor all arms share."
 )
 ```
 
@@ -475,13 +475,17 @@ print(": Accuracy versus cell granularity, corrected instruments, gpt-5-mini, "
       "released per-call logs. {#tbl-granularity}")
 ```
 
-The granularity curve locates where structure emerges: toplines are nearly
-flat in cell count — consistent with the marginal-accuracy tie — while
-subgroup ordering appears as soon as the cells encode the reporting
-dimension and does not degrade at 149 cells despite each cell receiving no
-pooling. Where the value of granularity shows is composability: only the
-149-cell table supports the detailed-dimension audiences the product
-exists to serve.
+The granularity curve locates where structure emerges — and where accuracy
+does not. Toplines are best with a single cell and degrade mildly as
+composition error accumulates across finer tables: granularity is a small
+*tax* on marginal accuracy, the ablation's version of the H1 tie. Rank
+structure behaves differently: encoding the reporting dimension is not
+sufficient (age $\times$ sex cells rank age bands at only $\rho = 0.40$); ordering
+sharpens to 0.80 once the interacting income conditioning arrives at 40
+cells, and holds at 149 despite each cell receiving no pooling. The
+149-cell premium over 40 buys neither marginal accuracy nor age-ordering —
+it buys composability: only the detailed table supports the
+tenure/children/benefits audiences the estimator exists to serve.
 
 # Results: error structure
 
@@ -617,7 +621,7 @@ The right yardstick matters: these items vary modestly across states, state
 targets at $n \ge 300$ with BRFSS design effects carry several points of
 sampling noise themselves, and the shrinkage limit (the national constant)
 is therefore hard to beat on pooled error. The estimator's genuine
-small-area signal is ordinal — it ranks states at $\rho \approx 0.66$ from
+small-area signal is ordinal — it ranks states at median $\\rho$ = 0.66 from
 composition plus the state's name — and where state effects are
 compositional (smoking history, exercise) it captures them, while
 contextual effects beyond demographics (health-care affordability) defeat an
