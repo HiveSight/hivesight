@@ -56,6 +56,9 @@ def pts(x, d=1):
     return "—" if x is None else f"{x*100:.{d}f}"
 def num(x, d=2):
     return "—" if x is None else f"{x:.{d}f}"
+FIGEXT = "svg" if os.environ.get("HS_PAPER_TARGET") == "html" else "pdf"
+def fig(stem, caption, label):
+    print(f"![{caption}](figures/{stem}.{FIGEXT}){{#{label}}}")
 H = S["hypotheses"]
 V1 = S2["v1_registered"]; V4 = S2["v4_corrected"]
 P1 = S2["paired_v1"]
@@ -324,9 +327,10 @@ print(": Registered results, points, gpt-5-mini. Persona: its pre-registered "
       "metric. {#tbl-pooled}")
 ```
 
-![Pooled accuracy by arm. Persona role-play (evaluated on its pre-registered
-20-item subset) is not competitive; cells and direct estimation are
-statistically indistinguishable on marginal accuracy.](figures/fig1-arms.pdf){#fig-arms}
+```{python}
+#| output: asis
+fig("fig1-arms", "Pooled accuracy by arm. Persona role-play (evaluated on its pre-registered 20-item subset) is not competitive; cells and direct estimation are statistically indistinguishable on marginal accuracy.", "fig-arms")
+```
 
 ```{python}
 #| output: asis
@@ -507,8 +511,10 @@ tenure/children/benefits audiences the estimator exists to serve.
 val = S2["valence"]
 ```
 
-![Signed topline error of the cells arm by item valence (registered v1 run).
-Bars mark means.](figures/fig2-valence.pdf){#fig-valence}
+```{python}
+#| output: asis
+fig("fig2-valence", "Signed topline error of the cells arm by item valence (registered v1 run). Bars mark means.", "fig-valence")
+```
 
 Signed topline error averages `{python} pts(val["means"]["positive"]["mean"])`
 points on positive-valence items (n=`{python} str(val["means"]["positive"]["n"])`,
@@ -553,8 +559,10 @@ print(
 )
 ```
 
-![Signed error versus target movement since the prior anchor wave, by arm.
-](figures/fig5-contamination.pdf){#fig-contamination}
+```{python}
+#| output: asis
+fig("fig5-contamination", "Signed error versus target movement since the prior anchor wave, by arm. The dashed line is pure training-window anchoring (slope −1).", "fig-contamination")
+```
 
 # Valid inference from small human anchors
 
@@ -631,8 +639,10 @@ if b:
     )
 ```
 
-![State-level estimates versus BRFSS 2023 weighted targets, four items,
-48 states plus DC.](figures/fig3-states.pdf){#fig-states}
+```{python}
+#| output: asis
+fig("fig3-states", "State-level estimates versus BRFSS 2023 weighted targets, four items, 48 states plus DC.", "fig-states")
+```
 
 The right yardstick matters: these items vary modestly across states, state
 targets at $n \ge 300$ with BRFSS design effects carry several points of

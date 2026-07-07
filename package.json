@@ -11,7 +11,8 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "evals:shed": "node evals/run-shed-powered.mjs",
-    "data:release": "python3 pipeline/build_cell_release.py"
+    "data:release": "python3 pipeline/build_cell_release.py",
+    "paper:site": "uv run --with \"jupyter,nbclient,ipykernel,numpy,scipy,matplotlib\" python paper/render_site.py"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.86.0",

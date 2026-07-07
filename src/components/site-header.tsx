@@ -30,6 +30,9 @@ export function SiteHeader() {
           </span>
         </Link>
         <nav className="flex gap-6 text-sm text-muted">
+          <a href="/paper" className="hover:text-ink">
+            Paper
+          </a>
           <Link href="/methodology" className="hover:text-ink">
             Methodology
           </Link>

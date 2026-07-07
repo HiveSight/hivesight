@@ -1,0 +1,27 @@
+# Site profile: quarto render --profile site  → ../public/paper/
+# (submission PDF/HTML formats live in _quarto.yml; this profile overrides
+# output for the hivesight.ai embed)
+project:
+  output-dir: ../public/paper
+
+format:
+  html:
+    theme:
+      light: [cosmo, hivesight-light.scss]
+      dark: [darkly, hivesight-dark.scss]
+    embed-resources: false
+    toc: true
+    toc-depth: 2
+    toc-title: "Sections"
+    number-sections: true
+    anchor-sections: true
+    fig-responsive: true
+    include-in-header:
+      text: |
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Libre+Franklin:ital,wght@0,300..900;1,300..900&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+        <link rel="icon" href="/icon.svg" type="image/svg+xml">
+    include-before-body:
+      text: |
+        <nav class="hs-band"><a href="/">HiveSight</a><span>/</span><a href="/paper" aria-current="page">Research paper</a><span class="hs-links"><a href="/paper/paper.pdf">PDF</a><a href="/benchmarks">Benchmarks</a><a href="/methodology">Methodology</a><a href="https://github.com/HiveSight/hivesight">Repository</a></span></nav>

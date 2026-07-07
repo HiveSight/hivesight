@@ -1,0 +1,1606 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head><base href="/paper/">
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.9.36">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Max Ghenis">
+<meta name="dcterms.date" content="2026-07-07">
+
+<title>Cells, not personas: predicting population survey responses with language models via post-stratification over calibrated census microdata</title>
+<style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for citations */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+}
+.hanging-indent div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}</style>
+
+
+<script src="paper_files/libs/clipboard/clipboard.min.js"></script>
+<script src="paper_files/libs/quarto-html/quarto.js" type="module"></script>
+<script src="paper_files/libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="paper_files/libs/quarto-html/popper.min.js"></script>
+<script src="paper_files/libs/quarto-html/tippy.umd.min.js"></script>
+<script src="paper_files/libs/quarto-html/anchor.min.js"></script>
+<link href="paper_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="paper_files/libs/quarto-html/quarto-syntax-highlighting-1adaedc7c7dee7cb6b6543ab9349161a.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
+<link href="paper_files/libs/quarto-html/quarto-syntax-highlighting-dark-91da07c40d7e4d61db74d9457e8ba1bf.css" rel="stylesheet" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
+<link href="paper_files/libs/quarto-html/quarto-syntax-highlighting-1adaedc7c7dee7cb6b6543ab9349161a.css" rel="stylesheet" class="quarto-color-scheme-extra" id="quarto-text-highlighting-styles">
+<script src="paper_files/libs/bootstrap/bootstrap.min.js"></script>
+<link href="paper_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="paper_files/libs/bootstrap/bootstrap-1563d6bc41dac24f654b820aca5c253b.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="paper_files/libs/bootstrap/bootstrap-dark-a6149f72666a630a3a6134c648a70b2a.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
+<link href="paper_files/libs/bootstrap/bootstrap-1563d6bc41dac24f654b820aca5c253b.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+<link href="https://fonts.googleapis.com/css2?family=Libre+Franklin:ital,wght@0,300..900;1,300..900&amp;family=IBM+Plex+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
+<link rel="icon" href="/icon.svg" type="image/svg+xml">
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script defer="" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+</head>
+
+<body class="quarto-light"><script id="quarto-html-before-body" type="application/javascript">
+    const toggleBodyColorMode = (bsSheetEl) => {
+      const mode = bsSheetEl.getAttribute("data-mode");
+      const bodyEl = window.document.querySelector("body");
+      if (mode === "dark") {
+        bodyEl.classList.add("quarto-dark");
+        bodyEl.classList.remove("quarto-light");
+      } else {
+        bodyEl.classList.add("quarto-light");
+        bodyEl.classList.remove("quarto-dark");
+      }
+    }
+    const toggleBodyColorPrimary = () => {
+      const bsSheetEl = window.document.querySelector("link#quarto-bootstrap:not([rel=disabled-stylesheet])");
+      if (bsSheetEl) {
+        toggleBodyColorMode(bsSheetEl);
+      }
+    }
+    const setColorSchemeToggle = (alternate) => {
+      const toggles = window.document.querySelectorAll('.quarto-color-scheme-toggle');
+      for (let i=0; i < toggles.length; i++) {
+        const toggle = toggles[i];
+        if (toggle) {
+          if (alternate) {
+            toggle.classList.add("alternate");
+          } else {
+            toggle.classList.remove("alternate");
+          }
+        }
+      }
+    };
+    const toggleColorMode = (alternate) => {
+      // Switch the stylesheets
+      const primaryStylesheets = window.document.querySelectorAll('link.quarto-color-scheme:not(.quarto-color-alternate)');
+      const alternateStylesheets = window.document.querySelectorAll('link.quarto-color-scheme.quarto-color-alternate');
+      manageTransitions('#quarto-margin-sidebar .nav-link', false);
+      if (alternate) {
+        // note: dark is layered on light, we don't disable primary!
+        enableStylesheet(alternateStylesheets);
+        for (const sheetNode of alternateStylesheets) {
+          if (sheetNode.id === "quarto-bootstrap") {
+            toggleBodyColorMode(sheetNode);
+          }
+        }
+      } else {
+        disableStylesheet(alternateStylesheets);
+        enableStylesheet(primaryStylesheets)
+        toggleBodyColorPrimary();
+      }
+      manageTransitions('#quarto-margin-sidebar .nav-link', true);
+      // Switch the toggles
+      setColorSchemeToggle(alternate)
+      // Hack to workaround the fact that safari doesn't
+      // properly recolor the scrollbar when toggling (#1455)
+      if (navigator.userAgent.indexOf('Safari') > 0 && navigator.userAgent.indexOf('Chrome') == -1) {
+        manageTransitions("body", false);
+        window.scrollTo(0, 1);
+        setTimeout(() => {
+          window.scrollTo(0, 0);
+          manageTransitions("body", true);
+        }, 40);
+      }
+    }
+    const disableStylesheet = (stylesheets) => {
+      for (let i=0; i < stylesheets.length; i++) {
+        const stylesheet = stylesheets[i];
+        stylesheet.rel = 'disabled-stylesheet';
+      }
+    }
+    const enableStylesheet = (stylesheets) => {
+      for (let i=0; i < stylesheets.length; i++) {
+        const stylesheet = stylesheets[i];
+        if(stylesheet.rel !== 'stylesheet') { // for Chrome, which will still FOUC without this check
+          stylesheet.rel = 'stylesheet';
+        }
+      }
+    }
+    const manageTransitions = (selector, allowTransitions) => {
+      const els = window.document.querySelectorAll(selector);
+      for (let i=0; i < els.length; i++) {
+        const el = els[i];
+        if (allowTransitions) {
+          el.classList.remove('notransition');
+        } else {
+          el.classList.add('notransition');
+        }
+      }
+    }
+    const isFileUrl = () => {
+      return window.location.protocol === 'file:';
+    }
+    const hasAlternateSentinel = () => {
+      let styleSentinel = getColorSchemeSentinel();
+      if (styleSentinel !== null) {
+        return styleSentinel === "alternate";
+      } else {
+        return false;
+      }
+    }
+    const setStyleSentinel = (alternate) => {
+      const value = alternate ? "alternate" : "default";
+      if (!isFileUrl()) {
+        window.localStorage.setItem("quarto-color-scheme", value);
+      } else {
+        localAlternateSentinel = value;
+      }
+    }
+    const getColorSchemeSentinel = () => {
+      if (!isFileUrl()) {
+        const storageValue = window.localStorage.getItem("quarto-color-scheme");
+        return storageValue != null ? storageValue : localAlternateSentinel;
+      } else {
+        return localAlternateSentinel;
+      }
+    }
+    const toggleGiscusIfUsed = (isAlternate, darkModeDefault) => {
+      const baseTheme = document.querySelector('#giscus-base-theme')?.value ?? 'light';
+      const alternateTheme = document.querySelector('#giscus-alt-theme')?.value ?? 'dark';
+      let newTheme = '';
+      if(authorPrefersDark) {
+        newTheme = isAlternate ? baseTheme : alternateTheme;
+      } else {
+        newTheme = isAlternate ? alternateTheme : baseTheme;
+      }
+      const changeGiscusTheme = () => {
+        // From: https://github.com/giscus/giscus/issues/336
+        const sendMessage = (message) => {
+          const iframe = document.querySelector('iframe.giscus-frame');
+          if (!iframe) return;
+          iframe.contentWindow.postMessage({ giscus: message }, 'https://giscus.app');
+        }
+        sendMessage({
+          setConfig: {
+            theme: newTheme
+          }
+        });
+      }
+      const isGiscussLoaded = window.document.querySelector('iframe.giscus-frame') !== null;
+      if (isGiscussLoaded) {
+        changeGiscusTheme();
+      }
+    };
+    const authorPrefersDark = false;
+    const darkModeDefault = authorPrefersDark;
+      document.querySelector('link#quarto-text-highlighting-styles.quarto-color-scheme-extra').rel = 'disabled-stylesheet';
+      document.querySelector('link#quarto-bootstrap.quarto-color-scheme-extra').rel = 'disabled-stylesheet';
+    let localAlternateSentinel = darkModeDefault ? 'alternate' : 'default';
+    // Dark / light mode switch
+    window.quartoToggleColorScheme = () => {
+      // Read the current dark / light value
+      let toAlternate = !hasAlternateSentinel();
+      toggleColorMode(toAlternate);
+      setStyleSentinel(toAlternate);
+      toggleGiscusIfUsed(toAlternate, darkModeDefault);
+      window.dispatchEvent(new Event('resize'));
+    };
+    // Switch to dark mode if need be
+    if (hasAlternateSentinel()) {
+      toggleColorMode(true);
+    } else {
+      toggleColorMode(false);
+    }
+  </script>
+
+<div id="quarto-content" class="page-columns page-rows-contents page-layout-article">
+<div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+  <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Sections</h2>
+   
+  <ul class="collapse">
+  <li><a href="#introduction" id="toc-introduction" class="nav-link active" data-scroll-target="#introduction"><span class="header-section-number">1</span> Introduction</a></li>
+  <li><a href="#related-work" id="toc-related-work" class="nav-link" data-scroll-target="#related-work"><span class="header-section-number">2</span> Related work</a></li>
+  <li><a href="#method" id="toc-method" class="nav-link" data-scroll-target="#method"><span class="header-section-number">3</span> Method</a>
+  <ul class="collapse">
+  <li><a href="#estimand" id="toc-estimand" class="nav-link" data-scroll-target="#estimand"><span class="header-section-number">3.1</span> Estimand</a></li>
+  <li><a href="#population-frame-and-cells" id="toc-population-frame-and-cells" class="nav-link" data-scroll-target="#population-frame-and-cells"><span class="header-section-number">3.2</span> Population frame and cells</a></li>
+  <li><a href="#elicitation" id="toc-elicitation" class="nav-link" data-scroll-target="#elicitation"><span class="header-section-number">3.3</span> Elicitation</a></li>
+  <li><a href="#aggregation-and-provenance" id="toc-aggregation-and-provenance" class="nav-link" data-scroll-target="#aggregation-and-provenance"><span class="header-section-number">3.4</span> Aggregation and provenance</a></li>
+  </ul></li>
+  <li><a href="#evaluation-design" id="toc-evaluation-design" class="nav-link" data-scroll-target="#evaluation-design"><span class="header-section-number">4</span> Evaluation design</a></li>
+  <li><a href="#results-registered-evaluation" id="toc-results-registered-evaluation" class="nav-link" data-scroll-target="#results-registered-evaluation"><span class="header-section-number">5</span> Results: registered evaluation</a>
+  <ul class="collapse">
+  <li><a href="#pilot" id="toc-pilot" class="nav-link" data-scroll-target="#pilot"><span class="header-section-number">5.1</span> Pilot</a></li>
+  <li><a href="#main-comparison" id="toc-main-comparison" class="nav-link" data-scroll-target="#main-comparison"><span class="header-section-number">5.2</span> Main comparison</a></li>
+  <li><a href="#sensitivities" id="toc-sensitivities" class="nav-link" data-scroll-target="#sensitivities"><span class="header-section-number">5.3</span> Sensitivities</a></li>
+  </ul></li>
+  <li><a href="#results-instrument-corrected-robustness-registered-addendum" id="toc-results-instrument-corrected-robustness-registered-addendum" class="nav-link" data-scroll-target="#results-instrument-corrected-robustness-registered-addendum"><span class="header-section-number">6</span> Results: instrument-corrected robustness (registered addendum)</a>
+  <ul class="collapse">
+  <li><a href="#cell-granularity" id="toc-cell-granularity" class="nav-link" data-scroll-target="#cell-granularity"><span class="header-section-number">6.1</span> Cell granularity</a></li>
+  </ul></li>
+  <li><a href="#results-error-structure" id="toc-results-error-structure" class="nav-link" data-scroll-target="#results-error-structure"><span class="header-section-number">7</span> Results: error structure</a>
+  <ul class="collapse">
+  <li><a href="#contamination" id="toc-contamination" class="nav-link" data-scroll-target="#contamination"><span class="header-section-number">7.1</span> Contamination</a></li>
+  </ul></li>
+  <li><a href="#valid-inference-from-small-human-anchors" id="toc-valid-inference-from-small-human-anchors" class="nav-link" data-scroll-target="#valid-inference-from-small-human-anchors"><span class="header-section-number">8</span> Valid inference from small human anchors</a></li>
+  <li><a href="#context-the-in-survey-demographic-ceiling" id="toc-context-the-in-survey-demographic-ceiling" class="nav-link" data-scroll-target="#context-the-in-survey-demographic-ceiling"><span class="header-section-number">9</span> Context: the in-survey demographic ceiling</a></li>
+  <li><a href="#small-area-transfer-brfss-across-states" id="toc-small-area-transfer-brfss-across-states" class="nav-link" data-scroll-target="#small-area-transfer-brfss-across-states"><span class="header-section-number">10</span> Small-area transfer: BRFSS across states</a></li>
+  <li><a href="#model-variants" id="toc-model-variants" class="nav-link" data-scroll-target="#model-variants"><span class="header-section-number">11</span> Model variants</a></li>
+  <li><a href="#cost" id="toc-cost" class="nav-link" data-scroll-target="#cost"><span class="header-section-number">12</span> Cost</a></li>
+  <li><a href="#limitations" id="toc-limitations" class="nav-link" data-scroll-target="#limitations"><span class="header-section-number">13</span> Limitations</a></li>
+  <li><a href="#discussion" id="toc-discussion" class="nav-link" data-scroll-target="#discussion"><span class="header-section-number">14</span> Discussion</a></li>
+  <li><a href="#data-availability" id="toc-data-availability" class="nav-link" data-scroll-target="#data-availability">Data availability</a></li>
+  <li><a href="#acknowledgments" id="toc-acknowledgments" class="nav-link" data-scroll-target="#acknowledgments">Acknowledgments</a></li>
+  <li><a href="#appendix-a-instrument-fidelity" id="toc-appendix-a-instrument-fidelity" class="nav-link" data-scroll-target="#appendix-a-instrument-fidelity">Appendix A: instrument fidelity</a></li>
+  </ul>
+<div class="quarto-alternate-formats"><h2>Other Formats</h2><ul><li><a href="paper.pdf"><i class="bi bi-file-pdf"></i>PDF</a></li></ul></div></nav>
+</div>
+<main class="content" id="quarto-document-content">
+
+<nav class="hs-band"><a href="/">HiveSight</a><span>/</span><a href="/paper" aria-current="page">Research paper</a><span class="hs-links"><a href="/paper/paper.pdf">PDF</a><a href="/benchmarks">Benchmarks</a><a href="/methodology">Methodology</a><a href="https://github.com/HiveSight/hivesight">Repository</a></span></nav>
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Cells, not personas: predicting population survey responses with language models via post-stratification over calibrated census microdata</h1>
+</div>
+
+
+<div class="quarto-title-meta-author">
+  <div class="quarto-title-meta-heading">Author</div>
+  <div class="quarto-title-meta-heading">Affiliation</div>
+  
+    <div class="quarto-title-meta-contents">
+    <p class="author">Max Ghenis </p>
+  </div>
+  <div class="quarto-title-meta-contents">
+        <p class="affiliation">
+            HiveSight
+          </p>
+      </div>
+  </div>
+
+<div class="quarto-title-meta">
+
+      
+    <div>
+    <div class="quarto-title-meta-heading">Published</div>
+    <div class="quarto-title-meta-contents">
+      <p class="date">July 7, 2026</p>
+    </div>
+  </div>
+  
+    
+  </div>
+  
+<div>
+  <div class="abstract">
+    <div class="block-title">Abstract</div>
+    <p>Simulated survey respondents built by role-playing language models one persona at a time are widely marketed and widely distrusted. We evaluate an estimator that never simulates an individual: partition a census-calibrated synthetic population into demographic cells, elicit each cell’s response distribution from a language model acting as an expert predictor, and aggregate with calibrated population weights — post-stratification with an LLM-elicited cell response model. Against a pre-registered 63-item anchor bank from the 2024 General Social Survey and the Federal Reserve’s 2024 Survey of Household Economics and Decisionmaking, matched-budget persona role-play misses by roughly 25 points; cell-based estimation and direct expert estimation land near 9-10 points, and the registered hypothesis that cells beat direct estimation on subgroup margins fails — the paired difference is near zero. In exploratory comparisons, cells tend to order subgroups better than independent direct asks (one-sided p = .04, with a confidence interval marginally spanning zero) and preserve coherence and composability on the frame’s base dimensions; a battery of referee-driven robustness checks — instrument-corrected re-elicitation, replicate runs, option-order and paraphrase probes, a cell-granularity ablation, and a contamination regression against 2022/2023 anchor waves — bounds how far those claims travel. Prediction-powered inference with 200-person human anchors attains nominal coverage in a resampling study (asymptotic validity, not field validity) with no interval-width gains at demographic granularity, a substantive null about where demographic conditioning runs out. State-level validation against BRFSS 2023 shows the estimator ranks states well but does not beat a national-constant baseline on pooled error. We release the estimator, anchor banks, per-call elicitation logs for all revision-stage arms, and the evaluation harness; the public product renders its benchmark page from the same artifacts this paper reports.</p>
+  </div>
+</div>
+
+
+</header>
+
+
+<section id="introduction" class="level1" data-number="1">
+<h1 data-number="1"><span class="header-section-number">1</span> Introduction</h1>
+<p>Whether large language models can stand in for human survey respondents is among the most contested questions in survey research. Commercial “synthetic respondent” products have proliferated, while the field’s institutions urge caution: the American Association for Public Opinion Research’s 2026 task force classifies synthetic samples as the riskiest integration of AI into survey work <span class="citation" data-cites="aapor2026responsible">(<a href="#ref-aapor2026responsible" role="doc-biblioref">American Association for Public Opinion Research 2026</a>)</span>, and the ICC/ESOMAR code requires that simulated respondents never be presented as measurements of real people <span class="citation" data-cites="esomar2025code">(<a href="#ref-esomar2025code" role="doc-biblioref">ICC/ESOMAR 2025</a>)</span>. The research literature has converged on a diagnosis: role-playing one simulated respondent per model call — the dominant commercial architecture — compresses within-group variance, misportrays identity groups, and is unstable under prompt perturbation <span class="citation" data-cites="bisbee2024synthetic wang2025large santurkar2023whose boelaert2025machine">(<a href="#ref-bisbee2024synthetic" role="doc-biblioref">Bisbee et al. 2024</a>; <a href="#ref-wang2025large" role="doc-biblioref">Wang et al. 2025</a>; <a href="#ref-santurkar2023whose" role="doc-biblioref">Santurkar et al. 2023</a>; <a href="#ref-boelaert2025machine" role="doc-biblioref">Boelaert et al. 2025</a>)</span>, even as the same models demonstrably carry substantial distributional knowledge about public opinion <span class="citation" data-cites="argyle2023out meister2024benchmarking gong2026characterizing kim2024ai">(<a href="#ref-argyle2023out" role="doc-biblioref">Argyle et al. 2023</a>; <a href="#ref-meister2024benchmarking" role="doc-biblioref">Meister et al. 2024</a>; <a href="#ref-gong2026characterizing" role="doc-biblioref">Gong et al. 2026</a>; <a href="#ref-kim2024ai" role="doc-biblioref">Kim and Lee 2024</a>)</span>.</p>
+<p>This paper evaluates an estimator built around that diagnosis rather than against it. The design treats the language model not as a subject but as a conditional response model over population cells, grounded in a calibrated synthetic population rather than prompt-invented personas:</p>
+<ol type="1">
+<li><strong>Population frame.</strong> A synthetic population of 4.2 million adult records derived from the Current Population Survey <span class="citation" data-cites="census2024cps">(<a href="#ref-census2024cps" role="doc-biblioref">U.S. Census Bureau and U.S. Bureau of Labor Statistics 2024</a>)</span>, with calibrated weights and state and congressional-district assignment, partitioned into 149 post-stratification cells (age band, personal earned-income band, sex; cells holding at least 0.25% of population weight are further split by housing tenure, children at home, means-tested benefit receipt, and Social Security receipt).</li>
+<li><strong>Distribution elicitation.</strong> For each cell, the model is asked once, in an expert-predictor frame <span class="citation" data-cites="anthis2025llm">(<a href="#ref-anthis2025llm" role="doc-biblioref">Anthis et al. 2025</a>)</span>, for the percentage of that group choosing each response option — verbalized distributions rather than sampled individuals, following head-to-head evidence that direct distribution elicitation dominates simulate-then-count <span class="citation" data-cites="gong2026characterizing meister2024benchmarking">(<a href="#ref-gong2026characterizing" role="doc-biblioref">Gong et al. 2026</a>; <a href="#ref-meister2024benchmarking" role="doc-biblioref">Meister et al. 2024</a>)</span>.</li>
+<li><strong>Weighted aggregation.</strong> Cell distributions combine with calibrated population weights — the post-stratification arithmetic long used in survey inference <span class="citation" data-cites="gelman1997poststratification park2004bayesian">(<a href="#ref-gelman1997poststratification" role="doc-biblioref">Gelman and Little 1997</a>; <a href="#ref-park2004bayesian" role="doc-biblioref">Park et al. 2004</a>)</span>. We emphasize what this is <em>not</em>: there is no multilevel regression, no partial pooling, and no model-based shrinkage for sparse cells, so we do not call the method MRP. It is post-stratification with an LLM-elicited cell response model; MRP’s hierarchical regularization is a natural comparison and possible extension, not the method’s name.</li>
+</ol>
+<p>Proof-of-concept hybrids exist <span class="citation" data-cites="cerina2023artificially">(<a href="#ref-cerina2023artificially" role="doc-biblioref">Cerina and Duch 2023</a>)</span>, fine-tuned LLM-to-survey prediction is developing quickly <span class="citation" data-cites="kim2024ai suh2025language">(<a href="#ref-kim2024ai" role="doc-biblioref">Kim and Lee 2024</a>; <a href="#ref-suh2025language" role="doc-biblioref">Suh et al. 2025</a>)</span>, and open tooling for LLM surveys is maturing <span class="citation" data-cites="edsl2024 horton2023large">(<a href="#ref-edsl2024" role="doc-biblioref">Expected Parrot, Inc. 2024</a>; <a href="#ref-horton2023large" role="doc-biblioref">Horton 2023</a>)</span> — but registered evaluations with disclosed misses remain rare <span class="citation" data-cites="verasight2025synthetic rottger2024political">(<a href="#ref-verasight2025synthetic" role="doc-biblioref">Morris et al. 2025</a>; <a href="#ref-rottger2024political" role="doc-biblioref">Röttger et al. 2024</a>)</span>.</p>
+<p>Our contributions: (i) a pre-registered, 63-item evaluation against GSS 2024 and SHED 2024 human targets comparing the cell estimator to matched-budget persona role-play and to direct model estimation — including the registered hypothesis this design <em>failed</em>: on marginal subgroup accuracy, cells tie rather than beat per-subgroup direct estimation; (ii) a referee-driven robustness program, registered as an addendum before execution: instrument-corrected re-elicitation (verbatim wordings, volunteered-category handling, an explicit item-nonresponse instruction), replicate runs, option-order and paraphrase probes <span class="citation" data-cites="tjuatja2024llms dominguezolmedo2024questioning">(<a href="#ref-tjuatja2024llms" role="doc-biblioref">Tjuatja et al. 2024</a>; <a href="#ref-dominguezolmedo2024questioning" role="doc-biblioref">Dominguez-Olmedo et al. 2024</a>)</span>, a cell-granularity ablation, and a contamination regression against earlier anchor waves; (iii) a prediction-powered inference evaluation <span class="citation" data-cites="angelopoulos2023prediction krsteski2025valid broska2025mixed">(<a href="#ref-angelopoulos2023prediction" role="doc-biblioref">Angelopoulos et al. 2023</a>; <a href="#ref-krsteski2025valid" role="doc-biblioref"><span class="nocase">Krsteski et al.</span> 2025</a>; <a href="#ref-broska2025mixed" role="doc-biblioref">Broska et al. 2025</a>)</span> showing nominal coverage from small human anchors in a resampling design, with no interval-width gains at either of two demographic granularities; (iv) a state-level small-area validation against BRFSS 2023 <span class="citation" data-cites="cdc2024brfss">(<a href="#ref-cdc2024brfss" role="doc-biblioref">Centers for Disease Control and Prevention 2024</a>)</span>; and (v) a fully documented harness in which the production system’s public benchmark page and this paper render from the same artifacts, with per-call elicitation logs released for every revision-stage arm.</p>
+</section>
+<section id="related-work" class="level1" data-number="2">
+<h1 data-number="2"><span class="header-section-number">2</span> Related work</h1>
+<p><strong>Silicon sampling and its critics.</strong> <span class="citation" data-cites="argyle2023out">Argyle et al. (<a href="#ref-argyle2023out" role="doc-biblioref">2023</a>)</span> introduced demographic-conditioned “silicon samples”; subsequent evaluations found persona means can track surveys while variance, covariance structure, and temporal stability do not <span class="citation" data-cites="bisbee2024synthetic">(<a href="#ref-bisbee2024synthetic" role="doc-biblioref">Bisbee et al. 2024</a>)</span>, that identity-prompted personas caricature the groups they represent <span class="citation" data-cites="wang2025large">(<a href="#ref-wang2025large" role="doc-biblioref">Wang et al. 2025</a>)</span>, that model defaults reflect particular populations <span class="citation" data-cites="santurkar2023whose durmus2023towards vonderheyde2025vox boelaert2025machine">(<a href="#ref-santurkar2023whose" role="doc-biblioref">Santurkar et al. 2023</a>; <a href="#ref-durmus2023towards" role="doc-biblioref"><span class="nocase">Durmus et al.</span> 2023</a>; <a href="#ref-vonderheyde2025vox" role="doc-biblioref">Heyde et al. 2025</a>; <a href="#ref-boelaert2025machine" role="doc-biblioref">Boelaert et al. 2025</a>)</span>, and that LLM survey responses are acutely sensitive to response-scale artifacts — option order, forced choice, and prompt phrasing <span class="citation" data-cites="tjuatja2024llms dominguezolmedo2024questioning rottger2024political">(<a href="#ref-tjuatja2024llms" role="doc-biblioref">Tjuatja et al. 2024</a>; <a href="#ref-dominguezolmedo2024questioning" role="doc-biblioref">Dominguez-Olmedo et al. 2024</a>; <a href="#ref-rottger2024political" role="doc-biblioref">Röttger et al. 2024</a>)</span>. <span class="citation" data-cites="westwood2025llm">Westwood (<a href="#ref-westwood2025llm" role="doc-biblioref">2025</a>)</span> showed LLM respondents are effectively undetectable inside real panels.</p>
+<p><strong>Distribution elicitation.</strong> <span class="citation" data-cites="meister2024benchmarking">Meister et al. (<a href="#ref-meister2024benchmarking" role="doc-biblioref">2024</a>)</span> benchmark verbalized distributions against token log-probabilities and repeated sampling, finding verbalization dominant; <span class="citation" data-cites="gong2026characterizing">Gong et al. (<a href="#ref-gong2026characterizing" role="doc-biblioref">2026</a>)</span> find direct distribution elicitation beats simulate-individuals in 77% of question-demographic pairs at one-fifth the cost. Our elicitation follows both.</p>
+<p><strong>Prediction with and without human data.</strong> <span class="citation" data-cites="kim2024ai">Kim and Lee (<a href="#ref-kim2024ai" role="doc-biblioref">2024</a>)</span> fine-tune LLMs to predict GSS responses conditional on demographics; <span class="citation" data-cites="suh2025language">Suh et al. (<a href="#ref-suh2025language" role="doc-biblioref">2025</a>)</span> show survey fine-tuning narrows human-model gaps; <span class="citation" data-cites="park2024generative">Park et al. (<a href="#ref-park2024generative" role="doc-biblioref">2024</a>)</span> ground agents in two-hour interviews and evaluate on the GSS, finding interview grounding beats demographic-only conditioning — directly relevant to our finding that demographic-cell predictions carry group-level but not individual-level signal. For inference that combines model predictions with limited human data, <span class="citation" data-cites="angelopoulos2023prediction">Angelopoulos et al. (<a href="#ref-angelopoulos2023prediction" role="doc-biblioref">2023</a>)</span> introduce prediction-powered inference; <span class="citation" data-cites="egami2023dsl">Egami et al. (<a href="#ref-egami2023dsl" role="doc-biblioref">2023</a>)</span> develop design-based surrogate corrections; <span class="citation" data-cites="broska2025mixed">Broska et al. (<a href="#ref-broska2025mixed" role="doc-biblioref">2025</a>)</span> treat LLMs as potentially informative observations in a mixed human-silicon design; and <span class="citation" data-cites="krsteski2025valid"><span class="nocase">Krsteski et al.</span> (<a href="#ref-krsteski2025valid" role="doc-biblioref">2025</a>)</span> apply PPI rectification to survey simulation. <span class="citation" data-cites="cerina2023artificially">Cerina and Duch (<a href="#ref-cerina2023artificially" role="doc-biblioref">2023</a>)</span> blend LLM-derived data with bias-corrected MRP for the 2020 US election. The population frame we post-stratify over comes from the Populace calibrated-microdata line <span class="citation" data-cites="ghenis2026imputation ghenis2026sparsity ghenis2026dynamics">(<a href="#ref-ghenis2026imputation" role="doc-biblioref">Ghenis and Juaristi 2026</a>; <a href="#ref-ghenis2026sparsity" role="doc-biblioref">Ghenis 2026b</a>, <a href="#ref-ghenis2026dynamics" role="doc-biblioref">2026c</a>)</span>.</p>
+</section>
+<section id="method" class="level1" data-number="3">
+<h1 data-number="3"><span class="header-section-number">3</span> Method</h1>
+<section id="estimand" class="level2" data-number="3.1">
+<h2 data-number="3.1" class="anchored" data-anchor-id="estimand"><span class="header-section-number">3.1</span> Estimand</h2>
+<p>The estimator targets, for a defined population and a specific survey instrument, the response distribution that the instrument would measure: formally, the weighted distribution survey <span class="math inline">\(S\)</span> would record for question <span class="math inline">\(q\)</span> with its option set, administered as <span class="math inline">\(S\)</span> administers it. Human targets in this study embed each survey’s mode and house effects — GSS 2024 is a mixed-mode (in-person and web) probability survey, SHED an online probability panel, BRFSS a telephone survey — and the language model is not told the mode. Reported “error” therefore includes any gap between the model’s implicit measurement context and each survey’s actual one, a floor we cannot separate from model error without cross-mode anchors; we state per source which mode generated the targets, and note that self-rated health appears in both GSS (4-point, mixed-mode) and BRFSS (5-point, telephone) — a wording-and-mode contrast we exploit descriptively in the small-area section. Because human targets drop item nonresponse, the estimand is conditional on giving a substantive answer; the revision-stage elicitation states this conditioning explicitly, and per-item nonresponse rates appear in the appendix.</p>
+</section>
+<section id="population-frame-and-cells" class="level2" data-number="3.2">
+<h2 data-number="3.2" class="anchored" data-anchor-id="population-frame-and-cells"><span class="header-section-number">3.2</span> Population frame and cells</h2>
+<p>The frame reduces to 149 national cells covering 100% of population weight: 40 base cells (age band × earned-income band × sex) and 109 detailed cells carrying tenure, children, means-tested benefits, and Social Security receipt. Detailed cells hold 80.7% of population weight; the remaining 19.3% sits in base cells with no detailed attributes. Two consequences, disclosed wherever they bind: subgroup estimates on detailed dimensions (tenure, children, benefits) cover only the detailed share of the audience, so their weighted average does not mechanically equal the topline — coherence is guaranteed only for age, income, and sex; and composed audiences filtering on detailed dimensions exclude the base-cell weight, non-randomly. The 0.25% refinement threshold and band cutpoints are analyst choices without registered sensitivity analysis; the granularity ablation below examines the coarser end of the spectrum, and finer schemes (education and race/ethnicity are notable omissions from the conditioning set) are future work.</p>
+</section>
+<section id="elicitation" class="level2" data-number="3.3">
+<h2 data-number="3.3" class="anchored" data-anchor-id="elicitation"><span class="header-section-number">3.3</span> Elicitation</h2>
+<p>Each cell receives one call: an expert-survey-methodologist system prompt (not role-play), the survey question, the response options, and a request for integer percentages summing to 100 as JSON. Malformed responses are dropped and counted (never imputed); parsed responses that do not sum to 100 are renormalized. In the registered v1 runs the elicitation was <strong>not</strong> seeded or temperature-controlled — no such parameter is sent to the APIs; the study’s seed governs only persona-arm record sampling. Model outputs are therefore nondeterministic draws; the revision adds three replicate runs to measure run-to-run variance, and reproducibility rests on released per-call logs rather than on determinism. Primary model: gpt-5-mini (reasoning effort minimal); variants gpt-5.2 (reasoning effort none — a configuration difference noted where compared) and claude-haiku-4.5.</p>
+</section>
+<section id="aggregation-and-provenance" class="level2" data-number="3.4">
+<h2 data-number="3.4" class="anchored" data-anchor-id="aggregation-and-provenance"><span class="header-section-number">3.4</span> Aggregation and provenance</h2>
+<p>The population estimate for option <span class="math inline">\(k\)</span> is <span class="math inline">\(\hat\theta_k = \sum_c w_c \, \hat p_{ck} / \sum_c w_c\)</span>; subgroup estimates restrict the sum to matching cells. Failed cells drop with their weight — an implicit missing-at-random reweighting whose incidence we report (one failed cell in 9,386 registered-run calls). Every run records engine, prompt, and dataset versions, model, seed, cell counts, failures, and weighted audience.</p>
+</section>
+</section>
+<section id="evaluation-design" class="level1" data-number="4">
+<h1 data-number="4"><span class="header-section-number">4</span> Evaluation design</h1>
+<p>Two registration stages. <strong>Stage 1</strong> (PAP v2; repository tag <code>pap-v2</code>, commit <code>f93e00b</code>): the 63-item bank — 52 GSS 2024 items retained under an a priori <span class="math inline">\(n \ge 600\)</span> rule and 11 SHED 2024 items — with weighted topline and subgroup targets (age band and sex for both surveys; household income band and housing tenure for SHED), arms, metrics, and hypotheses H1-H5, committed before any elicitation. <strong>Stage 2</strong> (PAP v3 addendum; tag <code>pap-v3-addendum</code>, commit <code>5c301b6</code>): after referee review identified instrument-fidelity gaps, a corrected bank v2 and a robustness program were registered before the v4 runs they specify. Registration is by public commit in the authors’ repository — an ordering artifact auditable against run timestamps and per-call logs, not third-party timestamping; future studies will deposit externally.</p>
+<p>The four pilot SHED items sit inside the confirmatory bank and the 20-item subset (a design flaw the addendum addresses with a pilot-overlap sensitivity, reported below). Instrument-fidelity issues in bank v1 — adapted rather than verbatim wordings on several GSS items, normally volunteered response categories offered as explicit options on six items, no item-nonresponse instruction, and two SHED items rendered from derived variables — are catalogued per item in Appendix A and corrected in bank v2; the SHED income slices remain household income against the frame’s personal earned-income bands, a construct mismatch that is <em>asymmetric</em> in the direct arm’s favor (its subgroup prompts use the construct-correct household wording), which is why the family-disaggregated H1 below treats age and sex as the primary confirmatory pooling.</p>
+<p>Arms: <strong>cells</strong> (149 calls/item), <strong>direct</strong> (one whole-audience estimate plus one per reported subgroup; both arms share the expert system prompt), and <strong>persona</strong> (one role-play call per weighted-sampled microdata record, <span class="math inline">\(n{=}150\)</span>/item, on the pre-registered 20-item subset). The subset’s composition — 12 GSS, 8 SHED — overweights SHED relative to the bank (17.5%), a fact that matters for the persona comparison because SHED hardship items are where role-play dramatizes most; persona error is therefore also reported by source. Primary metric: absolute error of the designated positive-option share, pooled over items (topline) and subgroup bins (subgroup). The registered secondary metric, total-variation distance between full distributions, is reported alongside. Rank structure is measured as within-item Spearman correlation; the registered H5 statistic pooled heterogeneous slice families and is retained for the record, with an age-family-only version (the one family present in every item) as the cleaner statistic. Items where an arm’s constant estimates make the correlation undefined are excluded from that arm’s median (counts disclosed); a sensitivity treating them as zero discrimination appears in the artifact.</p>
+</section>
+<section id="results-registered-evaluation" class="level1" data-number="5">
+<h1 data-number="5"><span class="header-section-number">5</span> Results: registered evaluation</h1>
+<section id="pilot" class="level2" data-number="5.1">
+<h2 data-number="5.1" class="anchored" data-anchor-id="pilot"><span class="header-section-number">5.1</span> Pilot</h2>
+<p>On the four-item SHED pilot at matched budget, persona role-play reached 36.6 points topline MAE and 23.0 subgroup MAE, against 17.0 and 6.2 for cells — and, disclosed for completeness, 9.4 and 6.8 for the direct arm, which beat cells on pilot toplines. The pilot’s four hardship-heavy items are not representative of the bank (cells’ pilot topline error of 17.0 points fell to 9.2 on the full bank); the persona failure is qualitative — role-played low-income personas dramatized hardship, with 75.9% reporting serious housing-cost hardship versus 18.7% of real respondents (both figures in the committed pilot artifact).</p>
+</section>
+<section id="main-comparison" class="level2" data-number="5.2">
+<h2 data-number="5.2" class="anchored" data-anchor-id="main-comparison"><span class="header-section-number">5.2</span> Main comparison</h2>
+<div id="tbl-pooled" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-tbl figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-pooled-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Table&nbsp;1: Registered results, points, gpt-5-mini. Persona: its pre-registered 20-item subset (on those items, cells score 10.1/10.1 and direct 7.5/9.0); cells and direct: all 63 items. TV = total-variation distance, the registered secondary metric.
+</figcaption>
+<div aria-describedby="tbl-pooled-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Method</th>
+<th>Topline MAE</th>
+<th>Subgroup MAE</th>
+<th>Topline TV</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Persona role-play</td>
+<td>25.0</td>
+<td>25.0</td>
+<td>—</td>
+</tr>
+<tr class="even">
+<td>Direct estimate</td>
+<td>8.6</td>
+<td>9.8</td>
+<td>11.5</td>
+</tr>
+<tr class="odd">
+<td>Population cells</td>
+<td>9.2</td>
+<td>9.8</td>
+<td>11.7</td>
+</tr>
+</tbody>
+</table>
+</div>
+</figure>
+</div>
+<div id="fig-arms" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-arms-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="figures/fig1-arms.svg" class="img-fluid figure-img">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-arms-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;1: Pooled accuracy by arm. Persona role-play (evaluated on its pre-registered 20-item subset) is not competitive; cells and direct estimation are statistically indistinguishable on marginal accuracy.
+</figcaption>
+</figure>
+</div>
+<ul>
+<li><strong>H1 (registered, confirmatory): cells beat direct on subgroup margins — fails.</strong> Pooled subgroup MAE 9.8 vs 9.8 points over 63 items; paired mean difference +0.00 points (95% bootstrap CI [-0.79, 0.79]; one-sided Wilcoxon p = 0.51). Equivalence within ±1.5 points is supported by TOST at the 5% level — a demonstrated tie, not merely a null.</li>
+<li><strong>By slice family</strong>: age — cells 10.3 vs direct 10.1; sex — 9.3 vs 9.3; household income (construct-mismatched for cells only) — 9.8 vs 10.1; tenure (cells cover the detailed 80.7% of weight) — 9.8 vs 9.8.</li>
+<li><strong>Toplines</strong>: direct 8.6 vs cells 9.2 points (paired difference +0.56, 95% CI [-0.60, 1.67]) — direct estimation is directionally better on famous marginals (the interval includes zero), exactly where training-data recall is most plausible (see the contamination test).</li>
+<li><strong>H2/H3 (persona)</strong>: on the 20-item subset, persona subgroup MAE 25.0 vs cells 10.1; topline 25.0 vs 10.1. By source, persona topline MAE is 22.4 on GSS items and 29.0 on SHED items — the failure is general, not a SHED-composition artifact. The persona sampling floor at n=150 (expected MAE 2.9 points from binomial noise alone) explains only a small fraction of it.</li>
+<li><strong>H5 (registered): median pooled-family Spearman <span class="math inline">\(\ge 0.80\)</span> — fails</strong> at 0.62. <strong>Exploratory</strong>: on the age family alone, cells reach median <span class="math inline">\(\rho\)</span> = 0.80 (n = 63 items) vs direct 0.60 (n = 63); the paired difference is +0.08 (95% CI [-0.01, 0.17], one-sided Wilcoxon p = 0.040). This comparison was not pre-registered and is labeled exploratory wherever it appears, including the abstract.</li>
+</ul>
+<p>Persona role-play — the dominant commercial architecture — is not competitive at any level. Between the two viable methods, marginal accuracy is a demonstrated tie under the equivalence bound; what distinguishes them is structural. Cells produce subgroup systems that cohere with the topline by construction (on the base dimensions), order subgroups better in the exploratory comparison above, compose into arbitrary audience definitions from one auditable prediction set — where direct estimation needs a fresh unverifiable call per audience — and expose per-cell predictions that valid-inference machinery consumes. The price appears in the cost table below.</p>
+</section>
+<section id="sensitivities" class="level2" data-number="5.3">
+<h2 data-number="5.3" class="anchored" data-anchor-id="sensitivities"><span class="header-section-number">5.3</span> Sensitivities</h2>
+<p>Excluding the four pilot-overlapping items: cells 9.1/9.8, direct 8.8/9.9 (59 items) — conclusions unchanged. Excluding the six items with volunteered categories: cells 8.7/9.4, direct 8.2/9.2. Restricting subgroup MAE to bins with n <span class="math inline">\(\ge\)</span> 100 human respondents: cells 9.8, direct 9.8. Excluding the 15 items with nonresponse above 50% (where the conditional estimand covers a minority of eligible respondents): cells 8.6/9.2, direct 8.2/9.2. Human-target sampling noise is not negligible at bin level: under design-effect assumptions (GSS 1.5, SHED 1.2), the expected MAE floor from target noise alone is 0.9 points on toplines and 1.6 on subgroup bins (1.6 for bins with n <span class="math inline">\(\ge\)</span> 100) — a floor all arms share.</p>
+</section>
+</section>
+<section id="results-instrument-corrected-robustness-registered-addendum" class="level1" data-number="6">
+<h1 data-number="6"><span class="header-section-number">6</span> Results: instrument-corrected robustness (registered addendum)</h1>
+<p>Re-eliciting the full bank with corrected instruments (verbatim wordings, volunteered categories marked as not read to respondents, an explicit conditional-on-substantive-answer instruction): cells 9.3/10.0 points, direct 8.7/9.7 — the registered-run conclusions are robust to the instrument corrections (registered v1: cells 9.2/9.8, direct 8.6/9.8). The persona arm was not re-elicited: the measured instrument effects (at most a few points) cannot plausibly account for its 25-point gap.</p>
+<p>Across 4 independent runs of the 20-item subset, between-run SD of pooled MAEs is 0.07 points topline / 0.05 subgroup for the cells arm and 0.62 / 0.27 for the direct arm — cells’ run noise is negligible, and the direct arm’s exceeds its own topline advantage over cells (+0.56 points), which is itself evidence for the marginal-accuracy tie. Paraphrasing question stems moves item toplines by only 1.2 points on average (max 4.8; n = 10) — semantic-preserving rewording is a second-order perturbation at cell aggregation. Reversing option order is <strong>not</strong> second-order: it moves cells toplines by 3.5 points on average (max 7.6; n = 20) and direct toplines by 5.5 (max 18.0) — roughly a third of total topline error, the largest instrument sensitivity we measured, shared by both arms, and consistent with the LLM response-order artifacts documented by <span class="citation" data-cites="tjuatja2024llms">Tjuatja et al. (<a href="#ref-tjuatja2024llms" role="doc-biblioref">2024</a>)</span> and <span class="citation" data-cites="dominguezolmedo2024questioning">Dominguez-Olmedo et al. (<a href="#ref-dominguezolmedo2024questioning" role="doc-biblioref">2024</a>)</span>. Canonical instrument order (which our default runs use, matching what humans saw) is load-bearing, and order sensitivity belongs in any accuracy claim’s error budget.</p>
+<p><strong>Volunteered categories.</strong> In the registered v1 instrument, which offered normally-volunteered options as explicit choices, the model over-allocated mass to them on every affected item (points vs humans: trust +5.9, fair +7.2, helpful +5.0, getahead +9.0, courts +10.6, divlaw +14.7). Marking those options as “not read to respondents” in v4 removes much of the artifact (trust -1.7, fair -1.7, helpful -6.1, getahead -2.4, courts +7.4, divlaw +8.3; courts and divlaw retain sizable shifts) — a measured, referee-identified instrument effect and its measured correction. The no-volunteered variant appears in the released artifact.</p>
+<section id="cell-granularity" class="level2" data-number="6.1">
+<h2 data-number="6.1" class="anchored" data-anchor-id="cell-granularity"><span class="header-section-number">6.1</span> Cell granularity</h2>
+<div id="tbl-granularity" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-tbl figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-granularity-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Table&nbsp;2: Accuracy versus cell granularity, corrected instruments, gpt-5-mini, full bank. One cell is direct estimation without subgroup calls; age-family rank correlation for coarse tables is reconstructed from released per-call logs.
+</figcaption>
+<div aria-describedby="tbl-granularity-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Cells</th>
+<th>Topline MAE</th>
+<th>Median age-family Spearman</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>1</td>
+<td>8.3</td>
+<td>—</td>
+</tr>
+<tr class="even">
+<td>8</td>
+<td>8.9</td>
+<td>0.40</td>
+</tr>
+<tr class="odd">
+<td>40</td>
+<td>9.2</td>
+<td>0.80</td>
+</tr>
+<tr class="even">
+<td>149</td>
+<td>9.3</td>
+<td>0.80</td>
+</tr>
+</tbody>
+</table>
+</div>
+</figure>
+</div>
+<p>The granularity curve locates where structure emerges — and where accuracy does not. Toplines are best with a single cell and degrade mildly as composition error accumulates across finer tables: granularity is a small <em>tax</em> on marginal accuracy, the ablation’s version of the H1 tie. Rank structure behaves differently: encoding the reporting dimension is not sufficient (age <span class="math inline">\(\times\)</span> sex cells rank age bands at only <span class="math inline">\(\rho = 0.40\)</span>); ordering sharpens to 0.80 once the interacting income conditioning arrives at 40 cells, and holds at 149 despite each cell receiving no pooling. The 149-cell premium over 40 buys neither marginal accuracy nor age-ordering — it buys composability: only the detailed table supports the tenure/children/benefits audiences the estimator exists to serve.</p>
+</section>
+</section>
+<section id="results-error-structure" class="level1" data-number="7">
+<h1 data-number="7"><span class="header-section-number">7</span> Results: error structure</h1>
+<div id="fig-valence" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-valence-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="figures/fig2-valence.svg" class="img-fluid figure-img">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-valence-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;2: Signed topline error of the cells arm by item valence (registered v1 run). Bars mark means.
+</figcaption>
+</figure>
+</div>
+<p>Signed topline error averages -3.6 points on positive-valence items (n=16, SD 12.4), -3.4 on neutral items (n=44), and 8.8 on negative-valence items (n=3). The registered H4 contrast (positive vs negative) is -12.4 points with permutation p = 0.070 — <strong>not established</strong>: the negative class has three items, two of them derived or composite instruments whose format confounds point the same direction, and neutral items shift almost as far as positive ones, implicating option-position and extremity artifacts rather than valence per se (first-listed-positive regression coefficient 7.4 points). We report the pattern as hypothesis-generating; an adequately powered negative class on native instruments is registered future work.</p>
+<section id="contamination" class="level2" data-number="7.1">
+<h2 data-number="7.1" class="anchored" data-anchor-id="contamination"><span class="header-section-number">7.1</span> Contamination</h2>
+<p>An estimator anchored to its training window — whether by recalling published statistics or by genuine but frozen knowledge — cannot track target movement after that window, so its signed error on 2024 targets should run at slope −1 against each item’s movement since the prior anchor wave (GSS 2022, SHED 2023). Observed: cells slope -0.85 (SE 0.49, r = -0.22, n = 63, p = 0.09); direct slope -0.88 (SE 0.45, r = -0.24). Point estimates sit near the anchoring line for both arms, with wide uncertainty — these evergreen items moved only 2.2 points on average, so the test has little leverage and the slopes are statistically distinguishable from neither −1 nor, marginally, 0. Three sober conclusions: the pattern is consistent with training-window anchoring and affects both arms equally; on items this stable, staleness costs at most about two points; and the regression cannot separate frozen knowledge from recall of published values. Documented cutoffs sharpen this: gpt-5-mini’s knowledge cutoff (May 31, 2024) predates every 2024 target’s release, so the primary model cannot have seen the 2024 values at all — only earlier waves, which is precisely what the regression tests; gpt-5.2 (August 31, 2025) and claude-haiku-4.5 (February 2025) postdate the SHED 2024 report, so their variant runs carry a recall exposure the primary runs do not. Freshly fielded items remain the decisive test and are registered follow-up, where an open-weights model with an auditable corpus will be included.</p>
+<div id="fig-contamination" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-contamination-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="figures/fig5-contamination.svg" class="img-fluid figure-img">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-contamination-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;3: Signed error versus target movement since the prior anchor wave, by arm. The dashed line is pure training-window anchoring (slope −1).
+</figcaption>
+</figure>
+</div>
+</section>
+</section>
+<section id="valid-inference-from-small-human-anchors" class="level1" data-number="8">
+<h1 data-number="8"><span class="header-section-number">8</span> Valid inference from small human anchors</h1>
+<p>Treating each anchor survey as its population and redrawing weighted <span class="math inline">\(n{=}200\)</span> anchors 500 times per item: PPI rectification <span class="citation" data-cites="angelopoulos2023prediction">(<a href="#ref-angelopoulos2023prediction" role="doc-biblioref">Angelopoulos et al. 2023</a>)</span> attains 94.7% mean coverage of the full-sample target against a nominal (asymptotic) 95% — within the registered band — while the human-anchor-only interval covers at 94.9%. This is a resampling study: anchors are idealized self-weighting draws from the survey itself, so the result verifies the estimator’s arithmetic under clean conditions, not field validity under real designs and nonresponse. The registered efficiency criterion (median width ratio below 1) is technically met at 0.998, but the gain is negligible — PPI intervals are narrower on only 57% of items.</p>
+<p>Enriching the predictor from age × sex to age × sex × tenure (the richest covariate shared by frame and anchors; household income is not a frame conditioning variable, a disclosed deviation from the addendum’s phrasing) changes nothing: coverage 94.6%, median width ratio 1.001, narrower on 44% of items. PPI’s width gain scales with the individual-level variance the predictor explains, and demographic-cell predictions explain little of it on attitude items at either granularity — group-level signal is not individual-level signal. Validity comes cheap; precision gains await predictors of individual responses (fine-tuned response models <span class="citation" data-cites="suh2025language krsteski2025valid">(<a href="#ref-suh2025language" role="doc-biblioref">Suh et al. 2025</a>; <a href="#ref-krsteski2025valid" role="doc-biblioref"><span class="nocase">Krsteski et al.</span> 2025</a>)</span>, interview-grounded agents <span class="citation" data-cites="park2024generative">(<a href="#ref-park2024generative" role="doc-biblioref">Park et al. 2024</a>)</span>), not richer demographic conditioning. This is the paper’s most decision-relevant null.</p>
+</section>
+<section id="context-the-in-survey-demographic-ceiling" class="level1" data-number="9">
+<h1 data-number="9"><span class="header-section-number">9</span> Context: the in-survey demographic ceiling</h1>
+<p>A gradient-boosted classifier trained on each anchor survey’s own respondents (demographics only, 80/20 split) reaches 1.7 points subgroup MAE — the in-survey ceiling for demographic-composition prediction, achievable only <em>with</em> the human data the LLM arms never see <span class="citation" data-cites="miranda2025simulating">(<a href="#ref-miranda2025simulating" role="doc-biblioref">Miranda and Balbi 2025</a>)</span>. (Its topline figure of 1.0 points is close to mechanical — a classifier fit on 80% of a survey recovers that survey’s base rates — and is not a meaningful benchmark.) The gap between the subgroup ceiling and the cells arm is the price of operating without fielded data; the gap between cells and persona is pure architecture.</p>
+</section>
+<section id="small-area-transfer-brfss-across-states" class="level1" data-number="10">
+<h1 data-number="10"><span class="header-section-number">10</span> Small-area transfer: BRFSS across states</h1>
+<p>Across four full-sample BRFSS 2023 items estimated for every participating jurisdiction (48 states plus the District of Columbia; Kentucky and Pennsylvania did not meet BRFSS 2023 collection requirements), state-level cells estimation — age × sex cells from each state’s calibrated table, a deliberately reduced frame for cost — reaches 8.1 points MAE, versus 9.7 for one direct estimate per state and 7.8 for applying the national estimate uniformly. Cells do <strong>not</strong> beat the national-constant baseline pooled: the paired difference is +0.30 points (95% bootstrap CI over state-items [-0.30, 0.90]). Median within-item Spearman across states is 0.66 (<a href="#fig-states" class="quarto-xref">Figure&nbsp;4</a>).</p>
+<div id="fig-states" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-states-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="figures/fig3-states.svg" class="img-fluid figure-img">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-states-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;4: State-level estimates versus BRFSS 2023 weighted targets, four items, 48 states plus DC.
+</figcaption>
+</figure>
+</div>
+<p>The right yardstick matters: these items vary modestly across states, state targets at <span class="math inline">\(n \ge 300\)</span> with BRFSS design effects carry several points of sampling noise themselves, and the shrinkage limit (the national constant) is therefore hard to beat on pooled error. The self-rated-health contrast promised in the estimand section illustrates the instrument-and-mode floor directly: the same construct yields a 72.2% excellent-or-good share on the GSS’s four-point mixed-mode item and a 47.2% excellent-or-very-good share on BRFSS’s five-point telephone item — instrument and mode differences of the same order as the errors under study, which is why every target in this paper is defined relative to a named instrument. The estimator’s genuine small-area signal is ordinal — it ranks states at median <span class="math inline">\(\\rho\)</span> = 0.66 from composition plus the state’s name — and where state effects are compositional (smoking history, exercise) it captures them, while contextual effects beyond demographics (health-care affordability) defeat an age × sex frame. The full-frame state experiment is registered future work.</p>
+</section>
+<section id="model-variants" class="level1" data-number="11">
+<h1 data-number="11"><span class="header-section-number">11</span> Model variants</h1>
+<div id="tbl-models" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-tbl figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-models-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Table&nbsp;3: Cells-arm accuracy by model, 20-item subset (gpt-5-mini shown on the same subset). gpt-5.2 ran with reasoning effort <code>none</code> versus gpt-5-mini’s <code>minimal</code> — a configuration as well as capability difference. Variants were run for the cells arm only, so nothing here speaks to whether the cells-versus-direct tie persists with model capability.
+</figcaption>
+<div aria-describedby="tbl-models-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Cells arm model</th>
+<th>Topline MAE</th>
+<th>Subgroup MAE</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>anthropic:claude-haiku-4-5-20251001</td>
+<td>8.4</td>
+<td>9.8</td>
+</tr>
+<tr class="even">
+<td>openai:gpt-5-mini</td>
+<td>10.1</td>
+<td>10.1</td>
+</tr>
+<tr class="odd">
+<td>openai:gpt-5.2</td>
+<td>7.4</td>
+<td>8.5</td>
+</tr>
+</tbody>
+</table>
+</div>
+</figure>
+</div>
+</section>
+<section id="cost" class="level1" data-number="12">
+<h1 data-number="12"><span class="header-section-number">12</span> Cost</h1>
+<div id="tbl-cost" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-tbl figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-cost-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Table&nbsp;4: Elicitation cost per item, July 2026 list prices, token averages from the registered run (224 in / 30 out per call). Direct estimation is roughly an order of magnitude cheaper than cells for indistinguishable marginal accuracy on standard breaks; the cells premium buys coherence, composability into audiences direct asking cannot credibly serve, auditable per-cell provenance, and PPI-compatible outputs.
+</figcaption>
+<div aria-describedby="tbl-cost-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Arm</th>
+<th>Calls per item</th>
+<th>USD per item (gpt-5-mini)</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>cells</td>
+<td>149</td>
+<td>0.017</td>
+</tr>
+<tr class="even">
+<td>naive</td>
+<td>9.7</td>
+<td>0.001</td>
+</tr>
+<tr class="odd">
+<td>persona</td>
+<td>150</td>
+<td>0.018</td>
+</tr>
+</tbody>
+</table>
+</div>
+</figure>
+</div>
+</section>
+<section id="limitations" class="level1" data-number="13">
+<h1 data-number="13"><span class="header-section-number">13</span> Limitations</h1>
+<p><strong>Contamination.</strong> The delta regression bounds stale-value recall but cannot exclude recall of the 2024 targets themselves (GSS 2024 microdata released fall 2025; SHED 2024 May 2025; published toplines circulate earlier). Freshly fielded items on a verified human panel remain the decisive test and are registered follow-up.</p>
+<p><strong>Measurement.</strong> The estimand is conditional on each survey’s instrument and mode, which the model is not told; the target-noise floors reported above are shared by all arms but the mode gap is not separately identifiable here. Construct mismatches (household versus earned income) and the frame’s omitted conditioning variables (education, race/ethnicity) are disclosed design limits.</p>
+<p><strong>Scope.</strong> Evergreen attitude and finance items on US adults; nothing here speaks to fast-moving topics (a frozen model cannot track post-cutoff opinion change), to small or marginalized subgroups below the <span class="math inline">\(n \ge 30\)</span> reporting floor, or to non-US populations. Persona results characterize one standard role-play implementation at one budget.</p>
+<p><strong>Inference.</strong> The PPI study is a resampling design, not a field validation; registration is by public commit, verifiable as ordering but not third-party-timestamped (annotated tags were attached at revision time, after their target commits; ordering is additionally auditable from provider response IDs and timestamps in the per-call logs); and the pilot-overlap and subset-composition flaws of the original design, while addressed by sensitivity analyses, should not recur in follow-ups.</p>
+</section>
+<section id="discussion" class="level1" data-number="14">
+<h1 data-number="14"><span class="header-section-number">14</span> Discussion</h1>
+<p>The synthetic-respondent debate has largely been conducted over the wrong architecture. Role-playing individuals is both the dominant commercial pattern and the design the evidence most clearly condemns; our matched-budget replication puts the gap at roughly fifteen points of MAE against either alternative, in both survey sources. Treating the model as a conditional response model over a calibrated population frame changes the question from “can an LLM impersonate a person?” to “how well does an LLM know conditional response distributions?” — a question that admits measurement, equivalence testing, and valid inference.</p>
+<p>Against our own registration, cells did not beat direct per-subgroup estimation on marginal accuracy; the revision’s equivalence test upgrades that null to a demonstrated tie within ±1.5 points on subgroup margins (toplines pass equivalence only in the corrected v4 run). Three things follow. First, on well-surveyed margins, elaborate machinery buys no marginal accuracy over simply asking the model — a deflationary finding vendors are unlikely to publish, and one that direct estimation’s order-of-magnitude cost advantage sharpens. Second, the machinery still earns its keep where direct asking structurally cannot go: coherent and composable subgroup systems, auditable provenance, cell-level outputs that make prediction-powered validity possible, and (exploratorily) better subgroup ordering. Third, the residual error is structured, not noisy — replicate SDs are two orders of magnitude below the error itself, paraphrase effects are second-order, and the two systematic components we can name (option-order sensitivity of a few points; training-window anchoring bounded by target movement) are exactly what instrument discipline and anchor-based correction methods target <span class="citation" data-cites="kambhatla2026improving krsteski2025valid">(<a href="#ref-kambhatla2026improving" role="doc-biblioref"><span class="nocase">Kambhatla et al.</span> 2026</a>; <a href="#ref-krsteski2025valid" role="doc-biblioref"><span class="nocase">Krsteski et al.</span> 2025</a>)</span>. The honest path — publish the misses, anchor with small human samples, never imply real people were surveyed <span class="citation" data-cites="esomar2025code aapor2026responsible">(<a href="#ref-esomar2025code" role="doc-biblioref">ICC/ESOMAR 2025</a>; <a href="#ref-aapor2026responsible" role="doc-biblioref">American Association for Public Opinion Research 2026</a>)</span> — is also the technically correct one.</p>
+<p>All code, prompts, cell tables, registered and revision-stage artifacts, per-call elicitation logs for every revision arm, and this manuscript’s source are public <span class="citation" data-cites="ghenis2026hivesight">(<a href="#ref-ghenis2026hivesight" role="doc-biblioref">Ghenis 2026a</a>)</span>; the production system’s benchmark page renders from the same artifacts. Registered-run persona and direct per-call logs were not persisted by the original runner (only aggregates and the cells arm’s parsed predictions survive), a release gap the revision runner closes for all subsequent runs.</p>
+</section>
+<section id="data-availability" class="level1 unnumbered">
+<h1 class="unnumbered">Data availability</h1>
+<p>GSS microdata are available from NORC under terms that do not permit redistribution; this repository ships weighted aggregates only, with exact acquisition instructions, file versions, and checksums in its DATA.md. SHED (Federal Reserve Board) and BRFSS (CDC) are public downloads. The synthetic population frame is pinned to a public Hugging Face revision; the derived cell tables the analyses consume are committed. Respondent-level extracts are regenerated locally by the released builders and never redistributed.</p>
+</section>
+<section id="acknowledgments" class="level1 unnumbered">
+<h1 class="unnumbered">Acknowledgments</h1>
+<p>Drafting, engineering, and analysis assistance from Claude (Anthropic). Population frame built on the Populace calibrated-microdata stack. Human targets derive from public data of NORC’s General Social Survey, the Federal Reserve Board’s SHED, and CDC’s BRFSS; all interpretations are the author’s. Four simulated referee reviews, generated with independent model instances instructed to verify claims against the repository, motivated the v3 addendum’s corrections; the review transcripts are preserved in the repository history.</p>
+</section>
+<section id="appendix-a-instrument-fidelity" class="level1 unnumbered">
+<h1 class="unnumbered">Appendix A: instrument fidelity</h1>
+<div id="tbl-fidelity" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-tbl figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-fidelity-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Table&nbsp;5: Per-item provenance and instrument notes, bank v2. Nonresponse: GSS rates exclude ballot nonassignment but conflate web-mode skips with don’t-know; the highest rates (led by gss_courts) exceed 50% and carry a dedicated sensitivity in Results. SHED rates are refusals. Bank v1’s wording deviations (adapted stems on nine items, option-order mismatch on the spending battery, a narrowed definition on shed_400cash) are corrected in v2; both banks and both runs are released.
+</figcaption>
+<div aria-describedby="tbl-fidelity-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Item</th>
+<th>Source</th>
+<th>Instrument notes</th>
+<th>Nonresponse rate</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>gss_happy</td>
+<td>gss2024</td>
+<td>—</td>
+<td>0.8</td>
+</tr>
+<tr class="even">
+<td>gss_health</td>
+<td>gss2024</td>
+<td>—</td>
+<td>0.3</td>
+</tr>
+<tr class="odd">
+<td>gss_satfin</td>
+<td>gss2024</td>
+<td>—</td>
+<td>0.5</td>
+</tr>
+<tr class="even">
+<td>gss_finrela</td>
+<td>gss2024</td>
+<td>—</td>
+<td>1.0</td>
+</tr>
+<tr class="odd">
+<td>gss_getahead</td>
+<td>gss2024</td>
+<td>volunteered option(s)</td>
+<td>70.0</td>
+</tr>
+<tr class="even">
+<td>gss_class</td>
+<td>gss2024</td>
+<td>—</td>
+<td>1.1</td>
+</tr>
+<tr class="odd">
+<td>gss_fear</td>
+<td>gss2024</td>
+<td>—</td>
+<td>32.8</td>
+</tr>
+<tr class="even">
+<td>gss_cappun</td>
+<td>gss2024</td>
+<td>—</td>
+<td>37.2</td>
+</tr>
+<tr class="odd">
+<td>gss_gunlaw</td>
+<td>gss2024</td>
+<td>—</td>
+<td>33.9</td>
+</tr>
+<tr class="even">
+<td>gss_grass</td>
+<td>gss2024</td>
+<td>—</td>
+<td>73.6</td>
+</tr>
+<tr class="odd">
+<td>gss_courts</td>
+<td>gss2024</td>
+<td>volunteered option(s)</td>
+<td>75.5</td>
+</tr>
+<tr class="even">
+<td>gss_trust</td>
+<td>gss2024</td>
+<td>volunteered option(s)</td>
+<td>71.2</td>
+</tr>
+<tr class="odd">
+<td>gss_fair</td>
+<td>gss2024</td>
+<td>volunteered option(s)</td>
+<td>71.4</td>
+</tr>
+<tr class="even">
+<td>gss_helpful</td>
+<td>gss2024</td>
+<td>volunteered option(s)</td>
+<td>71.4</td>
+</tr>
+<tr class="odd">
+<td>gss_satjob</td>
+<td>gss2024</td>
+<td>restricted universe</td>
+<td>31.9</td>
+</tr>
+<tr class="even">
+<td>gss_spanking</td>
+<td>gss2024</td>
+<td>—</td>
+<td>35.6</td>
+</tr>
+<tr class="odd">
+<td>gss_sexeduc</td>
+<td>gss2024</td>
+<td>volunteered option(s)</td>
+<td>35.5</td>
+</tr>
+<tr class="even">
+<td>gss_divlaw</td>
+<td>gss2024</td>
+<td>volunteered option(s)</td>
+<td>72.5</td>
+</tr>
+<tr class="odd">
+<td>gss_fepol</td>
+<td>gss2024</td>
+<td>—</td>
+<td>72.8</td>
+</tr>
+<tr class="even">
+<td>gss_fefam</td>
+<td>gss2024</td>
+<td>—</td>
+<td>34.7</td>
+</tr>
+<tr class="odd">
+<td>gss_fechld</td>
+<td>gss2024</td>
+<td>—</td>
+<td>34.5</td>
+</tr>
+<tr class="even">
+<td>gss_fepresch</td>
+<td>gss2024</td>
+<td>—</td>
+<td>34.9</td>
+</tr>
+<tr class="odd">
+<td>gss_helppoor</td>
+<td>gss2024</td>
+<td>—</td>
+<td>35.4</td>
+</tr>
+<tr class="even">
+<td>gss_helpsick</td>
+<td>gss2024</td>
+<td>—</td>
+<td>35.1</td>
+</tr>
+<tr class="odd">
+<td>gss_helpnot</td>
+<td>gss2024</td>
+<td>—</td>
+<td>36.0</td>
+</tr>
+<tr class="even">
+<td>gss_eqwlth</td>
+<td>gss2024</td>
+<td>—</td>
+<td>34.5</td>
+</tr>
+<tr class="odd">
+<td>gss_polviews</td>
+<td>gss2024</td>
+<td>—</td>
+<td>4.2</td>
+</tr>
+<tr class="even">
+<td>gss_confinan</td>
+<td>gss2024</td>
+<td>—</td>
+<td>34.4</td>
+</tr>
+<tr class="odd">
+<td>gss_conbus</td>
+<td>gss2024</td>
+<td>—</td>
+<td>35.0</td>
+</tr>
+<tr class="even">
+<td>gss_coneduc</td>
+<td>gss2024</td>
+<td>—</td>
+<td>34.4</td>
+</tr>
+<tr class="odd">
+<td>gss_conpress</td>
+<td>gss2024</td>
+<td>—</td>
+<td>35.0</td>
+</tr>
+<tr class="even">
+<td>gss_conmedic</td>
+<td>gss2024</td>
+<td>—</td>
+<td>34.5</td>
+</tr>
+<tr class="odd">
+<td>gss_conarmy</td>
+<td>gss2024</td>
+<td>—</td>
+<td>34.7</td>
+</tr>
+<tr class="even">
+<td>gss_confed</td>
+<td>gss2024</td>
+<td>—</td>
+<td>35.0</td>
+</tr>
+<tr class="odd">
+<td>gss_conjudge</td>
+<td>gss2024</td>
+<td>—</td>
+<td>34.9</td>
+</tr>
+<tr class="even">
+<td>gss_consci</td>
+<td>gss2024</td>
+<td>—</td>
+<td>35.6</td>
+</tr>
+<tr class="odd">
+<td>gss_conlegis</td>
+<td>gss2024</td>
+<td>—</td>
+<td>34.9</td>
+</tr>
+<tr class="even">
+<td>gss_natspac</td>
+<td>gss2024</td>
+<td>—</td>
+<td>51.9</td>
+</tr>
+<tr class="odd">
+<td>gss_natenvir</td>
+<td>gss2024</td>
+<td>—</td>
+<td>50.0</td>
+</tr>
+<tr class="even">
+<td>gss_natheal</td>
+<td>gss2024</td>
+<td>—</td>
+<td>50.0</td>
+</tr>
+<tr class="odd">
+<td>gss_natcity</td>
+<td>gss2024</td>
+<td>—</td>
+<td>51.6</td>
+</tr>
+<tr class="even">
+<td>gss_natcrime</td>
+<td>gss2024</td>
+<td>—</td>
+<td>50.1</td>
+</tr>
+<tr class="odd">
+<td>gss_natdrug</td>
+<td>gss2024</td>
+<td>—</td>
+<td>50.2</td>
+</tr>
+<tr class="even">
+<td>gss_nateduc</td>
+<td>gss2024</td>
+<td>—</td>
+<td>49.4</td>
+</tr>
+<tr class="odd">
+<td>gss_natarms</td>
+<td>gss2024</td>
+<td>—</td>
+<td>50.5</td>
+</tr>
+<tr class="even">
+<td>gss_nataid</td>
+<td>gss2024</td>
+<td>—</td>
+<td>50.7</td>
+</tr>
+<tr class="odd">
+<td>gss_natfare</td>
+<td>gss2024</td>
+<td>—</td>
+<td>50.3</td>
+</tr>
+<tr class="even">
+<td>gss_natroad</td>
+<td>gss2024</td>
+<td>—</td>
+<td>1.9</td>
+</tr>
+<tr class="odd">
+<td>gss_natsoc</td>
+<td>gss2024</td>
+<td>—</td>
+<td>3.2</td>
+</tr>
+<tr class="even">
+<td>gss_natchld</td>
+<td>gss2024</td>
+<td>—</td>
+<td>3.5</td>
+</tr>
+<tr class="odd">
+<td>gss_natsci</td>
+<td>gss2024</td>
+<td>—</td>
+<td>5.0</td>
+</tr>
+<tr class="even">
+<td>gss_natenrgy</td>
+<td>gss2024</td>
+<td>—</td>
+<td>3.8</td>
+</tr>
+<tr class="odd">
+<td>shed_b2</td>
+<td>shed2024</td>
+<td>—</td>
+<td>0.0</td>
+</tr>
+<tr class="even">
+<td>shed_b3</td>
+<td>shed2024</td>
+<td>—</td>
+<td>0.0</td>
+</tr>
+<tr class="odd">
+<td>shed_400cash</td>
+<td>shed2024</td>
+<td>derived</td>
+<td>0.0</td>
+</tr>
+<tr class="even">
+<td>shed_ef1</td>
+<td>shed2024</td>
+<td>—</td>
+<td>0.0</td>
+</tr>
+<tr class="odd">
+<td>shed_ef2</td>
+<td>shed2024</td>
+<td>—</td>
+<td>0.0</td>
+</tr>
+<tr class="even">
+<td>shed_ef7</td>
+<td>shed2024</td>
+<td>—</td>
+<td>0.0</td>
+</tr>
+<tr class="odd">
+<td>shed_bk1</td>
+<td>shed2024</td>
+<td>—</td>
+<td>0.0</td>
+</tr>
+<tr class="even">
+<td>shed_bnpl</td>
+<td>shed2024</td>
+<td>—</td>
+<td>0.0</td>
+</tr>
+<tr class="odd">
+<td>shed_work</td>
+<td>shed2024</td>
+<td>—</td>
+<td>0.0</td>
+</tr>
+<tr class="even">
+<td>shed_i41d</td>
+<td>shed2024</td>
+<td>derived</td>
+<td>0.0</td>
+</tr>
+<tr class="odd">
+<td>shed_housing_stress</td>
+<td>shed2024</td>
+<td>composite</td>
+<td>—</td>
+</tr>
+</tbody>
+</table>
+</div>
+</figure>
+</div>
+
+</section>
+
+<div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" role="doc-bibliography" id="quarto-bibliography"><h2 class="anchored quarto-appendix-heading">References</h2><div id="refs" class="references csl-bib-body hanging-indent" role="list">
+<div id="ref-aapor2026responsible" class="csl-entry" role="listitem">
+American Association for Public Opinion Research. 2026. <em>Responsible AI Integration in Survey Research: Report of the AAPOR Task Force</em>. <a href="https://aapor.org/wp-content/uploads/2026/05/Responsible-AI-Integration-In-Survey-Research.pdf">https://aapor.org/wp-content/uploads/2026/05/Responsible-AI-Integration-In-Survey-Research.pdf</a>.
+</div>
+<div id="ref-angelopoulos2023prediction" class="csl-entry" role="listitem">
+Angelopoulos, Anastasios N., Stephen Bates, Clara Fannjiang, Michael I. Jordan, and Tijana Zrnic. 2023. <span>“Prediction-Powered Inference.”</span> <em>Science</em> 382 (6671): 669–74. <a href="https://doi.org/10.1126/science.adi6000">https://doi.org/10.1126/science.adi6000</a>.
+</div>
+<div id="ref-anthis2025llm" class="csl-entry" role="listitem">
+Anthis, Jacy Reese, Ryan Liu, Sean M. Richardson, et al. 2025. <span>“LLM Social Simulations Are a Promising Research Method.”</span> <em>arXiv Preprint arXiv:2504.02234</em>.
+</div>
+<div id="ref-argyle2023out" class="csl-entry" role="listitem">
+Argyle, Lisa P., Ethan C. Busby, Nancy Fulda, Joshua R. Gubler, Christopher Rytting, and David Wingate. 2023. <span>“Out of One, Many: Using Language Models to Simulate Human Samples.”</span> <em>Political Analysis</em> 31 (3): 337–51. <a href="https://doi.org/10.1017/pan.2023.2">https://doi.org/10.1017/pan.2023.2</a>.
+</div>
+<div id="ref-bisbee2024synthetic" class="csl-entry" role="listitem">
+Bisbee, James, Joshua D. Clinton, Cassy Dorff, Brenton Kenkel, and Jennifer M. Larson. 2024. <span>“Synthetic Replacements for Human Survey Data? The Perils of Large Language Models.”</span> <em>Political Analysis</em> 32 (4): 401–16. <a href="https://doi.org/10.1017/pan.2024.5">https://doi.org/10.1017/pan.2024.5</a>.
+</div>
+<div id="ref-boelaert2025machine" class="csl-entry" role="listitem">
+Boelaert, Julien, Samuel Coavoux, Étienne Ollion, and Ivaylo Petev. 2025. <span>“Machine Bias: How Do Generative Language Models Answer Opinion Polls?”</span> <em>Sociological Methods &amp; Research</em>, ahead of print. <a href="https://doi.org/10.1177/00491241251330582">https://doi.org/10.1177/00491241251330582</a>.
+</div>
+<div id="ref-broska2025mixed" class="csl-entry" role="listitem">
+Broska, David, Michael Howes, and Austin van Loon. 2025. <span>“The Mixed Subjects Design: Treating Large Language Models as Potentially Informative Observations.”</span> <em>Sociological Methods &amp; Research</em>, ahead of print. <a href="https://doi.org/10.1177/00491241251326865">https://doi.org/10.1177/00491241251326865</a>.
+</div>
+<div id="ref-cdc2024brfss" class="csl-entry" role="listitem">
+Centers for Disease Control and Prevention. 2024. <em>Behavioral Risk Factor Surveillance System Survey Data, 2023</em>. <a href="https://www.cdc.gov/brfss/annual_data/annual_2023.html">https://www.cdc.gov/brfss/annual_data/annual_2023.html</a>.
+</div>
+<div id="ref-cerina2023artificially" class="csl-entry" role="listitem">
+Cerina, Roberto, and Raymond Duch. 2023. <span>“Artificially Intelligent Opinion Polling.”</span> <em>arXiv Preprint arXiv:2309.06029</em>.
+</div>
+<div id="ref-dominguezolmedo2024questioning" class="csl-entry" role="listitem">
+Dominguez-Olmedo, Ricardo, Moritz Hardt, and Celestine Mendler-Dünner. 2024. <span>“Questioning the Survey Responses of Large Language Models.”</span> <em>Advances in Neural Information Processing Systems</em>.
+</div>
+<div id="ref-durmus2023towards" class="csl-entry" role="listitem">
+<span class="nocase">Durmus, Esin, Karina Nyugen, Thomas I. Liao, et al.</span> 2023. <span>“Towards Measuring the Representation of Subjective Global Opinions in Language Models.”</span> <em>arXiv Preprint arXiv:2306.16388</em>.
+</div>
+<div id="ref-egami2023dsl" class="csl-entry" role="listitem">
+Egami, Naoki, Musashi Hinck, Brandon M. Stewart, and Hanying Wei. 2023. <span>“Using Imperfect Surrogates for Downstream Inference: Design-Based Supervised Learning for Social Science Applications of Large Language Models.”</span> <em>Advances in Neural Information Processing Systems</em>.
+</div>
+<div id="ref-edsl2024" class="csl-entry" role="listitem">
+Expected Parrot, Inc. 2024. <em>EDSL: Expected Parrot Domain-Specific Language for AI-Powered Social Science</em>. <a href="https://github.com/expectedparrot/edsl" class="uri">Https://github.com/expectedparrot/edsl</a>.
+</div>
+<div id="ref-gelman1997poststratification" class="csl-entry" role="listitem">
+Gelman, Andrew, and Thomas C. Little. 1997. <span>“Poststratification into Many Categories Using Hierarchical Logistic Regression.”</span> <em>Survey Methodology</em> 23 (2): 127–35.
+</div>
+<div id="ref-ghenis2026hivesight" class="csl-entry" role="listitem">
+Ghenis, Max. 2026a. <em>HiveSight Anchor-Bank Evaluation: Pre-Analysis Plan V2 and Replication Materials</em>. <a href="https://github.com/HiveSight/hivesight" class="uri">Https://github.com/HiveSight/hivesight</a>.
+</div>
+<div id="ref-ghenis2026sparsity" class="csl-entry" role="listitem">
+Ghenis, Max. 2026b. <em>L0 Regularization for Subnational Microsimulation Calibration</em>. <a href="https://populace.dev/sparsity/paper" class="uri">Https://populace.dev/sparsity/paper</a>.
+</div>
+<div id="ref-ghenis2026dynamics" class="csl-entry" role="listitem">
+Ghenis, Max. 2026c. <em>Populace Dynamics: An Open, Scored Longitudinal Layer for Policy Microsimulation</em>. <a href="https://populace.dev/dynamics/paper" class="uri">Https://populace.dev/dynamics/paper</a>.
+</div>
+<div id="ref-ghenis2026imputation" class="csl-entry" role="listitem">
+Ghenis, Max, and María Juaristi. 2026. <em>Weight-Aware Imputation for Policy Microsimulation</em>. <a href="https://populace.dev/support/paper" class="uri">Https://populace.dev/support/paper</a>.
+</div>
+<div id="ref-gong2026characterizing" class="csl-entry" role="listitem">
+Gong, Qi, Nathan E. Sanders, and Bruce Schneier. 2026. <span>“Characterizing the Ability of Large Language Models to Recapitulate Americans’ Distributional Survey Responses.”</span> <em>arXiv Preprint arXiv:2603.20229</em>.
+</div>
+<div id="ref-vonderheyde2025vox" class="csl-entry" role="listitem">
+Heyde, Leah von der, Anna-Carolina Haensch, and Alexander Wenz. 2025. <span>“Vox Populi, Vox AI? Using Large Language Models to Estimate German Vote Choice.”</span> <em>Social Science Computer Review</em>, ahead of print. <a href="https://doi.org/10.1177/08944393241271866">https://doi.org/10.1177/08944393241271866</a>.
+</div>
+<div id="ref-horton2023large" class="csl-entry" role="listitem">
+Horton, John J. 2023. <span>“Large Language Models as Simulated Economic Agents: What Can We Learn from Homo Silicus?”</span> <em>NBER Working Paper 31122</em>, ahead of print. <a href="https://doi.org/10.3386/w31122">https://doi.org/10.3386/w31122</a>.
+</div>
+<div id="ref-esomar2025code" class="csl-entry" role="listitem">
+ICC/ESOMAR. 2025. <em>ICC/ESOMAR International Code on Market, Opinion and Social Research and Data Analytics</em>. 5th ed. <a href="https://standards.esomar.org/assets/documents/icc-esomar-code-2025.pdf">https://standards.esomar.org/assets/documents/icc-esomar-code-2025.pdf</a>.
+</div>
+<div id="ref-kambhatla2026improving" class="csl-entry" role="listitem">
+<span class="nocase">Kambhatla, Gauri et al.</span> 2026. <span>“Improving the Distributional Alignment of LLMs Using Supervision.”</span> <em>arXiv Preprint arXiv:2507.00439</em>.
+</div>
+<div id="ref-kim2024ai" class="csl-entry" role="listitem">
+Kim, Junsol, and Byungkyu Lee. 2024. <span>“AI-Augmented Surveys: Leveraging Large Language Models and Surveys for Opinion Prediction.”</span> <em>arXiv Preprint arXiv:2305.09620</em>.
+</div>
+<div id="ref-krsteski2025valid" class="csl-entry" role="listitem">
+<span class="nocase">Krsteski, Stefan et al.</span> 2025. <span>“Valid Survey Simulations with Limited Human Data: The Roles of Prediction-Powered Inference and Fine-Tuning.”</span> <em>arXiv Preprint arXiv:2510.11408</em>.
+</div>
+<div id="ref-meister2024benchmarking" class="csl-entry" role="listitem">
+Meister, Nicole, Carlos Guestrin, and Tatsunori Hashimoto. 2024. <span>“Benchmarking Distributional Alignment of Large Language Models.”</span> <em>arXiv Preprint arXiv:2411.05403</em>.
+</div>
+<div id="ref-miranda2025simulating" class="csl-entry" role="listitem">
+Miranda, Ana, and Stefano Balbi. 2025. <span>“Simulating Public Opinion: Distributional Versus Individual-Level Predictions with LLMs and Random Forests.”</span> <em>Entropy</em>.
+</div>
+<div id="ref-verasight2025synthetic" class="csl-entry" role="listitem">
+Morris, G. Elliott, Benjamin Leff, and Peter K. Enns. 2025. <em>The Risks of Using LLM Imputation to Create <span>“Synthetic Samples”</span></em>. Verasight. <a href="https://www.verasight.io/reports/synthetic-sampling-2">https://www.verasight.io/reports/synthetic-sampling-2</a>.
+</div>
+<div id="ref-park2004bayesian" class="csl-entry" role="listitem">
+Park, David K., Andrew Gelman, and Joseph Bafumi. 2004. <span>“Bayesian Multilevel Estimation with Poststratification: State-Level Estimates from National Polls.”</span> <em>Political Analysis</em> 12 (4): 375–85. <a href="https://doi.org/10.1093/pan/mph024">https://doi.org/10.1093/pan/mph024</a>.
+</div>
+<div id="ref-park2024generative" class="csl-entry" role="listitem">
+Park, Joon Sung, Carolyn Q. Zou, Aaron Shaw, et al. 2024. <span>“Generative Agent Simulations of 1,000 People.”</span> <em>arXiv Preprint arXiv:2411.10109</em>.
+</div>
+<div id="ref-rottger2024political" class="csl-entry" role="listitem">
+Röttger, Paul, Valentin Hofmann, Valentina Pyatkin, et al. 2024. <span>“Political Compass or Spinning Arrow? Towards More Meaningful Evaluations for Values and Opinions in Large Language Models.”</span> <em>Proceedings of the 62nd Annual Meeting of the Association for Computational Linguistics</em>.
+</div>
+<div id="ref-santurkar2023whose" class="csl-entry" role="listitem">
+Santurkar, Shibani, Esin Durmus, Faisal Ladhak, Cinoo Lee, Percy Liang, and Tatsunori Hashimoto. 2023. <span>“Whose Opinions Do Language Models Reflect?”</span> <em>Proceedings of the 40th International Conference on Machine Learning</em>.
+</div>
+<div id="ref-suh2025language" class="csl-entry" role="listitem">
+Suh, Joseph, Esmaeil Jahanparast, Suhong Moon, Minwoo Kang, and Serina Chang. 2025. <span>“Language Model Fine-Tuning on Scaled Survey Data for Predicting Distributions of Public Opinions.”</span> <em>Proceedings of the 63rd Annual Meeting of the Association for Computational Linguistics</em>.
+</div>
+<div id="ref-tjuatja2024llms" class="csl-entry" role="listitem">
+Tjuatja, Lindia, Valerie Chen, Tongshuang Wu, Ameet Talwalkar, and Graham Neubig. 2024. <span>“Do LLMs Exhibit Human-Like Response Biases? A Case Study in Survey Design.”</span> <em>Transactions of the Association for Computational Linguistics</em> 12. <a href="https://doi.org/10.1162/tacl_a_00685">https://doi.org/10.1162/tacl_a_00685</a>.
+</div>
+<div id="ref-census2024cps" class="csl-entry" role="listitem">
+U.S. Census Bureau and U.S. Bureau of Labor Statistics. 2024. <em>Current Population Survey, Annual Social and Economic Supplement</em>. <a href="https://www.census.gov/programs-surveys/cps.html">https://www.census.gov/programs-surveys/cps.html</a>.
+</div>
+<div id="ref-wang2025large" class="csl-entry" role="listitem">
+Wang, Angelina, Jamie Morgenstern, and John P. Dickerson. 2025. <span>“Large Language Models That Replace Human Participants Can Harmfully Misportray and Flatten Identity Groups.”</span> <em>Nature Machine Intelligence</em> 7: 400–411. <a href="https://doi.org/10.1038/s42256-025-00986-z">https://doi.org/10.1038/s42256-025-00986-z</a>.
+</div>
+<div id="ref-westwood2025llm" class="csl-entry" role="listitem">
+Westwood, Sean J. 2025. <span>“Large Language Model Respondents Are Undetectable in Online Surveys.”</span> <em>Proceedings of the National Academy of Sciences</em> 122. <a href="https://doi.org/10.1073/pnas.2518075122">https://doi.org/10.1073/pnas.2518075122</a>.
+</div>
+</div></section></div></main>
+<!-- /main column -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    // Ensure there is a toggle, if there isn't float one in the top right
+    if (window.document.querySelector('.quarto-color-scheme-toggle') === null) {
+      const a = window.document.createElement('a');
+      a.classList.add('top-right');
+      a.classList.add('quarto-color-scheme-toggle');
+      a.href = "";
+      a.onclick = function() { try { window.quartoToggleColorScheme(); } catch {} return false; };
+      const i = window.document.createElement("i");
+      i.classList.add('bi');
+      a.appendChild(i);
+      window.document.body.appendChild(a);
+    }
+    setColorSchemeToggle(hasAlternateSentinel())
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+</div> <!-- /content -->
+
+
+
+
+</body></html>

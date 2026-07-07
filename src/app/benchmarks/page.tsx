@@ -63,8 +63,11 @@ export default function BenchmarksPage() {
           and subgroups. Persona roleplay is not competitive. Cells and
           direct estimation tie on marginal accuracy; cells order subgroups
           better (median Spearman below) and stay coherent and composable.
-          Full method, hypotheses, and honest misses are in the research
-          paper in the repository.
+          Full method, hypotheses, and honest misses are in{" "}
+          <a href="/paper" className="underline hover:text-ink">
+            the research paper
+          </a>
+          , which renders from these same artifacts.
         </p>
         <div className="overflow-x-auto rounded-lg border border-line">
           <table className="w-full min-w-[34rem] text-sm">
@@ -155,8 +158,9 @@ export default function BenchmarksPage() {
             correct. A single-parameter calibration fit on these questions did
             not generalize under leave-one-question-out validation, so no
             silent correction is applied — results instead carry measured error
-            context. Building the multi-domain anchor bank that supports a
-            validated calibration layer is the top methodological priority.
+            context. The 63-item anchor bank above is the multi-domain
+            follow-up this pilot called for; the paper carries the full
+            robustness program.
           </p>
         </div>
       </section>

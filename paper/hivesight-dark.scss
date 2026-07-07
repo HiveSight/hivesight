@@ -1,0 +1,81 @@
+/*-- scss:defaults --*/
+// HiveSight dark tokens (parity with src/app/globals.css dark scheme)
+$paper: #14161f;
+$surface: #1c2030;
+$ink: #edeae1;
+$muted: #a6abbd;
+$line: #2c3145;
+$honey: #e8b23a;
+$indigo: #8d9ad6;
+
+$body-bg: $paper;
+$body-color: $ink;
+$link-color: $indigo;
+$font-family-sans-serif: "Libre Franklin", system-ui, sans-serif;
+$font-family-monospace: "IBM Plex Mono", ui-monospace, monospace;
+$headings-font-weight: 800;
+$toc-color: $muted;
+$toc-active-border: $honey;
+$code-block-bg: $surface;
+$table-border-color: $line;
+
+/*-- scss:rules --*/
+body {
+  -webkit-font-smoothing: antialiased;
+}
+
+h1.title { font-weight: 800; letter-spacing: -0.02em; line-height: 1.15; }
+h1, h2, h3 { letter-spacing: -0.01em; }
+
+.abstract {
+  border-left: 3px solid $honey;
+  padding-left: 1rem;
+  color: $muted;
+}
+.abstract .abstract-title {
+  font-family: $font-family-monospace;
+  font-size: 0.7rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: $muted;
+}
+
+table { font-variant-numeric: tabular-nums; }
+thead { font-family: $font-family-monospace; font-size: 0.75rem; }
+.figure-caption, .table-caption, caption { color: $muted; font-size: 0.85rem; }
+::selection { background: rgba(232, 178, 58, 0.3); }
+
+// Figures are light-background PDFs/SVGs; give them a readable plate.
+.quarto-figure img, .cell-output-display img {
+  background: #faf8f3;
+  border-radius: 6px;
+  padding: 6px;
+}
+
+.hs-band {
+  display: flex;
+  gap: 0.6rem;
+  align-items: baseline;
+  font-family: $font-family-monospace;
+  font-size: 0.75rem;
+  letter-spacing: 0.04em;
+  padding: 0.65rem 0 0.9rem;
+  border-bottom: 1px solid $line;
+  margin-bottom: 1.6rem;
+
+  a { color: $ink; text-decoration: none;
+    &:hover { color: $honey; }
+    &[aria-current="page"] { color: $muted; }
+  }
+  span { color: $muted; }
+  .hs-links { margin-left: auto; display: flex; gap: 1rem;
+    a { color: $muted; &:hover { color: $ink; } }
+  }
+}
+
+#title-block-header .quarto-title-meta-heading {
+  font-family: $font-family-monospace;
+  font-size: 0.65rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}

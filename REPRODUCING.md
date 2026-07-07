@@ -13,7 +13,8 @@ uv run --with "numpy,scipy" python analysis/analyze_anchor.py        # scores re
 uv run --with "numpy,scipy" python analysis/analyze_anchor_v2.py     # scores v4 robustness runs + sensitivities
 uv run --with "numpy,scipy,matplotlib" python analysis/make_paper_assets.py
 git diff --exit-code paper/artifacts/                                 # clean = reproduced
-cd paper && quarto render paper.qmd                                   # rebuild PDF/HTML
+cd paper && quarto render paper.qmd                                   # rebuild submission PDF/HTML
+bun run paper:site                                                    # rebuild the hivesight.ai/paper embed
 ```
 
 Inputs consumed: `evals/anchor-bank/anchor-bank-v{1,2}.json`,

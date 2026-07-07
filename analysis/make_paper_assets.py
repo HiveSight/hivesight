@@ -36,6 +36,11 @@ plt.rcParams.update({
 })
 
 
+def savefig(fig, stem):
+    for ext in ("pdf", "svg"):
+        fig.savefig(os.path.join(FIG, f"{stem}.{ext}"))
+
+
 def load(name, default=None):
     p = os.path.join(ART, f"{name}.json")
     if not os.path.exists(p):
@@ -90,7 +95,7 @@ def main():
     ax.set_ylabel("Mean absolute error (pts)")
     ax.legend(frameon=False)
     fig.tight_layout()
-    fig.savefig(os.path.join(FIG, "fig1-arms.pdf"))
+    savefig(fig, "fig1-arms")
     plt.close(fig)
 
     # ---- Figure 2: signed topline error by valence (cells arm)
@@ -111,7 +116,7 @@ def main():
     ax.set_xticks(range(3), [f"{v}\n(n={sum(1 for it in per.values() if it['valence']==v)})" for v in order])
     ax.set_ylabel("Signed topline error (pts)")
     fig.tight_layout()
-    fig.savefig(os.path.join(FIG, "fig2-valence.pdf"))
+    savefig(fig, "fig2-valence")
     plt.close(fig)
 
     # ---- BRFSS small-area
@@ -144,7 +149,7 @@ def main():
             ax.set_xlabel("BRFSS (pts)", fontsize=8)
         axes[0].set_ylabel("Estimate (pts)", fontsize=8)
         fig.tight_layout()
-        fig.savefig(os.path.join(FIG, "fig3-states.pdf"))
+        savefig(fig, "fig3-states")
         plt.close(fig)
         b["pooled"] = {
             "maeCells": float(np.mean([v["maeCells"] for v in b["items"].values()])),
@@ -177,7 +182,7 @@ def main():
         ax.set_ylabel("Signed error on 2024 target (pts)")
         ax.legend(frameon=False, fontsize=8)
         fig.tight_layout()
-        fig.savefig(os.path.join(FIG, "fig5-contamination.pdf"))
+        savefig(fig, "fig5-contamination")
         plt.close(fig)
 
     json.dump(s, open(os.path.join(ART, "summary.json"), "w"), indent=1)
