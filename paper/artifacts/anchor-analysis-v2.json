@@ -1,0 +1,394 @@
+{
+ "version": "anchor-analysis-v2",
+ "notes": [
+  "replicates incomplete",
+  "orderReversal incomplete",
+  "paraphrase incomplete"
+ ],
+ "v1_registered": {
+  "cells": {
+   "items": 63,
+   "toplineMAE": 0.0917876385422794,
+   "sliceMAE": 0.09841447823621598,
+   "toplineTV": 0.1171527893396829,
+   "medianSpearmanAge": 0.7999999999999999,
+   "nSpearmanAge": 63,
+   "medianSpearmanAll": 0.6190476190476191
+  },
+  "naive": {
+   "items": 63,
+   "toplineMAE": 0.08618251989443453,
+   "sliceMAE": 0.09840935341300004,
+   "toplineTV": 0.11468914855909218,
+   "medianSpearmanAge": 0.6000000000000001,
+   "nSpearmanAge": 63,
+   "medianSpearmanAll": 0.48196269271187986
+  }
+ },
+ "v4_corrected": {
+  "cells": {
+   "items": 25,
+   "toplineMAE": 0.09779610548323195,
+   "sliceMAE": 0.10264331848880469,
+   "toplineTV": 0.13045858211690273,
+   "medianSpearmanAge": 0.7999999999999999,
+   "nSpearmanAge": 25,
+   "medianSpearmanAll": 0.7142857142857144
+  },
+  "naive": {
+   "items": 24,
+   "toplineMAE": 0.08849715457900136,
+   "sliceMAE": 0.1014991900045596,
+   "toplineTV": 0.12782774379773632,
+   "medianSpearmanAge": 0.39999999999999997,
+   "nSpearmanAge": 24,
+   "medianSpearmanAll": 0.43789042607914874
+  }
+ },
+ "paired_v1": {
+  "topline": {
+   "n": 63,
+   "meanDiff": 0.005605118647844901,
+   "ci95": [
+    -0.005995694890448734,
+    0.01669787221046899
+   ],
+   "tostEquivalent15": false,
+   "wilcoxonOneSidedP": 0.9009646313150692
+  },
+  "subgroup": {
+   "n": 63,
+   "meanDiff": 5.1248232159510745e-06,
+   "ci95": [
+    -0.007865626554990554,
+    0.00787154895860039
+   ],
+   "tostEquivalent15": true,
+   "wilcoxonOneSidedP": 0.5136533355230949
+  },
+  "spearmanAgeDiff": {
+   "n": 63,
+   "meanDiff": 0.08297180830049315,
+   "ci95": [
+    -0.005446090717856043,
+    0.17366482452790946
+   ],
+   "wilcoxonOneSidedP": 0.03974127130096648
+  }
+ },
+ "paired_v4": {
+  "topline": {
+   "n": 24,
+   "meanDiff": 0.009496656662108877,
+   "ci95": [
+    -0.009512239406490626,
+    0.026998573903048505
+   ],
+   "tostEquivalent15": false,
+   "wilcoxonOneSidedP": 0.9062493443489075
+  },
+  "subgroup": {
+   "n": 24,
+   "meanDiff": 0.0017318747259523273,
+   "ci95": [
+    -0.009910211979475031,
+    0.013196364916545996
+   ],
+   "tostEquivalent15": true,
+   "wilcoxonOneSidedP": 0.647621750831604
+  },
+  "spearmanAgeDiff": {
+   "n": 24,
+   "meanDiff": 0.3188261142659141,
+   "ci95": [
+    0.1308688763813431,
+    0.5218300699133083
+   ],
+   "wilcoxonOneSidedP": 0.0026010784590638812
+  }
+ },
+ "h1_by_family": {
+  "age_band": {
+   "items": 63,
+   "cellsMAE": 0.10263885850139229,
+   "naiveMAE": 0.10084777309460492
+  },
+  "sex": {
+   "items": 63,
+   "cellsMAE": 0.09326573663669342,
+   "naiveMAE": 0.09339900524756037
+  },
+  "income_band": {
+   "items": 11,
+   "cellsMAE": 0.09837674965114675,
+   "naiveMAE": 0.10054622131139407
+  },
+  "tenure": {
+   "items": 63,
+   "cellsMAE": 0.09798116970234924,
+   "naiveMAE": 0.09787693190982964
+  }
+ },
+ "valence": {
+  "means": {
+   "positive": {
+    "mean": -0.0363534058316828,
+    "sd": 0.12358125360084803,
+    "n": 16
+   },
+   "neutral": {
+    "mean": -0.03433513392028573,
+    "sd": 0.10407418316619932,
+    "n": 44
+   },
+   "negative": {
+    "mean": 0.08813002801003327,
+    "sd": 0.04754849497924393,
+    "n": 3
+   }
+  },
+  "posMinusNeg": -0.12448343384171606,
+  "permutationP": 0.0705,
+  "signShare": {
+   "positive": 0.375,
+   "neutral": 0.4318181818181818,
+   "negative": 1.0
+  },
+  "firstPositionCoef": 0.07363256749903103,
+  "note": "negative class n=3; two of three are derived/composite items"
+ },
+ "contamination": {
+  "cells": {
+   "n": 63,
+   "slope": -0.8532073098512551,
+   "slopeSE": 0.4874103637207829,
+   "intercept": -0.03558015003381889,
+   "r": -0.2187016425033936,
+   "p": 0.08506160598241941,
+   "meanAbsDelta": 0.02170853124121446,
+   "interpretation": "memorization of older published values predicts slope near -1; slope near 0 is inconsistent with pure recall"
+  },
+  "naive": {
+   "n": 63,
+   "slope": -0.8839619634628235,
+   "slopeSE": 0.45161441700978167,
+   "intercept": -0.0282276574320594,
+   "r": -0.2430937799047507,
+   "p": 0.05488763186967509,
+   "meanAbsDelta": 0.02170853124121446,
+   "interpretation": "memorization of older published values predicts slope near -1; slope near 0 is inconsistent with pure recall"
+  }
+ },
+ "volunteered": {
+  "massShift": {
+   "gss_trust": {
+    "model": 0.08929683586553475,
+    "human": 0.10603246856159664,
+    "shift": -0.01673563269606189
+   },
+   "gss_fair": {
+    "model": 0.09912467432424465,
+    "human": 0.11654665733961378,
+    "shift": -0.017421983015369125
+   },
+   "gss_helpful": {
+    "model": 0.10270302256658148,
+    "human": 0.16356779219996787,
+    "shift": -0.060864769633386384
+   },
+   "gss_getahead": {
+    "model": 0.21108798398457493,
+    "human": 0.23532909874576352,
+    "shift": -0.024241114761188592
+   },
+   "gss_courts": {
+    "model": 0.3366394613045041,
+    "human": 0.2629450212305727,
+    "shift": 0.07369444007393144
+   },
+   "gss_divlaw": {
+    "model": 0.3262476447990471,
+    "human": 0.24359656423283532,
+    "shift": 0.08265108056621179
+   }
+  },
+  "excluding6_v1": {
+   "cells": {
+    "toplineMAE": 0.08686227556039988,
+    "sliceMAE": 0.09364139656618063
+   },
+   "naive": {
+    "toplineMAE": 0.08207587077908729,
+    "sliceMAE": 0.0915515976121516
+   }
+  },
+  "noVolunteeredArm": {}
+ },
+ "granularity": {
+  "1": {
+   "toplineMAE": null,
+   "medianSpearmanAge": null,
+   "nItems": 0
+  },
+  "8": {
+   "toplineMAE": null,
+   "medianSpearmanAge": null,
+   "nItems": 0
+  },
+  "40": {
+   "toplineMAE": null,
+   "medianSpearmanAge": null,
+   "nItems": 0
+  },
+  "149": {
+   "toplineMAE": 0.09779610548323195,
+   "medianSpearmanAge": 0.7999999999999999,
+   "nItems": 25
+  }
+ },
+ "pilotOverlap": {
+  "cells": {
+   "toplineMAE": 0.09081591219039635,
+   "sliceMAE": 0.09769011189603216,
+   "items": 59
+  },
+  "naive": {
+   "toplineMAE": 0.08782261255305616,
+   "sliceMAE": 0.09907284689309168,
+   "items": 59
+  },
+  "persona": {
+   "toplineMAE": 0.2229614674850905,
+   "sliceMAE": 0.23652481743411538,
+   "items": 59
+  }
+ },
+ "cost": {
+  "prices": {
+   "gpt-5-mini": {
+    "inPerM": 0.25,
+    "outPerM": 2.0
+   },
+   "gpt-5.2": {
+    "inPerM": 1.25,
+    "outPerM": 10.0
+   },
+   "claude-haiku-4-5-20251001": {
+    "inPerM": 1.0,
+    "outPerM": 5.0
+   }
+  },
+  "assumedTokensPerCall": {
+   "in": 224.2,
+   "out": 30.3
+  },
+  "cells": {
+   "callsPerItem": 149,
+   "usdPerItem": 0.0174
+  },
+  "naive": {
+   "callsPerItem": 9.7,
+   "usdPerItem": 0.0011
+  },
+  "persona": {
+   "callsPerItem": 150,
+   "usdPerItem": 0.0186
+  },
+  "note": "token averages from the registered v1 run's usage block; July 2026 list prices"
+ },
+ "personaNoiseFloor": {
+  "meanExpectedMAE": 0.028635878959813583,
+  "n": 150
+ },
+ "personaBySource": {
+  "gssToplineMAE": 0.22374856308969934,
+  "shedToplineMAE": 0.29024643569810304
+ },
+ "targetNoise": {
+  "deff": {
+   "gss2024": 1.5,
+   "shed2024": 1.2
+  },
+  "toplineExpectedMAEFloor": 0.009011642398591632,
+  "subgroupExpectedMAEFloor": 0.015731086479821806,
+  "subgroupExpectedMAEFloor_nMin100": 0.015666719471698367
+ },
+ "subgroupMAE_nMin100": {
+  "cells": 0.09847004130767169,
+  "naive": 0.09846348209866679
+ },
+ "frameCoverage": {
+  "detailedWeightShare": 0.8074275274286535,
+  "undetailedCells": 40,
+  "cells": 149
+ },
+ "dkRates": {
+  "mean": 0.3078794948113587,
+  "max": 0.7549875311720698,
+  "top5": [
+   [
+    0.7549875311720698,
+    "gss_courts"
+   ],
+   [
+    0.7359725685785536,
+    "gss_grass"
+   ],
+   [
+    0.7284912718204489,
+    "gss_fepol"
+   ],
+   [
+    0.7253740648379052,
+    "gss_divlaw"
+   ],
+   [
+    0.7141521197007481,
+    "gss_fair"
+   ]
+  ],
+  "note": "GSS rates exclude ballot nonassignment but conflate web-skip with DK"
+ },
+ "brfssInference": {
+  "brfss_genhlth": {
+   "cellsMinusConstMAE": 0.02616599304131202,
+   "ci95": [
+    0.015192690457503046,
+    0.03714521611365726
+   ],
+   "states": 49
+  },
+  "brfss_exerany": {
+   "cellsMinusConstMAE": 0.002607960805882285,
+   "ci95": [
+    -0.0071462424654745865,
+    0.013353773190171449
+   ],
+   "states": 49
+  },
+  "brfss_medcost": {
+   "cellsMinusConstMAE": -0.014943550179163243,
+   "ci95": [
+    -0.02244068180132215,
+    -0.006892615369212696
+   ],
+   "states": 49
+  },
+  "brfss_smoke100": {
+   "cellsMinusConstMAE": -0.0017775742468257962,
+   "ci95": [
+    -0.013941029199822623,
+    0.009973572099781223
+   ],
+   "states": 49
+  },
+  "pooled_cellsMinusConst": {
+   "mean": 0.0030132073553013165,
+   "ci95": [
+    -0.002564257461547596,
+    0.00870769341726937
+   ],
+   "n": 196
+  }
+ }
+}

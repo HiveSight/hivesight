@@ -29,3 +29,21 @@ jobs:
 
       - name: Build
         run: bun run build
+
+  reproduce-artifacts:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup uv
+        uses: astral-sh/setup-uv@v5
+        with:
+          python-version: "3.14"
+
+      - name: Regenerate analysis artifacts from committed inputs
+        run: |
+          uv run --with "numpy==2.3.4,scipy==1.16.3" python analysis/analyze_anchor.py
+          uv run --with "numpy==2.3.4,scipy==1.16.3" python analysis/analyze_anchor_v2.py
+
+      - name: Verify artifacts unchanged
+        run: git diff --exit-code paper/artifacts/anchor-analysis.json paper/artifacts/anchor-analysis-v2.json

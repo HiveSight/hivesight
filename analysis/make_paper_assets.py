@@ -154,6 +154,32 @@ def main():
         }
         s["brfss"] = b
 
+    # ---- Figure 5: contamination regression scatter (from analysis v2)
+    a2 = load("anchor-analysis-v2")
+    if a2 and a2.get("contamination"):
+        fig, ax = plt.subplots(figsize=(5.4, 3.0))
+        marks = {"cells": (INDIGO, "o"), "naive": (HONEY, "s")}
+        for arm, (color, m) in marks.items():
+            block = a2["contamination"].get(arm)
+            if not block or not block.get("points"):
+                continue
+            xs = [p[0] * 100 for p in block["points"]]
+            ys = [p[1] * 100 for p in block["points"]]
+            ax.scatter(xs, ys, s=14, color=color, marker=m, alpha=0.75,
+                       label=f"{arm} (slope {block['slope']:.2f})")
+            import numpy as _np
+            xr = _np.linspace(min(xs), max(xs), 10)
+            ax.plot(xr, block["intercept"] * 100 + block["slope"] * xr, color=color, lw=1.2)
+        xr_all = _np.linspace(-8, 8, 10)
+        ax.plot(xr_all, -xr_all, color=GRAY, lw=0.8, ls="--", label="pure recall (slope −1)")
+        ax.axhline(0, color=GRAY, lw=0.5)
+        ax.set_xlabel("Target movement since prior wave (pts)")
+        ax.set_ylabel("Signed error on 2024 target (pts)")
+        ax.legend(frameon=False, fontsize=8)
+        fig.tight_layout()
+        fig.savefig(os.path.join(FIG, "fig5-contamination.pdf"))
+        plt.close(fig)
+
     json.dump(s, open(os.path.join(ART, "summary.json"), "w"), indent=1)
     print("wrote summary.json and figures")
     print(json.dumps({k: v for k, v in s.items() if k in ("anchor", "ppi", "rf")}, indent=1)[:1200])

@@ -32,7 +32,7 @@ ROOT = os.path.join(os.path.dirname(__file__), "..")
 BANK = os.path.join(ROOT, "evals", "anchor-bank", "anchor-bank-v1.json")
 PRED_LOG = os.path.join(ROOT, "evals", "results", "anchor-cells-predictions.jsonl")
 US_TABLE = os.path.join(ROOT, "public", "data", "v1", "US.json")
-OUT = os.path.join(ROOT, "paper", "artifacts", "ppi.json")
+OUT = os.path.join(ROOT, "paper", "artifacts", "ppi-richer.json" if os.environ.get("PPI_RICHER_F") == "1" else "ppi.json")
 
 ANCHOR_N = 200
 REPLICATES = 500
@@ -75,31 +75,60 @@ def main():
     per_item = {}
     cov_ppi, cov_human, widths_ratio, cov_llm_asif = [], [], [], []
 
+    # RICHER_F: age x sex x tenure predictor for anchors that carry tenure
+    # (SHED and GSS both do). Registered as "richer predictor on SHED";
+    # household income is not a frame conditioning variable, so tenure is the
+    # richest shared covariate — deviation disclosed in the manuscript.
+    RICHER_F = os.environ.get("PPI_RICHER_F") == "1"
+
     for item_id, item in items.items():
         if item_id not in preds:
             continue
         pos = item["positiveOptions"]
         cell_pred = preds[item_id]
 
-        # f per age x sex group: microdata-weighted mean of cell positive shares.
+        # f per group: microdata-weighted mean of cell positive shares.
+        def group_of_cell(cell):
+            base = (cell["age"], cell["sex"])
+            if RICHER_F:
+                return base + (cell.get("tenure"),)  # None for undetailed cells
+            return base
+
         group_f, group_w = {}, {}
         for idx, cell in enumerate(cells):
             if idx not in cell_pred:
                 continue
             share = sum(cell_pred[idx][oi] for oi in pos)
-            g = (cell["age"], cell["sex"])
+            g = group_of_cell(cell)
             group_f[g] = group_f.get(g, 0.0) + cell["weight"] * share
             group_w[g] = group_w.get(g, 0.0) + cell["weight"]
         group_f = {g: group_f[g] / group_w[g] for g in group_f}
+        if RICHER_F:
+            # fallback for respondents whose tenure cell has no detailed match
+            base_f, base_w = {}, {}
+            for g, fv in group_f.items():
+                base = g[:2]
+                base_f[base] = base_f.get(base, 0.0) + group_w[g] * fv
+                base_w[base] = base_w.get(base, 0.0) + group_w[g]
+            base_f = {g: base_f[g] / base_w[g] for g in base_f}
 
         df = frames[item["source"]]
         sub = df[df["itemId"] == item_id].copy()
         sub["y"] = sub["opt"].isin(pos).astype(float)
-        sub["g"] = list(zip(sub["age"].apply(age_band), sub["sex"]))
-        sub = sub[sub["g"].isin(group_f)].reset_index(drop=True)
+        if RICHER_F:
+            lookup = {**base_f, **group_f}
+            keys = [
+                (g3 if g3 in group_f else g3[:2])
+                for g3 in zip(sub["age"].apply(age_band), sub["sex"], sub["tenure"])
+            ]
+        else:
+            lookup = group_f
+            keys = list(zip(sub["age"].apply(age_band), sub["sex"]))
+        fvals = [lookup.get(k) for k in keys]
+        sub["f"] = fvals
+        sub = sub[sub["f"].notna()].reset_index(drop=True)
         if len(sub) < 600:
             continue
-        sub["f"] = sub["g"].map(group_f)
         w_full = sub["weight"].values
         theta_true = float(np.average(sub["y"], weights=w_full))
 
@@ -151,7 +180,7 @@ def main():
         "anchorN": ANCHOR_N,
         "replicates": REPLICATES,
         "model": MODEL,
-        "granularity": "age_band x sex groups from cell predictions",
+        "granularity": ("age_band x sex x tenure" if os.environ.get("PPI_RICHER_F") == "1" else "age_band x sex") + " groups from cell predictions",
         "pooled": {
             "items": len(per_item),
             "meanCoveragePPI": float(np.mean(cov_ppi)),

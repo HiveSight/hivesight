@@ -1,0 +1,647 @@
+{
+ "version": "ppi-v1",
+ "anchorN": 200,
+ "replicates": 500,
+ "model": "gpt-5-mini",
+ "granularity": "age_band x sex x tenure groups from cell predictions",
+ "pooled": {
+  "items": 63,
+  "meanCoveragePPI": 0.9463809523809522,
+  "meanCoverageHuman": 0.9486349206349206,
+  "medianWidthRatio": 1.0010924741507936,
+  "shareItemsPPINarrower": 0.4444444444444444,
+  "meanLlmRawAbsError": 0.0892980812222908
+ },
+ "items": {
+  "gss_happy": {
+   "thetaTrue": 0.23571099798984876,
+   "llmRaw": 0.2921393370408504,
+   "llmRawAbsError": 0.056428339051001614,
+   "coveragePPI": 0.932,
+   "coverageHuman": 0.94,
+   "medianWidthPPI": 0.11853131846422892,
+   "medianWidthHuman": 0.11782139963120142,
+   "widthRatio": 1.0060253810873887
+  },
+  "gss_health": {
+   "thetaTrue": 0.722134409147569,
+   "llmRaw": 0.616160027471097,
+   "llmRawAbsError": 0.105974381676472,
+   "coveragePPI": 0.946,
+   "coverageHuman": 0.936,
+   "medianWidthPPI": 0.1254856722248805,
+   "medianWidthHuman": 0.12476845368592127,
+   "widthRatio": 1.005748396471793
+  },
+  "gss_satfin": {
+   "thetaTrue": 0.23004958151489258,
+   "llmRaw": 0.36324584864460985,
+   "llmRawAbsError": 0.13319626712971727,
+   "coveragePPI": 0.958,
+   "coverageHuman": 0.952,
+   "medianWidthPPI": 0.11387473504195582,
+   "medianWidthHuman": 0.1160383752153272,
+   "widthRatio": 0.9813540979925269
+  },
+  "gss_finrela": {
+   "thetaTrue": 0.276959281197759,
+   "llmRaw": 0.2314615565870179,
+   "llmRawAbsError": 0.045497724610741086,
+   "coveragePPI": 0.954,
+   "coverageHuman": 0.954,
+   "medianWidthPPI": 0.12305092050272343,
+   "medianWidthHuman": 0.12407802699881876,
+   "widthRatio": 0.9917220919695547
+  },
+  "gss_getahead": {
+   "thetaTrue": 0.6480873414159972,
+   "llmRaw": 0.4267028110726076,
+   "llmRawAbsError": 0.22138453034338962,
+   "coveragePPI": 0.964,
+   "coverageHuman": 0.966,
+   "medianWidthPPI": 0.13459937252559673,
+   "medianWidthHuman": 0.13254099583860635,
+   "widthRatio": 1.0155301133356267
+  },
+  "gss_class": {
+   "thetaTrue": 0.49672919603464366,
+   "llmRaw": 0.44572147329990464,
+   "llmRawAbsError": 0.051007722734739025,
+   "coveragePPI": 0.962,
+   "coverageHuman": 0.962,
+   "medianWidthPPI": 0.13538053324055768,
+   "medianWidthHuman": 0.138829519112055,
+   "widthRatio": 0.9751566821411123
+  },
+  "gss_fear": {
+   "thetaTrue": 0.3308113220945936,
+   "llmRaw": 0.38631321735751345,
+   "llmRawAbsError": 0.055501895262919876,
+   "coveragePPI": 0.946,
+   "coverageHuman": 0.954,
+   "medianWidthPPI": 0.1278523641704577,
+   "medianWidthHuman": 0.13066338354334384,
+   "widthRatio": 0.978486556090493
+  },
+  "gss_cappun": {
+   "thetaTrue": 0.6207554036932019,
+   "llmRaw": 0.6055153747942441,
+   "llmRawAbsError": 0.015240028898957814,
+   "coveragePPI": 0.958,
+   "coverageHuman": 0.964,
+   "medianWidthPPI": 0.13437873272724576,
+   "medianWidthHuman": 0.13487988030300424,
+   "widthRatio": 0.9962844897650216
+  },
+  "gss_gunlaw": {
+   "thetaTrue": 0.6888058651328657,
+   "llmRaw": 0.6354349314287465,
+   "llmRawAbsError": 0.05337093370411916,
+   "coveragePPI": 0.94,
+   "coverageHuman": 0.936,
+   "medianWidthPPI": 0.12867449073943493,
+   "medianWidthHuman": 0.12851828487705053,
+   "widthRatio": 1.0012154368737012
+  },
+  "gss_grass": {
+   "thetaTrue": 0.6681332268321726,
+   "llmRaw": 0.5978714885725767,
+   "llmRawAbsError": 0.07026173825959592,
+   "coveragePPI": 0.938,
+   "coverageHuman": 0.94,
+   "medianWidthPPI": 0.13059939359299266,
+   "medianWidthHuman": 0.13066338354334373,
+   "widthRatio": 0.9995102686872498
+  },
+  "gss_courts": {
+   "thetaTrue": 0.6001262874319762,
+   "llmRaw": 0.33511431992384116,
+   "llmRawAbsError": 0.265011967508135,
+   "coveragePPI": 0.962,
+   "coverageHuman": 0.966,
+   "medianWidthPPI": 0.13836072211940287,
+   "medianWidthHuman": 0.13613354365674435,
+   "widthRatio": 1.0163602474660784
+  },
+  "gss_trust": {
+   "thetaTrue": 0.24497382064314163,
+   "llmRaw": 0.3264837119737109,
+   "llmRawAbsError": 0.08150989133056927,
+   "coveragePPI": 0.954,
+   "coverageHuman": 0.95,
+   "medianWidthPPI": 0.12061372569437263,
+   "medianWidthHuman": 0.11951324730508761,
+   "widthRatio": 1.0092080034146824
+  },
+  "gss_fair": {
+   "thetaTrue": 0.4169293913852248,
+   "llmRaw": 0.4609530107018283,
+   "llmRawAbsError": 0.044023619316603535,
+   "coveragePPI": 0.944,
+   "coverageHuman": 0.948,
+   "medianWidthPPI": 0.1359130117701331,
+   "medianWidthHuman": 0.13715074492750978,
+   "widthRatio": 0.9909753814459347
+  },
+  "gss_helpful": {
+   "thetaTrue": 0.378785406291447,
+   "llmRaw": 0.4810996616798927,
+   "llmRawAbsError": 0.10231425538844569,
+   "coveragePPI": 0.942,
+   "coverageHuman": 0.942,
+   "medianWidthPPI": 0.1352980660135416,
+   "medianWidthHuman": 0.13487988030300424,
+   "widthRatio": 1.0031004306172122
+  },
+  "gss_satjob": {
+   "thetaTrue": 0.4516679121384121,
+   "llmRaw": 0.22734816742632172,
+   "llmRawAbsError": 0.2243197447120904,
+   "coveragePPI": 0.952,
+   "coverageHuman": 0.96,
+   "medianWidthPPI": 0.13758288336782543,
+   "medianWidthHuman": 0.1382442671033221,
+   "widthRatio": 0.9952158324583372
+  },
+  "gss_spanking": {
+   "thetaTrue": 0.541919479058689,
+   "llmRaw": 0.516399180885895,
+   "llmRawAbsError": 0.025520298172793998,
+   "coveragePPI": 0.948,
+   "coverageHuman": 0.948,
+   "medianWidthPPI": 0.13852111399877284,
+   "medianWidthHuman": 0.1384953922278344,
+   "widthRatio": 1.0001857229365156
+  },
+  "gss_sexeduc": {
+   "thetaTrue": 0.8659995956930552,
+   "llmRaw": 0.7490936757157227,
+   "llmRawAbsError": 0.11690591997733246,
+   "coveragePPI": 0.944,
+   "coverageHuman": 0.944,
+   "medianWidthPPI": 0.09373257541254376,
+   "medianWidthHuman": 0.09345248006420559,
+   "widthRatio": 1.0029971954531944
+  },
+  "gss_divlaw": {
+   "thetaTrue": 0.5122708062599522,
+   "llmRaw": 0.4071800908721104,
+   "llmRawAbsError": 0.10509071538784187,
+   "coveragePPI": 0.942,
+   "coverageHuman": 0.96,
+   "medianWidthPPI": 0.13520608237052234,
+   "medianWidthHuman": 0.13876693160307557,
+   "widthRatio": 0.9743393531051147
+  },
+  "gss_fepol": {
+   "thetaTrue": 0.8180509765270831,
+   "llmRaw": 0.7781889157659952,
+   "llmRawAbsError": 0.03986206076108789,
+   "coveragePPI": 0.944,
+   "coverageHuman": 0.936,
+   "medianWidthPPI": 0.10808052253486466,
+   "medianWidthHuman": 0.10790068390858187,
+   "widthRatio": 1.0016667051567083
+  },
+  "gss_fefam": {
+   "thetaTrue": 0.6801311454547548,
+   "llmRaw": 0.5581271406480119,
+   "llmRawAbsError": 0.1220040048067429,
+   "coveragePPI": 0.958,
+   "coverageHuman": 0.958,
+   "medianWidthPPI": 0.13289443816131863,
+   "medianWidthHuman": 0.12962506116647377,
+   "widthRatio": 1.0252217971233673
+  },
+  "gss_fechld": {
+   "thetaTrue": 0.7461410677083893,
+   "llmRaw": 0.641326383604291,
+   "llmRawAbsError": 0.10481468410409833,
+   "coveragePPI": 0.954,
+   "coverageHuman": 0.96,
+   "medianWidthPPI": 0.12013363507296515,
+   "medianWidthHuman": 0.12111773913704105,
+   "widthRatio": 0.9918748147786807
+  },
+  "gss_fepresch": {
+   "thetaTrue": 0.6782060192559991,
+   "llmRaw": 0.6213825754482812,
+   "llmRawAbsError": 0.056823443807717866,
+   "coveragePPI": 0.948,
+   "coverageHuman": 0.946,
+   "medianWidthPPI": 0.12867959838947496,
+   "medianWidthHuman": 0.12962506116647377,
+   "widthRatio": 0.9927061729538197
+  },
+  "gss_helppoor": {
+   "thetaTrue": 0.3858119089027311,
+   "llmRaw": 0.5280415243762346,
+   "llmRawAbsError": 0.14222961547350355,
+   "coveragePPI": 0.924,
+   "coverageHuman": 0.924,
+   "medianWidthPPI": 0.1347187948141254,
+   "medianWidthHuman": 0.13521580294785873,
+   "widthRatio": 0.9963243339691221
+  },
+  "gss_helpsick": {
+   "thetaTrue": 0.5323356778361006,
+   "llmRaw": 0.5918572827180372,
+   "llmRawAbsError": 0.059521604881936585,
+   "coveragePPI": 0.958,
+   "coverageHuman": 0.964,
+   "medianWidthPPI": 0.13872797477631682,
+   "medianWidthHuman": 0.13859989340638512,
+   "widthRatio": 1.000924108718873
+  },
+  "gss_helpnot": {
+   "thetaTrue": 0.3274184813732498,
+   "llmRaw": 0.497938086566527,
+   "llmRawAbsError": 0.1705196051932772,
+   "coveragePPI": 0.938,
+   "coverageHuman": 0.944,
+   "medianWidthPPI": 0.12928431010430297,
+   "medianWidthHuman": 0.13066338354334384,
+   "widthRatio": 0.9894456013487252
+  },
+  "gss_eqwlth": {
+   "thetaTrue": 0.5294947252374697,
+   "llmRaw": 0.5373359866712182,
+   "llmRawAbsError": 0.007841261433748525,
+   "coveragePPI": 0.94,
+   "coverageHuman": 0.938,
+   "medianWidthPPI": 0.13630740321564386,
+   "medianWidthHuman": 0.13859989340638507,
+   "widthRatio": 0.9834596540127238
+  },
+  "gss_polviews": {
+   "thetaTrue": 0.27710760134231815,
+   "llmRaw": 0.31589809209067066,
+   "llmRawAbsError": 0.0387904907483525,
+   "coveragePPI": 0.944,
+   "coverageHuman": 0.954,
+   "medianWidthPPI": 0.12659039436350394,
+   "medianWidthHuman": 0.12407802699881876,
+   "widthRatio": 1.0202482859008477
+  },
+  "gss_confinan": {
+   "thetaTrue": 0.17348825786830913,
+   "llmRaw": 0.224873641416552,
+   "llmRawAbsError": 0.051385383548242874,
+   "coveragePPI": 0.944,
+   "coverageHuman": 0.956,
+   "medianWidthPPI": 0.1067310001575284,
+   "medianWidthHuman": 0.10558580306577786,
+   "widthRatio": 1.0108461275900615
+  },
+  "gss_conbus": {
+   "thetaTrue": 0.1509937994566376,
+   "llmRaw": 0.15184129369700153,
+   "llmRawAbsError": 0.0008474942403639274,
+   "coveragePPI": 0.936,
+   "coverageHuman": 0.936,
+   "medianWidthPPI": 0.09958920158672063,
+   "medianWidthHuman": 0.09922351804216234,
+   "widthRatio": 1.0036854523178962
+  },
+  "gss_coneduc": {
+   "thetaTrue": 0.19936723699270695,
+   "llmRaw": 0.20751961722936396,
+   "llmRawAbsError": 0.008152380236657014,
+   "coveragePPI": 0.934,
+   "coverageHuman": 0.942,
+   "medianWidthPPI": 0.11186050800814068,
+   "medianWidthHuman": 0.11115257294530712,
+   "widthRatio": 1.006369038917182
+  },
+  "gss_conpress": {
+   "thetaTrue": 0.07747643153696988,
+   "llmRaw": 0.08867221946856985,
+   "llmRawAbsError": 0.011195787931599963,
+   "coveragePPI": 0.954,
+   "coverageHuman": 0.954,
+   "medianWidthPPI": 0.07489912731334189,
+   "medianWidthHuman": 0.07538734281884743,
+   "widthRatio": 0.9935239061724367
+  },
+  "gss_conmedic": {
+   "thetaTrue": 0.2650772326196418,
+   "llmRaw": 0.35571113622620226,
+   "llmRawAbsError": 0.09063390360656048,
+   "coveragePPI": 0.942,
+   "coverageHuman": 0.948,
+   "medianWidthPPI": 0.12288957781873476,
+   "medianWidthHuman": 0.12263830383627783,
+   "widthRatio": 1.0020489029495416
+  },
+  "gss_conarmy": {
+   "thetaTrue": 0.4343373345309055,
+   "llmRaw": 0.46715375480727067,
+   "llmRawAbsError": 0.032816420276365166,
+   "coveragePPI": 0.952,
+   "coverageHuman": 0.95,
+   "medianWidthPPI": 0.13816615176722094,
+   "medianWidthHuman": 0.13776166440960458,
+   "widthRatio": 1.0029361387244402
+  },
+  "gss_confed": {
+   "thetaTrue": 0.12268108793447538,
+   "llmRaw": 0.11646054670416447,
+   "llmRawAbsError": 0.006220541230310905,
+   "coveragePPI": 0.948,
+   "coverageHuman": 0.96,
+   "medianWidthPPI": 0.091911320809445,
+   "medianWidthHuman": 0.09190064549945275,
+   "widthRatio": 1.0001161614255725
+  },
+  "gss_conjudge": {
+   "thetaTrue": 0.18522179344438738,
+   "llmRaw": 0.13199439673931082,
+   "llmRawAbsError": 0.05322739670507656,
+   "coveragePPI": 0.944,
+   "coverageHuman": 0.942,
+   "medianWidthPPI": 0.10861245160961053,
+   "medianWidthHuman": 0.10790068390858187,
+   "widthRatio": 1.0065965077814678
+  },
+  "gss_consci": {
+   "thetaTrue": 0.36941002061453304,
+   "llmRaw": 0.2971312268251967,
+   "llmRawAbsError": 0.07227879378933633,
+   "coveragePPI": 0.958,
+   "coverageHuman": 0.95,
+   "medianWidthPPI": 0.1351238480090669,
+   "medianWidthHuman": 0.13416235270902976,
+   "widthRatio": 1.0071666550311802
+  },
+  "gss_conlegis": {
+   "thetaTrue": 0.05701560800281394,
+   "llmRaw": 0.06138350361530324,
+   "llmRawAbsError": 0.004367895612489299,
+   "coveragePPI": 0.922,
+   "coverageHuman": 0.922,
+   "medianWidthPPI": 0.06345190905941449,
+   "medianWidthHuman": 0.06335148183946672,
+   "widthRatio": 1.0015852386879007
+  },
+  "gss_natspac": {
+   "thetaTrue": 0.19811769007771377,
+   "llmRaw": 0.25458227969809094,
+   "llmRawAbsError": 0.056464589620377176,
+   "coveragePPI": 0.95,
+   "coverageHuman": 0.956,
+   "medianWidthPPI": 0.11308546090068236,
+   "medianWidthHuman": 0.11115257294530712,
+   "widthRatio": 1.017389502592318
+  },
+  "gss_natenvir": {
+   "thetaTrue": 0.6626658579279323,
+   "llmRaw": 0.495323831879504,
+   "llmRawAbsError": 0.1673420260484283,
+   "coveragePPI": 0.942,
+   "coverageHuman": 0.942,
+   "medianWidthPPI": 0.12965293617624474,
+   "medianWidthHuman": 0.13115738675538835,
+   "widthRatio": 0.9885294254760546
+  },
+  "gss_natheal": {
+   "thetaTrue": 0.7359303518234778,
+   "llmRaw": 0.574737661599957,
+   "llmRawAbsError": 0.16119269022352078,
+   "coveragePPI": 0.946,
+   "coverageHuman": 0.952,
+   "medianWidthPPI": 0.12225406227437907,
+   "medianWidthHuman": 0.12188831200330519,
+   "widthRatio": 1.0030007001086696
+  },
+  "gss_natcity": {
+   "thetaTrue": 0.5706019680265717,
+   "llmRaw": 0.42737188487329253,
+   "llmRawAbsError": 0.14323008315327918,
+   "coveragePPI": 0.93,
+   "coverageHuman": 0.934,
+   "medianWidthPPI": 0.1393455153938263,
+   "medianWidthHuman": 0.13736874045528458,
+   "widthRatio": 1.0143902821849429
+  },
+  "gss_natcrime": {
+   "thetaTrue": 0.6894137904641083,
+   "llmRaw": 0.5213770075974405,
+   "llmRawAbsError": 0.1680367828666678,
+   "coveragePPI": 0.956,
+   "coverageHuman": 0.954,
+   "medianWidthPPI": 0.13147406669711625,
+   "medianWidthHuman": 0.12851828487705053,
+   "widthRatio": 1.0229989205263161
+  },
+  "gss_natdrug": {
+   "thetaTrue": 0.6805598149853732,
+   "llmRaw": 0.5402133574451726,
+   "llmRawAbsError": 0.1403464575402006,
+   "coveragePPI": 0.94,
+   "coverageHuman": 0.94,
+   "medianWidthPPI": 0.13054369504168384,
+   "medianWidthHuman": 0.12962506116647377,
+   "widthRatio": 1.0070868539381463
+  },
+  "gss_nateduc": {
+   "thetaTrue": 0.7606018727402932,
+   "llmRaw": 0.578502273623483,
+   "llmRawAbsError": 0.18209959911681017,
+   "coveragePPI": 0.95,
+   "coverageHuman": 0.95,
+   "medianWidthPPI": 0.11882710642637806,
+   "medianWidthHuman": 0.11867847192516612,
+   "widthRatio": 1.001252413338332
+  },
+  "gss_natarms": {
+   "thetaTrue": 0.30212815875892907,
+   "llmRaw": 0.37911053546647977,
+   "llmRawAbsError": 0.0769823767075507,
+   "coveragePPI": 0.938,
+   "coverageHuman": 0.94,
+   "medianWidthPPI": 0.13079185370407864,
+   "medianWidthHuman": 0.12793867563648642,
+   "widthRatio": 1.022301138052257
+  },
+  "gss_nataid": {
+   "thetaTrue": 0.09572104904333942,
+   "llmRaw": 0.21133523354008277,
+   "llmRawAbsError": 0.11561418449674335,
+   "coveragePPI": 0.96,
+   "coverageHuman": 0.944,
+   "medianWidthPPI": 0.08081993728757197,
+   "medianWidthHuman": 0.08147898702508005,
+   "widthRatio": 0.9919114146902045
+  },
+  "gss_natfare": {
+   "thetaTrue": 0.33650653406672265,
+   "llmRaw": 0.3394331394532417,
+   "llmRawAbsError": 0.0029266053865190655,
+   "coveragePPI": 0.94,
+   "coverageHuman": 0.94,
+   "medianWidthPPI": 0.13053417458091704,
+   "medianWidthHuman": 0.13115738675538835,
+   "widthRatio": 0.995248363894032
+  },
+  "gss_natroad": {
+   "thetaTrue": 0.5236812357579186,
+   "llmRaw": 0.5182681027826469,
+   "llmRawAbsError": 0.005413132975271684,
+   "coveragePPI": 0.952,
+   "coverageHuman": 0.96,
+   "medianWidthPPI": 0.14028415046902665,
+   "medianWidthHuman": 0.13869039740248157,
+   "widthRatio": 1.011491444947843
+  },
+  "gss_natsoc": {
+   "thetaTrue": 0.6126793698491309,
+   "llmRaw": 0.4332208002728815,
+   "llmRawAbsError": 0.17945856957624934,
+   "coveragePPI": 0.954,
+   "coverageHuman": 0.948,
+   "medianWidthPPI": 0.13643643164436947,
+   "medianWidthHuman": 0.13521580294785873,
+   "widthRatio": 1.0090272636030675
+  },
+  "gss_natchld": {
+   "thetaTrue": 0.6267657720465012,
+   "llmRaw": 0.5257950060986027,
+   "llmRawAbsError": 0.10097076594789844,
+   "coveragePPI": 0.956,
+   "coverageHuman": 0.958,
+   "medianWidthPPI": 0.13656576063523707,
+   "medianWidthHuman": 0.13416235270902965,
+   "widthRatio": 1.017914175457402
+  },
+  "gss_natsci": {
+   "thetaTrue": 0.4019043653096325,
+   "llmRaw": 0.5452889712122165,
+   "llmRawAbsError": 0.143384605902584,
+   "coveragePPI": 0.944,
+   "coverageHuman": 0.948,
+   "medianWidthPPI": 0.13786534270892964,
+   "medianWidthHuman": 0.13613354365674435,
+   "widthRatio": 1.0127213249994576
+  },
+  "gss_natenrgy": {
+   "thetaTrue": 0.48556563293014304,
+   "llmRaw": 0.5626484471615506,
+   "llmRawAbsError": 0.07708281423140756,
+   "coveragePPI": 0.938,
+   "coverageHuman": 0.926,
+   "medianWidthPPI": 0.1406127980008896,
+   "medianWidthHuman": 0.13876693160307557,
+   "widthRatio": 1.0133019183784642
+  },
+  "shed_b2": {
+   "thetaTrue": 0.728667221278241,
+   "llmRaw": 0.5388736757388666,
+   "llmRawAbsError": 0.18979354553937444,
+   "coveragePPI": 0.96,
+   "coverageHuman": 0.958,
+   "medianWidthPPI": 0.11904412196164371,
+   "medianWidthHuman": 0.12336808999145887,
+   "widthRatio": 0.9649506770339517
+  },
+  "shed_b3": {
+   "thetaTrue": 0.23068886895806637,
+   "llmRaw": 0.21232621982044209,
+   "llmRawAbsError": 0.018362649137624282,
+   "coveragePPI": 0.938,
+   "coverageHuman": 0.934,
+   "medianWidthPPI": 0.11706929578733911,
+   "medianWidthHuman": 0.11694154017754116,
+   "widthRatio": 1.0010924741507936
+  },
+  "shed_400cash": {
+   "thetaTrue": 0.6273650319733974,
+   "llmRaw": 0.6037943311349293,
+   "llmRawAbsError": 0.023570700838468128,
+   "coveragePPI": 0.936,
+   "coverageHuman": 0.942,
+   "medianWidthPPI": 0.12932487022696115,
+   "medianWidthHuman": 0.13416235270902965,
+   "widthRatio": 0.9639430705828482
+  },
+  "shed_ef1": {
+   "thetaTrue": 0.5504060066444075,
+   "llmRaw": 0.3981789591031412,
+   "llmRawAbsError": 0.1522270475412663,
+   "coveragePPI": 0.942,
+   "coverageHuman": 0.946,
+   "medianWidthPPI": 0.13189401306609186,
+   "medianWidthHuman": 0.13824426710332216,
+   "widthRatio": 0.9540649737577602
+  },
+  "shed_ef2": {
+   "thetaTrue": 0.3323190077574487,
+   "llmRaw": 0.42170466031373993,
+   "llmRawAbsError": 0.08938565255629122,
+   "coveragePPI": 0.958,
+   "coverageHuman": 0.958,
+   "medianWidthPPI": 0.1283920211433764,
+   "medianWidthHuman": 0.13115738675538835,
+   "widthRatio": 0.9789156700935996
+  },
+  "shed_ef7": {
+   "thetaTrue": 0.48258037399876136,
+   "llmRaw": 0.2513409585632205,
+   "llmRawAbsError": 0.23123941543554088,
+   "coveragePPI": 0.934,
+   "coverageHuman": 0.946,
+   "medianWidthPPI": 0.13395038107663804,
+   "medianWidthHuman": 0.13876693160307552,
+   "widthRatio": 0.9652903579347377
+  },
+  "shed_bk1": {
+   "thetaTrue": 0.9351636952187411,
+   "llmRaw": 0.902052752112451,
+   "llmRawAbsError": 0.03311094310629015,
+   "coveragePPI": 0.956,
+   "coverageHuman": 0.96,
+   "medianWidthPPI": 0.06742520089946269,
+   "medianWidthHuman": 0.06850495928935496,
+   "widthRatio": 0.9842382449228014
+  },
+  "shed_bnpl": {
+   "thetaTrue": 0.14683266602527706,
+   "llmRaw": 0.22637052526392487,
+   "llmRawAbsError": 0.07953785923864781,
+   "coveragePPI": 0.95,
+   "coverageHuman": 0.956,
+   "medianWidthPPI": 0.09859769842949995,
+   "medianWidthHuman": 0.09922351804216234,
+   "widthRatio": 0.9936928298349947
+  },
+  "shed_work": {
+   "thetaTrue": 0.5959693016605033,
+   "llmRaw": 0.5182845968477854,
+   "llmRawAbsError": 0.07768470481271794,
+   "coveragePPI": 0.952,
+   "coverageHuman": 0.972,
+   "medianWidthPPI": 0.12396676471516943,
+   "medianWidthHuman": 0.13613354365674435,
+   "widthRatio": 0.9106261497735415
+  },
+  "shed_i41d": {
+   "thetaTrue": 0.03155180225228994,
+   "llmRaw": 0.07387271181467511,
+   "llmRawAbsError": 0.04232090956238517,
+   "coveragePPI": 0.928,
+   "coverageHuman": 0.952,
+   "medianWidthPPI": 0.0464221853788305,
+   "medianWidthHuman": 0.04740302134000324,
+   "widthRatio": 0.9793085771023415
+  },
+  "shed_housing_stress": {
+   "thetaTrue": 0.18737877157451172,
+   "llmRaw": 0.30928643516378473,
+   "llmRawAbsError": 0.12190766358927302,
+   "coveragePPI": 0.944,
+   "coverageHuman": 0.942,
+   "medianWidthPPI": 0.09709011481602017,
+   "medianWidthHuman": 0.1090131373762035,
+   "widthRatio": 0.8906276541786238
+  }
+ }
+}
