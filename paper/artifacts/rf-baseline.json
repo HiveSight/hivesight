@@ -1,0 +1,3226 @@
+{
+ "version": "rf-baseline-v1",
+ "model": "HistGradientBoostingClassifier(max_depth=4)",
+ "seed": 20260707,
+ "pooled": {
+  "toplineMAE": 0.01014821580036343,
+  "sliceMAE": 0.017189708472248273,
+  "items": 63
+ },
+ "items": {
+  "gss_happy": {
+   "toplineEstimate": 0.2371860544514847,
+   "toplineHuman": 0.23616882990397142,
+   "toplineAbsError": 0.001017224547513268,
+   "sliceMAE": 0.006456034085832719,
+   "slices": {
+    "age_band": {
+     "18-29": {
+      "estimate": 0.19639478699926008,
+      "absError": 0.00041306573439969796
+     },
+     "30-44": {
+      "estimate": 0.23320689585720347,
+      "absError": 0.007144126807874102
+     },
+     "45-64": {
+      "estimate": 0.22827083698812983,
+      "absError": 0.0002036211703836388
+     },
+     "65+": {
+      "estimate": 0.2902754334807322,
+      "absError": 0.01110017009527603
+     }
+    },
+    "sex": {
+     "men": {
+      "estimate": 0.23556593872751064,
+      "absError": 0.0019860776180886663
+     },
+     "women": {
+      "estimate": 0.23931024119049207,
+      "absError": 0.0015516551647645482
+     }
+    },
+    "tenure": {
+     "homeowners": {
+      "estimate": 0.267975947300728,
+      "absError": 0.018566740536074572
+     },
+     "renters or other housing": {
+      "estimate": 0.220760268083058,
+      "absError": 0.010682815559800496
+     }
+    }
+   },
+   "nTrain": 2546,
+   "nTest": 637
+  },
+  "gss_health": {
+   "toplineEstimate": 0.7194808171934497,
+   "toplineHuman": 0.7222509749087858,
+   "toplineAbsError": 0.0027701577153360635,
+   "sliceMAE": 0.010458047585675118,
+   "slices": {
+    "age_band": {
+     "18-29": {
+      "estimate": 0.7971585915838086,
+      "absError": 0.003085671125609979
+     },
+     "30-44": {
+      "estimate": 0.7206363156108914,
+      "absError": 0.01597174978405469
+     },
+     "45-64": {
+      "estimate": 0.6761469733761656,
+      "absError": 0.019060517591619197
+     },
+     "65+": {
+      "estimate": 0.7082396085857879,
+      "absError": 0.008239123495731193
+     }
+    },
+    "sex": {
+     "men": {
+      "estimate": 0.6975938570016069,
+      "absError": 0.019402283635130302
+     },
+     "women": {
+      "estimate": 0.7378509320480412,
+      "absError": 0.010786491708197676
+     }
+    },
+    "tenure": {
+     "homeowners": {
+      "estimate": 0.7592347441490049,
+      "absError": 0.005324705742513203
+     },
+     "renters or other housing": {
+      "estimate": 0.6339066613615933,
+      "absError": 0.0017938376025447011
+     }
+    }
+   },
+   "nTrain": 2558,
+   "nTest": 640
+  },
+  "gss_satfin": {
+   "toplineEstimate": 0.22985799784586536,
+   "toplineHuman": 0.2296470345555679,
+   "toplineAbsError": 0.0002109632902974612,
+   "sliceMAE": 0.006253200464903751,
+   "slices": {
+    "age_band": {
+     "18-29": {
+      "estimate": 0.17184295728245239,
+      "absError": 0.005345150136405269
+     },
+     "30-44": {
+      "estimate": 0.19078545605903122,
+      "absError": 0.005758262963437066
+     },
+     "45-64": {
+      "estimate": 0.22102248894951596,
+      "absError": 0.0003419367259493711
+     },
+     "65+": {
+      "estimate": 0.3385590890866449,
+      "absError": 0.012375102214497113
+     }
+    },
+    "sex": {
+     "men": {
+      "estimate": 0.2420423733028926,
+      "absError": 0.0036849903274277507
+     },
+     "women": {
+      "estimate": 0.21712523024508973,
+      "absError": 0.005027333399055839
+     }
+    },
+    "tenure": {
+     "homeowners": {
+      "estimate": 0.2968800069051584,
+      "absError": 0.01515458733052838
+     },
+     "renters or other housing": {
+      "estimate": 0.11040661668377601,
+      "absError": 0.0023382406219292218
+     }
+    }
+   },
+   "nTrain": 2553,
+   "nTest": 639
+  },
+  "gss_finrela": {
+   "toplineEstimate": 0.2845134745528495,
+   "toplineHuman": 0.2762397603543203,
+   "toplineAbsError": 0.00827371419852918,
+   "sliceMAE": 0.014677836016528403,
+   "slices": {
+    "age_band": {
+     "18-29": {
+      "estimate": 0.2445645198719634,
+      "absError": 0.04753930740958617
+     },
+     "30-44": {
+      "estimate": 0.29904150093678933,
+      "absError": 0.010378088139294028
+     },
+     "45-64": {
+      "estimate": 0.30434974463383135,
+      "absError": 0.005867562492187006
+     },
+     "65+": {
+      "estimate": 0.2797487091054865,
+      "absError": 0.0022385771078620165
+     }
+    },
+    "sex": {
+     "men": {
+      "estimate": 0.330283127074013,
+      "absError": 0.0209238134822034
+     },
+     "women": {
+      "estimate": 0.23351845455849254,
+      "absError": 0.01215776578742886
+     }
+    },
+    "tenure": {
+     "homeowners": {
+      "estimate": 0.37283773699273304,
+      "absError": 0.01732731319631675
+     },
+     "renters or other housing": {
+      "estimate": 0.15630293584450455,
+      "absError": 0.0009902605173489898
+     }
+    }
+   },
+   "nTrain": 2541,
+   "nTest": 636
+  },
+  "gss_getahead": {
+   "toplineEstimate": 0.6655350994400837,
+   "toplineHuman": 0.6484153900605167,
+   "toplineAbsError": 0.017119709379566972,
+   "sliceMAE": 0.0403682141389517,
+   "slices": {
+    "age_band": {
+     "18-29": {
+      "estimate": 0.7335672096548588,
+      "absError": 0.11517014865168052
+     },
+     "30-44": {
+      "estimate": 0.6416646520397142,
+      "absError": 0.03193854902163906
+     },
+     "45-64": {
+      "estimate": 0.6571354541251075,
+      "absError": 0.020532754518433616
+     },
+     "65+": {
+      "estimate": 0.6356526885094178,
+      "absError": 0.03226291778776236
+     }
+    },
+    "sex": {
+     "men": {
+      "estimate": 0.6255726613244371,
+      "absError": 0.027232826017960288
+     },
+     "women": {
+      "estimate": 0.7089141367021291,
+      "absError": 0.019094745826437665
+     }
+    },
+    "tenure": {
+     "homeowners": {
+      "estimate": 0.7108954813553852,
+      "absError": 0.06940848237674702
+     },
+     "renters or other housing": {
+      "estimate": 0.622727721197385,
+      "absError": 0.007305288910953056
+     }
+    }
+   },
+   "nTrain": 768,
+   "nTest": 193
+  },
+  "gss_class": {
+   "toplineEstimate": 0.5139132935713224,
+   "toplineHuman": 0.4953539763174796,
+   "toplineAbsError": 0.0185593172538428,
+   "sliceMAE": 0.025738818407045394,
+   "slices": {
+    "age_band": {
+     "18-29": {
+      "estimate": 0.4491417071421446,
+      "absError": 0.08130554450006905
+     },
+     "30-44": {
+      "estimate": 0.41562009635148006,
+      "absError": 0.016837299950336004
+     },
+     "45-64": {
+      "estimate": 0.4867732836313155,
+      "absError": 0.014147667878664894
+     },
+     "65+": {
+      "estimate": 0.6836894015752107,
+      "absError": 0.013170999086508983
+     }
+    },
+    "sex": {
+     "men": {
+      "estimate": 0.5408321749322554,
+      "absError": 0.031946396328015436
+     },
+     "women": {
+      "estimate": 0.49085650060372304,
+      "absError": 0.005945755682710274
+     }
+    },
+    "tenure": {
+     "homeowners": {
+      "estimate": 0.6126699566811555,
+      "absError": 0.020852787142970675
+     },
+     "renters or other housing": {
+      "estimate": 0.35921843680206805,
+      "absError": 0.021704096687087837
+     }
+    }
+   },
+   "nTrain": 2539,
+   "nTest": 635
+  },
+  "gss_fear": {
+   "toplineEstimate": 0.3210262645487203,
+   "toplineHuman": 0.33037776738944896,
+   "toplineAbsError": 0.009351502840728665,
+   "sliceMAE": 0.017415732485574223,
+   "slices": {
+    "age_band": {
+     "18-29": {
+      "estimate": 0.40871946504265777,
+      "absError": 0.026992550768832224
+     },
+     "30-44": {
+      "estimate": 0.34605693196237985,
+      "absError": 0.01743623317283438
+     },
+     "45-64": {
+      "estimate": 0.2393511490014099,
+      "absError": 0.03703008380167572
+     },
+     "65+": {
+      "estimate": 0.30828231863486777,
+      "absError": 0.012240588114846962
+     }
+    },
+    "sex": {
+     "men": {
+      "estimate": 0.21455269247251235,
+      "absError": 0.016979858504112544
+     },
+     "women": {
+      "estimate": 0.4107276648269926,
+      "absError": 0.012600541804071053
+     }
+    },
+    "tenure": {
+     "homeowners": {
+      "estimate": 0.2405174691603106,
+      "absError": 0.00933979829339171
+     },
+     "renters or other housing": {
+      "estimate": 0.46279367223428014,
+      "absError": 0.0067062054248291925
+     }
+    }
+   },
+   "nTrain": 1725,
+   "nTest": 432
+  },
+  "gss_cappun": {
+   "toplineEstimate": 0.600619431293256,
+   "toplineHuman": 0.6204515941226038,
+   "toplineAbsError": 0.019832162829347744,
+   "sliceMAE": 0.02810837305571179,
+   "slices": {
+    "age_band": {
+     "18-29": {
+      "estimate": 0.5015911207475994,
+      "absError": 0.05262599067740137
+     },
+     "30-44": {
+      "estimate": 0.5673225205154544,
+      "absError": 0.013316610756184621
+     },
+     "45-64": {
+      "estimate": 0.6191202455865124,
+      "absError": 0.025274700809906014
+     },
+     "65+": {
+      "estimate": 0.6615685967842052,
+      "absError": 0.027502070425115543
+     }
+    },
+    "sex": {
+     "men": {
+      "estimate": 0.6214145412544834,
+      "absError": 0.024150670012204167
+     },
+     "women": {
+      "estimate": 0.5799037111445137,
+      "absError": 0.014273196921392617
+     }
+    },
+    "tenure": {
+     "homeowners": {
+      "estimate": 0.6500497633101767,
+      "absError": 0.03558500104086515
+     },
+     "renters or other housing": {
+      "estimate": 0.5599102304593122,
+      "absError": 0.032138743802624825
+     }
+    }
+   },
+   "nTrain": 1611,
+   "nTest": 403
+  },
+  "gss_gunlaw": {
+   "toplineEstimate": 0.6818899615420376,
+   "toplineHuman": 0.6884573103006131,
+   "toplineAbsError": 0.006567348758575453,
+   "sliceMAE": 0.013242214639096722,
+   "slices": {
+    "age_band": {
+     "18-29": {
+      "estimate": 0.6225103339757235,
+      "absError": 0.030706642779628535
+     },
+     "30-44": {
+      "estimate": 0.6890364844770428,
+      "absError": 0.0016799157356134353
+     },
+     "45-64": {
+      "estimate": 0.679454358477979,
+      "absError": 0.006947126721829955
+     },
+     "65+": {
+      "estimate": 0.7474017016125671,
+      "absError": 0.0024304030876559635
+     }
+    },
+    "sex": {
+     "men": {
+      "estimate": 0.6518706636766043,
+      "absError": 0.0011778457922386742
+     },
+     "women": {
+      "estimate": 0.7047831492071178,
+      "absError": 0.018213967064095837
+     }
+    },
+    "tenure": {
+     "homeowners": {
+      "estimate": 0.6546022008038388,
+      "absError": 0.001145349816107255
+     },
+     "renters or other housing": {
+      "estimate": 0.6904993746687174,
+      "absError": 0.04363646611560412
+     }
+    }
+   },
+   "nTrain": 1697,
+   "nTest": 425
+  },
+  "gss_grass": {
+   "toplineEstimate": 0.6572273025178951,
+   "toplineHuman": 0.6684993352804133,
+   "toplineAbsError": 0.011272032762518203,
+   "sliceMAE": 0.037326127800675415,
+   "slices": {
+    "age_band": {
+     "18-29": {
+      "estimate": 0.8157595094228578,
+      "absError": 0.03738366993242925
+     },
+     "30-44": {
+      "estimate": 0.594027021540771,
+      "absError": 0.051311806449264474
+     },
+     "45-64": {
+      "estimate": 0.6138092931089497,
+      "absError": 0.037946806148918544
+     },
+     "65+": {
+      "estimate": 0.6553312585328189,
+      "absError": 0.06272481845762867
+     }
+    },
+    "sex": {
+     "men": {
+      "estimate": 0.7099498583413216,
+      "absError": 0.012957532313328413
+     },
+     "women": {
+      "estimate": 0.6062277274654834,
+      "absError": 0.010236959794342138
+     }
+    },
+    "tenure": {
+     "homeowners": {
+      "estimate": 0.5367356019390729,
+      "absError": 0.06046123120436442
+     },
+     "renters or other housing": {
+      "estimate": 0.6984225684558132,
+      "absError": 0.02558619810512741
+     }
+    }
+   },
+   "nTrain": 677,
+   "nTest": 170
+  },
+  "gss_courts": {
+   "toplineEstimate": 0.6261098870031198,
+   "toplineHuman": 0.6001262874319762,
+   "toplineAbsError": 0.0259835995711436,
+   "sliceMAE": 0.046121096856905366,
+   "slices": {
+    "age_band": {
+     "18-29": {
+      "estimate": 0.5169085271399935,
+      "absError": 0.019108995486238012
+     },
+     "30-44": {
+      "estimate": 0.5648156627607125,
+      "absError": 0.07594173011667316
+     },
+     "45-64": {
+      "estimate": 0.7212571444929258,
+      "absError": 0.03297515955610675
+     },
+     "65+": {
+      "estimate": 0.6188221582125668,
+      "absError": 0.017839969813851497
+     }
+    },
+    "sex": {
+     "men": {
+      "estimate": 0.6070337223387918,
+      "absError": 0.047731972003400513
+     },
+     "women": {
+      "estimate": 0.6477272134964178,
+      "absError": 0.006303066237086208
+     }
+    },
+    "tenure": {
+     "homeowners": {
+      "estimate": 0.5568555607204695,
+      "absError": 0.056953437284385955
+     },
+     "renters or other housing": {
+      "estimate": 0.6793242277592701,
+      "absError": 0.11211444435750084
+     }
+    }
+   },
+   "nTrain": 628,
+   "nTest": 158
+  },
+  "gss_trust": {
+   "toplineEstimate": 0.26476061752744723,
+   "toplineHuman": 0.24472828806581792,
+   "toplineAbsError": 0.020032329461629306,
+   "sliceMAE": 0.022482260375326246,
+   "slices": {
+    "age_band": {
+     "18-29": {
+      "estimate": 0.03351326384938462,
+      "absError": 0.02059769182433418
+     },
+     "30-44": {
+      "estimate": 0.1967778805473544,
+      "absError": 0.017942416233482694
+     },
+     "45-64": {
+      "estimate": 0.3167194203116537,
+      "absError": 0.023954787946395162
+     },
+     "65+": {
+      "estimate": 0.3652486744908516,
+      "absError": 0.03570568409028135
+     }
+    },
+    "sex": {
+     "men": {
+      "estimate": 0.32395293745145526,
+      "absError": 0.00711693045539491
+     },
+     "women": {
+      "estimate": 0.20799605466810447,
+      "absError": 0.03219919311350611
+     }
+    },
+    "tenure": {
+     "homeowners": {
+      "estimate": 0.23707857226236412,
+      "absError": 0.03929938089554619
+     },
+     "renters or other housing": {
+      "estimate": 0.13240993194242726,
+      "absError": 0.0030419984436693692
+     }
+    }
+   },
+   "nTrain": 740,
+   "nTest": 185
+  },
+  "gss_fair": {
+   "toplineEstimate": 0.4322518331458704,
+   "toplineHuman": 0.4165099483878352,
+   "toplineAbsError": 0.015741884758035174,
+   "sliceMAE": 0.04483882243873187,
+   "slices": {
+    "age_band": {
+     "18-29": {
+      "estimate": 0.16175307121157884,
+      "absError": 0.08290848106056617
+     },
+     "30-44": {
+      "estimate": 0.4038050746228248,
+      "absError": 0.05945895714524441
+     },
+     "45-64": {
+      "estimate": 0.5019491658091783,
+      "absError": 0.048267397341150375
+     },
+     "65+": {
+      "estimate": 0.5214343410645393,
+      "absError": 0.018064733134657618
+     }
+    },
+    "sex": {
+     "men": {
+      "estimate": 0.48169141926312387,
+      "absError": 2.2805791124236308e-05
+     },
+     "women": {
+      "estimate": 0.38290850862422837,
+      "absError": 0.029340994874881454
+     }
+    },
+    "tenure": {
+     "homeowners": {
+      "estimate": 0.5640737213268198,
+      "absError": 0.059334574612605495
+     },
+     "renters or other housing": {
+      "estimate": 0.384481888841836,
+      "absError": 0.06131263554962518
+     }
+    }
+   },
+   "nTrain": 733,
+   "nTest": 184
+  },
+  "gss_helpful": {
+   "toplineEstimate": 0.3808751882033075,
+   "toplineHuman": 0.3784001283573921,
+   "toplineAbsError": 0.002475059845915395,
+   "sliceMAE": 0.036364441045840405,
+   "slices": {
+    "age_band": {
+     "30-44": {
+      "estimate": 0.2255228954692776,
+      "absError": 0.050173269491970235
+     },
+     "45-64": {
+      "estimate": 0.3582493091517394,
+      "absError": 0.05532251346927691
+     },
+     "65+": {
+      "estimate": 0.556269719051778,
+      "absError": 0.062299228309960375
+     }
+    },
+    "sex": {
+     "men": {
+      "estimate": 0.3809750448981339,
+      "absError": 0.002986445179340158
+     },
+     "women": {
+      "estimate": 0.38077213289120454,
+      "absError": 0.0012396708573140791
+     }
+    },
+    "tenure": {
+     "homeowners": {
+      "estimate": 0.41229493989712174,
+      "absError": 0.038468412954571596
+     },
+     "renters or other housing": {
+      "estimate": 0.3114594252132185,
+      "absError": 0.044061547058449446
+     }
+    }
+   },
+   "nTrain": 735,
+   "nTest": 184
+  },
+  "gss_satjob": {
+   "toplineEstimate": 0.4485858620392493,
+   "toplineHuman": 0.4514311658895291,
+   "toplineAbsError": 0.0028453038502798123,
+   "sliceMAE": 0.011999272747441718,
+   "slices": {
+    "age_band": {
+     "18-29": {
+      "estimate": 0.34253633481501494,
+      "absError": 0.018868364813080796
+     },
+     "30-44": {
+      "estimate": 0.4335805424130923,
+      "absError": 0.00098143990108851
+     },
+     "45-64": {
+      "estimate": 0.5210208877856736,
+      "absError": 0.016368731983821383
+     },
+     "65+": {
+      "estimate": 0.6294500585387591,
+      "absError": 0.01606471072500515
+     }
+    },
+    "sex": {
+     "men": {
+      "estimate": 0.4420427621124234,
+      "absError": 0.0035806379552981715
+     },
+     "women": {
+      "estimate": 0.4544531217273745,
+      "absError": 0.003284376334644845
+     }
+    },
+    "tenure": {
+     "homeowners": {
+      "estimate": 0.48648568168342704,
+      "absError": 0.0018913481857971148
+     },
+     "renters or other housing": {
+      "estimate": 0.46478334473313476,
+      "absError": 0.034954572080797774
+     }
+    }
+   },
+   "nTrain": 1748,
+   "nTest": 437
+  },
+  "gss_spanking": {
+   "toplineEstimate": 0.5334847608340243,
+   "toplineHuman": 0.5418467408585513,
+   "toplineAbsError": 0.008361980024527038,
+   "sliceMAE": 0.00960323420040421,
+   "slices": {
+    "age_band": {
+     "18-29": {
+      "estimate": 0.5834336431241378,
+      "absError": 0.01009279266955343
+     },
+     "30-44": {
+      "estimate": 0.470911475738088,
+      "absError": 0.013287780660241333
+     },
+     "45-64": {
+      "estimate": 0.601662859185502,
+      "absError": 0.00010318782784013436
+     },
+     "65+": {
+      "estimate": 0.48117604006833525,
+      "absError": 0.01834744556159279
+     }
+    },
+    "sex": {
+     "men": {
+      "estimate": 0.5837166990491123,
+      "absError": 0.012760415348975207
+     },
+     "women": {
+      "estimate": 0.4852823497053239,
+      "absError": 0.005066390620038774
+     }
+    },
+    "tenure": {
+     "homeowners": {
+      "estimate": 0.5254699470296945,
+      "absError": 0.014382717918111854
+     },
+     "renters or other housing": {
+      "estimate": 0.548371055762731,
+      "absError": 0.002785142996880152
+     }
+    }
+   },
+   "nTrain": 1653,
+   "nTest": 414
+  },
+  "gss_sexeduc": {
+   "toplineEstimate": 0.8570568013507981,
+   "toplineHuman": 0.8660820397592018,
+   "toplineAbsError": 0.009025238408403746,
+   "sliceMAE": 0.013160348534048627,
+   "slices": {
+    "age_band": {
+     "18-29": {
+      "estimate": 0.9276584081791514,
+      "absError": 0.012739350765673785
+     },
+     "30-44": {
+      "estimate": 0.8319770938766954,
+      "absError": 0.027712097672491387
+     },
+     "45-64": {
+      "estimate": 0.8654991428141607,
+      "absError": 0.00492778769506097
+     },
+     "65+": {
+      "estimate": 0.8309938048676079,
+      "absError": 0.013575112115585264
+     }
+    },
+    "sex": {
+     "men": {
+      "estimate": 0.8465538589302013,
+      "absError": 0.005721073619510686
+     },
+     "women": {
+      "estimate": 0.8664356950164854,
+      "absError": 0.012517635098328372
+     }
+    },
+    "tenure": {
+     "homeowners": {
+      "estimate": 0.850341415796484,
+      "absError": 0.005238047410526692
+     },
+     "renters or other housing": {
+      "estimate": 0.8696547848847718,
+      "absError": 0.02285168389521186
+     }
+    }
+   },
+   "nTrain": 1655,
+   "nTest": 414
+  },
+  "gss_divlaw": {
+   "toplineEstimate": 0.5133246744055514,
+   "toplineHuman": 0.5122708062599521,
+   "toplineAbsError": 0.0010538681455992682,
+   "sliceMAE": 0.018538401064034187,
+   "slices": {
+    "age_band": {
+     "30-44": {
+      "estimate": 0.6116591751055411,
+      "absError": 0.018289846572716262
+     },
+     "45-64": {
+      "estimate": 0.46633757067737114,
+      "absError": 0.022162402984316487
+     },
+     "65+": {
+      "estimate": 0.3558367680450802,
+      "absError": 0.005507069896108774
+     }
+    },
+    "sex": {
+     "men": {
+      "estimate": 0.5038954453780115,
+      "absError": 0.030320420989824293
+     },
+     "women": {
+      "estimate": 0.52058972442609,
+      "absError": 0.023912789587407723
+     }
+    },
+    "tenure": {
+     "homeowners": {
+      "estimate": 0.41060548574435113,
+      "absError": 0.02648845726644694
+     },
+     "renters or other housing": {
+      "estimate": 0.6140475059621376,
+      "absError": 0.003087820151418841
+     }
+    }
+   },
+   "nTrain": 704,
+   "nTest": 177
+  },
+  "gss_fepol": {
+   "toplineEstimate": 0.8322622766616327,
+   "toplineHuman": 0.8180509765270831,
+   "toplineAbsError": 0.01421130013454952,
+   "sliceMAE": 0.03053606140947207,
+   "slices": {
+    "age_band": {
+     "18-29": {
+      "estimate": 0.9433693277270401,
+      "absError": 0.037165075531333636
+     },
+     "30-44": {
+      "estimate": 0.7606918886598403,
+      "absError": 0.04133869456138439
+     },
+     "45-64": {
+      "estimate": 0.8422266519917911,
+      "absError": 0.014772961012877506
+     },
+     "65+": {
+      "estimate": 0.8126468399982706,
+      "absError": 0.050751095013827574
+     }
+    },
+    "sex": {
+     "men": {
+      "estimate": 0.8280830580125648,
+      "absError": 0.030991092628830375
+     },
+     "women": {
+      "estimate": 0.8359379136241658,
+      "absError": 0.0010210248505565511
+     }
+    },
+    "tenure": {
+     "homeowners": {
+      "estimate": 0.8422723442789808,
+      "absError": 0.04204399602987119
+     },
+     "renters or other housing": {
+      "estimate": 0.8125070771217997,
+      "absError": 0.026204551647095342
+     }
+    }
+   },
+   "nTrain": 696,
+   "nTest": 175
+  },
+  "gss_fefam": {
+   "toplineEstimate": 0.7044407612095308,
+   "toplineHuman": 0.6801279305263601,
+   "toplineAbsError": 0.024312830683170694,
+   "sliceMAE": 0.026417488031830527,
+   "slices": {
+    "age_band": {
+     "18-29": {
+      "estimate": 0.6804314783908447,
+      "absError": 0.02065545718907158
+     },
+     "30-44": {
+      "estimate": 0.719285903166754,
+      "absError": 0.017460045696070514
+     },
+     "45-64": {
+      "estimate": 0.7364794057700668,
+      "absError": 0.03514981607586476
+     },
+     "65+": {
+      "estimate": 0.6837395981187937,
+      "absError": 0.04177580855828478
+     }
+    },
+    "sex": {
+     "men": {
+      "estimate": 0.6949115218896734,
+      "absError": 0.03579659762487186
+     },
+     "women": {
+      "estimate": 0.7128839274221841,
+      "absError": 0.013205423696000529
+     }
+    },
+    "tenure": {
+     "homeowners": {
+      "estimate": 0.7294968574276826,
+      "absError": 0.03386254787551546
+     },
+     "renters or other housing": {
+      "estimate": 0.6678833815311859,
+      "absError": 0.013434207538964738
+     }
+    }
+   },
+   "nTrain": 1676,
+   "nTest": 420
+  },
+  "gss_fechld": {
+   "toplineEstimate": 0.7655516574186509,
+   "toplineHuman": 0.7461718206718067,
+   "toplineAbsError": 0.019379836746844292,
+   "sliceMAE": 0.020289889640843883,
+   "slices": {
+    "age_band": {
+     "18-29": {
+      "estimate": 0.8354378906595595,
+      "absError": 0.04484558792270332
+     },
+     "30-44": {
+      "estimate": 0.7501793655508121,
+      "absError": 0.022227726136910042
+     },
+     "45-64": {
+      "estimate": 0.7457286363548576,
+      "absError": 0.006862068049606096
+     },
+     "65+": {
+      "estimate": 0.7460957981085587,
+      "absError": 0.025714615959619547
+     }
+    },
+    "sex": {
+     "men": {
+      "estimate": 0.7179830177985621,
+      "absError": 0.02048921267100534
+     },
+     "women": {
+      "estimate": 0.801024234826232,
+      "absError": 0.009762503221816043
+     }
+    },
+    "tenure": {
+     "homeowners": {
+      "estimate": 0.7838159671046487,
+      "absError": 0.0274343950128475
+     },
+     "renters or other housing": {
+      "estimate": 0.7317781184862863,
+      "absError": 0.0049830081522431735
+     }
+    }
+   },
+   "nTrain": 1680,
+   "nTest": 421
+  },
+  "gss_fepresch": {
+   "toplineEstimate": 0.6934214440071692,
+   "toplineHuman": 0.6779290523439105,
+   "toplineAbsError": 0.015492391663258664,
+   "sliceMAE": 0.02063134174374641,
+   "slices": {
+    "age_band": {
+     "18-29": {
+      "estimate": 0.7762028060008206,
+      "absError": 0.052599665511177784
+     },
+     "30-44": {
+      "estimate": 0.6889230699489252,
+      "absError": 0.004541064121740823
+     },
+     "45-64": {
+      "estimate": 0.7010450341350375,
+      "absError": 0.010133069455880439
+     },
+     "65+": {
+      "estimate": 0.5957443781855732,
+      "absError": 0.006246393910694148
+     }
+    },
+    "sex": {
+     "men": {
+      "estimate": 0.6215903073087293,
+      "absError": 0.009344380346994474
+     },
+     "women": {
+      "estimate": 0.7562038275743992,
+      "absError": 0.03421772412909718
+     }
+    },
+    "tenure": {
+     "homeowners": {
+      "estimate": 0.688726052487046,
+      "absError": 0.005049491472883472
+     },
+     "renters or other housing": {
+      "estimate": 0.6951344432532304,
+      "absError": 0.04291894500150295
+     }
+    }
+   },
+   "nTrain": 1669,
+   "nTest": 418
+  },
+  "gss_helppoor": {
+   "toplineEstimate": 0.38695122666900034,
+   "toplineHuman": 0.3851728669540217,
+   "toplineAbsError": 0.001778359714978639,
+   "sliceMAE": 0.018247415335838957,
+   "slices": {
+    "age_band": {
+     "18-29": {
+      "estimate": 0.5272566904964594,
+      "absError": 0.006635380572435956
+     },
+     "30-44": {
+      "estimate": 0.483396599713918,
+      "absError": 0.044778170491624525
+     },
+     "45-64": {
+      "estimate": 0.3459135981590347,
+      "absError": 0.027425967956397956
+     },
+     "65+": {
+      "estimate": 0.2547688054097612,
+      "absError": 0.022601148797162185
+     }
+    },
+    "sex": {
+     "men": {
+      "estimate": 0.3845243815739857,
+      "absError": 0.012599072068960437
+     },
+     "women": {
+      "estimate": 0.3894709359838063,
+      "absError": 0.01060274571309544
+     }
+    },
+    "tenure": {
+     "homeowners": {
+      "estimate": 0.33893738156509245,
+      "absError": 0.019199023752854982
+     },
+     "renters or other housing": {
+      "estimate": 0.5008213125612884,
+      "absError": 0.002137813334180172
+     }
+    }
+   },
+   "nTrain": 1658,
+   "nTest": 415
+  },
+  "gss_helpsick": {
+   "toplineEstimate": 0.5592462309958679,
+   "toplineHuman": 0.5312816764363834,
+   "toplineAbsError": 0.027964554559484545,
+   "sliceMAE": 0.02623851530605535,
+   "slices": {
+    "age_band": {
+     "18-29": {
+      "estimate": 0.6768377655150529,
+      "absError": 0.10439348274561244
+     },
+     "30-44": {
+      "estimate": 0.5832266015533697,
+      "absError": 0.006376120346466063
+     },
+     "45-64": {
+      "estimate": 0.5389872428320559,
+      "absError": 0.01773332893992352
+     },
+     "65+": {
+      "estimate": 0.4755521866783997,
+      "absError": 0.013103615906421173
+     }
+    },
+    "sex": {
+     "men": {
+      "estimate": 0.5417571834047618,
+      "absError": 0.04832961160163429
+     },
+     "women": {
+      "estimate": 0.5748653616255486,
+      "absError": 0.0023522890087406267
+     }
+    },
+    "tenure": {
+     "homeowners": {
+      "estimate": 0.4755029359534044,
+      "absError": 0.015065462548604414
+     },
+     "renters or other housing": {
+      "estimate": 0.6094000387178662,
+      "absError": 0.002554211351040281
+     }
+    }
+   },
+   "nTrain": 1665,
+   "nTest": 417
+  },
+  "gss_helpnot": {
+   "toplineEstimate": 0.31431173046562755,
+   "toplineHuman": 0.3264730130764055,
+   "toplineAbsError": 0.01216128261077798,
+   "sliceMAE": 0.030155071302956676,
+   "slices": {
+    "age_band": {
+     "18-29": {
+      "estimate": 0.3657655379565686,
+      "absError": 0.0703190702678465
+     },
+     "30-44": {
+      "estimate": 0.31307277318493043,
+      "absError": 0.004843917050399882
+     },
+     "45-64": {
+      "estimate": 0.3408264454843668,
+      "absError": 0.010989317783398844
+     },
+     "65+": {
+      "estimate": 0.20720570590442977,
+      "absError": 0.03654432605655175
+     }
+    },
+    "sex": {
+     "men": {
+      "estimate": 0.29431668249711995,
+      "absError": 0.011362197282203446
+     },
+     "women": {
+      "estimate": 0.3361388751702806,
+      "absError": 0.013718428398750149
+     }
+    },
+    "tenure": {
+     "homeowners": {
+      "estimate": 0.2588918269861263,
+      "absError": 0.024135832706764226
+     },
+     "renters or other housing": {
+      "estimate": 0.32045341982731423,
+      "absError": 0.0693274808777386
+     }
+    }
+   },
+   "nTrain": 1641,
+   "nTest": 411
+  },
+  "gss_eqwlth": {
+   "toplineEstimate": 0.5639852626723978,
+   "toplineHuman": 0.5297632821632863,
+   "toplineAbsError": 0.034221980509111516,
+   "sliceMAE": 0.028739107890799448,
+   "slices": {
+    "age_band": {
+     "18-29": {
+      "estimate": 0.6901074579258106,
+      "absError": 0.07881758886256962
+     },
+     "30-44": {
+      "estimate": 0.6134845510863152,
+      "absError": 0.028559088457451143
+     },
+     "45-64": {
+      "estimate": 0.5112890343012149,
+      "absError": 0.004795810068398243
+     },
+     "65+": {
+      "estimate": 0.43718235455523025,
+      "absError": 0.015715435008690437
+     }
+    },
+    "sex": {
+     "men": {
+      "estimate": 0.5253202837033799,
+      "absError": 0.041372085763487054
+     },
+     "women": {
+      "estimate": 0.5984229258613956,
+      "absError": 0.021837856098934627
+     }
+    },
+    "tenure": {
+     "homeowners": {
+      "estimate": 0.4785440917673994,
+      "absError": 0.01685244211379977
+     },
+     "renters or other housing": {
+      "estimate": 0.6951189137463346,
+      "absError": 0.021962556753064688
+     }
+    }
+   },
+   "nTrain": 1680,
+   "nTest": 421
+  },
+  "gss_polviews": {
+   "toplineEstimate": 0.28256792712432716,
+   "toplineHuman": 0.2766106906461177,
+   "toplineAbsError": 0.005957236478209449,
+   "sliceMAE": 0.014040606517701691,
+   "slices": {
+    "age_band": {
+     "18-29": {
+      "estimate": 0.35389984292955157,
+      "absError": 0.038745183474541145
+     },
+     "30-44": {
+      "estimate": 0.327028645117566,
+      "absError": 0.004163841668754609
+     },
+     "45-64": {
+      "estimate": 0.2286604897760245,
+      "absError": 0.004716511522052047
+     },
+     "65+": {
+      "estimate": 0.24359236189155953,
+      "absError": 0.007295287349640189
+     }
+    },
+    "sex": {
+     "men": {
+      "estimate": 0.2852565845070884,
+      "absError": 0.020702349270869003
+     },
+     "women": {
+      "estimate": 0.2816654414708133,
+      "absError": 0.007768667724959932
+     }
+    },
+    "tenure": {
+     "homeowners": {
+      "estimate": 0.27583943735822664,
+      "absError": 0.01851616794474875
+     },
+     "renters or other housing": {
+      "estimate": 0.3049514642719986,
+      "absError": 0.010416843186047853
+     }
+    }
+   },
+   "nTrain": 2457,
+   "nTest": 615
+  },
+  "gss_confinan": {
+   "toplineEstimate": 0.16003255905024835,
+   "toplineHuman": 0.17306366653822422,
+   "toplineAbsError": 0.013031107487975868,
+   "sliceMAE": 0.014675335127600952,
+   "slices": {
+    "age_band": {
+     "18-29": {
+      "estimate": 0.1533056230168175,
+      "absError": 0.011507226397973941
+     },
+     "30-44": {
+      "estimate": 0.1719720504968745,
+      "absError": 0.0052965374584500735
+     },
+     "45-64": {
+      "estimate": 0.13786337609875085,
+      "absError": 0.02084206797157301
+     },
+     "65+": {
+      "estimate": 0.18760439586842834,
+      "absError": 0.026554974958262617
+     }
+    },
+    "sex": {
+     "men": {
+      "estimate": 0.15266632580893486,
+      "absError": 0.00035585055246326047
+     },
+     "women": {
+      "estimate": 0.16672125640922297,
+      "absError": 0.02781966057130003
+     }
+    },
+    "tenure": {
+     "homeowners": {
+      "estimate": 0.13124006640479036,
+      "absError": 0.006122725652318334
+     },
+     "renters or other housing": {
+      "estimate": 0.1507011151956273,
+      "absError": 0.01890363745846635
+     }
+    }
+   },
+   "nTrain": 1682,
+   "nTest": 421
+  },
+  "gss_conbus": {
+   "toplineEstimate": 0.15718731995716334,
+   "toplineHuman": 0.15025298859540837,
+   "toplineAbsError": 0.006934331361754975,
+   "sliceMAE": 0.016228403265789386,
+   "slices": {
+    "age_band": {
+     "18-29": {
+      "estimate": 0.12112900614249039,
+      "absError": 0.021664795172327306
+     },
+     "30-44": {
+      "estimate": 0.17807728137051207,
+      "absError": 0.03439407280979981
+     },
+     "45-64": {
+      "estimate": 0.15818508622318284,
+      "absError": 0.0068755124880945095
+     },
+     "65+": {
+      "estimate": 0.15778296571357409,
+      "absError": 0.004509079890575529
+     }
+    },
+    "sex": {
+     "men": {
+      "estimate": 0.18026907051381783,
+      "absError": 0.014139480522808029
+     },
+     "women": {
+      "estimate": 0.13251277358152244,
+      "absError": 0.002797821619021368
+     }
+    },
+    "tenure": {
+     "homeowners": {
+      "estimate": 0.12068986555996643,
+      "absError": 0.02030292491311629
+     },
+     "renters or other housing": {
+      "estimate": 0.16930233512196863,
+      "absError": 0.025143538710572233
+     }
+    }
+   },
+   "nTrain": 1667,
+   "nTest": 417
+  },
+  "gss_coneduc": {
+   "toplineEstimate": 0.21912213841254538,
+   "toplineHuman": 0.19839388212344825,
+   "toplineAbsError": 0.020728256289097136,
+   "sliceMAE": 0.020397185070735593,
+   "slices": {
+    "age_band": {
+     "18-29": {
+      "estimate": 0.293366034421238,
+      "absError": 0.009923267892104626
+     },
+     "30-44": {
+      "estimate": 0.2606816140468667,
+      "absError": 0.05144724548675539
+     },
+     "45-64": {
+      "estimate": 0.18020931937001158,
+      "absError": 0.017904110564088
+     },
+     "65+": {
+      "estimate": 0.16794103252964823,
+      "absError": 0.003113308104122303
+     }
+    },
+    "sex": {
+     "men": {
+      "estimate": 0.22624448163965402,
+      "absError": 0.024525290301107117
+     },
+     "women": {
+      "estimate": 0.21030362969633046,
+      "absError": 0.01334415702836994
+     }
+    },
+    "tenure": {
+     "homeowners": {
+      "estimate": 0.15491264637819604,
+      "absError": 0.02154276628932078
+     },
+     "renters or other housing": {
+      "estimate": 0.2215994436953916,
+      "absError": 0.021377334900016587
+     }
+    }
+   },
+   "nTrain": 1684,
+   "nTest": 422
+  },
+  "gss_conpress": {
+   "toplineEstimate": 0.07425582918049728,
+   "toplineHuman": 0.07728112536877942,
+   "toplineAbsError": 0.0030252961882821366,
+   "sliceMAE": 0.01366533210861565,
+   "slices": {
+    "age_band": {
+     "18-29": {
+      "estimate": 0.026431230276773878,
+      "absError": 0.035067831520770754
+     },
+     "30-44": {
+      "estimate": 0.10691054925412809,
+      "absError": 0.00785484498284221
+     },
+     "45-64": {
+      "estimate": 0.05305609370895797,
+      "absError": 0.012842340251322588
+     },
+     "65+": {
+      "estimate": 0.10567954679709127,
+      "absError": 0.023741403804064337
+     }
+    },
+    "sex": {
+     "men": {
+      "estimate": 0.07045188834780296,
+      "absError": 0.006709167789254122
+     },
+     "women": {
+      "estimate": 0.07808111756942746,
+      "absError": 0.00027987260599281194
+     }
+    },
+    "tenure": {
+     "homeowners": {
+      "estimate": 0.08688099066229248,
+      "absError": 0.0048294009456213705
+     },
+     "renters or other housing": {
+      "estimate": 0.05970158992478743,
+      "absError": 0.017997794969057
+     }
+    }
+   },
+   "nTrain": 1668,
+   "nTest": 418
+  },
+  "gss_conmedic": {
+   "toplineEstimate": 0.27488976250009556,
+   "toplineHuman": 0.26547287763263866,
+   "toplineAbsError": 0.009416884867456898,
+   "sliceMAE": 0.014765941542682955,
+   "slices": {
+    "age_band": {
+     "18-29": {
+      "estimate": 0.3231975478439543,
+      "absError": 0.02636806883215842
+     },
+     "30-44": {
+      "estimate": 0.26442997548169817,
+      "absError": 0.015820096119258498
+     },
+     "45-64": {
+      "estimate": 0.21823772561662833,
+      "absError": 0.0164318987855277
+     },
+     "65+": {
+      "estimate": 0.32152581940813574,
+      "absError": 0.021378906779334073
+     }
+    },
+    "sex": {
+     "men": {
+      "estimate": 0.29671512330905087,
+      "absError": 0.013558808322439386
+     },
+     "women": {
+      "estimate": 0.2565009740426485,
+      "absError": 0.010053809756624704
+     }
+    },
+    "tenure": {
+     "homeowners": {
+      "estimate": 0.2689142575451942,
+      "absError": 0.01188149672129235
+     },
+     "renters or other housing": {
+      "estimate": 0.2006385078201624,
+      "absError": 0.0026344470248285123
+     }
+    }
+   },
+   "nTrain": 1680,
+   "nTest": 420
+  },
+  "gss_conarmy": {
+   "toplineEstimate": 0.41294352687074715,
+   "toplineHuman": 0.4345348912681044,
+   "toplineAbsError": 0.02159136439735726,
+   "sliceMAE": 0.025978368375577703,
+   "slices": {
+    "age_band": {
+     "18-29": {
+      "estimate": 0.33429665518932017,
+      "absError": 0.09840532918773603
+     },
+     "30-44": {
+      "estimate": 0.34125432921634724,
+      "absError": 0.01799048415169552
+     },
+     "45-64": {
+      "estimate": 0.4707806128575294,
+      "absError": 0.00034165109628736534
+     },
+     "65+": {
+      "estimate": 0.4716893869874642,
+      "absError": 0.0037434117268017597
+     }
+    },
+    "sex": {
+     "men": {
+      "estimate": 0.45867546333594544,
+      "absError": 0.016566684550921307
+     },
+     "women": {
+      "estimate": 0.36267858789646895,
+      "absError": 0.02933831923088903
+     }
+    },
+    "tenure": {
+     "homeowners": {
+      "estimate": 0.400129953891165,
+      "absError": 0.012426021445421376
+     },
+     "renters or other housing": {
+      "estimate": 0.36628075120547054,
+      "absError": 0.029015045614869228
+     }
+    }
+   },
+   "nTrain": 1676,
+   "nTest": 420
+  },
+  "gss_confed": {
+   "toplineEstimate": 0.14274953768518286,
+   "toplineHuman": 0.12253698039499435,
+   "toplineAbsError": 0.020212557290188518,
+   "sliceMAE": 0.018928817355287578,
+   "slices": {
+    "age_band": {
+     "18-29": {
+      "estimate": 0.16687532469574393,
+      "absError": 0.06211493377988375
+     },
+     "30-44": {
+      "estimate": 0.14332858307281932,
+      "absError": 0.019912563642595166
+     },
+     "45-64": {
+      "estimate": 0.14094700976323696,
+      "absError": 0.012799221862892896
+     },
+     "65+": {
+      "estimate": 0.1235090097904628,
+      "absError": 0.004902306350686073
+     }
+    },
+    "sex": {
+     "men": {
+      "estimate": 0.1510623830274572,
+      "absError": 0.03016747341887545
+     },
+     "women": {
+      "estimate": 0.1346016688553409,
+      "absError": 0.01006405529100965
+     }
+    },
+    "tenure": {
+     "homeowners": {
+      "estimate": 0.10050790583325483,
+      "absError": 0.004778992687218403
+     },
+     "renters or other housing": {
+      "estimate": 0.11084204767328452,
+      "absError": 0.006690991809139249
+     }
+    }
+   },
+   "nTrain": 1668,
+   "nTest": 418
+  },
+  "gss_conjudge": {
+   "toplineEstimate": 0.1932566174327478,
+   "toplineHuman": 0.18508820495504322,
+   "toplineAbsError": 0.008168412477704584,
+   "sliceMAE": 0.01324236802389351,
+   "slices": {
+    "age_band": {
+     "18-29": {
+      "estimate": 0.21192734911871583,
+      "absError": 0.026167120298708657
+     },
+     "30-44": {
+      "estimate": 0.17269104171109984,
+      "absError": 0.011007674120581207
+     },
+     "45-64": {
+      "estimate": 0.19243403057204128,
+      "absError": 0.0015700003379823246
+     },
+     "65+": {
+      "estimate": 0.19775519251005663,
+      "absError": 0.00022521407381032033
+     }
+    },
+    "sex": {
+     "men": {
+      "estimate": 0.21760260633348477,
+      "absError": 0.0009327011199577462
+     },
+     "women": {
+      "estimate": 0.16254121945723754,
+      "absError": 0.01008699326526602
+     }
+    },
+    "tenure": {
+     "homeowners": {
+      "estimate": 0.17520097164555853,
+      "absError": 0.022876734094985224
+     },
+     "renters or other housing": {
+      "estimate": 0.1489161553491684,
+      "absError": 0.03307250687985658
+     }
+    }
+   },
+   "nTrain": 1670,
+   "nTest": 418
+  },
+  "gss_consci": {
+   "toplineEstimate": 0.3825678218927318,
+   "toplineHuman": 0.3697784519630929,
+   "toplineAbsError": 0.012789369929638916,
+   "sliceMAE": 0.014705774868749945,
+   "slices": {
+    "age_band": {
+     "18-29": {
+      "estimate": 0.4331937660102359,
+      "absError": 0.03442148355902108
+     },
+     "30-44": {
+      "estimate": 0.35755760681241555,
+      "absError": 0.004318758618317653
+     },
+     "45-64": {
+      "estimate": 0.35193675961428805,
+      "absError": 0.007080911458262895
+     },
+     "65+": {
+      "estimate": 0.4043778304886834,
+      "absError": 0.00590220567272931
+     }
+    },
+    "sex": {
+     "men": {
+      "estimate": 0.42457594648559266,
+      "absError": 0.020212997713385528
+     },
+     "women": {
+      "estimate": 0.33542008536791884,
+      "absError": 0.0023581494167865813
+     }
+    },
+    "tenure": {
+     "homeowners": {
+      "estimate": 0.3939831555762785,
+      "absError": 0.040777288104463905
+     },
+     "renters or other housing": {
+      "estimate": 0.3531535581647402,
+      "absError": 0.0025744044070326044
+     }
+    }
+   },
+   "nTrain": 1652,
+   "nTest": 413
+  },
+  "gss_conlegis": {
+   "toplineEstimate": 0.04699506216125263,
+   "toplineHuman": 0.05673518143717846,
+   "toplineAbsError": 0.00974011927592583,
+   "sliceMAE": 0.008176883146465995,
+   "slices": {
+    "age_band": {
+     "18-29": {
+      "estimate": 0.06425421839903432,
+      "absError": 0.012365113874633946
+     },
+     "30-44": {
+      "estimate": 0.06168329510641328,
+      "absError": 0.011271937210601365
+     },
+     "45-64": {
+      "estimate": 0.04392890079657729,
+      "absError": 2.476127630643421e-07
+     },
+     "65+": {
+      "estimate": 0.028841741917227534,
+      "absError": 0.012359636186459098
+     }
+    },
+    "sex": {
+     "men": {
+      "estimate": 0.039238442155268206,
+      "absError": 0.012718988099178659
+     },
+     "women": {
+      "estimate": 0.05306781879561692,
+      "absError": 0.009146823518088779
+     }
+    },
+    "tenure": {
+     "homeowners": {
+      "estimate": 0.02375383482082111,
+      "absError": 0.00011925232040823491
+     },
+     "renters or other housing": {
+      "estimate": 0.08801808799859367,
+      "absError": 0.0074330663495948135
+     }
+    }
+   },
+   "nTrain": 1670,
+   "nTest": 418
+  },
+  "gss_natspac": {
+   "toplineEstimate": 0.2319050571841951,
+   "toplineHuman": 0.19912540933831696,
+   "toplineAbsError": 0.03277964784587814,
+   "sliceMAE": 0.03443483972770974,
+   "slices": {
+    "age_band": {
+     "18-29": {
+      "estimate": 0.2909959845255228,
+      "absError": 0.07663158021978786
+     },
+     "30-44": {
+      "estimate": 0.21063802964176662,
+      "absError": 0.04162318793828648
+     },
+     "45-64": {
+      "estimate": 0.22647932827700262,
+      "absError": 0.013877759598782208
+     },
+     "65+": {
+      "estimate": 0.1892033609572103,
+      "absError": 0.011276580743662029
+     }
+    },
+    "sex": {
+     "men": {
+      "estimate": 0.31377420031994374,
+      "absError": 0.053289148946655485
+     },
+     "women": {
+      "estimate": 0.1308765036844738,
+      "absError": 0.001573525527387848
+     }
+    },
+    "tenure": {
+     "homeowners": {
+      "estimate": 0.20774378696686682,
+      "absError": 0.0162784899959576
+     },
+     "renters or other housing": {
+      "estimate": 0.2589954852422982,
+      "absError": 0.06092844485115842
+     }
+    }
+   },
+   "nTrain": 1235,
+   "nTest": 309
+  },
+  "gss_natenvir": {
+   "toplineEstimate": 0.6628349458110779,
+   "toplineHuman": 0.6631519792388899,
+   "toplineAbsError": 0.00031703342781197463,
+   "sliceMAE": 0.024864713843008424,
+   "slices": {
+    "age_band": {
+     "18-29": {
+      "estimate": 0.7327771503000315,
+      "absError": 0.05641192797595784
+     },
+     "30-44": {
+      "estimate": 0.6903912194839165,
+      "absError": 0.007151363130613375
+     },
+     "45-64": {
+      "estimate": 0.6273379256916349,
+      "absError": 0.017802782972954123
+     },
+     "65+": {
+      "estimate": 0.6240265453156219,
+      "absError": 0.04666362011403846
+     }
+    },
+    "sex": {
+     "men": {
+      "estimate": 0.6229103072280285,
+      "absError": 0.01920394518509283
+     },
+     "women": {
+      "estimate": 0.7089723160449996,
+      "absError": 0.025273404995279414
+     }
+    },
+    "tenure": {
+     "homeowners": {
+      "estimate": 0.6452888448550773,
+      "absError": 0.00677307998007759
+     },
+     "renters or other housing": {
+      "estimate": 0.680731540014418,
+      "absError": 0.01963758639005375
+     }
+    }
+   },
+   "nTrain": 1283,
+   "nTest": 321
+  },
+  "gss_natheal": {
+   "toplineEstimate": 0.7400119078250764,
+   "toplineHuman": 0.7353385530623898,
+   "toplineAbsError": 0.004673354762686599,
+   "sliceMAE": 0.02433393239757227,
+   "slices": {
+    "age_band": {
+     "18-29": {
+      "estimate": 0.8226225751991965,
+      "absError": 0.04143397091232637
+     },
+     "30-44": {
+      "estimate": 0.7563584350767962,
+      "absError": 0.006020464076356147
+     },
+     "45-64": {
+      "estimate": 0.7688197571888642,
+      "absError": 0.01696960223565802
+     },
+     "65+": {
+      "estimate": 0.5851284224320794,
+      "absError": 0.06310923383306866
+     }
+    },
+    "sex": {
+     "men": {
+      "estimate": 0.73359839811385,
+      "absError": 0.016976542394348537
+     },
+     "women": {
+      "estimate": 0.7473544507274739,
+      "absError": 0.007920769857072019
+     }
+    },
+    "tenure": {
+     "homeowners": {
+      "estimate": 0.7348565141916453,
+      "absError": 0.01115078589485552
+     },
+     "renters or other housing": {
+      "estimate": 0.7495193694737172,
+      "absError": 0.031090089976892887
+     }
+    }
+   },
+   "nTrain": 1284,
+   "nTest": 321
+  },
+  "gss_natcity": {
+   "toplineEstimate": 0.614922038679593,
+   "toplineHuman": 0.5712372364532359,
+   "toplineAbsError": 0.04368480222635718,
+   "sliceMAE": 0.042598163643131084,
+   "slices": {
+    "age_band": {
+     "18-29": {
+      "estimate": 0.6862032802497494,
+      "absError": 0.1311451592865136
+     },
+     "30-44": {
+      "estimate": 0.5561095553279242,
+      "absError": 0.00011314578826793209
+     },
+     "45-64": {
+      "estimate": 0.6572473682556673,
+      "absError": 0.036015028318966746
+     },
+     "65+": {
+      "estimate": 0.5269895590789918,
+      "absError": 0.004169169198858569
+     }
+    },
+    "sex": {
+     "men": {
+      "estimate": 0.6230599230779769,
+      "absError": 0.10845572374637735
+     },
+     "women": {
+      "estimate": 0.6038718121015678,
+      "absError": 0.023647504499853977
+     }
+    },
+    "tenure": {
+     "homeowners": {
+      "estimate": 0.559049149590882,
+      "absError": 0.03195874594416104
+     },
+     "renters or other housing": {
+      "estimate": 0.6160421219914257,
+      "absError": 0.005280832362049459
+     }
+    }
+   },
+   "nTrain": 1241,
+   "nTest": 311
+  },
+  "gss_natcrime": {
+   "toplineEstimate": 0.6937067617173855,
+   "toplineHuman": 0.6902550528552962,
+   "toplineAbsError": 0.003451708862089342,
+   "sliceMAE": 0.02285654298565494,
+   "slices": {
+    "age_band": {
+     "18-29": {
+      "estimate": 0.6562072487783053,
+      "absError": 0.05732671007668744
+     },
+     "30-44": {
+      "estimate": 0.6927371304830539,
+      "absError": 0.006996668201392553
+     },
+     "45-64": {
+      "estimate": 0.7279035068385549,
+      "absError": 0.025474517005775743
+     },
+     "65+": {
+      "estimate": 0.6711825131331893,
+      "absError": 0.021415553527784903
+     }
+    },
+    "sex": {
+     "men": {
+      "estimate": 0.6703888528091815,
+      "absError": 0.00883394099675272
+     },
+     "women": {
+      "estimate": 0.7213607414403832,
+      "absError": 0.021666658629083124
+     }
+    },
+    "tenure": {
+     "homeowners": {
+      "estimate": 0.7132032354970934,
+      "absError": 0.011235287558555185
+     },
+     "renters or other housing": {
+      "estimate": 0.6834314238893686,
+      "absError": 0.029903007889207855
+     }
+    }
+   },
+   "nTrain": 1280,
+   "nTest": 320
+  },
+  "gss_natdrug": {
+   "toplineEstimate": 0.6824919819135187,
+   "toplineHuman": 0.6814317707124571,
+   "toplineAbsError": 0.0010602112010615894,
+   "sliceMAE": 0.022220766215739138,
+   "slices": {
+    "age_band": {
+     "18-29": {
+      "estimate": 0.6731430497005927,
+      "absError": 0.0686035749819367
+     },
+     "30-44": {
+      "estimate": 0.7353986973457176,
+      "absError": 0.01808150663918895
+     },
+     "45-64": {
+      "estimate": 0.689409144763198,
+      "absError": 0.03724991191645688
+     },
+     "65+": {
+      "estimate": 0.6147820143391888,
+      "absError": 0.005409332752431495
+     }
+    },
+    "sex": {
+     "men": {
+      "estimate": 0.6428456006532046,
+      "absError": 0.007105169344748474
+     },
+     "women": {
+      "estimate": 0.7291533339573348,
+      "absError": 0.017446949580381843
+     }
+    },
+    "tenure": {
+     "homeowners": {
+      "estimate": 0.6836542944961154,
+      "absError": 0.0036413661263734465
+     },
+     "renters or other housing": {
+      "estimate": 0.7094860736301561,
+      "absError": 0.020228318384395316
+     }
+    }
+   },
+   "nTrain": 1278,
+   "nTest": 320
+  },
+  "gss_nateduc": {
+   "toplineEstimate": 0.7666484529729733,
+   "toplineHuman": 0.7606007525790149,
+   "toplineAbsError": 0.006047700393958411,
+   "sliceMAE": 0.02632766018578027,
+   "slices": {
+    "age_band": {
+     "18-29": {
+      "estimate": 0.6761402818478699,
+      "absError": 0.0465633649892524
+     },
+     "30-44": {
+      "estimate": 0.8240128934726905,
+      "absError": 0.01997066170216688
+     },
+     "45-64": {
+      "estimate": 0.8218104333297946,
+      "absError": 0.02540590203844839
+     },
+     "65+": {
+      "estimate": 0.693477340768716,
+      "absError": 0.0010751021325666743
+     }
+    },
+    "sex": {
+     "men": {
+      "estimate": 0.7678314869485853,
+      "absError": 0.0030350248696691118
+     },
+     "women": {
+      "estimate": 0.7638665952905156,
+      "absError": 0.007425445588263968
+     }
+    },
+    "tenure": {
+     "homeowners": {
+      "estimate": 0.7477499700771542,
+      "absError": 0.031090747611469127
+     },
+     "renters or other housing": {
+      "estimate": 0.7733703265227796,
+      "absError": 0.0760550325544056
+     }
+    }
+   },
+   "nTrain": 1297,
+   "nTest": 325
+  },
+  "gss_natarms": {
+   "toplineEstimate": 0.31187255576755063,
+   "toplineHuman": 0.3019571314296528,
+   "toplineAbsError": 0.009915424337897827,
+   "sliceMAE": 0.02455611658476077,
+   "slices": {
+    "age_band": {
+     "18-29": {
+      "estimate": 0.23119027692401498,
+      "absError": 0.0656206329468769
+     },
+     "30-44": {
+      "estimate": 0.20266197376402598,
+      "absError": 0.02883176042837693
+     },
+     "45-64": {
+      "estimate": 0.3922841553857132,
+      "absError": 0.034384150599824914
+     },
+     "65+": {
+      "estimate": 0.44682788994373623,
+      "absError": 0.005166069304133825
+     }
+    },
+    "sex": {
+     "men": {
+      "estimate": 0.29636413573598114,
+      "absError": 0.0042790599193647805
+     },
+     "women": {
+      "estimate": 0.3284156503559546,
+      "absError": 0.01584188066295028
+     }
+    },
+    "tenure": {
+     "homeowners": {
+      "estimate": 0.35804757362622364,
+      "absError": 0.019563344932536586
+     },
+     "renters or other housing": {
+      "estimate": 0.24741672216140104,
+      "absError": 0.022762033884021954
+     }
+    }
+   },
+   "nTrain": 1270,
+   "nTest": 318
+  },
+  "gss_nataid": {
+   "toplineEstimate": 0.07922520080250102,
+   "toplineHuman": 0.09687332179596246,
+   "toplineAbsError": 0.01764812099346144,
+   "sliceMAE": 0.02110723095500569,
+   "slices": {
+    "age_band": {
+     "18-29": {
+      "estimate": 0.09754235846966587,
+      "absError": 0.05957254346941161
+     },
+     "30-44": {
+      "estimate": 0.10154167716351838,
+      "absError": 0.007143726524356672
+     },
+     "45-64": {
+      "estimate": 0.05696806464655621,
+      "absError": 0.007131141183661427
+     },
+     "65+": {
+      "estimate": 0.06487126000922684,
+      "absError": 0.006342490316008656
+     }
+    },
+    "sex": {
+     "men": {
+      "estimate": 0.07154440816664637,
+      "absError": 0.01815340470875214
+     },
+     "women": {
+      "estimate": 0.08695495774853905,
+      "absError": 0.014881185627859284
+     }
+    },
+    "tenure": {
+     "homeowners": {
+      "estimate": 0.06849053147349334,
+      "absError": 0.009936281207130498
+     },
+     "renters or other housing": {
+      "estimate": 0.09336635629033377,
+      "absError": 0.045697074602865234
+     }
+    }
+   },
+   "nTrain": 1264,
+   "nTest": 317
+  },
+  "gss_natfare": {
+   "toplineEstimate": 0.34562474160645024,
+   "toplineHuman": 0.337072312735011,
+   "toplineAbsError": 0.008552428871439255,
+   "sliceMAE": 0.015752005209767626,
+   "slices": {
+    "age_band": {
+     "18-29": {
+      "estimate": 0.4258910406181411,
+      "absError": 0.03836927822089509
+     },
+     "30-44": {
+      "estimate": 0.38044818905130523,
+      "absError": 0.006769787426161578
+     },
+     "45-64": {
+      "estimate": 0.32691065634256417,
+      "absError": 0.021263654369273688
+     },
+     "65+": {
+      "estimate": 0.25307000634768667,
+      "absError": 0.03613889731335329
+     }
+    },
+    "sex": {
+     "men": {
+      "estimate": 0.2962291536876407,
+      "absError": 0.009388662843970053
+     },
+     "women": {
+      "estimate": 0.3894888384227064,
+      "absError": 0.003936324254932455
+     }
+    },
+    "tenure": {
+     "homeowners": {
+      "estimate": 0.26312648982906733,
+      "absError": 0.008706667945853619
+     },
+     "renters or other housing": {
+      "estimate": 0.44719872662919835,
+      "absError": 0.0014427693037012412
+     }
+    }
+   },
+   "nTrain": 1276,
+   "nTest": 319
+  },
+  "gss_natroad": {
+   "toplineEstimate": 0.5129459352778676,
+   "toplineHuman": 0.5233941909299238,
+   "toplineAbsError": 0.010448255652056204,
+   "sliceMAE": 0.017305429964305875,
+   "slices": {
+    "age_band": {
+     "18-29": {
+      "estimate": 0.2860805583557575,
+      "absError": 0.06001377217775983
+     },
+     "30-44": {
+      "estimate": 0.4698446280860884,
+      "absError": 0.00836132089654773
+     },
+     "45-64": {
+      "estimate": 0.5769816323166382,
+      "absError": 0.011996854287056546
+     },
+     "65+": {
+      "estimate": 0.6632693843495471,
+      "absError": 0.020468264500859368
+     }
+    },
+    "sex": {
+     "men": {
+      "estimate": 0.5614660352190839,
+      "absError": 0.013771038958121151
+     },
+     "women": {
+      "estimate": 0.4666101301558582,
+      "absError": 0.00721724153568043
+     }
+    },
+    "tenure": {
+     "homeowners": {
+      "estimate": 0.5665931684321354,
+      "absError": 0.0025457856657962186
+     },
+     "renters or other housing": {
+      "estimate": 0.4465445771493253,
+      "absError": 0.014069161692625731
+     }
+    }
+   },
+   "nTrain": 2516,
+   "nTest": 630
+  },
+  "gss_natsoc": {
+   "toplineEstimate": 0.6063768437387564,
+   "toplineHuman": 0.6126896309760341,
+   "toplineAbsError": 0.006312787237277684,
+   "sliceMAE": 0.0136906281507915,
+   "slices": {
+    "age_band": {
+     "18-29": {
+      "estimate": 0.43745054638243525,
+      "absError": 0.009312739813072679
+     },
+     "30-44": {
+      "estimate": 0.6045712695662111,
+      "absError": 0.007410448984297324
+     },
+     "45-64": {
+      "estimate": 0.7143349089900672,
+      "absError": 0.013953247280220626
+     },
+     "65+": {
+      "estimate": 0.5869351462869973,
+      "absError": 0.04468389549744267
+     }
+    },
+    "sex": {
+     "men": {
+      "estimate": 0.5716979388076547,
+      "absError": 0.0046139435160957865
+     },
+     "women": {
+      "estimate": 0.6416875046344505,
+      "absError": 0.0065942544638870615
+     }
+    },
+    "tenure": {
+     "homeowners": {
+      "estimate": 0.6120357056600817,
+      "absError": 0.0024918260786203072
+     },
+     "renters or other housing": {
+      "estimate": 0.6437464388072079,
+      "absError": 0.02046466957269555
+     }
+    }
+   },
+   "nTrain": 2483,
+   "nTest": 621
+  },
+  "gss_natchld": {
+   "toplineEstimate": 0.6253756744832081,
+   "toplineHuman": 0.6270097439931619,
+   "toplineAbsError": 0.0016340695099538172,
+   "sliceMAE": 0.011623461867037319,
+   "slices": {
+    "age_band": {
+     "18-29": {
+      "estimate": 0.585651818983879,
+      "absError": 0.0337681923097185
+     },
+     "30-44": {
+      "estimate": 0.6807302875913385,
+      "absError": 0.001518460016849854
+     },
+     "45-64": {
+      "estimate": 0.6174620128522597,
+      "absError": 0.007927632554847519
+     },
+     "65+": {
+      "estimate": 0.59985423864232,
+      "absError": 0.0024654636995463663
+     }
+    },
+    "sex": {
+     "men": {
+      "estimate": 0.5661420201971605,
+      "absError": 0.012451784560633783
+     },
+     "women": {
+      "estimate": 0.6819676107898659,
+      "absError": 0.008889773949687374
+     }
+    },
+    "tenure": {
+     "homeowners": {
+      "estimate": 0.5898487909189998,
+      "absError": 0.013781367980822634
+     },
+     "renters or other housing": {
+      "estimate": 0.6859087544172132,
+      "absError": 0.012185019864192514
+     }
+    }
+   },
+   "nTrain": 2477,
+   "nTest": 620
+  },
+  "gss_natsci": {
+   "toplineEstimate": 0.40209966588771373,
+   "toplineHuman": 0.4026846244507256,
+   "toplineAbsError": 0.0005849585630118836,
+   "sliceMAE": 0.010643793698804374,
+   "slices": {
+    "age_band": {
+     "18-29": {
+      "estimate": 0.3615274372416461,
+      "absError": 0.012668691291750411
+     },
+     "30-44": {
+      "estimate": 0.4254723187341755,
+      "absError": 0.02258629555102043
+     },
+     "45-64": {
+      "estimate": 0.42829643858015093,
+      "absError": 0.010593325977210355
+     },
+     "65+": {
+      "estimate": 0.3727569011274579,
+      "absError": 0.0039032585248000573
+     }
+    },
+    "sex": {
+     "men": {
+      "estimate": 0.41845699057422464,
+      "absError": 0.009011522997419363
+     },
+     "women": {
+      "estimate": 0.38230914099261093,
+      "absError": 0.006039309484062283
+     }
+    },
+    "tenure": {
+     "homeowners": {
+      "estimate": 0.4522919474989316,
+      "absError": 0.013628489573988267
+     },
+     "renters or other housing": {
+      "estimate": 0.36222932977490474,
+      "absError": 0.006719456190183826
+     }
+    }
+   },
+   "nTrain": 2436,
+   "nTest": 610
+  },
+  "gss_natenrgy": {
+   "toplineEstimate": 0.49450242537899297,
+   "toplineHuman": 0.48617546759230096,
+   "toplineAbsError": 0.008326957786692013,
+   "sliceMAE": 0.009262753224134591,
+   "slices": {
+    "age_band": {
+     "18-29": {
+      "estimate": 0.4816776760447929,
+      "absError": 0.015041867322053648
+     },
+     "30-44": {
+      "estimate": 0.5045986832891729,
+      "absError": 0.012303404322504374
+     },
+     "45-64": {
+      "estimate": 0.5039189821376784,
+      "absError": 0.005904445362530486
+     },
+     "65+": {
+      "estimate": 0.4826317859084331,
+      "absError": 0.002911905154091843
+     }
+    },
+    "sex": {
+     "men": {
+      "estimate": 0.4927368845947328,
+      "absError": 0.005754861244994636
+     },
+     "women": {
+      "estimate": 0.4962673015840784,
+      "absError": 0.012116227773751431
+     }
+    },
+    "tenure": {
+     "homeowners": {
+      "estimate": 0.4890942943506341,
+      "absError": 0.014067343952947398
+     },
+     "renters or other housing": {
+      "estimate": 0.5002434199870733,
+      "absError": 0.0060019706602029155
+     }
+    }
+   },
+   "nTrain": 2469,
+   "nTest": 618
+  },
+  "shed_b2": {
+   "toplineEstimate": 0.728669067155644,
+   "toplineHuman": 0.728667221278241,
+   "toplineAbsError": 1.8458774029284086e-06,
+   "sliceMAE": 0.004377030101859493,
+   "slices": {
+    "age_band": {
+     "18-29": {
+      "estimate": 0.6704023715349745,
+      "absError": 0.006049132499419851
+     },
+     "30-44": {
+      "estimate": 0.6557346375250726,
+      "absError": 0.011142280391681747
+     },
+     "45-64": {
+      "estimate": 0.7276034559525829,
+      "absError": 0.006057978504318995
+     },
+     "65+": {
+      "estimate": 0.8670650258968661,
+      "absError": 0.001539070810434473
+     }
+    },
+    "income_band": {
+     "$150k+": {
+      "estimate": 0.8958748932357372,
+      "absError": 0.0005245665134095967
+     },
+     "$25k-$74,999": {
+      "estimate": 0.6063100151668475,
+      "absError": 0.006858233792147672
+     },
+     "$75k-$149,999": {
+      "estimate": 0.7968206124664002,
+      "absError": 0.0020280864622880257
+     },
+     "<$25k": {
+      "estimate": 0.3856624914487415,
+      "absError": 0.013285417964700563
+     }
+    },
+    "sex": {
+     "men": {
+      "estimate": 0.7379803737162924,
+      "absError": 0.0015784531678938452
+     },
+     "women": {
+      "estimate": 0.7191923823608202,
+      "absError": 0.0008953295793048266
+     }
+    },
+    "tenure": {
+     "homeowners": {
+      "estimate": 0.7942742641136994,
+      "absError": 0.0020940508980268335
+     },
+     "renters or other housing": {
+      "estimate": 0.5544297202440676,
+      "absError": 0.00047176063868747953
+     }
+    }
+   },
+   "nTrain": 9836,
+   "nTest": 2459
+  },
+  "shed_b3": {
+   "toplineEstimate": 0.23227164849459436,
+   "toplineHuman": 0.2306888689580664,
+   "toplineAbsError": 0.0015827795365279673,
+   "sliceMAE": 0.0029503625052277557,
+   "slices": {
+    "age_band": {
+     "18-29": {
+      "estimate": 0.28767974575172023,
+      "absError": 0.006162775253545638
+     },
+     "30-44": {
+      "estimate": 0.24688929249719735,
+      "absError": 0.003472123078432726
+     },
+     "45-64": {
+      "estimate": 0.20403841234145534,
+      "absError": 0.0013074541244369464
+     },
+     "65+": {
+      "estimate": 0.2096043862994938,
+      "absError": 0.0025435322768218582
+     }
+    },
+    "income_band": {
+     "$150k+": {
+      "estimate": 0.2665277299245316,
+      "absError": 0.008553843855299281
+     },
+     "$25k-$74,999": {
+      "estimate": 0.21117654969762886,
+      "absError": 0.002637223917822229
+     },
+     "$75k-$149,999": {
+      "estimate": 0.24352972467029974,
+      "absError": 0.004341138743120754
+     },
+     "<$25k": {
+      "estimate": 0.1594194936070798,
+      "absError": 0.0003564444343618911
+     }
+    },
+    "sex": {
+     "men": {
+      "estimate": 0.24483920067879303,
+      "absError": 0.0008383294026115817
+     },
+     "women": {
+      "estimate": 0.21948088385631315,
+      "absError": 0.0014667032832447746
+     }
+    },
+    "tenure": {
+     "homeowners": {
+      "estimate": 0.22569932699473017,
+      "absError": 0.0027915126219610897
+     },
+     "renters or other housing": {
+      "estimate": 0.24972692732808968,
+      "absError": 0.0009332690710742997
+     }
+    }
+   },
+   "nTrain": 9836,
+   "nTest": 2459
+  },
+  "shed_400cash": {
+   "toplineEstimate": 0.6251704520862743,
+   "toplineHuman": 0.6273650319733973,
+   "toplineAbsError": 0.002194579887123016,
+   "sliceMAE": 0.004944009707154612,
+   "slices": {
+    "age_band": {
+     "18-29": {
+      "estimate": 0.47319211618140855,
+      "absError": 0.0013569791465168901
+     },
+     "30-44": {
+      "estimate": 0.5497669416609348,
+      "absError": 0.012375903436037672
+     },
+     "45-64": {
+      "estimate": 0.6527978776542469,
+      "absError": 0.0025469629346113187
+     },
+     "65+": {
+      "estimate": 0.8049098124586431,
+      "absError": 0.0009418436287190746
+     }
+    },
+    "income_band": {
+     "$150k+": {
+      "estimate": 0.838500130321386,
+      "absError": 0.002069640749677082
+     },
+     "$25k-$74,999": {
+      "estimate": 0.4838450027535679,
+      "absError": 0.006520709285748549
+     },
+     "$75k-$149,999": {
+      "estimate": 0.6887575356610622,
+      "absError": 0.005255769072293415
+     },
+     "<$25k": {
+      "estimate": 0.21916101091435328,
+      "absError": 0.0118194592603873
+     }
+    },
+    "sex": {
+     "men": {
+      "estimate": 0.6420314138481755,
+      "absError": 0.005281814408174101
+     },
+     "women": {
+      "estimate": 0.6080100225682135,
+      "absError": 0.00036183574977277644
+     }
+    },
+    "tenure": {
+     "homeowners": {
+      "estimate": 0.7106814598656825,
+      "absError": 0.00297391208858222
+     },
+     "renters or other housing": {
+      "estimate": 0.3980637160336338,
+      "absError": 0.007823286725334944
+     }
+    }
+   },
+   "nTrain": 9836,
+   "nTest": 2459
+  },
+  "shed_ef1": {
+   "toplineEstimate": 0.5528811173574473,
+   "toplineHuman": 0.5504060066444076,
+   "toplineAbsError": 0.00247511071303963,
+   "sliceMAE": 0.0067659986500526416,
+   "slices": {
+    "age_band": {
+     "18-29": {
+      "estimate": 0.3761701000312941,
+      "absError": 0.012766574161279853
+     },
+     "30-44": {
+      "estimate": 0.49106347132239364,
+      "absError": 0.010290633339568867
+     },
+     "45-64": {
+      "estimate": 0.5792265932169818,
+      "absError": 0.0074181100163986935
+     },
+     "65+": {
+      "estimate": 0.7403539877510635,
+      "absError": 0.0005680409058049785
+     }
+    },
+    "income_band": {
+     "$150k+": {
+      "estimate": 0.7592860356591931,
+      "absError": 0.004589774942625913
+     },
+     "$25k-$74,999": {
+      "estimate": 0.4265995459356642,
+      "absError": 0.01405505337232582
+     },
+     "$75k-$149,999": {
+      "estimate": 0.5880945074646098,
+      "absError": 0.006879342336713834
+     },
+     "<$25k": {
+      "estimate": 0.2127395620934454,
+      "absError": 0.00895006310475216
+     }
+    },
+    "sex": {
+     "men": {
+      "estimate": 0.5686540412493143,
+      "absError": 0.0018079852635758398
+     },
+     "women": {
+      "estimate": 0.5368280503638578,
+      "absError": 0.005517878891475592
+     }
+    },
+    "tenure": {
+     "homeowners": {
+      "estimate": 0.6246889861105631,
+      "absError": 0.0016618037087059445
+     },
+     "renters or other housing": {
+      "estimate": 0.36216823583596763,
+      "absError": 0.0066867237574042004
+     }
+    }
+   },
+   "nTrain": 9836,
+   "nTest": 2459
+  },
+  "shed_ef2": {
+   "toplineEstimate": 0.33737358568886416,
+   "toplineHuman": 0.3323190077574487,
+   "toplineAbsError": 0.005054577931415449,
+   "sliceMAE": 0.00861806143920154,
+   "slices": {
+    "age_band": {
+     "18-29": {
+      "estimate": 0.27638178317215106,
+      "absError": 0.0066962662794401995
+     },
+     "30-44": {
+      "estimate": 0.3017863686599527,
+      "absError": 0.011659530249548467
+     },
+     "45-64": {
+      "estimate": 0.36481804120541717,
+      "absError": 0.011646801304082022
+     },
+     "65+": {
+      "estimate": 0.47232757659098884,
+      "absError": 0.010009001645318094
+     }
+    },
+    "income_band": {
+     "$150k+": {
+      "estimate": 0.5689883843607756,
+      "absError": 0.026344558286405362
+     },
+     "$25k-$74,999": {
+      "estimate": 0.25806945701218564,
+      "absError": 0.006158163151993301
+     },
+     "$75k-$149,999": {
+      "estimate": 0.4314391781425636,
+      "absError": 0.0007804947178966515
+     },
+     "<$25k": {
+      "estimate": 0.14503245272306162,
+      "absError": 0.0046398329690633955
+     }
+    },
+    "sex": {
+     "men": {
+      "estimate": 0.3597440229337756,
+      "absError": 0.009715703788872876
+     },
+     "women": {
+      "estimate": 0.3162202286900713,
+      "absError": 0.0006458213689765624
+     }
+    },
+    "tenure": {
+     "homeowners": {
+      "estimate": 0.42637015424216046,
+      "absError": 0.010656739248353808
+     },
+     "renters or other housing": {
+      "estimate": 0.21269360324580566,
+      "absError": 0.004463824260467736
+     }
+    }
+   },
+   "nTrain": 4115,
+   "nTest": 1029
+  },
+  "shed_ef7": {
+   "toplineEstimate": 0.48663915103213123,
+   "toplineHuman": 0.48258037399876136,
+   "toplineAbsError": 0.004058777033369876,
+   "sliceMAE": 0.0062854757807298935,
+   "slices": {
+    "age_band": {
+     "18-29": {
+      "estimate": 0.30932293594130983,
+      "absError": 0.01723912376783926
+     },
+     "30-44": {
+      "estimate": 0.43392150219840664,
+      "absError": 0.006661475788765248
+     },
+     "45-64": {
+      "estimate": 0.5150719001612316,
+      "absError": 0.0069852225190984996
+     },
+     "65+": {
+      "estimate": 0.6607734783144644,
+      "absError": 0.0004205205420718672
+     }
+    },
+    "income_band": {
+     "$150k+": {
+      "estimate": 0.7595542442055317,
+      "absError": 0.011841494670088548
+     },
+     "$25k-$74,999": {
+      "estimate": 0.3045339293393726,
+      "absError": 0.0093723106321571
+     },
+     "$75k-$149,999": {
+      "estimate": 0.5315964047247058,
+      "absError": 0.0006021289398131513
+     },
+     "<$25k": {
+      "estimate": 0.08360311959780745,
+      "absError": 0.004862595445794787
+     }
+    },
+    "sex": {
+     "men": {
+      "estimate": 0.5102571203043736,
+      "absError": 0.003321367458471558
+     },
+     "women": {
+      "estimate": 0.4626017027074546,
+      "absError": 0.009535403533322051
+     }
+    },
+    "tenure": {
+     "homeowners": {
+      "estimate": 0.5664736377617967,
+      "absError": 0.0017678782712180485
+     },
+     "renters or other housing": {
+      "estimate": 0.2746085578202675,
+      "absError": 0.002816187800118608
+     }
+    }
+   },
+   "nTrain": 9836,
+   "nTest": 2459
+  },
+  "shed_bk1": {
+   "toplineEstimate": 0.9349752959310434,
+   "toplineHuman": 0.9351636952187411,
+   "toplineAbsError": 0.00018839928769764924,
+   "sliceMAE": 0.00259806510186412,
+   "slices": {
+    "age_band": {
+     "18-29": {
+      "estimate": 0.8751628314445433,
+      "absError": 0.0044236950651460605
+     },
+     "30-44": {
+      "estimate": 0.9175256991995705,
+      "absError": 0.0033618157049810637
+     },
+     "45-64": {
+      "estimate": 0.95179759892536,
+      "absError": 0.002789096151794679
+     },
+     "65+": {
+      "estimate": 0.9822723906554408,
+      "absError": 0.0016332654119544099
+     }
+    },
+    "income_band": {
+     "$150k+": {
+      "estimate": 0.9849567196747216,
+      "absError": 0.000803799700541008
+     },
+     "$25k-$74,999": {
+      "estimate": 0.9237682397456982,
+      "absError": 0.0025936206812409157
+     },
+     "$75k-$149,999": {
+      "estimate": 0.9674152585720449,
+      "absError": 0.0021661554011754847
+     },
+     "<$25k": {
+      "estimate": 0.72506288834068,
+      "absError": 0.00642500246913269
+     }
+    },
+    "sex": {
+     "men": {
+      "estimate": 0.9331515360932842,
+      "absError": 0.0006775826477448676
+     },
+     "women": {
+      "estimate": 0.9368314475904626,
+      "absError": 0.0003970689255559101
+     }
+    },
+    "tenure": {
+     "homeowners": {
+      "estimate": 0.9644016514090474,
+      "absError": 0.002580270706013077
+     },
+     "renters or other housing": {
+      "estimate": 0.8568225092889517,
+      "absError": 0.0033254083570892767
+     }
+    }
+   },
+   "nTrain": 9836,
+   "nTest": 2459
+  },
+  "shed_bnpl": {
+   "toplineEstimate": 0.14890364208589268,
+   "toplineHuman": 0.14683266602527706,
+   "toplineAbsError": 0.0020709760606156258,
+   "sliceMAE": 0.004365185905582133,
+   "slices": {
+    "age_band": {
+     "18-29": {
+      "estimate": 0.19658510903626628,
+      "absError": 0.007256981430040221
+     },
+     "30-44": {
+      "estimate": 0.19367301117214467,
+      "absError": 0.005960451499285951
+     },
+     "45-64": {
+      "estimate": 0.1396405612046456,
+      "absError": 0.003436590106787818
+     },
+     "65+": {
+      "estimate": 0.06864366084012674,
+      "absError": 0.000533941266322141
+     }
+    },
+    "income_band": {
+     "$150k+": {
+      "estimate": 0.10327898733571114,
+      "absError": 0.0033319408461904843
+     },
+     "$25k-$74,999": {
+      "estimate": 0.1795505145848039,
+      "absError": 0.003385274654534004
+     },
+     "$75k-$149,999": {
+      "estimate": 0.1518078350241116,
+      "absError": 0.0035779068132880676
+     },
+     "<$25k": {
+      "estimate": 0.18342889243406194,
+      "absError": 0.007950428294004247
+     }
+    },
+    "sex": {
+     "men": {
+      "estimate": 0.1313993546989442,
+      "absError": 0.00847799074283008
+     },
+     "women": {
+      "estimate": 0.1667188233436066,
+      "absError": 0.0028803878913103154
+     }
+    },
+    "tenure": {
+     "homeowners": {
+      "estimate": 0.12446780534025134,
+      "absError": 0.00424960093313996
+     },
+     "renters or other housing": {
+      "estimate": 0.21380222380222402,
+      "absError": 0.001340736389252306
+     }
+    }
+   },
+   "nTrain": 9836,
+   "nTest": 2459
+  },
+  "shed_work": {
+   "toplineEstimate": 0.5965108492742089,
+   "toplineHuman": 0.5959693016605033,
+   "toplineAbsError": 0.0005415476137056174,
+   "sliceMAE": 0.004278909901886114,
+   "slices": {
+    "age_band": {
+     "18-29": {
+      "estimate": 0.7036996801536075,
+      "absError": 0.009751762224057381
+     },
+     "30-44": {
+      "estimate": 0.7298824864070358,
+      "absError": 0.007271554670501557
+     },
+     "45-64": {
+      "estimate": 0.6844383365190957,
+      "absError": 0.006721044956493172
+     },
+     "65+": {
+      "estimate": 0.2114774480066492,
+      "absError": 0.004677460510698894
+     }
+    },
+    "income_band": {
+     "$150k+": {
+      "estimate": 0.7063559487328347,
+      "absError": 0.0007278976300618689
+     },
+     "$25k-$74,999": {
+      "estimate": 0.5202554699102857,
+      "absError": 0.0025242047771346643
+     },
+     "$75k-$149,999": {
+      "estimate": 0.641999996964246,
+      "absError": 0.0033433612086017916
+     },
+     "<$25k": {
+      "estimate": 0.3575643537675378,
+      "absError": 0.01087870437597982
+     }
+    },
+    "sex": {
+     "men": {
+      "estimate": 0.6349893554523391,
+      "absError": 0.0029279209364497794
+     },
+     "women": {
+      "estimate": 0.5573489258587727,
+      "absError": 0.0013193338946297928
+     }
+    },
+    "tenure": {
+     "homeowners": {
+      "estimate": 0.5994764571865525,
+      "absError": 0.0008048450518302053
+     },
+     "renters or other housing": {
+      "estimate": 0.588634558830742,
+      "absError": 0.00039882858619444406
+     }
+    }
+   },
+   "nTrain": 9836,
+   "nTest": 2459
+  },
+  "shed_i41d": {
+   "toplineEstimate": 0.0320614717446734,
+   "toplineHuman": 0.03155180225228994,
+   "toplineAbsError": 0.0005096694923834577,
+   "sliceMAE": 0.0015885845690006188,
+   "slices": {
+    "age_band": {
+     "18-29": {
+      "estimate": 0.03437241106941438,
+      "absError": 0.003185010096887146
+     },
+     "30-44": {
+      "estimate": 0.0479328404512172,
+      "absError": 0.004839245801303189
+     },
+     "45-64": {
+      "estimate": 0.02886020364300701,
+      "absError": 7.784594527994113e-05
+     },
+     "65+": {
+      "estimate": 0.01629686502382628,
+      "absError": 0.0006225380036445696
+     }
+    },
+    "income_band": {
+     "$150k+": {
+      "estimate": 0.0066845548709391495,
+      "absError": 0.00108127458265458
+     },
+     "$25k-$74,999": {
+      "estimate": 0.032912048549896794,
+      "absError": 0.0010165526138468939
+     },
+     "$75k-$149,999": {
+      "estimate": 0.0039145233846079,
+      "absError": 0.0006885908050660904
+     },
+     "<$25k": {
+      "estimate": 0.18817480299971726,
+      "absError": 0.001233499662837867
+     }
+    },
+    "sex": {
+     "men": {
+      "estimate": 0.023916232437248174,
+      "absError": 0.0006071037167378439
+     },
+     "women": {
+      "estimate": 0.040351378750967136,
+      "absError": 0.002107599176880977
+     }
+    },
+    "tenure": {
+     "homeowners": {
+      "estimate": 0.005799120758020878,
+      "absError": 0.00035559541070003236
+     },
+     "renters or other housing": {
+      "estimate": 0.10181105099222199,
+      "absError": 0.0032481590121682946
+     }
+    }
+   },
+   "nTrain": 9836,
+   "nTest": 2459
+  },
+  "shed_housing_stress": {
+   "toplineEstimate": 0.1837677715640866,
+   "toplineHuman": 0.18737877157451166,
+   "toplineAbsError": 0.003611000010425053,
+   "sliceMAE": 0.006075008226843227,
+   "slices": {
+    "age_band": {
+     "18-29": {
+      "estimate": 0.2813251359328063,
+      "absError": 0.007945594709168446
+     },
+     "30-44": {
+      "estimate": 0.2656162472867653,
+      "absError": 0.008326118050484221
+     },
+     "45-64": {
+      "estimate": 0.142645090085178,
+      "absError": 0.008774873777902814
+     },
+     "65+": {
+      "estimate": 0.06487869515130584,
+      "absError": 0.0035061127565189643
+     }
+    },
+    "income_band": {
+     "$150k+": {
+      "estimate": 0.05226520267511657,
+      "absError": 0.0021317555909153157
+     },
+     "$25k-$74,999": {
+      "estimate": 0.2859114783178068,
+      "absError": 0.004162697293782769
+     },
+     "$75k-$149,999": {
+      "estimate": 0.12274117695038571,
+      "absError": 0.0020307905501417978
+     },
+     "<$25k": {
+      "estimate": 0.46024168353232997,
+      "absError": 0.023291175647351003
+     }
+    },
+    "sex": {
+     "men": {
+      "estimate": 0.17136840117941032,
+      "absError": 0.0020002858587837846
+     },
+     "women": {
+      "estimate": 0.1963873673237654,
+      "absError": 0.008139797871190957
+     }
+    },
+    "tenure": {
+     "homeowners": {
+      "estimate": 0.00594402933153706,
+      "absError": 0.0002519330804254963
+     },
+     "renters or other housing": {
+      "estimate": 0.6560457944740901,
+      "absError": 0.0023389635354531535
+     }
+    }
+   },
+   "nTrain": 9836,
+   "nTest": 2459
+  }
+ }
+}

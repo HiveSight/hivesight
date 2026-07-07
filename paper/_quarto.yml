@@ -1,0 +1,17 @@
+project:
+  render:
+    - paper.qmd
+
+format:
+  pdf:
+    documentclass: article
+    fontsize: 11pt
+    geometry: margin=1.1in
+    number-sections: true
+    colorlinks: true
+  html:
+    toc: true
+    number-sections: true
+    embed-resources: true
+
+bibliography: references.bib

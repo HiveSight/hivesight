@@ -1,0 +1,436 @@
+---
+title: "Cells, not personas: population survey estimates from language models via post-stratification over calibrated census microdata"
+author:
+  - name: Max Ghenis
+    affiliations:
+      - name: HiveSight
+date: 2026-07-07
+abstract: |
+  Simulated survey respondents built by role-playing language models one
+  persona at a time are widely marketed and widely distrusted. We test an
+  alternative estimator that never simulates an individual: partition a
+  census-calibrated synthetic population into demographic cells, elicit each
+  cell's full response distribution from a language model acting as an expert
+  predictor, and aggregate with calibrated population weights — multilevel
+  regression and post-stratification with a language model as the response
+  model. Against a pre-registered 63-item anchor bank drawn from the 2024
+  General Social Survey and the Federal Reserve's 2024 Survey of Household
+  Economics and Decisionmaking, cell-based estimation beats matched-budget
+  persona role-play on every pooled metric and is the most accurate method in
+  test on demographic subgroups, while a direct model estimate remains
+  competitive on national toplines. Errors are systematic rather than random:
+  signed topline error varies by item valence, subgroup rank ordering is
+  largely preserved, and prediction-powered inference with a 200-person human
+  anchor restores valid confidence intervals. State-level validation against
+  the 2023 Behavioral Risk Factor Surveillance System measures small-area
+  transfer. We release the estimator, anchor bank, raw elicitations, and this
+  evaluation harness; the public product renders its live benchmark page from
+  the same artifacts this paper reports.
+format:
+  pdf:
+    keep-tex: false
+execute:
+  echo: false
+---
+
+```{python}
+#| output: false
+import json, os
+S = json.load(open(os.path.join("artifacts", "summary.json")))
+MINI = "openai:gpt-5-mini"
+def pts(x, d=1):
+    return f"{x*100:.{d}f}"
+def arm(a, key="cells"):
+    return S["anchor"][f"{key}:{MINI}"][a]
+H = S["hypotheses"]
+```
+
+# Introduction
+
+Whether large language models can stand in for human survey respondents has
+become one of the most contested questions in survey research. Commercial
+"synthetic respondent" products have proliferated, while the field's
+institutions urge caution: the American Association for Public Opinion
+Research's 2026 task force classifies synthetic samples as the riskiest
+integration of AI into survey work [@aapor2026responsible], and the
+ICC/ESOMAR code requires that simulated respondents never be presented as
+measurements of real people [@esomar2025code]. The scientific literature has
+converged on a specific diagnosis: role-playing one fake respondent per model
+call — the dominant commercial architecture — compresses within-group
+variance, misportrays identity groups, and is unstable under prompt
+perturbation [@bisbee2024synthetic; @wang2025large; @santurkar2023whose],
+even as the same models demonstrably carry substantial distributional
+knowledge about public opinion [@argyle2023out; @meister2024benchmarking;
+@gong2026characterizing].
+
+This paper tests an estimator built around that diagnosis rather than against
+it. The design treats the language model not as a subject but as a
+conditional response model over population cells, and it grounds the cells in
+a calibrated synthetic population rather than in prompt-invented personas:
+
+1. **Population frame.** A synthetic population of 4.2 million adult records
+   derived from the Current Population Survey [@census2024cps], with
+   calibrated weights and state and congressional-district assignment,
+   partitioned into roughly 150 post-stratification cells (age band, earned
+   income band, sex, and — where a cell carries sufficient weight — housing
+   tenure, children at home, means-tested benefit receipt, and Social
+   Security receipt).
+2. **Distribution elicitation.** For each cell, the model is asked once, in
+   an expert-predictor frame, for the percentage of that group choosing each
+   response option — verbalized distributions rather than sampled
+   individuals, following the head-to-head evidence that direct distribution
+   elicitation dominates simulate-then-count [@gong2026characterizing;
+   @meister2024benchmarking].
+3. **Weighted aggregation.** Cell distributions combine with calibrated
+   population weights, the post-stratification arithmetic of MRP
+   [@gelman1997poststratification; @park2004bayesian]; subgroup estimates
+   re-aggregate the same cell predictions, so breakdowns are always
+   consistent with toplines.
+
+Each component has published support; to our knowledge their integration —
+verbalized per-cell elicitation over a *calibrated small-area microdata
+frame*, with registered evaluation and valid-inference machinery — has not
+previously been assembled or evaluated end to end. Proof-of-concept hybrids
+exist [@cerina2023artificially], and open tooling for LLM surveys is
+maturing [@edsl2024; @horton2023large], but public evaluations with
+pre-registered hypotheses and disclosed misses remain rare
+[@verasight2025synthetic].
+
+Our contributions: (i) a pre-registered, 63-item evaluation against GSS 2024
+and SHED 2024 human targets comparing the cell estimator to matched-budget
+persona role-play and to direct model estimation; (ii) evidence that the
+estimator's residual error is *systematic* — signed by item valence, with
+subgroup structure largely preserved — which makes it correctable in
+principle and honestly reportable in practice; (iii) a prediction-powered
+inference [@angelopoulos2023prediction; @krsteski2025valid] evaluation
+showing valid coverage from small human anchors; (iv) a state-level
+small-area validation against BRFSS 2023 [@cdc2024brfss]; and (v) a fully
+released harness in which the production system's public benchmark page and
+this paper render from the same artifacts.
+
+# Related work
+
+**Silicon sampling and its critics.** @argyle2023out introduced
+demographic-conditioned "silicon samples"; subsequent evaluations found
+persona means can track surveys while variance, covariance structure, and
+temporal stability do not [@bisbee2024synthetic], that identity-prompted
+personas caricature the groups they represent [@wang2025large], and that
+model defaults reflect particular populations [@santurkar2023whose;
+@durmus2023towards; @vonderheyde2025vox]. @westwood2025llm showed LLM
+respondents are effectively undetectable when inserted into real panels,
+sharpening the field's data-integrity concerns.
+
+**Distribution elicitation.** @meister2024benchmarking benchmark verbalized
+distributions against token log-probabilities and repeated sampling, finding
+verbalization dominant; @gong2026characterizing find direct distribution
+elicitation beats simulate-individuals in 77% of question-demographic pairs
+at one-fifth the cost, with predictable error structure. Our elicitation
+design follows both.
+
+**Post-stratification hybrids and calibration.** @cerina2023artificially
+blend LLM-derived data with bias-corrected MRP for the 2020 US election.
+Fine-tuning on survey corpora narrows human-model gaps [@suh2025language],
+supervised distributional calibration helps with as few as one to ten
+examples per question [@kambhatla2026improving], and prediction-powered
+inference converts biased predictors into valid estimators given a small
+labeled anchor [@angelopoulos2023prediction; @krsteski2025valid;
+@huang2025how]. The population frame we post-stratify over comes from the
+Populace line of calibrated-microdata work [@ghenis2026imputation;
+@ghenis2026sparsity; @ghenis2026dynamics].
+
+# Method
+
+## Population frame and cells
+
+The frame is a calibrated synthetic population of US adults constructed from
+CPS microdata with survey-weight calibration and geographic assignment
+(national, state, congressional district). We reduce each geography to
+post-stratification cells over age band ($18$–$29$, $30$–$44$, $45$–$64$,
+$65+$), personal earned-income band ($\$0$, $\$1$–$25$k, $\$25$–$75$k,
+$\$75$–$150$k, $\$150$k$+$), and sex; cells holding at least 0.25% of
+population weight are further split by housing tenure, children at home,
+means-tested benefit receipt, and Social Security receipt. The national table
+has 149 cells covering 100% of population weight. Cell tables are versioned
+data artifacts; the reduction code is released.
+
+## Elicitation
+
+Each cell receives one call: a system prompt establishing an
+expert-survey-methodologist frame (explicitly *not* role-play, following
+@anthis2025llm), the survey question verbatim, the response options, and a
+request for integer percentages summing to 100, returned as JSON. We use
+gpt-5-mini with minimal reasoning effort as the primary model; model variants
+are evaluated on a fixed subset. Malformed responses are dropped and counted
+as failures (never imputed). Elicitation is seeded and versioned; a
+paraphrase-stability probe accompanies the pilot.
+
+## Aggregation and provenance
+
+The population estimate for option $k$ is
+$\hat\theta_k = \sum_c w_c \, \hat p_{ck} / \sum_c w_c$, with $w_c$ the
+calibrated cell weight and $\hat p_{ck}$ the elicited probability. Subgroup
+estimates restrict the sum to matching cells. Every run records engine,
+prompt, and dataset versions, model, seed, cell counts, failures, and
+weighted audience.
+
+# Evaluation design
+
+The pre-analysis plan (PAP v2) was committed to the public repository before
+any anchor-bank elicitation, fixing arms, items, metrics, and hypotheses; the
+pilot that motivated it is reported separately below. Human targets come from
+the GSS 2024 cross-section (52 items retained under an a priori $n \ge 600$
+rule; weight `wtssnrps`) [@gss2024] and the SHED 2024 public-use file (11
+items; population weights) [@fed2025shed], with subgroup targets by age band
+and sex (both surveys) plus household income band and housing tenure (SHED),
+reported for bins with $n \ge 30$. SHED income slices are household income
+while cells band personal earned income — a construct mismatch shared
+identically by all microdata arms and disclosed wherever income slices
+appear.
+
+Arms: **cells** (the estimator; all 63 items), **direct** (one expert
+estimate for the full audience and one per subgroup; all items), and
+**persona** (one role-play call per weighted-sampled microdata record,
+$n{=}150$ per item — a matched-budget re-implementation of the standard
+synthetic-respondent design; 20-item pre-registered subset). Primary metric:
+absolute error of each item's designated positive-option share, pooled over
+items (topline) and over all subgroup bins (subgroup). Secondary: total
+variation distance, within-item Spearman rank correlation across subgroup
+bins, and signed error by item valence.
+
+# Results
+
+## Pilot: the persona architecture fails at matched budget
+
+```{python}
+#| output: false
+P = S["pilot"]
+```
+
+On the four-item SHED pilot with 150 role-play calls per item, persona
+simulation reached `{python} pts(P["persona"]["topline"])` points topline MAE
+and `{python} pts(P["persona"]["slice"])` points subgroup MAE — against
+`{python} pts(P["cells"]["topline"])` and `{python} pts(P["cells"]["slice"])`
+for cells at the same call budget. The failure is qualitative, not marginal:
+role-played low-income personas dramatized hardship (75.9% reporting serious
+housing-cost hardship versus 18.7% of real respondents), the variance-
+compression and stereotyping failure documented in prior work
+[@bisbee2024synthetic; @wang2025large]. A paraphrase probe moved the cells
+estimate by about one point.
+
+## Anchor bank: pooled accuracy
+
+```{python}
+#| output: asis
+rows = [
+    ("Persona role-play (20-item subset)", f"persona:{MINI}",
+     S["anchor"][f"persona:{MINI}"]["toplineMAE_subset20"], S["anchor"][f"persona:{MINI}"]["sliceMAE_subset20"]),
+    ("Direct model estimate", f"naive:{MINI}",
+     S["anchor"][f"naive:{MINI}"]["toplineMAE"], S["anchor"][f"naive:{MINI}"]["sliceMAE"]),
+    ("Population cells (this paper)", f"cells:{MINI}",
+     S["anchor"][f"cells:{MINI}"]["toplineMAE"], S["anchor"][f"cells:{MINI}"]["sliceMAE"]),
+]
+print("| Method | Topline MAE (pts) | Subgroup MAE (pts) |")
+print("|---|---|---|")
+for label, key, t, sl in rows:
+    print(f"| {label} | {t*100:.1f} | {sl*100:.1f} |")
+```
+
+: Pooled mean absolute error against human targets, gpt-5-mini.
+Persona is evaluated on its pre-registered 20-item subset; cells and direct
+on all 63 items. {#tbl-pooled}
+
+![Pooled accuracy by arm. Cells is the strongest subgroup estimator; the
+direct estimate remains competitive on toplines, where models can lean on
+memorized aggregates.](figures/fig1-arms.pdf){#fig-arms}
+
+Confirmatory results (@tbl-pooled, @fig-arms):
+
+```{python}
+#| output: asis
+h1 = H["H1_cells_vs_naive_subgroups"]
+h2 = H.get("H2_cells_vs_persona_subgroups")
+h3 = H.get("H3_persona_topline")
+h5 = H["H5_rank_correlation"]
+lines = []
+lines.append(
+    f"- **H1 (subgroups vs direct).** Over {h1['items']} items with both arms, cells "
+    f"subgroup MAE is {pts(h1['cellsSliceMAE'])} points versus {pts(h1['naiveSliceMAE'])} "
+    f"for per-subgroup direct estimation"
+    + (f" (Wilcoxon p = {h1['wilcoxonP']:.3g})" if h1.get("wilcoxonP") is not None else "")
+    + ("; the pre-registered direction holds." if h1["supported"] else "; the pre-registered direction does **not** hold.")
+)
+if h2:
+    lines.append(
+        f"- **H2 (subgroups vs persona).** On the 20-item subset, cells subgroup MAE is "
+        f"{pts(h2['cellsSliceMAE'])} points versus {pts(h2['personaSliceMAE'])} for persona role-play."
+    )
+if h3:
+    lines.append(
+        f"- **H3 (persona toplines).** Persona topline MAE is {pts(h3['personaToplineMAE'])} points "
+        f"versus {pts(h3['cellsToplineMAE'])} for cells on the same items, replicating the pilot."
+    )
+lines.append(
+    f"- **H5 (structure).** Median within-item Spearman correlation between cell-estimated and "
+    f"human subgroup values is {h5['median']:.2f} across {h5['items']} items with at least four bins."
+)
+print("\n".join(lines))
+```
+
+## Error is systematic: valence
+
+```{python}
+#| output: false
+h4 = H["H4_valence_signed_error"]
+```
+
+![Signed topline error of the cells arm by item valence. Bars mark means.
+](figures/fig2-valence.pdf){#fig-valence}
+
+Signed topline error for the cells arm averages
+`{python} pts(h4["positive"]["mean"])` points on positive-valence items
+(n=`{python} str(h4["positive"]["n"])`),
+`{python} pts(h4["neutral"]["mean"])` on neutral items
+(n=`{python} str(h4["neutral"]["n"])`), and
+`{python} pts(h4["negative"]["mean"])` on negative-valence items
+(n=`{python} str(h4["negative"]["n"])`) (@fig-valence). The model
+systematically under-rates how positively people describe their own
+circumstances — a level bias, not noise. In the pilot we additionally showed
+a one-parameter logit calibration fit on these self-report items fails
+leave-one-question-out validation precisely because the bias flips sign with
+valence; no calibration is therefore applied anywhere in this paper, and the
+production system reports measured error context instead of silently
+correcting. A valence-aware calibration is estimable from an anchor bank of
+this size and is registered future work.
+
+## Valid inference from small human anchors
+
+```{python}
+#| output: false
+ppi = S.get("ppi", {})
+```
+
+Treating each anchor survey as its population and redrawing weighted
+$n{=}200$ human anchors 500 times per item: prediction-powered inference
+achieves `{python} f"{ppi.get('meanCoveragePPI', 0)*100:.1f}"`% mean coverage
+of the full-sample target (nominal 95%;
+human-anchor-only: `{python} f"{ppi.get('meanCoverageHuman', 0)*100:.1f}"`%),
+with a median interval-width ratio of
+`{python} f"{ppi.get('medianWidthRatio', 0):.2f}"` versus the human-only
+interval; PPI intervals are narrower on
+`{python} f"{ppi.get('shareItemsPPINarrower', 0)*100:.0f}"`% of items. The
+practical reading: the estimator alone provides structure but not guarantees;
+200 real respondents turn it into a valid instrument whose intervals are
+typically tighter than those 200 respondents alone would support
+[@angelopoulos2023prediction; @krsteski2025valid].
+
+## Context: the in-survey demographic ceiling
+
+```{python}
+#| output: false
+rf = S.get("rf", {})
+```
+
+A gradient-boosted classifier trained on each anchor survey's own
+respondents (demographics only, 80/20 split) reaches
+`{python} pts(rf.get("toplineMAE", 0))` points topline and
+`{python} pts(rf.get("sliceMAE", 0))` points subgroup MAE — the ceiling for
+demographic-composition prediction *given the human data the LLM arms never
+see* [@miranda2025simulating]. The gap between this ceiling and the cells arm
+is the price of operating without fielded data; the gap between cells and
+persona is pure architecture.
+
+## Small-area transfer: 49 states against BRFSS
+
+```{python}
+#| output: asis
+b = S.get("brfss")
+if b:
+    p = b["pooled"]
+    print(
+        f"Across four full-sample BRFSS 2023 items estimated for every participating state "
+        f"(49 states with $n \\ge 300$), state-level cells estimation (age $\\times$ sex cells from each "
+        f"state's calibrated table) reaches {pts(p['maeCells'])} points mean absolute error, versus "
+        f"{pts(p['maeNaive'])} for one direct estimate per state and {pts(p['maeNationalConst'])} for "
+        f"applying the national estimate uniformly to all states. Median within-item Spearman "
+        f"correlation across states is {p['medianSpearman']:.2f} (@fig-states)."
+    )
+else:
+    print("_BRFSS run pending at time of rendering._")
+```
+
+![State-level estimates versus BRFSS 2023 weighted targets, four items,
+49 states.](figures/fig3-states.pdf){#fig-states}
+
+## Model variants
+
+```{python}
+#| output: asis
+keys = [k for k in S["anchor"] if k.startswith("cells:") ]
+print("| Cells arm model | Topline MAE (pts) | Subgroup MAE (pts) |")
+print("|---|---|---|")
+for k in keys:
+    v = S["anchor"][k]
+    t = v.get("toplineMAE_subset20") or v.get("toplineMAE")
+    sl = v.get("sliceMAE_subset20") or v.get("sliceMAE")
+    label = k.replace("cells:", "")
+    print(f"| {label} | {t*100:.1f} | {sl*100:.1f} |")
+```
+
+: Cells-arm accuracy by model on the 20-item subset (gpt-5-mini shown on the
+same subset for comparability). {#tbl-models}
+
+# Limitations
+
+**Training-data contamination.** GSS 2024 microdata were released in fall
+2025 and SHED 2024 in May 2025; published toplines for classic items
+circulate widely. Contamination would flatter all arms — including the
+direct-estimate arm, whose strength on famous marginals is partly evidence
+of it — and cannot be excluded without post-cutoff items. A registered
+follow-up fields fresh questions on a verified human panel.
+
+**Construct mismatches.** SHED income subgroups are household income; the
+frame's income bands are personal earned income. GSS 2024's smaller sample
+thins some subgroup bins. Both are disclosed per item.
+
+**Temporal drift and scope.** A frozen model cannot track post-cutoff opinion
+change; fast-moving topics will degrade in ways this evergreen-item bank does
+not measure. Small and marginalized subgroups are where role-play failure
+modes concentrate; while cell estimation avoids individual caricature, we
+evaluate only subgroups with $n \ge 30$ human respondents and make no claims
+below that resolution.
+
+**No fresh human data in this study.** All targets are public secondary data;
+the PPI analysis simulates anchors by subsampling the same surveys. The
+follow-up with newly fielded items is the decisive contamination-robust test.
+
+# Discussion
+
+The synthetic-respondent debate has largely been conducted over the wrong
+architecture. Role-playing individuals is both the dominant commercial
+pattern and the design the evidence most clearly condemns; our matched-budget
+replication quantifies the gap. Treating the model as a conditional response
+model over a calibrated population frame changes the question from "can an
+LLM impersonate a person?" to "how well does an LLM know conditional response
+distributions?" — a question that admits measurement, calibration, and valid
+inference. On subgroups, where fielding real surveys is most expensive, the
+cell estimator is the strongest method we tested; on toplines its error is
+systematic and sign-predictable, which is what makes the honest path —
+publish the misses, anchor with small human samples, never imply real people
+were surveyed [@esomar2025code; @aapor2026responsible] — also the technically
+correct one.
+
+All code, prompts, cell tables, elicitation logs, human-target construction,
+and this manuscript's source are public [@ghenis2026hivesight]; the
+production system's benchmark page renders from the same artifacts.
+
+# Acknowledgments {.unnumbered}
+
+Drafting, engineering, and analysis assistance from Claude (Anthropic).
+Population frame built on the Populace calibrated-microdata stack. Human
+targets derive from public data of NORC's General Social Survey, the Federal
+Reserve Board's SHED, and CDC's BRFSS; all interpretations are the author's.
+
+# References {.unnumbered}
+
+::: {#refs}
+:::
