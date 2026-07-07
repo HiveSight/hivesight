@@ -432,12 +432,14 @@ if rep:
             f"Across {len(rc['runs'])} independent runs of the 20-item subset, between-run SD of pooled MAEs is "
             f"{pts(rc['toplineSD'], 2)} points topline / {pts(rc['sliceSD'], 2)} subgroup for the cells arm"
             + (f" and {pts(rn['toplineSD'], 2)} / {pts(rn['sliceSD'], 2)} for the direct arm" if rn else "")
-            + " — run-to-run noise is far below the differences of interest. "
+            + " — cells' run noise is negligible, and the direct arm's exceeds its own topline advantage over cells "
+            + "(+0.56 points), which is itself evidence for the marginal-accuracy tie. "
         )
-if par:
+if par and par.get("cells"):
+    pc = par["cells"]
     print(
-        f"Paraphrasing question stems moves item toplines by only {pts(par['meanAbsDelta'])} points on average "
-        f"(max {pts(par['maxAbsDelta'])}; n = {par['n']}) — semantic-preserving rewording is a second-order "
+        f"Paraphrasing question stems moves item toplines by only {pts(pc['meanAbsDelta'])} points on average "
+        f"(max {pts(pc['maxAbsDelta'])}; n = {pc['n']}) — semantic-preserving rewording is a second-order "
         f"perturbation at cell aggregation. "
     )
 if orv:
