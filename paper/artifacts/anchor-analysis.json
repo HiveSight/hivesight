@@ -1425,7 +1425,7 @@
       "tv": 0.3899933631022005
      },
      "sliceMAE": 0.116256000821334,
-     "sliceSpearman": NaN,
+     "sliceSpearman": null,
      "sliceN": 8
     },
     "cells:openai:gpt-5.2": {
@@ -1827,7 +1827,7 @@
       "tv": 0.23939924742098506
      },
      "sliceMAE": 0.248112940470195,
-     "sliceSpearman": NaN,
+     "sliceSpearman": null,
      "sliceN": 8
     },
     "cells:openai:gpt-5.2": {
@@ -2028,7 +2028,7 @@
       "tv": 0.3873103690239659
      },
      "sliceMAE": 0.39397937519020443,
-     "sliceSpearman": NaN,
+     "sliceSpearman": null,
      "sliceN": 8
     },
     "cells:openai:gpt-5.2": {
@@ -2847,7 +2847,7 @@
    "sliceMAE": 0.2496375880081127,
    "toplineMAE_subset20": 0.2503477121330608,
    "sliceMAE_subset20": 0.2496375880081127,
-   "medianSliceSpearman": NaN
+   "medianSliceSpearman": 0.4285714285714286
   }
  },
  "hypotheses": {

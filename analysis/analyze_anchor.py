@@ -70,7 +70,8 @@ def score_arm(item, arm):
     out["slices"] = slice_detail
     if len(pairs) >= 4:
         r, _ = spearmanr([p[0] for p in pairs], [p[1] for p in pairs])
-        out["sliceSpearman"] = float(r)
+        if not np.isnan(r):  # undefined when an arm's estimates are constant
+            out["sliceSpearman"] = float(r)
     return out
 
 
@@ -118,7 +119,7 @@ def main():
             "sliceMAE": pool(sc, "sliceMAE"),
             "toplineMAE_subset20": pool(sc, "topline", SUBSET20),
             "sliceMAE_subset20": pool(sc, "sliceMAE", SUBSET20),
-            "medianSliceSpearman": float(np.median([s["sliceSpearman"] for s in sc.values() if s.get("sliceSpearman") is not None])) if any(s.get("sliceSpearman") is not None for s in sc.values()) else None,
+            "medianSliceSpearman": (lambda vals: float(np.median(vals)) if vals else None)([s["sliceSpearman"] for s in sc.values() if s.get("sliceSpearman") is not None and not np.isnan(s["sliceSpearman"])]),
         }
 
     mini = "openai:gpt-5-mini"
