@@ -1,160 +1,53 @@
-import { NextResponse } from "next/server";
-import { loadAndSampleForLocation } from "@/lib/data/location-resolver";
-import { createSeededRandom } from "@/lib/data/sampler";
-import { createClient } from "@/lib/supabase/server";
-import type { LocationFilter } from "@/types";
+import { loadGeography } from "@/engine/data";
+import { pingStore, storeConfigured } from "@/lib/store";
 
-export const dynamic = "force-dynamic";
+export async function GET() {
+  const checks: Array<{ name: string; status: string; message: string }> = [];
 
-type HealthStatus = "ok" | "failed" | "skipped";
-
-interface HealthCheck {
-  name: string;
-  status: HealthStatus;
-  latencyMs: number;
-  message?: string;
-}
-
-const HEALTH_LOCATION: LocationFilter = {
-  type: "state",
-  value: "DE",
-  label: "Delaware",
-};
-
-function now() {
-  return Date.now();
-}
-
-async function withTimeout<T>(
-  promise: Promise<T>,
-  timeoutMs: number,
-  label: string
-): Promise<T> {
-  let timeout: ReturnType<typeof setTimeout> | undefined;
-  const timeoutPromise = new Promise<never>((_, reject) => {
-    timeout = setTimeout(
-      () => reject(new Error(`${label} timed out after ${timeoutMs}ms`)),
-      timeoutMs
-    );
+  checks.push({
+    name: "model_config",
+    status: process.env.OPENAI_API_KEY ? "ok" : "failed",
+    message: process.env.OPENAI_API_KEY ? "OPENAI_API_KEY configured" : "OPENAI_API_KEY missing",
   });
 
   try {
-    return await Promise.race([promise, timeoutPromise]);
-  } finally {
-    if (timeout) clearTimeout(timeout);
-  }
-}
-
-async function runCheck(
-  name: string,
-  check: () => Promise<string | void>
-): Promise<HealthCheck> {
-  const startedAt = now();
-
-  try {
-    const message = await check();
-    return {
-      name,
-      status: "ok",
-      latencyMs: now() - startedAt,
-      message: message ?? undefined,
-    };
-  } catch (error) {
-    return {
-      name,
-      status: "failed",
-      latencyMs: now() - startedAt,
-      message: error instanceof Error ? error.message : String(error),
-    };
-  }
-}
-
-export async function GET(request: Request) {
-  const url = new URL(request.url);
-  const shallow = url.searchParams.get("shallow") === "1";
-  const checks: HealthCheck[] = [];
-
-  checks.push(
-    await runCheck("supabase", async () => {
-      if (!process.env.NEXT_PUBLIC_SUPABASE_URL) {
-        throw new Error("NEXT_PUBLIC_SUPABASE_URL is not configured");
-      }
-      if (!process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
-        throw new Error("NEXT_PUBLIC_SUPABASE_ANON_KEY is not configured");
-      }
-
-      const supabase = await createClient();
-      const query = supabase
-        .from("surveys")
-        .select("id", { count: "exact", head: true });
-      const { error, count } = await withTimeout(
-        Promise.resolve(
-          query as unknown as PromiseLike<{
-            error: { message: string } | null;
-            count: number | null;
-          }>
-        ),
-        5_000,
-        "Supabase survey metadata check"
-      );
-
-      if (error) throw new Error(error.message);
-      return `reachable; surveys visible to health check: ${count ?? 0}`;
-    })
-  );
-
-  checks.push(
-    await runCheck("openai_config", async () => {
-      if (!process.env.OPENAI_API_KEY) {
-        throw new Error("OPENAI_API_KEY is not configured");
-      }
-      return "OPENAI_API_KEY is configured";
-    })
-  );
-
-  if (shallow) {
+    const { table } = await loadGeography({ type: "state", value: "DE" });
     checks.push({
-      name: "microdata_sample",
-      status: "skipped",
-      latencyMs: 0,
-      message: "Skipped by shallow=1",
+      name: "cell_data",
+      status: "ok",
+      message: `${table.cells.length} cells for Delaware, weight ${Math.round(table.totalWeight).toLocaleString()}`,
+    });
+  } catch (err) {
+    checks.push({
+      name: "cell_data",
+      status: "failed",
+      message: err instanceof Error ? err.message : "unknown",
+    });
+  }
+
+  if (storeConfigured()) {
+    const ping = await pingStore();
+    checks.push({
+      name: "store",
+      status: ping.ok ? "ok" : "failed",
+      message: ping.message,
     });
   } else {
-    checks.push(
-      await runCheck("microdata_sample", async () => {
-        const sample = await withTimeout(
-          loadAndSampleForLocation(HEALTH_LOCATION, 1, {
-            allowSyntheticFallback: false,
-            random: createSeededRandom(20260425),
-          }),
-          10_000,
-          "Microdata sample check"
-        );
-
-        if (sample.synthetic || sample.persons.length !== 1) {
-          throw new Error("Calibrated microdata sample did not return one real record");
-        }
-
-        return `loaded ${sample.metadata.eligibleCount.toLocaleString()} eligible records for ${HEALTH_LOCATION.label}`;
-      })
-    );
+    checks.push({
+      name: "store",
+      status: "disabled",
+      message: "persistence not configured; runs return inline only",
+    });
   }
 
-  const failed = checks.filter((check) => check.status === "failed");
-  const status = failed.length > 0 ? "degraded" : "ok";
-
-  return NextResponse.json(
+  const failed = checks.some((c) => c.status === "failed");
+  return Response.json(
     {
-      status,
-      checkedAt: new Date().toISOString(),
+      status: failed ? "degraded" : "ok",
       service: "hivesight",
+      checkedAt: new Date().toISOString(),
       checks,
     },
-    {
-      status: failed.length > 0 ? 503 : 200,
-      headers: {
-        "Cache-Control": "no-store",
-      },
-    }
+    { status: failed ? 503 : 200 }
   );
 }

@@ -1,0 +1,674 @@
+{
+  "version": 2,
+  "suiteId": "shed_2024_household_finance",
+  "resultType": "powered_model_comparison",
+  "generatedAt": "2026-07-07T10:32:29.316Z",
+  "model": "gpt-5-mini",
+  "reasoningEffort": "minimal",
+  "seed": 20260707,
+  "personaN": 150,
+  "cellCount": 149,
+  "datasetVersion": "MaxGhenis/hivesight-persona-data:main:US",
+  "cellDescriptionVersion": "cell-desc:v2-social-security",
+  "notes": "Powered comparison over the full national calibrated file. Caveat: SHED income slices are household income; microdata income bands are personal earned income (identical proxy used by all microdata-based arms, so arms are comparable but income-slice errors include construct mismatch). Age slices are construct-clean.",
+  "questions": [
+    {
+      "questionId": "doing_okay",
+      "prompt": "I am doing okay financially.",
+      "scoring": "positive_agreement",
+      "sliceFamily": "income_band",
+      "arms": {
+        "naive": {
+          "estimate": 0.55,
+          "slices": {
+            "income_band": {
+              "$75k-$149,999": 0.75,
+              "<$25k": 0.35,
+              "$25k-$74,999": 0.62,
+              "$150k+": 0.8
+            }
+          },
+          "toplineHuman": 0.729,
+          "toplineAbsError": 0.17899999999999994,
+          "sliceErrors": [
+            {
+              "label": "<$25k",
+              "estimate": 0.35,
+              "human": 0.399,
+              "absError": 0.049000000000000044
+            },
+            {
+              "label": "$25k-$74,999",
+              "estimate": 0.62,
+              "human": 0.599,
+              "absError": 0.02100000000000002
+            },
+            {
+              "label": "$75k-$149,999",
+              "estimate": 0.75,
+              "human": 0.795,
+              "absError": 0.04500000000000004
+            },
+            {
+              "label": "$150k+",
+              "estimate": 0.8,
+              "human": 0.895,
+              "absError": 0.09499999999999997
+            }
+          ],
+          "sliceMAE": 0.05250000000000002
+        },
+        "persona": {
+          "estimate": 0.5171007188417397,
+          "slices": {
+            "income_band": {
+              "<$25k": 0.18917776969192596,
+              "$25k-$74,999": 0.8199763996057102,
+              "$75k-$149,999": 0.9115236967389663,
+              "$150k+": 1
+            },
+            "age_band": {
+              "45-64": 0.5457257546262126,
+              "18-29": 0.21927813987226058,
+              "65+": 0.8743603066870207,
+              "30-44": 0.43192635742923174
+            }
+          },
+          "sliceNs": {
+            "income_band": {
+              "<$25k": 96,
+              "$25k-$74,999": 42,
+              "$75k-$149,999": 7,
+              "$150k+": 5
+            },
+            "age_band": {
+              "45-64": 42,
+              "18-29": 30,
+              "65+": 35,
+              "30-44": 43
+            }
+          },
+          "n": 150,
+          "parseFailures": 0,
+          "toplineHuman": 0.729,
+          "toplineAbsError": 0.2118992811582603,
+          "sliceErrors": [
+            {
+              "label": "<$25k",
+              "estimate": 0.18917776969192596,
+              "human": 0.399,
+              "absError": 0.20982223030807406
+            },
+            {
+              "label": "$25k-$74,999",
+              "estimate": 0.8199763996057102,
+              "human": 0.599,
+              "absError": 0.22097639960571025
+            },
+            {
+              "label": "$75k-$149,999",
+              "estimate": 0.9115236967389663,
+              "human": 0.795,
+              "absError": 0.11652369673896623
+            },
+            {
+              "label": "$150k+",
+              "estimate": 1,
+              "human": 0.895,
+              "absError": 0.10499999999999998
+            }
+          ],
+          "sliceMAE": 0.16308058166318762
+        },
+        "cells": {
+          "estimate": 0.4230254178332675,
+          "slices": {
+            "income_band": {
+              "<$25k": 0.36274074075567847,
+              "$25k-$74,999": 0.46833999126848247,
+              "$75k-$149,999": 0.6165182443688072,
+              "$150k+": 0.8157852116096107
+            },
+            "age_band": {
+              "65+": 0.5168219167719821,
+              "18-29": 0.3515915261893864,
+              "30-44": 0.398660738454245,
+              "45-64": 0.4187683177082601
+            }
+          },
+          "cellCount": 149,
+          "parseFailures": 0,
+          "toplineHuman": 0.729,
+          "toplineAbsError": 0.30597458216673246,
+          "sliceErrors": [
+            {
+              "label": "<$25k",
+              "estimate": 0.36274074075567847,
+              "human": 0.399,
+              "absError": 0.03625925924432155
+            },
+            {
+              "label": "$25k-$74,999",
+              "estimate": 0.46833999126848247,
+              "human": 0.599,
+              "absError": 0.1306600087315175
+            },
+            {
+              "label": "$75k-$149,999",
+              "estimate": 0.6165182443688072,
+              "human": 0.795,
+              "absError": 0.17848175563119284
+            },
+            {
+              "label": "$150k+",
+              "estimate": 0.8157852116096107,
+              "human": 0.895,
+              "absError": 0.07921478839038931
+            }
+          ],
+          "sliceMAE": 0.1061539529993553
+        }
+      },
+      "stability": {
+        "paraphraseEstimate": 0.3966915587246403,
+        "delta": -0.026333859108627233
+      }
+    },
+    {
+      "questionId": "expense_shock",
+      "prompt": "I could cover a $400 emergency expense using cash or its equivalent.",
+      "scoring": "positive_agreement",
+      "sliceFamily": "income_band",
+      "arms": {
+        "naive": {
+          "estimate": 0.64,
+          "slices": {
+            "income_band": {
+              "<$25k": 0.2,
+              "$25k-$74,999": 0.58,
+              "$75k-$149,999": 0.6,
+              "$150k+": 0.7
+            }
+          },
+          "toplineHuman": 0.627,
+          "toplineAbsError": 0.013000000000000012,
+          "sliceErrors": [
+            {
+              "label": "<$25k",
+              "estimate": 0.2,
+              "human": 0.231,
+              "absError": 0.031
+            },
+            {
+              "label": "$25k-$74,999",
+              "estimate": 0.58,
+              "human": 0.477,
+              "absError": 0.10299999999999998
+            },
+            {
+              "label": "$75k-$149,999",
+              "estimate": 0.6,
+              "human": 0.694,
+              "absError": 0.09399999999999997
+            },
+            {
+              "label": "$150k+",
+              "estimate": 0.7,
+              "human": 0.836,
+              "absError": 0.136
+            }
+          ],
+          "sliceMAE": 0.091
+        },
+        "persona": {
+          "estimate": 0.11377223333069518,
+          "slices": {
+            "income_band": {
+              "<$25k": 0.030966763837482966,
+              "$75k-$149,999": 0.23327742559058473,
+              "$25k-$74,999": 0.0945045719660361,
+              "$150k+": 1
+            },
+            "age_band": {
+              "65+": 0.24900623351107198,
+              "45-64": 0.1835493958177296,
+              "30-44": 0.03708770859657532,
+              "18-29": 0.03609852893862239
+            }
+          },
+          "sliceNs": {
+            "income_band": {
+              "<$25k": 95,
+              "$75k-$149,999": 13,
+              "$25k-$74,999": 38,
+              "$150k+": 4
+            },
+            "age_band": {
+              "65+": 28,
+              "45-64": 45,
+              "30-44": 49,
+              "18-29": 28
+            }
+          },
+          "n": 150,
+          "parseFailures": 0,
+          "toplineHuman": 0.627,
+          "toplineAbsError": 0.5132277666693048,
+          "sliceErrors": [
+            {
+              "label": "<$25k",
+              "estimate": 0.030966763837482966,
+              "human": 0.231,
+              "absError": 0.20003323616251706
+            },
+            {
+              "label": "$25k-$74,999",
+              "estimate": 0.0945045719660361,
+              "human": 0.477,
+              "absError": 0.38249542803396386
+            },
+            {
+              "label": "$75k-$149,999",
+              "estimate": 0.23327742559058473,
+              "human": 0.694,
+              "absError": 0.4607225744094152
+            },
+            {
+              "label": "$150k+",
+              "estimate": 1,
+              "human": 0.836,
+              "absError": 0.16400000000000003
+            }
+          ],
+          "sliceMAE": 0.30181280965147406
+        },
+        "cells": {
+          "estimate": 0.4144984239274973,
+          "slices": {
+            "income_band": {
+              "<$25k": 0.3355092194411335,
+              "$25k-$74,999": 0.48967126323307086,
+              "$75k-$149,999": 0.6426900126761182,
+              "$150k+": 0.8498261405347411
+            },
+            "age_band": {
+              "65+": 0.48846414326742366,
+              "18-29": 0.3407621656648978,
+              "30-44": 0.39959854858989646,
+              "45-64": 0.41890429208581076
+            }
+          },
+          "cellCount": 149,
+          "parseFailures": 0,
+          "toplineHuman": 0.627,
+          "toplineAbsError": 0.2125015760725027,
+          "sliceErrors": [
+            {
+              "label": "<$25k",
+              "estimate": 0.3355092194411335,
+              "human": 0.231,
+              "absError": 0.10450921944113348
+            },
+            {
+              "label": "$25k-$74,999",
+              "estimate": 0.48967126323307086,
+              "human": 0.477,
+              "absError": 0.012671263233070884
+            },
+            {
+              "label": "$75k-$149,999",
+              "estimate": 0.6426900126761182,
+              "human": 0.694,
+              "absError": 0.0513099873238817
+            },
+            {
+              "label": "$150k+",
+              "estimate": 0.8498261405347411,
+              "human": 0.836,
+              "absError": 0.013826140534741183
+            }
+          ],
+          "sliceMAE": 0.04557915263320681
+        }
+      },
+      "stability": null
+    },
+    {
+      "questionId": "better_worse_year",
+      "prompt": "My finances are better than they were a year ago.",
+      "scoring": "ordered_mean",
+      "sliceFamily": "age_band",
+      "arms": {
+        "naive": {
+          "estimate": 0.56,
+          "slices": {
+            "age_band": {
+              "45-64": 0.46,
+              "65+": 0.46,
+              "30-44": 0.56,
+              "18-29": 0.42
+            }
+          },
+          "toplineHuman": 0.471,
+          "toplineAbsError": 0.08900000000000008,
+          "sliceErrors": [
+            {
+              "label": "18-29",
+              "estimate": 0.42,
+              "human": 0.505,
+              "absError": 0.08500000000000002
+            },
+            {
+              "label": "30-44",
+              "estimate": 0.56,
+              "human": 0.471,
+              "absError": 0.08900000000000008
+            },
+            {
+              "label": "45-64",
+              "estimate": 0.46,
+              "human": 0.444,
+              "absError": 0.016000000000000014
+            },
+            {
+              "label": "65+",
+              "estimate": 0.46,
+              "human": 0.481,
+              "absError": 0.020999999999999963
+            }
+          ],
+          "sliceMAE": 0.05275000000000002
+        },
+        "persona": {
+          "estimate": 0.3055750963635364,
+          "slices": {
+            "income_band": {
+              "$25k-$74,999": 0.5018754012943042,
+              "<$25k": 0.1642271476917646,
+              "$150k+": 1,
+              "$75k-$149,999": 0.9504566766945823
+            },
+            "age_band": {
+              "45-64": 0.402600236570543,
+              "65+": 0.09138511245132053,
+              "30-44": 0.5014362075763867,
+              "18-29": 0.28226030775849603
+            }
+          },
+          "sliceNs": {
+            "income_band": {
+              "$25k-$74,999": 37,
+              "<$25k": 103,
+              "$150k+": 2,
+              "$75k-$149,999": 8
+            },
+            "age_band": {
+              "45-64": 42,
+              "65+": 44,
+              "30-44": 36,
+              "18-29": 28
+            }
+          },
+          "n": 150,
+          "parseFailures": 0,
+          "toplineHuman": 0.471,
+          "toplineAbsError": 0.16542490363646356,
+          "sliceErrors": [
+            {
+              "label": "18-29",
+              "estimate": 0.28226030775849603,
+              "human": 0.505,
+              "absError": 0.22273969224150397
+            },
+            {
+              "label": "30-44",
+              "estimate": 0.5014362075763867,
+              "human": 0.471,
+              "absError": 0.030436207576386765
+            },
+            {
+              "label": "45-64",
+              "estimate": 0.402600236570543,
+              "human": 0.444,
+              "absError": 0.041399763429457004
+            },
+            {
+              "label": "65+",
+              "estimate": 0.09138511245132053,
+              "human": 0.481,
+              "absError": 0.38961488754867946
+            }
+          ],
+          "sliceMAE": 0.1710476376990068
+        },
+        "cells": {
+          "estimate": 0.4683969936476466,
+          "slices": {
+            "income_band": {
+              "<$25k": 0.39655133941581777,
+              "$25k-$74,999": 0.5410574875470002,
+              "$75k-$149,999": 0.6818409855058151,
+              "$150k+": 0.8055424924949276
+            },
+            "age_band": {
+              "65+": 0.512450877941477,
+              "18-29": 0.42262412723811016,
+              "30-44": 0.4732889142917314,
+              "45-64": 0.4606912223931181
+            }
+          },
+          "cellCount": 149,
+          "parseFailures": 0,
+          "toplineHuman": 0.471,
+          "toplineAbsError": 0.0026030063523533875,
+          "sliceErrors": [
+            {
+              "label": "18-29",
+              "estimate": 0.42262412723811016,
+              "human": 0.505,
+              "absError": 0.08237587276188985
+            },
+            {
+              "label": "30-44",
+              "estimate": 0.4732889142917314,
+              "human": 0.471,
+              "absError": 0.0022889142917314476
+            },
+            {
+              "label": "45-64",
+              "estimate": 0.4606912223931181,
+              "human": 0.444,
+              "absError": 0.0166912223931181
+            },
+            {
+              "label": "65+",
+              "estimate": 0.512450877941477,
+              "human": 0.481,
+              "absError": 0.03145087794147705
+            }
+          ],
+          "sliceMAE": 0.03320172184705411
+        }
+      },
+      "stability": null
+    },
+    {
+      "questionId": "housing_cost_stress",
+      "prompt": "Housing costs caused a serious hardship for my household, such as falling behind on rent or mortgage, facing foreclosure or eviction risk, or needing housing assistance.",
+      "scoring": "positive_agreement",
+      "sliceFamily": "income_band",
+      "arms": {
+        "naive": {
+          "estimate": 0.28,
+          "slices": {
+            "income_band": {
+              "$75k-$149,999": 0.28,
+              "<$25k": 0.48,
+              "$25k-$74,999": 0.28,
+              "$150k+": 0.18
+            }
+          },
+          "toplineHuman": 0.187,
+          "toplineAbsError": 0.09300000000000003,
+          "sliceErrors": [
+            {
+              "label": "<$25k",
+              "estimate": 0.48,
+              "human": 0.484,
+              "absError": 0.0040000000000000036
+            },
+            {
+              "label": "$25k-$74,999",
+              "estimate": 0.28,
+              "human": 0.29,
+              "absError": 0.009999999999999953
+            },
+            {
+              "label": "$75k-$149,999",
+              "estimate": 0.28,
+              "human": 0.125,
+              "absError": 0.15500000000000003
+            },
+            {
+              "label": "$150k+",
+              "estimate": 0.18,
+              "human": 0.054,
+              "absError": 0.126
+            }
+          ],
+          "sliceMAE": 0.07375
+        },
+        "persona": {
+          "estimate": 0.7585494857221994,
+          "slices": {
+            "income_band": {
+              "<$25k": 0.8297482432179456,
+              "$75k-$149,999": 0.07564299654830917,
+              "$25k-$74,999": 0.9787351041237367,
+              "$150k+": 0
+            },
+            "age_band": {
+              "45-64": 0.8269794448194955,
+              "18-29": 0.7619953224175802,
+              "65+": 0.5199022508893839,
+              "30-44": 0.73637546129552
+            }
+          },
+          "sliceNs": {
+            "income_band": {
+              "<$25k": 99,
+              "$75k-$149,999": 12,
+              "$25k-$74,999": 37,
+              "$150k+": 1
+            },
+            "age_band": {
+              "45-64": 55,
+              "18-29": 29,
+              "65+": 25,
+              "30-44": 40
+            }
+          },
+          "n": 150,
+          "parseFailures": 1,
+          "toplineHuman": 0.187,
+          "toplineAbsError": 0.5715494857221994,
+          "sliceErrors": [
+            {
+              "label": "<$25k",
+              "estimate": 0.8297482432179456,
+              "human": 0.484,
+              "absError": 0.3457482432179456
+            },
+            {
+              "label": "$25k-$74,999",
+              "estimate": 0.9787351041237367,
+              "human": 0.29,
+              "absError": 0.6887351041237366
+            },
+            {
+              "label": "$75k-$149,999",
+              "estimate": 0.07564299654830917,
+              "human": 0.125,
+              "absError": 0.049357003451690834
+            },
+            {
+              "label": "$150k+",
+              "estimate": 0,
+              "human": 0.054,
+              "absError": 0.054
+            }
+          ],
+          "sliceMAE": 0.2844600876983433
+        },
+        "cells": {
+          "estimate": 0.34692385985704227,
+          "slices": {
+            "income_band": {
+              "<$25k": 0.3822417851927626,
+              "$25k-$74,999": 0.33528962200795687,
+              "$75k-$149,999": 0.1922225599505514,
+              "$150k+": 0.09290229911639537
+            },
+            "age_band": {
+              "65+": 0.11740902649603037,
+              "18-29": 0.42900749299815644,
+              "30-44": 0.459936320409135,
+              "45-64": 0.3731862801533631
+            }
+          },
+          "cellCount": 149,
+          "parseFailures": 0,
+          "toplineHuman": 0.187,
+          "toplineAbsError": 0.15992385985704227,
+          "sliceErrors": [
+            {
+              "label": "<$25k",
+              "estimate": 0.3822417851927626,
+              "human": 0.484,
+              "absError": 0.1017582148072374
+            },
+            {
+              "label": "$25k-$74,999",
+              "estimate": 0.33528962200795687,
+              "human": 0.29,
+              "absError": 0.04528962200795689
+            },
+            {
+              "label": "$75k-$149,999",
+              "estimate": 0.1922225599505514,
+              "human": 0.125,
+              "absError": 0.0672225599505514
+            },
+            {
+              "label": "$150k+",
+              "estimate": 0.09290229911639537,
+              "human": 0.054,
+              "absError": 0.038902299116395374
+            }
+          ],
+          "sliceMAE": 0.06329317397053527
+        }
+      },
+      "stability": null
+    }
+  ],
+  "pooled": {
+    "naive": {
+      "toplineMAE": 0.09350000000000001,
+      "sliceMAE": 0.0675
+    },
+    "persona": {
+      "toplineMAE": 0.36552535929655705,
+      "sliceMAE": 0.23010027917800294
+    },
+    "cells": {
+      "toplineMAE": 0.17025075611215773,
+      "sliceMAE": 0.062057000362537876
+    }
+  },
+  "usage": {
+    "calls": 745,
+    "tokensIn": 150777,
+    "tokensOut": 29558
+  }
+}

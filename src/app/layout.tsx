@@ -1,36 +1,36 @@
 import type { Metadata } from "next";
-import { DM_Sans, Newsreader } from "next/font/google";
+import { IBM_Plex_Mono, Libre_Franklin } from "next/font/google";
 import "./globals.css";
+import { SiteHeader } from "@/components/site-header";
+import { SiteFooter } from "@/components/site-footer";
 
-const dmSans = DM_Sans({
+const franklin = Libre_Franklin({
   subsets: ["latin"],
-  variable: "--font-dm-sans",
-  display: "swap",
+  variable: "--font-franklin",
 });
 
-const newsreader = Newsreader({
+const plexMono = IBM_Plex_Mono({
   subsets: ["latin"],
-  variable: "--font-newsreader",
-  display: "swap",
+  weight: ["400", "500"],
+  variable: "--font-plex-mono",
 });
 
 export const metadata: Metadata = {
-  title: {
-    default: "HiveSight",
-    template: "%s | HiveSight",
-  },
+  title: "HiveSight — calibrated audience estimates",
   description:
-    "Ask AI audiences anything you would ask humans, grounded in calibrated population microdata.",
+    "Pre-field directional estimates of how US populations would answer survey questions, built on census-calibrated microdata and benchmarked in the open.",
 };
 
 export default function RootLayout({
   children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
+}: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en" className={`${dmSans.variable} ${newsreader.variable}`}>
-      <body className="antialiased">{children}</body>
+    <html lang="en" className={`${franklin.variable} ${plexMono.variable}`}>
+      <body className="min-h-screen font-sans flex flex-col">
+        <SiteHeader />
+        <main className="flex-1">{children}</main>
+        <SiteFooter />
+      </body>
     </html>
   );
 }
