@@ -57,3 +57,4 @@ evals/results/shed-powered-raw-calls.jsonl
 evals/results/prep-shed.json
 paper/.quarto/
 paper/paper_files/
+.env.production.backup
