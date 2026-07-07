@@ -425,30 +425,36 @@ if rep:
         f"{pts(rep['toplineSD'], 2)} points (topline) and {pts(rep['sliceSD'], 2)} (subgroup) — run-to-run noise is an "
         f"order of magnitude below the arm differences of interest. "
     )
-if orv:
-    print(
-        f"Reversing option order moves item toplines by {pts(orv['meanAbsDelta'])} points on average "
-        f"(max {pts(orv['maxAbsDelta'])}; n = {orv['n']}). "
-    )
 if par:
     print(
-        f"Paraphrasing question stems moves them by {pts(par['meanAbsDelta'])} on average "
-        f"(max {pts(par['maxAbsDelta'])}; n = {par['n']}) — the response-scale artifacts documented for LLM survey "
-        f"responses [@tjuatja2024llms; @dominguezolmedo2024questioning] are present but second-order at cell "
-        f"aggregation, not the first-order instability seen in role-play designs."
+        f"Paraphrasing question stems moves item toplines by only {pts(par['meanAbsDelta'])} points on average "
+        f"(max {pts(par['maxAbsDelta'])}; n = {par['n']}) — semantic-preserving rewording is a second-order "
+        f"perturbation at cell aggregation. "
+    )
+if orv:
+    print(
+        f"Reversing option order is **not** second-order: it moves toplines by {pts(orv['meanAbsDelta'])} points on "
+        f"average (max {pts(orv['maxAbsDelta'])}; n = {orv['n']}) — roughly a third of total topline error, and the "
+        f"largest instrument sensitivity we measured, consistent with the LLM response-order artifacts documented by "
+        f"@tjuatja2024llms and @dominguezolmedo2024questioning. Canonical instrument order (which our default runs "
+        f"use, matching what humans saw) is therefore load-bearing, and order sensitivity belongs in any accuracy "
+        f"claim's error budget; we did not probe the direct arm's order sensitivity, which shares the exposure."
     )
 ```
 
 ```{python}
 #| output: asis
-ms = S2["volunteered"]["massShift"]
-if ms:
-    shifts = ", ".join(f"{k.replace('gss_','')} {v['shift']*100:+.1f}" for k, v in ms.items())
+ms1 = S2["volunteered"].get("massShiftV1", {})
+ms4 = S2["volunteered"].get("massShiftV4", {})
+if ms1 and ms4:
+    s1 = ", ".join(f"{k.replace('gss_','')} {v['shift']*100:+.1f}" for k, v in ms1.items())
+    s4 = ", ".join(f"{k.replace('gss_','')} {v['shift']*100:+.1f}" for k, v in ms4.items())
     print(
-        f"**Volunteered categories.** Offering normally-volunteered options as explicit choices shifts model mass "
-        f"onto them relative to humans (points: {shifts}) — a measured instrument artifact confirming the referee "
-        f"critique that motivated the correction; the v4 elicitation marks these options as volunteered, and the "
-        f"no-volunteered variant appears in the released artifact."
+        f"**Volunteered categories.** In the registered v1 instrument, which offered normally-volunteered options as "
+        f"explicit choices, the model over-allocated mass to them on every affected item (points vs humans: {s1}). "
+        f"Marking those options as \"not read to respondents\" in v4 removes most of the artifact ({s4}) — a "
+        f"measured, referee-identified instrument effect and its measured correction. The no-volunteered variant "
+        f"appears in the released artifact."
     )
 ```
 
@@ -511,16 +517,18 @@ instruments is registered future work.
 #| output: asis
 c = S2["contamination"]
 print(
-    f"If the model were recalling published statistics from earlier waves rather than reasoning about groups, its "
-    f"signed error on 2024 targets should track how much each item moved since the wave in its training window: "
-    f"regressing signed error on the 2022→2024 (GSS) and 2023→2024 (SHED) target movement, recall of older values "
-    f"predicts slope −1. Observed: cells slope {num(c['cells']['slope'])} (SE {num(c['cells']['slopeSE'])}, "
-    f"r = {num(c['cells']['r'])}, n = {c['cells']['n']}); direct slope {num(c['naive']['slope'])} "
-    f"(SE {num(c['naive']['slopeSE'])}, r = {num(c['naive']['r'])}). "
-    f"Mean absolute target movement is {pts(c['cells']['meanAbsDelta'])} points, so the test has limited leverage on "
-    f"very stable items, and it cannot rule out recall of the 2024 values themselves for items published before the "
-    f"models' cutoffs — the fully contamination-robust test is freshly fielded items, registered as follow-up. "
-    f"What the regression does establish is that neither arm's error structure is dominated by stale-value recall."
+    f"An estimator anchored to its training window — whether by recalling published statistics or by genuine but "
+    f"frozen knowledge — cannot track target movement after that window, so its signed error on 2024 targets should "
+    f"run at slope −1 against each item's movement since the prior anchor wave (GSS 2022, SHED 2023). Observed: "
+    f"cells slope {num(c['cells']['slope'])} (SE {num(c['cells']['slopeSE'])}, r = {num(c['cells']['r'])}, "
+    f"n = {c['cells']['n']}, p = {c['cells']['p']:.2f}); direct slope {num(c['naive']['slope'])} "
+    f"(SE {num(c['naive']['slopeSE'])}, r = {num(c['naive']['r'])}). Point estimates sit near the anchoring line for "
+    f"both arms, with wide uncertainty — these evergreen items moved only {pts(c['cells']['meanAbsDelta'])} points on "
+    f"average, so the test has little leverage and the slopes are statistically distinguishable from neither −1 nor, "
+    f"marginally, 0. Three sober conclusions: the pattern is consistent with training-window anchoring and affects "
+    f"both arms equally; on items this stable, staleness costs at most about two points; and the regression cannot "
+    f"separate frozen knowledge from recall of published values, nor rule out recall of 2024 values published before "
+    f"the model cutoffs. Freshly fielded items remain the decisive test and are registered follow-up."
 )
 ```
 
@@ -705,14 +713,15 @@ cost advantage sharpens. Second, the machinery still earns its keep where
 direct asking structurally cannot go: coherent and composable subgroup
 systems, auditable provenance, cell-level outputs that make
 prediction-powered validity possible, and (exploratorily) better subgroup
-ordering. Third, the residual error is not noise — replicate SDs are an
-order of magnitude below arm differences, paraphrase and option-order
-effects are second-order at cell aggregation, and the systematic component
-that remains is exactly what anchor-based correction methods target
-[@kambhatla2026improving; @krsteski2025valid]. The honest path — publish the
-misses, anchor with small human samples, never imply real people were
-surveyed [@esomar2025code; @aapor2026responsible] — is also the technically
-correct one.
+ordering. Third, the residual error is structured, not noisy — replicate SDs are two
+orders of magnitude below the error itself, paraphrase effects are
+second-order, and the two systematic components we can name (option-order
+sensitivity of a few points; training-window anchoring bounded by target
+movement) are exactly what instrument discipline and anchor-based correction
+methods target [@kambhatla2026improving; @krsteski2025valid]. The honest
+path — publish the misses, anchor with small human samples, never imply real
+people were surveyed [@esomar2025code; @aapor2026responsible] — is also the
+technically correct one.
 
 All code, prompts, cell tables, registered and revision-stage artifacts,
 per-call elicitation logs for every revision arm, and this manuscript's

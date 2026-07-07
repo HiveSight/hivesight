@@ -291,15 +291,15 @@ def main():
             out["notes"].append(f"{name} incomplete")
 
     # ---------------- 8. volunteered options ------------------------------
-    vol = {"massShift": {}, "excluding6_v1": {}, "noVolunteeredArm": {}}
+    vol = {"massShiftV1": {}, "massShiftV4": {}, "excluding6_v1": {}, "noVolunteeredArm": {}}
     for iid in VOLUNTEERED6:
         it = items2[iid]
-        res = r2(iid, "cells") or r1(iid, "cells")
-        if not res or not res.get("topline"):
-            continue
-        vmodel = sum(res["topline"][i] for i in it["volunteered"])
         vhuman = sum(it["targets"]["overall"]["dist"][i] for i in it["volunteered"])
-        vol["massShift"][iid] = {"model": vmodel, "human": vhuman, "shift": vmodel - vhuman}
+        for label, res in [("massShiftV1", r1(iid, "cells")), ("massShiftV4", r2(iid, "cells"))]:
+            if not res or not res.get("topline"):
+                continue
+            vmodel = sum(res["topline"][i] for i in it["volunteered"])
+            vol[label][iid] = {"model": vmodel, "human": vhuman, "shift": vmodel - vhuman}
     keep = [i for i in items1 if i not in VOLUNTEERED6]
     vol["excluding6_v1"] = {
         arm: {
