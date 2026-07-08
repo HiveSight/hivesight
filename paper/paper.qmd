@@ -1,5 +1,5 @@
 ---
-title: "Cells, not personas: predicting population survey responses with language models via post-stratification over calibrated census microdata"
+title: "What does post-stratifying language-model predictions buy? A registered three-arm evaluation against 63 survey items"
 author:
   - name: Max Ghenis
     affiliations:
@@ -733,7 +733,8 @@ recur in follow-ups.
 # Discussion
 
 The synthetic-respondent debate has largely been conducted over the wrong
-architecture. Role-playing individuals is both the dominant commercial
+architecture — cells, not personas, is the field-facing summary of our
+harshest result. Role-playing individuals is both the dominant commercial
 pattern and the design the evidence most clearly condemns; our
 matched-budget replication puts the gap at roughly fifteen points of MAE
 against either alternative, in both survey sources. Treating the model as a

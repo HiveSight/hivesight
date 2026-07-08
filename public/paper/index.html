@@ -9,7 +9,7 @@
 <meta name="author" content="Max Ghenis">
 <meta name="dcterms.date" content="2026-07-07">
 
-<title>Cells, not personas: predicting population survey responses with language models via post-stratification over calibrated census microdata</title>
+<title>What does post-stratifying language-model predictions buy? A registered three-arm evaluation against 63 survey items</title>
 <style>
 /* Default styles provided by pandoc.
 ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
@@ -312,7 +312,7 @@ window.Quarto = {
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title">Cells, not personas: predicting population survey responses with language models via post-stratification over calibrated census microdata</h1>
+<h1 class="title">What does post-stratifying language-model predictions buy? A registered three-arm evaluation against 63 survey items</h1>
 </div>
 
 
@@ -655,7 +655,7 @@ Table&nbsp;4: Elicitation cost per item, July 2026 list prices, token averages f
 </section>
 <section id="discussion" class="level1" data-number="14">
 <h1 data-number="14"><span class="header-section-number">14</span> Discussion</h1>
-<p>The synthetic-respondent debate has largely been conducted over the wrong architecture. Role-playing individuals is both the dominant commercial pattern and the design the evidence most clearly condemns; our matched-budget replication puts the gap at roughly fifteen points of MAE against either alternative, in both survey sources. Treating the model as a conditional response model over a calibrated population frame changes the question from “can an LLM impersonate a person?” to “how well does an LLM know conditional response distributions?” — a question that admits measurement, equivalence testing, and valid inference.</p>
+<p>The synthetic-respondent debate has largely been conducted over the wrong architecture — cells, not personas, is the field-facing summary of our harshest result. Role-playing individuals is both the dominant commercial pattern and the design the evidence most clearly condemns; our matched-budget replication puts the gap at roughly fifteen points of MAE against either alternative, in both survey sources. Treating the model as a conditional response model over a calibrated population frame changes the question from “can an LLM impersonate a person?” to “how well does an LLM know conditional response distributions?” — a question that admits measurement, equivalence testing, and valid inference.</p>
 <p>Against our own registration, cells did not beat direct per-subgroup estimation on marginal accuracy; the revision’s equivalence test upgrades that null to a demonstrated tie within ±1.5 points on subgroup margins (toplines pass equivalence only in the corrected v4 run). Three things follow. First, on well-surveyed margins, elaborate machinery buys no marginal accuracy over simply asking the model — a deflationary finding vendors are unlikely to publish, and one that direct estimation’s order-of-magnitude cost advantage sharpens. Second, the machinery still earns its keep where direct asking structurally cannot go: coherent and composable subgroup systems, auditable provenance, cell-level outputs that make prediction-powered validity possible, and (exploratorily) better subgroup ordering. Third, the residual error is structured, not noisy — replicate SDs are two orders of magnitude below the error itself, paraphrase effects are second-order, and the two systematic components we can name (option-order sensitivity of a few points; training-window anchoring bounded by target movement) are exactly what instrument discipline and anchor-based correction methods target <span class="citation" data-cites="kambhatla2026improving krsteski2025valid">(<a href="#ref-kambhatla2026improving" role="doc-biblioref"><span class="nocase">Kambhatla et al.</span> 2026</a>; <a href="#ref-krsteski2025valid" role="doc-biblioref"><span class="nocase">Krsteski et al.</span> 2025</a>)</span>. The honest path — publish the misses, anchor with small human samples, never imply real people were surveyed <span class="citation" data-cites="esomar2025code aapor2026responsible">(<a href="#ref-esomar2025code" role="doc-biblioref">ICC/ESOMAR 2025</a>; <a href="#ref-aapor2026responsible" role="doc-biblioref">American Association for Public Opinion Research 2026</a>)</span> — is also the technically correct one.</p>
 <p>All code, prompts, cell tables, registered and revision-stage artifacts, per-call elicitation logs for every revision arm, and this manuscript’s source are public <span class="citation" data-cites="ghenis2026hivesight">(<a href="#ref-ghenis2026hivesight" role="doc-biblioref">Ghenis 2026a</a>)</span>; the production system’s benchmark page renders from the same artifacts. Registered-run persona and direct per-call logs were not persisted by the original runner (only aggregates and the cells arm’s parsed predictions survive), a release gap the revision runner closes for all subsequent runs.</p>
 </section>

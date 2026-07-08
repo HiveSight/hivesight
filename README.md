@@ -12,8 +12,7 @@ publishes its own misses.
 
 ## The research paper
 
-*Cells, not personas: predicting population survey responses with language
-models via post-stratification over calibrated census microdata* — source in
+*What does post-stratifying language-model predictions buy? A registered three-arm evaluation against 63 survey items* — source in
 [paper/](paper/), rendered [paper/paper.pdf](paper/paper.pdf). The paper's
 every number renders from artifacts in [paper/artifacts/](paper/artifacts/),
 which the production benchmarks page also imports. Pre-registration:
