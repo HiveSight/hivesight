@@ -1,4 +1,5 @@
 import { z } from "zod/v4";
+import { DEFAULT_MODEL, SERVED_MODEL_IDS } from "@/engine/models";
 
 export const GeographySchema = z.object({
   type: z.enum(["national", "state", "district"]),
@@ -31,7 +32,7 @@ export const RunRequestSchema = z.object({
     geography: GeographySchema,
     filters: FiltersSchema.default({}),
   }),
-  model: z.enum(["gpt-5-mini", "gpt-5.2"]).default("gpt-5-mini"),
+  model: z.enum(SERVED_MODEL_IDS).default(DEFAULT_MODEL),
   verbatimCount: z.number().int().min(0).max(12).default(6),
 });
 

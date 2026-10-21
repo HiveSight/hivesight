@@ -1,3 +1,4 @@
+import { reasoningEffortFor } from "./models";
 import type { Distribution, ResponseFormat } from "./types";
 import { optionIds } from "./types";
 
@@ -16,8 +17,7 @@ export interface LlmClient {
 export function openAiClient(apiKey: string, baseUrl = "https://api.openai.com/v1"): LlmClient {
   return {
     async complete({ system, user, model, json = true, maxTokens = 700 }) {
-      // gpt-5-mini supports 'minimal'; gpt-5.x point releases use 'none'.
-      let reasoningEffort: string | null = model.startsWith("gpt-5.") ? "none" : "minimal";
+      let reasoningEffort = reasoningEffortFor(model);
       for (let attempt = 0; attempt < 4; attempt++) {
         try {
           const body: Record<string, unknown> = {

@@ -1,5 +1,4 @@
 import { describe, expect, it } from "vitest";
-// @ts-expect-error — plain ESM module, no types
 import * as runner from "../../../evals/run-anchor-bank-v2.mjs";
 import { CELL_SYSTEM_PROMPT, describeCell } from "../prompts";
 import type { Cell } from "../types";
@@ -35,5 +34,48 @@ describe("engine/runner parity", () => {
       label: "United States",
     });
     expect(runner.describeCell(cell)).toBe(engineDesc);
+  });
+});
+
+describe("persona arm (model refresh)", () => {
+  const item = {
+    itemId: "gss_trust",
+    wording: "Generally speaking, would you say that most people can be trusted?",
+    options: ["Can trust", "Can't be too careful", "Depends"],
+    volunteered: [2],
+  };
+
+  it("draws the same records for an item regardless of run order", () => {
+    expect(runner.itemSeed("gss_trust", 20260707)).toBe(runner.itemSeed("gss_trust", 20260707));
+    expect(runner.itemSeed("gss_trust", 20260707)).not.toBe(runner.itemSeed("gss_happy", 20260707));
+    expect(runner.itemSeed("gss_trust", 20260707)).not.toBe(runner.itemSeed("gss_trust", 20260708));
+  });
+
+  it("samples records in proportion to weight", () => {
+    const records = Array.from({ length: 100 }, (_, i) => ({ id: i, weight: i < 50 ? 3 : 1 }));
+    let s = 1;
+    const rng = () => ((s = (s * 16807) % 2147483647) / 2147483647);
+    const picked = runner.weightedSample(records, 40, rng) as Array<{ id: number }>;
+    expect(picked).toHaveLength(40);
+    expect(picked.filter((r) => r.id < 50).length).toBe(30);
+  });
+
+  it("presents the same options as the cells arm, volunteered ones marked", () => {
+    const { text, opts } = runner.personaPrompt(item);
+    expect(text).toContain("A. Can trust");
+    expect(text).toContain("C. Depends (not read to respondents — some volunteer it)");
+    expect(opts.map((o: { idx: number }) => o.idx)).toEqual([0, 1, 2]);
+  });
+
+  it.each([
+    ["RESPONSE: B\nREASONING: careful.", 1],
+    ["RESPONSE: **A**\nREASONING: yes", 0],
+    ["RESPONSE: [C]", 2],
+    ["I'd say can't be too careful.", 1],
+    ["RESPONSE: Z", null],
+    ["", null],
+  ])("parses %j as option %s", (reply, expected) => {
+    const { opts } = runner.personaPrompt(item);
+    expect(runner.parsePersonaChoice(reply, item, opts)).toBe(expected);
   });
 });
