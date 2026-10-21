@@ -1,11 +1,23 @@
 import { z } from "zod/v4";
 import { DEFAULT_MODEL, SERVED_MODEL_IDS } from "@/engine/models";
+import { canonicalGeography } from "@/lib/geographies";
 
-export const GeographySchema = z.object({
-  type: z.enum(["national", "state", "district"]),
-  value: z.string().min(2).max(8),
-  label: z.string().min(2).max(60),
-});
+// The label is derived from the value (canonicalGeography), so a request
+// cannot weight one place while prompting about another.
+export const GeographySchema = z
+  .object({
+    type: z.enum(["national", "state", "district"]),
+    value: z.string().min(2).max(8),
+    label: z.string().max(60).optional(),
+  })
+  .transform((g, ctx) => {
+    const canonical = canonicalGeography(g.type, g.value);
+    if (!canonical) {
+      ctx.addIssue({ code: "custom", message: `Unknown ${g.type} geography "${g.value}"` });
+      return z.NEVER;
+    }
+    return canonical;
+  });
 
 export const FiltersSchema = z.object({
   ageBands: z.array(z.string()).optional(),

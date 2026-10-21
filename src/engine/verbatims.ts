@@ -25,23 +25,30 @@ function mulberry32(seed: number) {
   };
 }
 
-/** Weighted sample of k records via seeded systematic sampling. */
+/**
+ * Seeded systematic sample of k audience records. A "pps" pool already
+ * represents adults in proportion to weight, so records are drawn with equal
+ * probability; weighting them again would over-represent heavy records.
+ * A "population" pool is drawn in proportion to weight.
+ */
 export function sampleForVerbatims(
   samples: SampleRecord[],
   audience: AudienceSpec,
   k: number,
-  seed: number
+  seed: number,
+  pool: "pps" | "population" = "pps"
 ): SampleRecord[] {
   const eligible = samples.filter((p) => sampleMatchesFilters(p, audience.filters));
   if (eligible.length <= k) return eligible;
   const rng = mulberry32(seed);
-  const total = eligible.reduce((s, p) => s + p.weight, 0);
+  const weightOf = (p: SampleRecord) => (pool === "pps" ? 1 : p.weight);
+  const total = eligible.reduce((s, p) => s + weightOf(p), 0);
   const step = total / k;
   let target = rng() * step;
   let acc = 0;
   const out: SampleRecord[] = [];
   for (const p of eligible) {
-    acc += p.weight;
+    acc += weightOf(p);
     while (acc >= target && out.length < k) {
       out.push(p);
       target += step;
@@ -59,6 +66,7 @@ export async function generateVerbatims(args: {
   llm: LlmClient;
   model: string;
   samples: SampleRecord[];
+  samplePool: "pps" | "population";
   audience: AudienceSpec;
   question: string;
   format: ResponseFormat;
@@ -66,7 +74,13 @@ export async function generateVerbatims(args: {
   seed: number;
   concurrency?: number;
 }): Promise<Verbatim[]> {
-  const picked = sampleForVerbatims(args.samples, args.audience, args.count, args.seed);
+  const picked = sampleForVerbatims(
+    args.samples,
+    args.audience,
+    args.count,
+    args.seed,
+    args.samplePool
+  );
   const ids = optionIds(args.format);
   const results = await mapLimit(picked, args.concurrency ?? 8, async (p) => {
     const personaDescription = describeSample(p, args.audience.geography);

@@ -105,6 +105,8 @@ export function Results({ result, runId }: { result: RunResult; runId: string | 
   }
 
   const p = result.provenance;
+  // Runs saved before coverage was recorded carry no elicitedShare.
+  const elicitedShare = p.elicitedShare ?? 1;
 
   return (
     <section aria-label="Estimate results" className="space-y-10">
@@ -137,6 +139,14 @@ export function Results({ result, runId }: { result: RunResult; runId: string | 
         </div>
         <Honeycomb dist={result.topline} format={result.format} />
       </div>
+
+      {elicitedShare < 0.9 && (
+        <p role="note" className="rounded-lg border border-line bg-surface px-4 py-3 text-sm text-ink">
+          This estimate rests on {pct(elicitedShare)} of the audience: {p.cellFailures} of{" "}
+          {p.cellCount + p.cellFailures} population cells returned no usable answer. Groups in the
+          failed cells are missing from the topline, so treat it with extra caution or run it again.
+        </p>
+      )}
 
       {result.subgroups.length > 0 && (
         <div>
@@ -188,6 +198,7 @@ export function Results({ result, runId }: { result: RunResult; runId: string | 
               ["Model", p.model],
               ["Population cells", `${p.cellCount}${p.cellFailures ? ` (${p.cellFailures} failed)` : ""}`],
               ["Weighted audience", Math.round(p.eligibleWeight).toLocaleString()],
+              ["Audience estimated", pct(elicitedShare)],
               ["Share of geography", pct(p.populationShare)],
               ["Seed", String(p.seed)],
               ["Started", p.startedAt],

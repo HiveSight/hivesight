@@ -42,7 +42,7 @@ export async function runEstimate(
     message: `Loading the calibrated population for ${spec.audience.geography.label}`,
   });
 
-  const { table, samples } = await loadGeography(spec.audience.geography);
+  const { table, samples, samplePool } = await loadGeography(spec.audience.geography);
   const cells = table.cells.filter((c) => cellMatchesFilters(c, spec.audience.filters));
   if (cells.length === 0) {
     throw new Error(
@@ -54,12 +54,21 @@ export async function runEstimate(
   let completed = 0;
   const estimates: CellEstimate[] = [];
   let failures = 0;
+  let elicitedWeight = 0;
+  let firstError: unknown = null;
+  // A cell whose call fails after retries counts as a failed cell; it must
+  // not abort the other cells' work.
   const results = await mapLimit(cells, ELICIT_CONCURRENCY, async (cell) => {
-    const content = await llm.complete({
-      system: CELL_SYSTEM_PROMPT,
-      user: cellUserPrompt(cell, spec.audience.geography, spec.question, spec.format),
-      model: spec.model,
-    });
+    let content = "";
+    try {
+      content = await llm.complete({
+        system: CELL_SYSTEM_PROMPT,
+        user: cellUserPrompt(cell, spec.audience.geography, spec.question, spec.format),
+        model: spec.model,
+      });
+    } catch (err) {
+      firstError ??= err;
+    }
     completed++;
     onProgress?.({
       stage: "eliciting",
@@ -70,10 +79,16 @@ export async function runEstimate(
     return { cell, dist: parseDistribution(content, spec.format) };
   });
   for (const r of results) {
-    if (r.dist) estimates.push({ cell: r.cell, dist: r.dist });
-    else failures++;
+    if (r.dist) {
+      estimates.push({ cell: r.cell, dist: r.dist });
+      elicitedWeight += r.cell.weight;
+    } else failures++;
   }
-  if (estimates.length === 0) throw new Error("All cell elicitations failed.");
+  if (estimates.length === 0) {
+    // Provider messages can echo request details; log them, show a plain one.
+    if (firstError) console.error("cell elicitation failed:", firstError);
+    throw new Error("All cell elicitations failed.");
+  }
 
   onProgress?.({
     stage: "aggregating",
@@ -94,6 +109,7 @@ export async function runEstimate(
     llm,
     model: spec.model,
     samples,
+    samplePool,
     audience: spec.audience,
     question: spec.question,
     format: spec.format,
@@ -118,6 +134,8 @@ export async function runEstimate(
       cellCount: estimates.length,
       cellFailures: failures,
       eligibleWeight,
+      elicitedWeight,
+      elicitedShare: elicitedWeight / eligibleWeight,
       populationShare: eligibleWeight / table.totalWeight,
       startedAt,
       completedAt: new Date().toISOString(),

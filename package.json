@@ -30,6 +30,7 @@
     "@types/react-dom": "^18",
     "eslint": "^9",
     "eslint-config-next": "^15.5.7",
+    "fast-check": "^4.10.2",
     "postcss": "^8",
     "tailwindcss": "^4.2.1",
     "typescript": "^5",

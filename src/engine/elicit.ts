@@ -95,12 +95,19 @@ export function parseDistribution(
   content: string,
   format: ResponseFormat
 ): Distribution | null {
-  let raw: Record<string, unknown>;
+  let raw: unknown;
   try {
     raw = JSON.parse(content);
   } catch {
     return null;
   }
+  // Valid JSON that is not an object ("null", a number, an array) carries no
+  // distribution.
+  if (!raw || typeof raw !== "object" || Array.isArray(raw)) return null;
+  return parseObject(raw as Record<string, unknown>, format);
+}
+
+function parseObject(raw: Record<string, unknown>, format: ResponseFormat): Distribution | null {
   const ids = optionIds(format);
   const values = ids.map((id) => {
     const v = raw[id];
@@ -123,7 +130,11 @@ export function parseDistribution(
 }
 
 function normalize(ids: string[], values: number[]): Distribution | null {
-  const total = values.reduce((s, v) => s + v, 0);
-  if (total <= 0) return null;
-  return Object.fromEntries(ids.map((id, i) => [id, values[i] / total]));
+  // Scale by the largest value first so finite but huge replies cannot
+  // overflow the sum to Infinity.
+  const max = Math.max(...values);
+  if (!(max > 0)) return null;
+  const scaled = values.map((v) => v / max);
+  const total = scaled.reduce((s, v) => s + v, 0);
+  return Object.fromEntries(ids.map((id, i) => [id, scaled[i] / total]));
 }

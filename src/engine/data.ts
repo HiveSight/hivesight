@@ -8,9 +8,17 @@ export const DATASET_VERSION = "hivesight-cells:v1";
 const HF_BASE =
   "https://huggingface.co/datasets/MaxGhenis/hivesight-persona-data/resolve/f27f20ae7d9dd255bd9d93b4ffaf3f057685c813";
 
+export const SAMPLE_POOL_SIZE = 1200;
+
 export interface GeographyData {
   table: CellTable;
   samples: SampleRecord[];
+  /**
+   * "pps": the pool is a weight-proportional sample of a larger population,
+   * so each record stands for the same share of adults. "population": the
+   * pool is every record, which still needs its weight.
+   */
+  samplePool: "pps" | "population";
 }
 
 // Small in-memory cache; cell tables are tiny, district reductions modest.
@@ -41,7 +49,10 @@ function cacheSet(key: string, data: GeographyData) {
 async function loadReleased(geo: string): Promise<GeographyData> {
   const file = path.join(process.cwd(), "public", "data", "v1", `${geo}.json`);
   const parsed = JSON.parse(await readFile(file, "utf-8"));
-  return { table: parsed.table, samples: parsed.samples };
+  // build_cell_release.py draws a weight-proportional pool of SAMPLE_POOL_SIZE
+  // unless the geography has fewer records, in which case it keeps them all.
+  const samplePool = parsed.samples.length >= SAMPLE_POOL_SIZE ? "pps" : "population";
+  return { table: parsed.table, samples: parsed.samples, samplePool };
 }
 
 /**
@@ -57,7 +68,8 @@ async function reduceDistrict(districtId: string): Promise<GeographyData> {
   >;
   return {
     table: reduceToCells(persons, districtId),
-    samples: systematicSample(persons, 1200),
+    samples: systematicSample(persons, SAMPLE_POOL_SIZE),
+    samplePool: persons.length > SAMPLE_POOL_SIZE ? "pps" : "population",
   };
 }
 
