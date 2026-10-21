@@ -431,6 +431,14 @@ ${shape}`;
 // (volunteered options marked), universe notes. Records are drawn per item
 // from a seed fixed by item and replicate, so every model answers as the
 // same 150 people.
+//
+// Two sampling designs (model-refresh addendum, amendment 1):
+//  - "persona": the released sample pool is already a weight-proportional
+//    (PPS) sample of the population, so each pool record stands for the same
+//    share of adults. Draw 150 with equal probability, weight draws equally.
+//  - "persona-july": the July design, kept to measure the correction: draw
+//    in proportion to weight, then weight each draw by its weight again,
+//    which weights pool records by weight squared.
 const PERSONA_SYSTEM = `You are answering a survey as a specific American adult. Answer as this person honestly would, based on their circumstances.
 
 `;
@@ -473,6 +481,14 @@ export function weightedSample(records, n, rng) {
     if (out.length >= n) break;
   }
   return out;
+}
+
+/** Equal-probability systematic sample of n records (one random start). */
+export function equalProbabilitySample(records, n, rng) {
+  if (records.length <= n) return [...records];
+  const step = records.length / n;
+  const start = rng() * step;
+  return Array.from({ length: n }, (_, i) => records[Math.floor(start + i * step)]);
 }
 
 /** FNV-1a: a stable 32-bit seed per item, independent of run order. */
@@ -526,21 +542,25 @@ const PERSONA_SLICE = {
   tenure: (p) => (p.tenure_type === 1 ? "homeowners" : "renters or other housing"),
 };
 
-async function runPersonaArm(item, samples) {
+async function runPersonaArm(item, samples, design) {
   const rng = mulberry32(itemSeed(item.itemId, SEED));
-  const sample = weightedSample(samples, PERSONA_N, rng);
+  const july = design === "persona-july";
+  const sample = july
+    ? weightedSample(samples, PERSONA_N, rng)
+    : equalProbabilitySample(samples, PERSONA_N, rng);
+  const weightOf = (p) => (july ? p.weight : 1);
   const { opts, text } = personaPrompt(item);
   const results = await mapLimit(sample, CONCURRENCY, async (p, idx) => {
     const content = await llm(PERSONA_SYSTEM + describeSample(p), text, {
-      arm: "persona", itemId: item.itemId, recordIdx: idx, variant: VARIANT, replicate: REPLICATE,
+      arm: design, itemId: item.itemId, recordIdx: idx, variant: VARIANT, replicate: REPLICATE,
     }, { json: false });
     return { p, oi: parsePersonaChoice(content, item, opts) };
   });
   const ok = results.filter((r) => r.oi != null);
   const agg = (list) => {
-    const w = list.reduce((s, r) => s + r.p.weight, 0);
+    const w = list.reduce((s, r) => s + weightOf(r.p), 0);
     return item.options.map((_, oi) =>
-      list.reduce((s, r) => s + (r.oi === oi ? r.p.weight : 0), 0) / w
+      list.reduce((s, r) => s + (r.oi === oi ? weightOf(r.p) : 0), 0) / w
     );
   };
   const slices = {};
@@ -597,7 +617,7 @@ async function main() {
       let res;
       if (arm === "cells") res = await runCellsArm(item, cells);
       else if (arm === "naive") res = await runNaiveArm(item);
-      else if (arm === "persona") res = await runPersonaArm(item, us.samples);
+      else if (arm === "persona" || arm === "persona-july") res = await runPersonaArm(item, us.samples, arm);
       else throw new Error(`arm ${arm} not supported in v2 runner`);
       artifact.results[item.itemId][key] = { ...res, ms: Date.now() - t0 };
       writeFileSync(ARTIFACT, JSON.stringify(artifact, null, 1));

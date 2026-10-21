@@ -79,3 +79,26 @@ describe("persona arm (model refresh)", () => {
     expect(runner.parsePersonaChoice(reply, item, opts)).toBe(expected);
   });
 });
+
+describe("persona sampling designs", () => {
+  // A PPS pool: every record stands for the same share of adults.
+  const pool = Array.from({ length: 1200 }, (_, i) => ({ id: i, weight: i < 600 ? 10 : 1 }));
+  const heavyCount = (picked: Array<{ id: number }>) => picked.filter((p) => p.id < 600).length;
+
+  it("equal-probability sampling ignores weights and covers the pool evenly", () => {
+    let s = 7;
+    const rng = () => ((s = (s * 16807) % 2147483647) / 2147483647);
+    const picked = runner.equalProbabilitySample(pool, 150, rng) as Array<{ id: number }>;
+    expect(picked).toHaveLength(150);
+    expect(new Set(picked.map((p) => p.id)).size).toBe(150);
+    expect(heavyCount(picked)).toBe(75);
+  });
+
+  it("the July design over-represents heavy records", () => {
+    let s = 7;
+    const rng = () => ((s = (s * 16807) % 2147483647) / 2147483647);
+    const picked = runner.weightedSample(pool, 150, rng) as Array<{ id: number }>;
+    // 6000 of 6600 weight units are heavy: about 136 of 150 draws.
+    expect(heavyCount(picked)).toBeGreaterThan(130);
+  });
+});

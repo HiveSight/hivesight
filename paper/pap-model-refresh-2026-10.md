@@ -91,3 +91,28 @@ full-bank cells topline and bin-mean subgroup MAE from this refresh,
 replacing the July figure, and the benchmarks page states the change of
 instrument (bank v2) and pooling (bin-mean). A Claude model is added to the
 product only by a later decision, whatever these results show.
+
+## Amendment 1 (registered before any persona result was produced or read)
+
+Checking the verbatim sampler against the 2026-09-25 audit finding that
+illustrative profiles are weighted twice showed the same defect in the
+persona arm, both the July runs and the arm as first registered here. The
+released sample pool (`public/data/v1/US.json` samples, 1,200 records) is
+already a weight-proportional systematic sample of the population, so each
+record stands for the same share of adults. The persona arm drew 150
+records in proportion to weight again and then weighted each draw by its
+weight, which weights pool records by weight squared. On the US pool that
+puts 34.9% of the persona mass on ages 18–29 (population 20.1%), 41.6% on
+women (50.6%), and 26.8% on adults with no earnings (38.7%); the ten
+heaviest records carry 34% of the mass.
+
+The refresh's persona arm is therefore amended: 150 records per item are
+drawn with equal probability (systematic, seeded per item as above) and
+weighted equally. To measure the size of the correction, gpt-5-mini also runs
+the July design (`persona-july`: weight-proportional draw, weighted
+aggregation) on the same 20 items. A gpt-5-mini persona run under the first
+design had started; it was stopped and its output set aside unread. No other
+persona run had started. Cells and direct runs are unaffected and continue.
+
+The July registered persona results are not changed here; whether to correct
+or annotate them is a separate decision.
