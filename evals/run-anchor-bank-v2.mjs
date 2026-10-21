@@ -15,11 +15,20 @@
  *   node evals/run-anchor-bank-v2.mjs --arms cells --items paraphrase10 --variant paraphrase
  *   node evals/run-anchor-bank-v2.mjs --arms cells --items volunteered6 --variant no-volunteered
  *   node evals/run-anchor-bank-v2.mjs --arms cells --items all --granularity 8
+ *
+ * Model refresh (paper/pap-model-refresh-2026-10.md): current models, persona
+ * arm, separate artifact, spend cap.
+ *   node evals/run-anchor-bank-v2.mjs --model gpt-6-luna --arms cells,naive,persona \
+ *     --items all --artifact model-refresh-run.json --max-usd 10
+ *
+ * Request settings per model (reasoning effort, thinking) come from
+ * evals/models.mjs; the provider follows from the model.
  */
 
 import { readFileSync, writeFileSync, mkdirSync, appendFileSync, existsSync } from "node:fs";
 import path from "node:path";
 import { pathToFileURL } from "node:url";
+import { anthropicText, costUsd, modelConfig, requestExtras } from "./models.mjs";
 
 const ARGS = process.argv.slice(2);
 const arg = (name, dflt) => {
@@ -27,14 +36,18 @@ const arg = (name, dflt) => {
   return i >= 0 ? ARGS[i + 1] : dflt;
 };
 
-const PROVIDER = arg("--provider", "openai");
 const MODEL = arg("--model", "gpt-5-mini");
+const PROVIDER = modelConfig(MODEL).provider;
+if (arg("--provider", PROVIDER) !== PROVIDER) {
+  throw new Error(`--provider ${arg("--provider")} disagrees with ${MODEL}'s provider ${PROVIDER}`);
+}
 const ARMS = arg("--arms", "cells,naive").split(",");
 const ITEMS_SEL = arg("--items", "all");
 const VARIANT = arg("--variant", "default");
 const REPLICATE = arg("--replicate", "0");
 const GRANULARITY = Number(arg("--granularity", "149"));
 const CONCURRENCY = Number(arg("--concurrency", "25"));
+const MAX_USD = Number(arg("--max-usd", "Infinity"));
 const PERSONA_N = 150;
 const SEED = 20260707 + Number(REPLICATE);
 
@@ -42,7 +55,7 @@ const PROMPT_VERSION = "prompts:v4-conditional-substantive";
 const ROOT = path.join(import.meta.dirname, "..");
 const OUT_DIR = path.join(import.meta.dirname, "results");
 const LOG_DIR = path.join(OUT_DIR, "logs");
-const ARTIFACT = path.join(OUT_DIR, "anchor-bank-run-v2.json");
+const ARTIFACT = path.join(OUT_DIR, arg("--artifact", "anchor-bank-run-v2.json"));
 
 const SUBSET20 = [
   "gss_happy", "gss_health", "gss_satfin", "gss_trust", "gss_cappun",
@@ -93,79 +106,94 @@ async function mapLimit(items, limit, fn) {
   return results;
 }
 
-let calls = 0, tokIn = 0, tokOut = 0;
+let calls = 0, tokIn = 0, tokOut = 0, failedCalls = 0, spentUsd = 0;
 let logPath = null;
 
 function logCall(record) {
   appendFileSync(logPath, JSON.stringify(record) + "\n");
 }
 
-async function llm(system, user, meta, { json = true, maxTokens = 700 } = {}) {
-  for (let attempt = 0; attempt < 4; attempt++) {
-    try {
-      let content, usage, responseId = null;
-      if (PROVIDER === "anthropic") {
-        const res = await fetch("https://api.anthropic.com/v1/messages", {
-          method: "POST",
-          headers: {
-            "x-api-key": process.env.ANTHROPIC_API_KEY,
-            "anthropic-version": "2023-06-01",
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            model: MODEL, max_tokens: maxTokens, system,
-            messages: [{ role: "user", content: user }],
-          }),
-        });
-        if (res.status === 429 || res.status >= 500) {
-          await new Promise((r) => setTimeout(r, 1500 * 2 ** attempt));
-          continue;
-        }
-        const data = await res.json();
-        if (data.error) throw new Error(data.error.message);
-        content = data.content?.[0]?.text ?? "";
-        usage = { in: data.usage?.input_tokens ?? 0, out: data.usage?.output_tokens ?? 0 };
-        responseId = data.id ?? null;
-      } else {
-        const effort = MODEL.startsWith("gpt-5.") ? "none" : "minimal";
-        const body = {
-          model: MODEL,
-          messages: [
-            { role: "system", content: system },
-            { role: "user", content: user },
-          ],
-          max_completion_tokens: maxTokens,
-          reasoning_effort: effort,
-        };
-        if (json) body.response_format = { type: "json_object" };
-        const res = await fetch("https://api.openai.com/v1/chat/completions", {
-          method: "POST",
-          headers: {
-            Authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(body),
-        });
-        if (res.status === 429 || res.status >= 500) {
-          await new Promise((r) => setTimeout(r, 1500 * 2 ** attempt));
-          continue;
-        }
-        const data = await res.json();
-        if (data.error) throw new Error(data.error.message);
-        content = data.choices?.[0]?.message?.content ?? "";
-        usage = { in: data.usage?.prompt_tokens ?? 0, out: data.usage?.completion_tokens ?? 0 };
-        responseId = data.id ?? null;
-      }
-      calls++;
-      tokIn += usage.in;
-      tokOut += usage.out;
-      logCall({ at: new Date().toISOString(), responseId, system, user, content, usage, ...meta });
-      return content;
-    } catch (err) {
-      if (attempt === 3) throw err;
-      await new Promise((r) => setTimeout(r, 1500 * 2 ** attempt));
-    }
+const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+const MAX_ATTEMPTS = 8;
+
+function requestFor(system, user, json, maxTokens) {
+  if (PROVIDER === "anthropic") {
+    return {
+      url: "https://api.anthropic.com/v1/messages",
+      headers: {
+        "x-api-key": process.env.ANTHROPIC_API_KEY,
+        "anthropic-version": "2023-06-01",
+        "Content-Type": "application/json",
+      },
+      body: {
+        model: MODEL, max_tokens: maxTokens, system,
+        messages: [{ role: "user", content: user }],
+        ...requestExtras(MODEL),
+      },
+    };
   }
+  const body = {
+    model: MODEL,
+    messages: [
+      { role: "system", content: system },
+      { role: "user", content: user },
+    ],
+    max_completion_tokens: maxTokens,
+    ...requestExtras(MODEL),
+  };
+  if (json) body.response_format = { type: "json_object" };
+  return {
+    url: "https://api.openai.com/v1/chat/completions",
+    headers: {
+      Authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
+      "Content-Type": "application/json",
+    },
+    body,
+  };
+}
+
+/**
+ * One elicitation. Rate limits, server errors and network failures retry with
+ * backoff; after MAX_ATTEMPTS the call is logged as failed and returns "" so
+ * the arm counts it as a failed elicitation. A request the API rejects (bad
+ * parameter, unknown model) stops the run: retrying cannot fix it.
+ */
+async function llm(system, user, meta, { json = true, maxTokens = 700 } = {}) {
+  if (spentUsd > MAX_USD) {
+    throw new Error(`spend cap reached: $${spentUsd.toFixed(2)} > --max-usd ${MAX_USD}`);
+  }
+  const req = requestFor(system, user, json, maxTokens);
+  let lastError = null;
+  for (let attempt = 0; attempt < MAX_ATTEMPTS; attempt++) {
+    if (attempt > 0) await sleep(Math.min(30000, 1500 * 2 ** (attempt - 1)));
+    let res, data;
+    try {
+      res = await fetch(req.url, { method: "POST", headers: req.headers, body: JSON.stringify(req.body) });
+      data = await res.json();
+    } catch (err) {
+      lastError = String(err);
+      continue;
+    }
+    if (res.status === 429 || res.status >= 500) {
+      lastError = `HTTP ${res.status}: ${data?.error?.message ?? ""}`;
+      continue;
+    }
+    if (data.error) throw new Error(`${MODEL}: ${data.error.message}`);
+    const content = PROVIDER === "anthropic" ? anthropicText(data) : data.choices?.[0]?.message?.content ?? "";
+    const usage = PROVIDER === "anthropic"
+      ? { in: data.usage?.input_tokens ?? 0, out: data.usage?.output_tokens ?? 0 }
+      : { in: data.usage?.prompt_tokens ?? 0, out: data.usage?.completion_tokens ?? 0 };
+    const stop = PROVIDER === "anthropic" ? data.stop_reason : data.choices?.[0]?.finish_reason;
+    calls++;
+    tokIn += usage.in;
+    tokOut += usage.out;
+    spentUsd += costUsd(MODEL, usage.in, usage.out);
+    logCall({ at: new Date().toISOString(), responseId: data.id ?? null, system, user, content, usage, stop, ...meta });
+    return content;
+  }
+  failedCalls++;
+  logCall({ at: new Date().toISOString(), responseId: null, system, user, content: null, error: lastError, ...meta });
+  return "";
 }
 
 function extractJson(text) {
@@ -396,6 +424,144 @@ ${shape}`;
   return { topline, slices };
 }
 
+// ------------------------------------------------- persona arm (refresh)
+
+// Ported from the v1 runner (PAP v2 persona arm) onto the v4 instrument:
+// corrected wordings, the same presented options as cells and direct
+// (volunteered options marked), universe notes. Records are drawn per item
+// from a seed fixed by item and replicate, so every model answers as the
+// same 150 people.
+const PERSONA_SYSTEM = `You are answering a survey as a specific American adult. Answer as this person honestly would, based on their circumstances.
+
+`;
+
+function describeSample(p) {
+  const earned = Math.round(p.employment_income + p.self_employment_income);
+  const parts = [
+    `You are a ${p.age}-year-old ${p.is_female ? "woman" : "man"} living in the United States`,
+    earned > 0
+      ? `with personal earned income of about $${earned.toLocaleString()} per year`
+      : "with no wage or self-employment income this year",
+    p.tenure_type === 1 ? "You own your home" : "You rent your home",
+    p.children_count > 0
+      ? `You have ${p.children_count} child${p.children_count > 1 ? "ren" : ""} at home`
+      : "You have no children at home",
+  ];
+  const b = [];
+  if (p.receives_snap) b.push("SNAP");
+  if (p.receives_ssi) b.push("SSI");
+  if (p.receives_social_security) b.push("Social Security");
+  if (p.receives_unemployment) b.push("unemployment insurance");
+  if (b.length) parts.push(`You receive ${b.join(", ")}`);
+  if (p.is_in_college) parts.push("You are in college");
+  if (p.is_disabled) parts.push("You have a disability");
+  return parts.join(". ") + ".";
+}
+
+/** Systematic weighted sample of n records (weight-proportional, one random start). */
+export function weightedSample(records, n, rng) {
+  const total = records.reduce((s, p) => s + p.weight, 0);
+  const step = total / n;
+  let target = rng() * step, acc = 0;
+  const out = [];
+  for (const p of records) {
+    acc += p.weight;
+    while (acc >= target && out.length < n) {
+      out.push(p);
+      target += step;
+    }
+    if (out.length >= n) break;
+  }
+  return out;
+}
+
+/** FNV-1a: a stable 32-bit seed per item, independent of run order. */
+export function itemSeed(itemId, base) {
+  let h = 0x811c9dc5;
+  for (const ch of `${base}:${itemId}`) {
+    h ^= ch.charCodeAt(0);
+    h = Math.imul(h, 0x01000193);
+  }
+  return h >>> 0;
+}
+
+const LETTERS = "ABCDEFGHIJ";
+
+export function personaPrompt(item) {
+  const opts = presentedOptions(item);
+  const list = opts.map((o, pos) =>
+    `${LETTERS[pos]}. ${o.label}${o.volunteered ? " (not read to respondents — some volunteer it)" : ""}`
+  ).join("\n");
+  const universe = item.universeNote ? `\n${item.universeNote}` : "";
+  return {
+    opts,
+    text: `Survey question: "${wordingFor(item)}"${universe}
+
+${list}
+
+Respond with exactly:
+RESPONSE: [the letter of your choice]
+REASONING: [one short sentence]`,
+  };
+}
+
+/** Canonical option index chosen in a persona reply, or null. */
+export function parsePersonaChoice(content, item, opts) {
+  const m = content.match(/RESPONSE:\s*\**\s*\[?([A-J])\b/i);
+  let pos = m ? LETTERS.indexOf(m[1].toUpperCase()) : -1;
+  if (pos < 0 || pos >= opts.length) {
+    const lower = content.toLowerCase();
+    pos = opts.findIndex((o) => lower.includes(o.label.toLowerCase()));
+  }
+  return pos >= 0 && pos < opts.length ? opts[pos].idx : null;
+}
+
+const PERSONA_SLICE = {
+  age_band: (p) => (p.age < 30 ? "18-29" : p.age < 45 ? "30-44" : p.age < 65 ? "45-64" : "65+"),
+  sex: (p) => (p.is_female ? "women" : "men"),
+  income_band: (p) => {
+    const e = p.employment_income + p.self_employment_income;
+    return e < 25000 ? "<$25k" : e < 75000 ? "$25k-$74,999" : e < 150000 ? "$75k-$149,999" : "$150k+";
+  },
+  tenure: (p) => (p.tenure_type === 1 ? "homeowners" : "renters or other housing"),
+};
+
+async function runPersonaArm(item, samples) {
+  const rng = mulberry32(itemSeed(item.itemId, SEED));
+  const sample = weightedSample(samples, PERSONA_N, rng);
+  const { opts, text } = personaPrompt(item);
+  const results = await mapLimit(sample, CONCURRENCY, async (p, idx) => {
+    const content = await llm(PERSONA_SYSTEM + describeSample(p), text, {
+      arm: "persona", itemId: item.itemId, recordIdx: idx, variant: VARIANT, replicate: REPLICATE,
+    }, { json: false });
+    return { p, oi: parsePersonaChoice(content, item, opts) };
+  });
+  const ok = results.filter((r) => r.oi != null);
+  const agg = (list) => {
+    const w = list.reduce((s, r) => s + r.p.weight, 0);
+    return item.options.map((_, oi) =>
+      list.reduce((s, r) => s + (r.oi === oi ? r.p.weight : 0), 0) / w
+    );
+  };
+  const slices = {};
+  if (VARIANT === "default") {
+    for (const family of Object.keys(item.targets.slices ?? {})) {
+      const byLabel = new Map();
+      for (const r of ok) {
+        const label = PERSONA_SLICE[family]?.(r.p);
+        if (!label) continue;
+        (byLabel.get(label) ?? byLabel.set(label, []).get(label)).push(r);
+      }
+      slices[family] = Object.fromEntries(
+        [...byLabel.entries()]
+          .filter(([, list]) => list.length >= 10)
+          .map(([label, list]) => [label, agg(list)])
+      );
+    }
+  }
+  return { topline: ok.length ? agg(ok) : null, slices, n: PERSONA_N, failures: results.length - ok.length };
+}
+
 // -------------------------------------------------------------------- main
 
 async function main() {
@@ -431,6 +597,7 @@ async function main() {
       let res;
       if (arm === "cells") res = await runCellsArm(item, cells);
       else if (arm === "naive") res = await runNaiveArm(item);
+      else if (arm === "persona") res = await runPersonaArm(item, us.samples);
       else throw new Error(`arm ${arm} not supported in v2 runner`);
       artifact.results[item.itemId][key] = { ...res, ms: Date.now() - t0 };
       writeFileSync(ARTIFACT, JSON.stringify(artifact, null, 1));
@@ -440,10 +607,12 @@ async function main() {
     }
   }
   artifact.usage ??= {};
-  artifact.usage[`${PROVIDER}:${MODEL}:${ARMS.join("+")}:${ITEMS_SEL}:${runTag}`] =
-    { calls, tokIn, tokOut, at: new Date().toISOString(), log: path.basename(logPath) };
+  artifact.usage[`${PROVIDER}:${MODEL}:${ARMS.join("+")}:${ITEMS_SEL}:${runTag}`] = {
+    calls, failedCalls, tokIn, tokOut, usd: Number(spentUsd.toFixed(4)),
+    request: requestExtras(MODEL), at: new Date().toISOString(), log: path.basename(logPath),
+  };
   writeFileSync(ARTIFACT, JSON.stringify(artifact, null, 1));
-  console.log(`done: ${calls} calls, tokens ${tokIn}/${tokOut}, log ${path.basename(logPath)}`);
+  console.log(`done: ${calls} calls (${failedCalls} failed), tokens ${tokIn}/${tokOut}, ~$${spentUsd.toFixed(2)}, log ${path.basename(logPath)}`);
 }
 
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
