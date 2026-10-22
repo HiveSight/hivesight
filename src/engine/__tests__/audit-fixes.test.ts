@@ -179,7 +179,9 @@ describe("choice formats", () => {
   it.each([
     "Don’t know", "Refused", "Not sure", "Undecided", "Decline to answer", "Can't choose",
     "Can't say", "No answer", "DK/NA", "No preference", "Haven't heard enough to say",
-    "Never heard of them", "Don't know / Refused", "Prefer not to say",
+    "Never heard of them", "Don't know / Refused", "Prefer not to say", "I don't know",
+    "I'm not sure", "Not applicable", "Prefer not to respond", "Skip",
+    "Don't know (volunteered)", "Never heard of",
   ])("treats %j as a nonresponse option", (option) => {
     expect(isNonresponseOption(option)).toBe(true);
   });

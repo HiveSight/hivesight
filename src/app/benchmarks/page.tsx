@@ -72,7 +72,7 @@ function directWins(models: Record<string, ModelScores>, current: string[]): str
     const d = row(m, "naive");
     if (!c || !d || c.subgroupMAE == null || d.subgroupMAE == null) continue;
     if (d.subgroupMAE <= c.subgroupMAE) losers.push(m);
-    else exceptions.push(`${MODEL_LABELS[m]} (${pts(c.subgroupMAE)} vs ${pts(d.subgroupMAE)})`);
+    else exceptions.push(`${MODEL_LABELS[m]} (cells ${pts(c.subgroupMAE)}, direct ${pts(d.subgroupMAE)})`);
   }
   const lead = `direct estimation's subgroup error is at or below the cells estimator's for ${losers.length} of ${losers.length + exceptions.length} current models in the table`;
   return exceptions.length ? `${lead}; the exception is ${exceptions.join(", ")}.` : `${lead}.`;

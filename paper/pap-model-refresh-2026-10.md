@@ -167,10 +167,11 @@ number; each corrects or completes the record above.
    shed_b2, shed_b3, shed_400cash, shed_ef1, shed_ef7, shed_bk1, shed_work,
    shed_housing_stress). Amendment 2's statement that every cells and direct
    result except gpt-6.1-sol's persona arm "had been produced and read" is
-   therefore inaccurate for those 24 items: they were produced while and just
-   after amendment 2 was registered (the last call came 20 s after it was
-   pushed) and read afterwards. The run artifact's usage entry covers only the
-   resumed segment; costs are reported from the per-call logs.
+   therefore inaccurate for those 24 items: 23 finished between 10:47:26Z and
+   11:06:16Z, before amendment 2 was pushed at 11:06:43Z, and
+   shed_housing_stress finished at 11:07:03Z, after it; none of the 24 had
+   been read when amendment 2 was registered. The run artifact's usage entry
+   covers only the resumed segment; costs are reported from the per-call logs.
 2. **Amendment 1's heading.** It says it was registered "before any persona
    result was produced or read". Persona results had been produced, though
    not read: the one-item plumbing check described above, and the stopped

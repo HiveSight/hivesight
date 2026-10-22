@@ -16,7 +16,8 @@ function elicitationFormat(format: ResponseFormat): ResponseFormat {
 
 /** Whole-option labels that are nonresponse categories, not substantive answers. */
 const NONRESPONSE_LABELS = new Set([
-  "don't know", "do not know", "dont know", "dk", "na", "n/a", "not sure", "unsure",
+  "don't know", "do not know", "dont know", "i don't know", "dk", "na", "n/a", "not sure",
+  "i'm not sure", "unsure", "not applicable", "prefer not to respond", "skip", "never heard of",
   "undecided", "no opinion", "no preference", "no answer", "refused", "refuse to answer",
   "decline to answer", "declined to answer", "decline to say", "prefer not to say",
   "prefer not to answer", "rather not say", "can't choose", "can't say", "cannot say",
@@ -32,6 +33,7 @@ export function isNonresponseOption(option: string): boolean {
   const parts = option
     .toLowerCase()
     .replace(/[’‘]/g, "'")
+    .replace(/\s*\((?:volunteered|vol\.?)\)$/, "")
     .replace(/[.!]+$/, "")
     .split(/\s*(?:\/|,|;|\bor\b)\s*/)
     .map((p) => p.trim())
@@ -42,8 +44,9 @@ export function isNonresponseOption(option: string): boolean {
 /**
  * The benchmarked instruction conditions on a substantive answer. When the
  * asker lists a nonresponse option themselves, that instruction would forbid
- * one of their own options, so shares cover every listed option instead.
- * (v4.1 changes only that case; every benchmarked prompt is unchanged.)
+ * one of their own options, so shares cover every listed option instead
+ * (v4.1). v4.2 also sends yes/no questions as the benchmark's Yes/No choice.
+ * Neither changes a benchmarked prompt; parity tests pin this.
  */
 function shareInstruction(format: ResponseFormat): string {
   const listsNonresponse = format.kind === "choice" && format.options.some(isNonresponseOption);
