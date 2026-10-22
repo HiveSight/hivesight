@@ -150,3 +150,41 @@ the settings above.
 
 The product decision rule above is unchanged; nothing in this amendment
 feeds it.
+
+## Post-run notes (2026-10-22; corrections and disclosures, not a registration)
+
+Written after all runs, during independent review. None changes a reported
+number; each corrects or completes the record above.
+
+1. **Interrupted gpt-6.1-sol run.** The full-bank cells and direct run
+   stopped at 2026-10-22T00:28:07Z, after 39 complete items and 97 of 149
+   cells of gss_natheal, when the session hosting the process restarted (not
+   the spend cap: $9.99 of a $20 cap had been spent). It resumed at
+   10:47:26Z with unchanged cells and direct code, redid gss_natheal from its
+   first cell (97 calls repeated; the per-call log keeps both, the results
+   use the resumed item), and finished the remaining 24 items at 11:07:03Z.
+   Ten of those items are in the 20-item subset (gss_natsoc, gss_nateduc,
+   shed_b2, shed_b3, shed_400cash, shed_ef1, shed_ef7, shed_bk1, shed_work,
+   shed_housing_stress). Amendment 2's statement that every cells and direct
+   result except gpt-6.1-sol's persona arm "had been produced and read" is
+   therefore inaccurate for those 24 items: they were produced while and just
+   after amendment 2 was registered (the last call came 20 s after it was
+   pushed) and read afterwards. The run artifact's usage entry covers only the
+   resumed segment; costs are reported from the per-call logs.
+2. **Amendment 1's heading.** It says it was registered "before any persona
+   result was produced or read". Persona results had been produced, though
+   not read: the one-item plumbing check described above, and the stopped
+   first-design gpt-5-mini run (2,020 of 3,000 calls, about 13 items; set
+   aside, not committed). One console line of that stopped run (an item's
+   estimate against its target) was displayed after amendment 1 was
+   registered.
+3. **Shared person samples.** Equal-probability systematic draws of 150 from
+   the 1,200-record pool step by 8, so there are only eight possible samples;
+   the 20 items used seven distinct sets of people. Person-sampling noise is
+   therefore shared across items. Item-resampling intervals that compare a
+   persona arm with cells (Q2, Q4 against cells) may be somewhat narrow;
+   comparisons across models (Q1, Q4 against persona) are unaffected, because
+   every model answered as the same people.
+4. **Reporting.** The analysis reports failure rates for every arm and lists
+   any item above 10% failed elicitations; none was. Across all refresh runs,
+   one reply (one claude-opus-5-5 persona-prob call) failed to parse.

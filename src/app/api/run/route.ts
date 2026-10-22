@@ -49,7 +49,7 @@ function admit(ip: string): (() => void) | null {
 function publicMessage(err: unknown): string {
   if (err instanceof LlmRequestError) {
     console.error("model API rejected request:", err);
-    return "The model service rejected the request. Please try again later.";
+    return "The model service rejected this request.";
   }
   if (err instanceof Error && err.name === "TimeoutError") {
     return "The estimate took too long and was stopped. Please try again.";
@@ -72,16 +72,19 @@ export async function POST(request: Request) {
       { status: 400 }
     );
   }
-  if (rateLimited(ip)) {
-    return Response.json(
-      { error: `Free demo allows ${RATE_LIMIT_PER_DAY} estimates per day.` },
-      { status: 429 }
-    );
-  }
+  // Admit first: a request turned away because others are running must not
+  // use up the daily allowance.
   const release = admit(ip);
   if (!release) {
     return Response.json(
       { error: "Too many estimates are running right now. Please try again in a minute." },
+      { status: 429 }
+    );
+  }
+  if (rateLimited(ip)) {
+    release();
+    return Response.json(
+      { error: `Free demo allows ${RATE_LIMIT_PER_DAY} estimates per day.` },
       { status: 429 }
     );
   }

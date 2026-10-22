@@ -1,6 +1,7 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 import * as evalModels from "../../../evals/models.mjs";
-import { openAiClient } from "../elicit";
+import { LlmRequestError, openAiClient } from "../elicit";
+import { benchmarkErrorFor } from "../run";
 import { DEFAULT_MODEL, SERVED_MODEL_IDS, SERVED_MODELS, reasoningEffortFor } from "../models";
 import { RunRequestSchema } from "@/lib/schema";
 
@@ -64,18 +65,21 @@ describe("openAiClient", () => {
     expect(bodies[0].model).toBe(model);
   });
 
-  it("retries without reasoning_effort when the API rejects the value", async () => {
+  it("fails loudly, without retrying at another effort, when the API rejects the effort", async () => {
     const rejected = {
       error: { message: "Unsupported value: 'reasoning_effort' does not support 'none' with this model." },
     };
     const bodies = stubFetch([rejected, ok]);
-    const content = await openAiClient("test-key").complete({
-      system: "s",
-      user: "u",
-      model: "gpt-6-luna",
-    });
-    expect(content).toBe('{"yes": 60, "no": 40}');
-    expect(bodies).toHaveLength(2);
-    expect(bodies[1].reasoning_effort).toBeUndefined();
+    await expect(
+      openAiClient("test-key").complete({ system: "s", user: "u", model: "gpt-6-luna" })
+    ).rejects.toBeInstanceOf(LlmRequestError);
+    expect(bodies).toHaveLength(1);
+  });
+
+  it.each(SERVED_MODEL_IDS)("has a measured benchmark for served model %s", (model) => {
+    const measured = benchmarkErrorFor(model);
+    expect(measured?.topline).toBeGreaterThan(0);
+    expect(measured?.subgroup).toBeGreaterThan(0);
+    expect(measured?.items).toBe(63);
   });
 });

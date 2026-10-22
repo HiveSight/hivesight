@@ -13,8 +13,10 @@ import {
   cellMatchesFilters,
   normalizeFilters,
 } from "../bands";
-import { mapLimit } from "../elicit";
-import { cellUserPrompt, verbatimUserPrompt } from "../prompts";
+import { mapLimit, parseDistribution } from "../elicit";
+import { cellUserPrompt, isNonresponseOption, verbatimUserPrompt } from "../prompts";
+import { allocatePercents } from "@/lib/percents";
+import { canonicalGeography } from "@/lib/geographies";
 import { runEstimate } from "../run";
 import type { AudienceFilters, Cell, CellTable, ResponseFormat } from "../types";
 import { FormatSchema, RunRequestSchema } from "@/lib/schema";
@@ -174,6 +176,36 @@ describe("choice formats", () => {
     }
   });
 
+  it.each([
+    "Don’t know", "Refused", "Not sure", "Undecided", "Decline to answer", "Can't choose",
+    "Can't say", "No answer", "DK/NA", "No preference", "Haven't heard enough to say",
+    "Never heard of them", "Don't know / Refused", "Prefer not to say",
+  ])("treats %j as a nonresponse option", (option) => {
+    expect(isNonresponseOption(option)).toBe(true);
+  });
+
+  it.each([
+    "Refuse vaccination", "Refuse to pay the fee", "I prefer not to drive at all",
+    "I don't know how to swim", "Was refused service", "Yes", "No", "Strongly agree",
+  ])("treats %j as a substantive option", (option) => {
+    expect(isNonresponseOption(option)).toBe(false);
+  });
+
+  // Byte identity with the benchmark runner: the published accuracy measures
+  // exactly these prompts for choice and yes/no questions.
+  it.each([
+    [{ kind: "choice", options: ["Very happy", "Pretty happy", "Not too happy"] }, ["Very happy", "Pretty happy", "Not too happy"]],
+    [{ kind: "binary" }, ["Yes", "No"]],
+  ] as Array<[ResponseFormat, string[]]>)("sends the runner's cell prompt for %j", (format, options) => {
+    const item = { itemId: "x", wording: "Is this a question?", options };
+    expect(cellUserPrompt(cell, national, "Is this a question?", format)).toBe(runner.cellPrompt(cell, item));
+  });
+
+  it("parses yes/no replies keyed by option position or by id", () => {
+    expect(parseDistribution('{"option_0": 30, "option_1": 70}', { kind: "binary" })).toEqual({ yes: 0.3, no: 0.7 });
+    expect(parseDistribution('{"yes": 30, "no": 70}', { kind: "binary" })).toEqual({ yes: 0.3, no: 0.7 });
+  });
+
   it.each([["Yes", "No", "Don’t know"], ["Yes", "No", "Refused"], ["A", "B", "Not sure"]])(
     "does not forbid the asker's own nonresponse option (%j)",
     (...options) => {
@@ -195,5 +227,33 @@ describe("choice formats", () => {
     expect(a).toContain("option_0: Bus");
     expect(b).toContain("option_0: Car");
     expect(a).not.toBe(b);
+  });
+});
+
+describe("district codes", () => {
+  it.each([["ny-3", "NY-03"], ["CA-1", "CA-01"], ["ca-52", "CA-52"]])("normalizes %s to %s", (input, id) => {
+    expect(canonicalGeography("district", input)).toEqual({
+      type: "district",
+      value: id,
+      label: `Congressional district ${id}`,
+    });
+  });
+});
+
+describe("percent allocation", () => {
+  // Invariant: the chart, legend and headline percents always total 100.
+  it("totals 100 for any distribution", () => {
+    fc.assert(
+      fc.property(fc.array(fc.double({ min: 0, max: 1, noNaN: true }), { minLength: 2, maxLength: 8 }), (raw) => {
+        const total = raw.reduce((s, v) => s + v, 0);
+        fc.pre(total > 0);
+        const options = raw.map((_, i) => `o${i}`);
+        const format: ResponseFormat = { kind: "choice", options };
+        const dist = Object.fromEntries(raw.map((v, i) => [`option_${i}`, v / total]));
+        const counts = allocatePercents(dist, format);
+        expect(counts.reduce((s, c) => s + c, 0)).toBe(100);
+        counts.forEach((c, i) => expect(Math.abs(c - (raw[i] / total) * 100)).toBeLessThan(1));
+      })
+    );
   });
 });

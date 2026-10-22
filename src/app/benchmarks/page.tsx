@@ -56,25 +56,51 @@ function diffCi(d: { diff: number; lo: number; hi: number } | null | undefined):
   return `${f(d.diff)} [${f(d.lo)}, ${f(d.hi)}]`;
 }
 
+/**
+ * Which current models' direct estimates beat cells, read from the same rows
+ * the table shows (full bank where run, else the 20-item subset).
+ */
+function directWins(models: Record<string, ModelScores>, current: string[]): string {
+  const row = (m: string, name: string) => {
+    const a = arm(models, m, name);
+    return a?.all ?? a?.subset20 ?? null;
+  };
+  const losers: string[] = [];
+  const exceptions: string[] = [];
+  for (const m of current) {
+    const c = row(m, "cells");
+    const d = row(m, "naive");
+    if (!c || !d || c.subgroupMAE == null || d.subgroupMAE == null) continue;
+    if (d.subgroupMAE <= c.subgroupMAE) losers.push(m);
+    else exceptions.push(`${MODEL_LABELS[m]} (${pts(c.subgroupMAE)} vs ${pts(d.subgroupMAE)})`);
+  }
+  const lead = `direct estimation's subgroup error is at or below the cells estimator's for ${losers.length} of ${losers.length + exceptions.length} current models in the table`;
+  return exceptions.length ? `${lead}; the exception is ${exceptions.join(", ")}.` : `${lead}.`;
+}
+
 function CurrentModels() {
   const models = refresh.models as unknown as Record<string, ModelScores>;
   const order = Object.keys(MODEL_LABELS).filter((m) => models[m]);
   const q4 = refresh.Q4_personaProb as Record<string, { vsPersona: Paired; vsCells: Paired }>;
   const design = refresh.personaDesignEffect as Paired;
   const decision = refresh.productDecision as { default: string };
+  const current = order.filter((m) => m !== "gpt-5-mini");
   return (
     <section className="mt-10">
       <h2 className="text-xl font-bold tracking-tight mb-2">Current models — October 2026 refresh</h2>
       <p className="mb-4 max-w-2xl text-sm text-muted">
         The registered design rerun with the models available in October 2026, on the
-        instrument-corrected bank and the prompts the product uses, registered by{" "}
+        instrument-corrected bank and the prompts the product uses, under{" "}
         <a
           href="https://github.com/HiveSight/hivesight/blob/main/paper/pap-model-refresh-2026-10.md"
           className="underline hover:text-ink"
         >
           an addendum
         </a>{" "}
-        before any run. Subgroup error pools every reported subgroup, as the plan registered.
+        registered before the refresh runs (it also records a one-item plumbing check, two
+        amendments and one interrupted run). The refresh registered no confirmatory hypotheses,
+        so all its comparisons are exploratory. Subgroup error pools every reported subgroup, as
+        the original plan registered.
         HiveSight serves {SERVED_MODELS[DEFAULT_MODEL].label} by default
         {decision.default === DEFAULT_MODEL ? ", the model the registered rule selects" : ""}.
       </p>
@@ -116,11 +142,9 @@ function CurrentModels() {
         other, not with full-bank rows.
       </p>
       <p className="mt-2 max-w-2xl text-xs text-muted">
-        Where our estimator loses: with every current model, direct estimation&apos;s error is
-        at or below the cells estimator&apos;s, most clearly on subgroups for the frontier
-        models. Cells keep their coherence (subgroups always add up to the topline) and compose
-        across any audience filter. This comparison was not one of the refresh&apos;s
-        registered questions.
+        Where our estimator loses: {directWins(models, current)} Cells keep their coherence
+        (subgroups always add up to the topline) and compose across any audience filter. This
+        comparison was not one of the refresh&apos;s questions.
       </p>
 
       <h3 className="mt-8 mb-2 font-bold tracking-tight">

@@ -241,7 +241,7 @@ function optionsBlock(item) {
 export const DK_LINE =
   "Estimate shares among respondents who give a substantive answer; do not allocate any share to don't know or refused.";
 
-function cellPrompt(cell, item) {
+export function cellPrompt(cell, item) {
   const { text, shape } = optionsBlock(item);
   const universe = item.universeNote ? ` ${item.universeNote}` : "";
   return `Survey question: "${wordingFor(item)}"

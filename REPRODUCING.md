@@ -119,14 +119,15 @@ used in July: `gpt-5-mini` (reasoning effort minimal), `gpt-5.2` (none),
 `evals/models.mjs`. When these are retired, Tier 0 still reproduces the
 paper and the refresh from the committed logs and artifacts.
 
-Approximate cost to re-run everything in Tier 2: ~$20 at July 2026 prices.
+Approximate cost to re-run the July Tier 2 runs: ~$20 at July 2026 prices. The October 2026 refresh cost $111 (from its per-call logs), most of it gpt-6-astra and claude-opus-5-5.
 
 ## Provenance markers
 
 - Pre-registrations: `paper/pap-v2.md` (tag `pap-v2`, commit `f93e00b`),
   `paper/pap-v3-addendum.md` (tag `pap-v3-addendum`, commit `5c301b6`),
   `paper/pap-model-refresh-2026-10.md` (tags `pap-model-refresh-2026-10`,
-  `pap-model-refresh-2026-10-amend1`) —
+  `pap-model-refresh-2026-10-amend1`, `pap-model-refresh-2026-10-amend2`;
+  its post-run notes record one interrupted and resumed run) —
   committed and pushed before the runs they specify; ordering is auditable
   against run-artifact timestamps and per-call log timestamps.
 - The production site's benchmarks page imports the same

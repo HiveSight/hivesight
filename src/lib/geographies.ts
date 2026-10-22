@@ -70,5 +70,7 @@ export function canonicalGeography(
     return state ? { type, value: state.value, label: state.label } : null;
   }
   if (!DISTRICT_PATTERN.test(v) || !STATES.some((s) => s.value === v.slice(0, 2))) return null;
-  return { type, value: v, label: `Congressional district ${v}` };
+  // The data release names districts with two digits (CA-01), so CA-1 is CA-01.
+  const id = v.replace(/-(\d)$/, "-0$1");
+  return { type, value: id, label: `Congressional district ${id}` };
 }

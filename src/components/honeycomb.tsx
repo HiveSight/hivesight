@@ -2,6 +2,7 @@
 
 import type { Distribution, ResponseFormat } from "@/engine/types";
 import { optionIds, optionLabel } from "@/engine/types";
+import { allocatePercents } from "@/lib/percents";
 
 const SCALE_VARS = [
   "var(--color-scale-1)",
@@ -35,19 +36,7 @@ export function Honeycomb({
   const ids = optionIds(format);
   const colors = colorsForFormat(format);
 
-  // Largest-remainder allocation of 100 hexes across options.
-  const raw = ids.map((id) => (dist[id] ?? 0) * 100);
-  const floors = raw.map(Math.floor);
-  let remaining = 100 - floors.reduce((s, v) => s + v, 0);
-  const order = raw
-    .map((v, i) => ({ i, frac: v - Math.floor(v) }))
-    .sort((a, b) => b.frac - a.frac);
-  const counts = [...floors];
-  for (const { i } of order) {
-    if (remaining <= 0) break;
-    counts[i]++;
-    remaining--;
-  }
+  const counts = allocatePercents(dist, format);
 
   const cellColors: string[] = [];
   counts.forEach((count, i) => {

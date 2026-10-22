@@ -26,9 +26,16 @@ export const BENCHMARK_SOURCE =
   "63-item anchor bank (GSS 2024 + SHED 2024, national), October 2026 model refresh";
 
 export function benchmarkErrorFor(model: string): RunResult["benchmarkError"] {
-  const measured = (refresh.servedBenchmark as Record<string, { topline: number; subgroup: number }>)[model];
+  const measured = (
+    refresh.servedBenchmark as Record<string, { topline: number; subgroup: number; items: number }>
+  )[model];
   return measured
-    ? { topline: measured.topline, subgroup: measured.subgroup, source: BENCHMARK_SOURCE }
+    ? {
+        topline: measured.topline,
+        subgroup: measured.subgroup,
+        items: measured.items,
+        source: BENCHMARK_SOURCE,
+      }
     : null;
 }
 
@@ -50,7 +57,7 @@ export async function runEstimate(
     message: `Loading the calibrated population for ${spec.audience.geography.label}`,
   });
 
-  const { table, samples, samplePool } = await loadGeography(spec.audience.geography);
+  const { table, samples, samplePool } = await loadGeography(spec.audience.geography, signal);
   const cells = table.cells.filter((c) => cellMatchesFilters(c, spec.audience.filters));
   if (cells.length === 0) {
     throw new Error(

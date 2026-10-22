@@ -55,6 +55,21 @@ describe("POST /api/run", { timeout: 20_000 }, () => {
     for (const r of [second, otherIp]) await r.body!.cancel();
   });
 
+  it("does not count requests turned away while others run against the daily allowance", async () => {
+    const signals: AbortSignal[] = [];
+    runEstimate.mockImplementation((_spec, _llm, _progress, signal: AbortSignal) => {
+      signals.push(signal);
+      return waitForAbort(signal);
+    });
+    const held = [await POST(post("5.5.5.5")), await POST(post("5.5.5.5"))];
+    for (let i = 0; i < 25; i++) expect((await POST(post("5.5.5.5"))).status).toBe(429);
+    for (const r of held) await r.body!.cancel();
+    await new Promise((r) => setTimeout(r, 0));
+    const next = await POST(post("5.5.5.5"));
+    expect(next.status).toBe(200);
+    await next.body!.cancel();
+  });
+
   it("rejects invalid requests before counting them against the daily allowance", async () => {
     const bad = new Request("http://localhost/api/run", {
       method: "POST",
@@ -70,7 +85,7 @@ describe("POST /api/run", { timeout: 20_000 }, () => {
     const errorLog = vi.spyOn(console, "error").mockImplementation(() => {});
     const text = await (await POST(post("4.4.4.4"))).text();
     expect(text).toContain("event: error");
-    expect(text).toContain("The model service rejected the request");
+    expect(text).toContain("The model service rejected this request");
     expect(text).not.toContain("sk-proj");
     errorLog.mockRestore();
   });

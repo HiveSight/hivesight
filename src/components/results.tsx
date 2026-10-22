@@ -10,6 +10,7 @@ import {
 } from "@tabler/icons-react";
 import type { RunResult, SubgroupEstimate } from "@/engine/types";
 import { optionIds, optionLabel } from "@/engine/types";
+import { allocatePercents } from "@/lib/percents";
 import { colorsForFormat, Honeycomb } from "./honeycomb";
 
 function pct(v: number): string {
@@ -149,8 +150,19 @@ export function Results({
   }
 
   const p = result.provenance;
-  // Runs saved before coverage was recorded carry no elicitedShare.
-  const elicitedShare = p.elicitedShare ?? 1;
+  // Runs saved before coverage was recorded carry no elicitedShare; it is
+  // known only when no cell failed.
+  const elicitedShare = p.elicitedShare ?? (p.cellFailures ? null : 1);
+  // The headline uses the chart's allocation, so it matches the legend.
+  const counts = allocatePercents(result.topline, result.format);
+  const ids = optionIds(result.format);
+  const headlinePct =
+    result.format.kind === "likert5"
+      ? counts[ids.indexOf("agree")] + counts[ids.indexOf("strongly_agree")]
+      : result.format.kind === "binary"
+        ? counts[ids.indexOf("yes")]
+        : (counts[result.format.options.indexOf(result.headline.label)] ?? Math.max(...counts));
+  const benchmarkItems = result.benchmarkError?.items;
   const filtersText = audienceFilters(result.audience.filters);
 
   return (
@@ -159,9 +171,7 @@ export function Results({
         <div>
           <p className="eyebrow mb-3">Estimate</p>
           {showQuestion && <p className="mb-3 max-w-xl text-ink">“{result.question}”</p>}
-          <p className="text-5xl font-extrabold tracking-tight text-ink">
-            {pct(result.headline.value)}
-          </p>
+          <p className="text-5xl font-extrabold tracking-tight text-ink">{headlinePct}%</p>
           <p className="mt-2 text-muted">
             of {result.audience.geography.label} adults
             {filtersText ? ` (${filtersText})` : ""} are estimated to {headlineLabel}
@@ -175,7 +185,7 @@ export function Results({
             <p className="mt-4 text-sm text-muted max-w-md">
               Directional estimate. On{" "}
               <Link href="/benchmarks" className="underline hover:text-ink">
-                63 benchmark questions
+                {benchmarkItems ? `${benchmarkItems} benchmark survey questions` : "benchmark questions"}
               </Link>
               , this method with {p.model} missed the real answer share by{" "}
               <span className="font-mono">
@@ -191,14 +201,17 @@ export function Results({
                   for subgroups
                 </>
               )}
-              . Treat it as a prior, not a poll.
+              .
+              {result.format.kind === "likert5" &&
+                " Five-point agreement statements like this one were not among them."}{" "}
+              Treat it as a prior, not a poll.
             </p>
           )}
         </div>
         <Honeycomb dist={result.topline} format={result.format} />
       </div>
 
-      {elicitedShare < 0.9 && (
+      {elicitedShare != null && elicitedShare < 0.9 && (
         <p role="note" className="rounded-lg border border-line bg-surface px-4 py-3 text-sm text-ink">
           This estimate rests on {pct(elicitedShare)} of the audience: {p.cellFailures} of{" "}
           {p.cellCount + p.cellFailures} population cells returned no usable answer. Groups in the
@@ -256,7 +269,7 @@ export function Results({
               ["Model", p.model],
               ["Population cells", `${p.cellCount}${p.cellFailures ? ` (${p.cellFailures} failed)` : ""}`],
               ["Weighted audience", Math.round(p.eligibleWeight).toLocaleString()],
-              ["Audience estimated", pct(elicitedShare)],
+              ["Audience estimated", elicitedShare == null ? "not recorded" : pct(elicitedShare)],
               ["Share of geography", pct(p.populationShare)],
               ["Seed", String(p.seed)],
               ["Started", p.startedAt],

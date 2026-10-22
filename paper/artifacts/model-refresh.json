@@ -489,7 +489,9 @@
   "cells:anthropic:claude-haiku-4-5-20251001": {
    "bins": 192,
    "failureRate": 0.0,
+   "flaggedItems": [],
    "items": 20,
+   "missingItems": [],
    "subgroupMAE": 0.09666059700379419,
    "subgroupMAE_itemMean": 0.09772148319809955,
    "toplineMAE": 0.08369866826908653,
@@ -498,7 +500,9 @@
   "cells:openai:gpt-5-mini": {
    "bins": 548,
    "failureRate": 0.00010653030787258975,
+   "flaggedItems": [],
    "items": 63,
+   "missingItems": [],
    "subgroupMAE": 0.09907058307613262,
    "subgroupMAE_itemMean": 0.09841447823621598,
    "toplineMAE": 0.09178763854227942,
@@ -507,7 +511,9 @@
   "cells:openai:gpt-5.2": {
    "bins": 192,
    "failureRate": 0.0,
+   "flaggedItems": [],
    "items": 20,
+   "missingItems": [],
    "subgroupMAE": 0.08472028119332742,
    "subgroupMAE_itemMean": 0.08515139317150756,
    "toplineMAE": 0.07417828897743325,
@@ -515,8 +521,10 @@
   },
   "naive:openai:gpt-5-mini": {
    "bins": 548,
-   "failureRate": null,
+   "failureRate": 0.0,
+   "flaggedItems": [],
    "items": 63,
+   "missingItems": [],
    "subgroupMAE": 0.098427811385717,
    "subgroupMAE_itemMean": 0.09840935341300004,
    "toplineMAE": 0.08618251989443454,
@@ -525,7 +533,9 @@
   "persona:openai:gpt-5-mini": {
    "bins": 190,
    "failureRate": 0.0,
+   "flaggedItems": [],
    "items": 20,
+   "missingItems": [],
    "subgroupMAE": 0.2523480762814251,
    "subgroupMAE_itemMean": 0.24963758800811275,
    "toplineMAE": 0.2503477121330608,
@@ -538,7 +548,9 @@
     "all": {
      "bins": 548,
      "failureRate": 0.0,
+     "flaggedItems": [],
      "items": 63,
+     "missingItems": [],
      "subgroupMAE": 0.08501978847879295,
      "subgroupMAE_itemMean": 0.08296038308492357,
      "toplineMAE": 0.07316479360120483,
@@ -547,7 +559,9 @@
     "subset20": {
      "bins": 192,
      "failureRate": 0.0,
+     "flaggedItems": [],
      "items": 20,
+     "missingItems": [],
      "subgroupMAE": 0.08479822459664987,
      "subgroupMAE_itemMean": 0.0799292427220548,
      "toplineMAE": 0.07167137893508772,
@@ -564,8 +578,10 @@
    "naive": {
     "all": {
      "bins": 548,
-     "failureRate": null,
+     "failureRate": 0.0,
+     "flaggedItems": [],
      "items": 63,
+     "missingItems": [],
      "subgroupMAE": 0.08641505004788683,
      "subgroupMAE_itemMean": 0.08527500163403948,
      "toplineMAE": 0.07790719063849949,
@@ -573,8 +589,10 @@
     },
     "subset20": {
      "bins": 192,
-     "failureRate": null,
+     "failureRate": 0.0,
+     "flaggedItems": [],
      "items": 20,
+     "missingItems": [],
      "subgroupMAE": 0.07965736825669693,
      "subgroupMAE_itemMean": 0.07865986838790522,
      "toplineMAE": 0.07002070540789716,
@@ -586,7 +604,9 @@
     "subset20": {
      "bins": 183,
      "failureRate": 0.0,
+     "flaggedItems": [],
      "items": 20,
+     "missingItems": [],
      "subgroupMAE": 0.21952127178967326,
      "subgroupMAE_itemMean": 0.21916702807668792,
      "toplineMAE": 0.2216996513363735,
@@ -598,7 +618,9 @@
     "subset20": {
      "bins": 183,
      "failureRate": 0.0,
+     "flaggedItems": [],
      "items": 20,
+     "missingItems": [],
      "subgroupMAE": 0.10210903272422985,
      "subgroupMAE_itemMean": 0.0967169836830529,
      "toplineMAE": 0.09443825904308667,
@@ -612,7 +634,9 @@
     "subset20": {
      "bins": 192,
      "failureRate": 0.0,
+     "flaggedItems": [],
      "items": 20,
+     "missingItems": [],
      "subgroupMAE": 0.06005256906432794,
      "subgroupMAE_itemMean": 0.0570087869302349,
      "toplineMAE": 0.03393245490433354,
@@ -630,8 +654,10 @@
     "all": null,
     "subset20": {
      "bins": 192,
-     "failureRate": null,
+     "failureRate": 0.0,
+     "flaggedItems": [],
      "items": 20,
+     "missingItems": [],
      "subgroupMAE": 0.045379828095346096,
      "subgroupMAE_itemMean": 0.04517978305522412,
      "toplineMAE": 0.026761710819335115,
@@ -643,7 +669,9 @@
     "subset20": {
      "bins": 183,
      "failureRate": 0.0,
+     "flaggedItems": [],
      "items": 20,
+     "missingItems": [],
      "subgroupMAE": 0.18321940969690448,
      "subgroupMAE_itemMean": 0.18666127278762099,
      "toplineMAE": 0.17529098390036899,
@@ -655,7 +683,9 @@
     "subset20": {
      "bins": 183,
      "failureRate": 0.0003333333333333333,
+     "flaggedItems": [],
      "items": 20,
+     "missingItems": [],
      "subgroupMAE": 0.08040504511558587,
      "subgroupMAE_itemMean": 0.07606663420079576,
      "toplineMAE": 0.07158571672584584,
@@ -669,7 +699,9 @@
     "subset20": {
      "bins": 192,
      "failureRate": 0.0,
+     "flaggedItems": [],
      "items": 20,
+     "missingItems": [],
      "subgroupMAE": 0.06923750770056118,
      "subgroupMAE_itemMean": 0.06556850009427946,
      "toplineMAE": 0.04049940473000309,
@@ -687,8 +719,10 @@
     "all": null,
     "subset20": {
      "bins": 192,
-     "failureRate": null,
+     "failureRate": 0.0,
+     "flaggedItems": [],
      "items": 20,
+     "missingItems": [],
      "subgroupMAE": 0.054690593549215516,
      "subgroupMAE_itemMean": 0.05427513120388265,
      "toplineMAE": 0.03908513876304785,
@@ -700,7 +734,9 @@
     "subset20": {
      "bins": 183,
      "failureRate": 0.0,
+     "flaggedItems": [],
      "items": 20,
+     "missingItems": [],
      "subgroupMAE": 0.2093406046358678,
      "subgroupMAE_itemMean": 0.21042823145810421,
      "toplineMAE": 0.20529098390036898,
@@ -712,7 +748,9 @@
     "subset20": {
      "bins": 183,
      "failureRate": 0.0,
+     "flaggedItems": [],
      "items": 20,
+     "missingItems": [],
      "subgroupMAE": 0.09534894882741733,
      "subgroupMAE_itemMean": 0.09055480286188486,
      "toplineMAE": 0.08655728861264875,
@@ -725,7 +763,9 @@
     "all": {
      "bins": 548,
      "failureRate": 0.0,
+     "flaggedItems": [],
      "items": 63,
+     "missingItems": [],
      "subgroupMAE": 0.10124531708919338,
      "subgroupMAE_itemMean": 0.09997694855284608,
      "toplineMAE": 0.09250321571092282,
@@ -734,7 +774,9 @@
     "subset20": {
      "bins": 192,
      "failureRate": 0.0,
+     "flaggedItems": [],
      "items": 20,
+     "missingItems": [],
      "subgroupMAE": 0.10021511032544299,
      "subgroupMAE_itemMean": 0.0979608336330969,
      "toplineMAE": 0.09431596180812848,
@@ -751,8 +793,10 @@
    "naive": {
     "all": {
      "bins": 548,
-     "failureRate": null,
+     "failureRate": 0.0,
+     "flaggedItems": [],
      "items": 63,
+     "missingItems": [],
      "subgroupMAE": 0.09773349922903825,
      "subgroupMAE_itemMean": 0.09721059601893674,
      "toplineMAE": 0.08721104812498831,
@@ -760,8 +804,10 @@
     },
     "subset20": {
      "bins": 192,
-     "failureRate": null,
+     "failureRate": 0.0,
+     "flaggedItems": [],
      "items": 20,
+     "missingItems": [],
      "subgroupMAE": 0.0929797553330139,
      "subgroupMAE_itemMean": 0.09364483341313505,
      "toplineMAE": 0.07950680316568384,
@@ -773,7 +819,9 @@
     "subset20": {
      "bins": 183,
      "failureRate": 0.0,
+     "flaggedItems": [],
      "items": 20,
+     "missingItems": [],
      "subgroupMAE": 0.24162377926132353,
      "subgroupMAE_itemMean": 0.24049611904330698,
      "toplineMAE": 0.24634174091468425,
@@ -785,7 +833,9 @@
     "subset20": {
      "bins": 189,
      "failureRate": 0.0,
+     "flaggedItems": [],
      "items": 20,
+     "missingItems": [],
      "subgroupMAE": 0.2401533784425019,
      "subgroupMAE_itemMean": 0.2382799161950647,
      "toplineMAE": 0.23278661807344694,
@@ -797,7 +847,9 @@
     "subset20": {
      "bins": 183,
      "failureRate": 0.0,
+     "flaggedItems": [],
      "items": 20,
+     "missingItems": [],
      "subgroupMAE": 0.12269818092273707,
      "subgroupMAE_itemMean": 0.11641910922695783,
      "toplineMAE": 0.11873741709635603,
@@ -811,7 +863,9 @@
     "subset20": {
      "bins": 192,
      "failureRate": 0.0,
+     "flaggedItems": [],
      "items": 20,
+     "missingItems": [],
      "subgroupMAE": 0.06455797542026186,
      "subgroupMAE_itemMean": 0.06241127995909281,
      "toplineMAE": 0.03506948782051432,
@@ -829,8 +883,10 @@
     "all": null,
     "subset20": {
      "bins": 192,
-     "failureRate": null,
+     "failureRate": 0.0,
+     "flaggedItems": [],
      "items": 20,
+     "missingItems": [],
      "subgroupMAE": 0.04591780982766654,
      "subgroupMAE_itemMean": 0.0469744716127916,
      "toplineMAE": 0.03171841663522375,
@@ -842,7 +898,9 @@
     "subset20": {
      "bins": 183,
      "failureRate": 0.0,
+     "flaggedItems": [],
      "items": 20,
+     "missingItems": [],
      "subgroupMAE": 0.21528237302204997,
      "subgroupMAE_itemMean": 0.22009722865695402,
      "toplineMAE": 0.21644437915508413,
@@ -854,7 +912,9 @@
     "subset20": {
      "bins": 183,
      "failureRate": 0.0,
+     "flaggedItems": [],
      "items": 20,
+     "missingItems": [],
      "subgroupMAE": 0.08754464642568374,
      "subgroupMAE_itemMean": 0.08344072584412862,
      "toplineMAE": 0.07913919101757465,
@@ -867,7 +927,9 @@
     "all": {
      "bins": 548,
      "failureRate": 0.0,
+     "flaggedItems": [],
      "items": 63,
+     "missingItems": [],
      "subgroupMAE": 0.0782424920640194,
      "subgroupMAE_itemMean": 0.07662695063796926,
      "toplineMAE": 0.06411214165648604,
@@ -876,7 +938,9 @@
     "subset20": {
      "bins": 192,
      "failureRate": 0.0,
+     "flaggedItems": [],
      "items": 20,
+     "missingItems": [],
      "subgroupMAE": 0.07257565016131749,
      "subgroupMAE_itemMean": 0.07035203303768309,
      "toplineMAE": 0.051934855455455356,
@@ -893,8 +957,10 @@
    "naive": {
     "all": {
      "bins": 548,
-     "failureRate": null,
+     "failureRate": 0.0,
+     "flaggedItems": [],
      "items": 63,
+     "missingItems": [],
      "subgroupMAE": 0.07462582576890744,
      "subgroupMAE_itemMean": 0.07482125645279467,
      "toplineMAE": 0.06307780399530857,
@@ -902,8 +968,10 @@
     },
     "subset20": {
      "bins": 192,
-     "failureRate": null,
+     "failureRate": 0.0,
+     "flaggedItems": [],
      "items": 20,
+     "missingItems": [],
      "subgroupMAE": 0.059935952598181075,
      "subgroupMAE_itemMean": 0.061169666693363454,
      "toplineMAE": 0.04998397451281615,
@@ -915,7 +983,9 @@
     "subset20": {
      "bins": 183,
      "failureRate": 0.0,
+     "flaggedItems": [],
      "items": 20,
+     "missingItems": [],
      "subgroupMAE": 0.2135213324742861,
      "subgroupMAE_itemMean": 0.21415294715547833,
      "toplineMAE": 0.2050480495461323,
@@ -927,7 +997,9 @@
     "subset20": {
      "bins": 183,
      "failureRate": 0.0,
+     "flaggedItems": [],
      "items": 20,
+     "missingItems": [],
      "subgroupMAE": 0.10413417778090928,
      "subgroupMAE_itemMean": 0.0977108121047919,
      "toplineMAE": 0.09399797230568833,
@@ -940,7 +1012,9 @@
     "all": {
      "bins": 548,
      "failureRate": 0.0,
+     "flaggedItems": [],
      "items": 63,
+     "missingItems": [],
      "subgroupMAE": 0.06232980977685405,
      "subgroupMAE_itemMean": 0.059970866993582506,
      "toplineMAE": 0.04563307679940613,
@@ -949,7 +1023,9 @@
     "subset20": {
      "bins": 192,
      "failureRate": 0.0,
+     "flaggedItems": [],
      "items": 20,
+     "missingItems": [],
      "subgroupMAE": 0.06541555711921841,
      "subgroupMAE_itemMean": 0.06336213856271114,
      "toplineMAE": 0.03603922290153529,
@@ -966,8 +1042,10 @@
    "naive": {
     "all": {
      "bins": 548,
-     "failureRate": null,
+     "failureRate": 0.0,
+     "flaggedItems": [],
      "items": 63,
+     "missingItems": [],
      "subgroupMAE": 0.05603931309149844,
      "subgroupMAE_itemMean": 0.0553582313323562,
      "toplineMAE": 0.04406348344621005,
@@ -975,8 +1053,10 @@
     },
     "subset20": {
      "bins": 192,
-     "failureRate": null,
+     "failureRate": 0.0,
+     "flaggedItems": [],
      "items": 20,
+     "missingItems": [],
      "subgroupMAE": 0.047873454331211096,
      "subgroupMAE_itemMean": 0.04887752609987636,
      "toplineMAE": 0.03029938706566166,
@@ -988,7 +1068,9 @@
     "subset20": {
      "bins": 183,
      "failureRate": 0.0,
+     "flaggedItems": [],
      "items": 20,
+     "missingItems": [],
      "subgroupMAE": 0.21611247830179772,
      "subgroupMAE_itemMean": 0.2212114460454754,
      "toplineMAE": 0.22077771248841738,
@@ -1000,7 +1082,9 @@
     "subset20": {
      "bins": 183,
      "failureRate": 0.0,
+     "flaggedItems": [],
      "items": 20,
+     "missingItems": [],
      "subgroupMAE": 0.08778636469766285,
      "subgroupMAE_itemMean": 0.08359186429202861,
      "toplineMAE": 0.07917815411517802,
@@ -1039,7 +1123,11 @@
   "margin": 0.01,
   "referenceCellsSubgroupMAE": 0.10124531708919338
  },
- "registration": "paper/pap-model-refresh-2026-10.md (tags pap-model-refresh-2026-10, pap-model-refresh-2026-10-amend1)",
+ "registration": "paper/pap-model-refresh-2026-10.md (tags pap-model-refresh-2026-10, -amend1, -amend2; see its post-run notes)",
+ "runNotes": [
+  "gpt-6.1-sol full-bank cells/direct was interrupted at 2026-10-22T00:28:07Z and resumed at 10:47:26Z with unchanged code; 97 calls were repeated.",
+  "Every refresh comparison is exploratory; the persona-prob arm (amendment 2) was added after the other results were read."
+ ],
  "servedBenchmark": {
   "gpt-6-luna": {
    "items": 63,

@@ -126,12 +126,30 @@ def mean(xs):
     return float(np.mean(xs)) if xs else None
 
 
+def arm_failures(res):
+    """(failed, attempted) elicitations for one item's arm result. Cells and
+    persona arms record failures; the direct arm records a null estimate."""
+    if "failures" in res:
+        return res["failures"] or 0, res.get("cellCount") or res.get("n") or 0
+    estimates = [res.get("topline")] + [e for fam in (res.get("slices") or {}).values() for e in fam.values()]
+    return sum(e is None for e in estimates), len(estimates)
+
+
 def score(items, getter, item_ids):
-    """Pooled metrics for one arm over item_ids (items without results are skipped)."""
+    """Pooled metrics for one arm over item_ids. Items with no usable topline
+    are listed in missingItems; items over 10% failed elicitations in
+    flaggedItems."""
     tops, tvs, bins_all, item_means, covered, failures, cells = [], [], [], [], [], 0, 0
+    missing, flagged = [], []
     for iid in item_ids:
         res = getter(iid)
-        if not res or not res.get("topline"):
+        if not res:
+            continue
+        failed, attempted = arm_failures(res)
+        if attempted and failed / attempted > 0.10:
+            flagged.append(iid)
+        if not res.get("topline"):
+            missing.append(iid)
             continue
         covered.append(iid)
         tops.append(topline_err(items[iid], res))
@@ -140,8 +158,8 @@ def score(items, getter, item_ids):
         bins_all.extend(b)
         if b:
             item_means.append(float(np.mean(b)))
-        failures += res.get("failures") or 0
-        cells += res.get("cellCount") or res.get("n") or 0
+        failures += failed
+        cells += attempted
     return {
         "items": len(covered),
         "toplineMAE": mean(tops),
@@ -150,6 +168,8 @@ def score(items, getter, item_ids):
         "bins": len(bins_all),
         "toplineTV": mean(tvs),
         "failureRate": (failures / cells) if cells else None,
+        "missingItems": missing,
+        "flaggedItems": flagged,
     }
 
 
@@ -204,7 +224,11 @@ def main():
 
     out = {
         "generatedFrom": "analysis/analyze_model_refresh.py",
-        "registration": "paper/pap-model-refresh-2026-10.md (tags pap-model-refresh-2026-10, pap-model-refresh-2026-10-amend1)",
+        "registration": "paper/pap-model-refresh-2026-10.md (tags pap-model-refresh-2026-10, -amend1, -amend2; see its post-run notes)",
+        "runNotes": [
+            "gpt-6.1-sol full-bank cells/direct was interrupted at 2026-10-22T00:28:07Z and resumed at 10:47:26Z with unchanged code; 97 calls were repeated.",
+            "Every refresh comparison is exploratory; the persona-prob arm (amendment 2) was added after the other results were read.",
+        ],
         "instrument": "anchor bank v2, prompts v4, 149 national cells",
         "pooling": "subgroupMAE pools absolute errors across all reported slice bins (PAP v2); subgroupMAE_itemMean averages within item first (July publication)",
         "models": {},

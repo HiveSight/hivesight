@@ -25,8 +25,12 @@ export class LlmRequestError extends Error {}
 export function openAiClient(apiKey: string, baseUrl = "https://api.openai.com/v1"): LlmClient {
   return {
     async complete({ system, user, model, json = true, maxTokens = 700, signal }) {
-      let reasoningEffort = reasoningEffortFor(model);
-      for (let attempt = 0; attempt < 4; attempt++) {
+      // The effort is part of the benchmarked configuration: if the API ever
+      // rejects it, fail loudly rather than silently serve a different one.
+      const reasoningEffort = reasoningEffortFor(model);
+      const attempts = 4;
+      let lastFailure = "";
+      for (let attempt = 0; attempt < attempts; attempt++) {
         signal?.throwIfAborted();
         try {
           const body: Record<string, unknown> = {
@@ -49,29 +53,19 @@ export function openAiClient(apiKey: string, baseUrl = "https://api.openai.com/v
             signal,
           });
           if (res.status === 429 || res.status >= 500) {
-            await sleep(1200 * 2 ** attempt, signal);
+            lastFailure = `HTTP ${res.status}`;
+            if (attempt < attempts - 1) await sleep(1200 * 2 ** attempt, signal);
             continue;
           }
           const data = await res.json();
-          if (data.error) {
-            // Models that reject the reasoning_effort value: drop it and retry.
-            if (
-              reasoningEffort &&
-              typeof data.error.message === "string" &&
-              data.error.message.includes("reasoning_effort")
-            ) {
-              reasoningEffort = null;
-              continue;
-            }
-            throw new LlmRequestError(data.error.message);
-          }
+          if (data.error) throw new LlmRequestError(data.error.message);
           return data.choices?.[0]?.message?.content ?? "";
         } catch (err) {
-          if (err instanceof LlmRequestError || signal?.aborted || attempt === 3) throw err;
+          if (err instanceof LlmRequestError || signal?.aborted || attempt === attempts - 1) throw err;
           await sleep(1200 * 2 ** attempt, signal);
         }
       }
-      throw new Error("unreachable");
+      throw new Error(`model API unavailable after ${attempts} attempts (${lastFailure})`);
     },
   };
 }
@@ -138,7 +132,14 @@ export function parseDistribution(
   // Valid JSON that is not an object ("null", a number, an array) carries no
   // distribution.
   if (!raw || typeof raw !== "object" || Array.isArray(raw)) return null;
-  return parseObject(raw as Record<string, unknown>, format);
+  const obj = raw as Record<string, unknown>;
+  if (format.kind === "binary") {
+    // Elicited as the two-option choice Yes/No (BINARY_AS_CHOICE); accept the
+    // yes/no keys too.
+    const asChoice = parseObject(obj, { kind: "choice", options: ["Yes", "No"] });
+    if (asChoice) return { yes: asChoice.option_0, no: asChoice.option_1 };
+  }
+  return parseObject(obj, format);
 }
 
 function parseObject(raw: Record<string, unknown>, format: ResponseFormat): Distribution | null {

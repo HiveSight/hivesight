@@ -1,11 +1,43 @@
 import type { Cell, GeographyRef, ResponseFormat, SampleRecord } from "./types";
 import { optionIds } from "./types";
 
-export const PROMPT_VERSION = "prompts:v4.1-core-conditional";
+export const PROMPT_VERSION = "prompts:v4.2-core-conditional";
 
-/** Choice options that are themselves nonresponse categories. */
-const NONRESPONSE_OPTION =
-  /\b(don'?t|do not)\s+know\b|\bnot\s+sure\b|\bunsure\b|\brefuse|\bno\s+opinion\b|\bprefer\s+not\b/i;
+/**
+ * Yes/no questions are elicited exactly as the benchmark's Yes/No items were:
+ * as a two-option choice (v4.2). parseDistribution maps the reply back to
+ * the yes/no ids.
+ */
+export const BINARY_AS_CHOICE: ResponseFormat = { kind: "choice", options: ["Yes", "No"] };
+
+function elicitationFormat(format: ResponseFormat): ResponseFormat {
+  return format.kind === "binary" ? BINARY_AS_CHOICE : format;
+}
+
+/** Whole-option labels that are nonresponse categories, not substantive answers. */
+const NONRESPONSE_LABELS = new Set([
+  "don't know", "do not know", "dont know", "dk", "na", "n/a", "not sure", "unsure",
+  "undecided", "no opinion", "no preference", "no answer", "refused", "refuse to answer",
+  "decline to answer", "declined to answer", "decline to say", "prefer not to say",
+  "prefer not to answer", "rather not say", "can't choose", "can't say", "cannot say",
+  "haven't heard enough to say", "never heard of them", "never heard of it",
+]);
+
+/**
+ * True when an option is entirely a nonresponse category, including combined
+ * labels like "Don't know / Refused". Substantive options that merely contain
+ * such words ("Refuse vaccination", "I don't know how to swim") are not.
+ */
+export function isNonresponseOption(option: string): boolean {
+  const parts = option
+    .toLowerCase()
+    .replace(/[’‘]/g, "'")
+    .replace(/[.!]+$/, "")
+    .split(/\s*(?:\/|,|;|\bor\b)\s*/)
+    .map((p) => p.trim())
+    .filter(Boolean);
+  return parts.length > 0 && parts.every((p) => NONRESPONSE_LABELS.has(p));
+}
 
 /**
  * The benchmarked instruction conditions on a substantive answer. When the
@@ -14,9 +46,7 @@ const NONRESPONSE_OPTION =
  * (v4.1 changes only that case; every benchmarked prompt is unchanged.)
  */
 function shareInstruction(format: ResponseFormat): string {
-  const listsNonresponse =
-    format.kind === "choice" &&
-    format.options.some((o) => NONRESPONSE_OPTION.test(o.replace(/’/g, "'")));
+  const listsNonresponse = format.kind === "choice" && format.options.some(isNonresponseOption);
   if (listsNonresponse) {
     return "Estimate shares across all the response options listed, including any don't-know or refusal option.";
   }
@@ -77,12 +107,13 @@ export function cellUserPrompt(
   question: string,
   format: ResponseFormat
 ): string {
-  const { optionsText, jsonShape } = formatBlock(format);
+  const elicited = elicitationFormat(format);
+  const { optionsText, jsonShape } = formatBlock(elicited);
   const stem =
     format.kind === "likert5"
       ? `Survey statement: "${question}"\nEstimate the percentage of the group below choosing each response option.`
       : `Survey question: "${question}"\nEstimate the percentage of the group below choosing each response option.`;
-  return `${stem} ${shareInstruction(format)}
+  return `${stem} ${shareInstruction(elicited)}
 
 Group: ${describeCell(cell, geography)}
 

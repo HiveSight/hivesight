@@ -64,9 +64,10 @@ async function loadReleased(geo: string): Promise<GeographyData> {
  * Districts are reduced at runtime from the per-district microdata file
  * (small enough to parse in-process), using the same banding as the pipeline.
  */
-async function reduceDistrict(districtId: string): Promise<GeographyData> {
-  const res = await fetch(`${HF_BASE}/districts/${districtId}.json.gz`);
-  if (!res.ok) throw new Error(`district data fetch failed: ${res.status}`);
+async function reduceDistrict(districtId: string, signal?: AbortSignal): Promise<GeographyData> {
+  const res = await fetch(`${HF_BASE}/districts/${districtId}.json.gz`, { signal });
+  if (res.status === 404) throw new Error(`HiveSight has no data for district ${districtId}.`);
+  if (!res.ok) throw new Error("District data is temporarily unavailable. Please try again.");
   const buf = Buffer.from(await res.arrayBuffer());
   const persons = JSON.parse(gunzipSync(buf).toString("utf-8")).persons as Array<
     SampleRecord & { [k: string]: unknown }
@@ -147,16 +148,19 @@ export function systematicSample<T extends { weight: number }>(
   return out;
 }
 
-export async function loadGeography(geo: {
-  type: "national" | "state" | "district";
-  value: string;
-}): Promise<GeographyData> {
+export async function loadGeography(
+  geo: {
+    type: "national" | "state" | "district";
+    value: string;
+  },
+  signal?: AbortSignal
+): Promise<GeographyData> {
   const key = `${geo.type}:${geo.value}`;
   const hit = cacheGet(key);
   if (hit) return hit;
   const data =
     geo.type === "district"
-      ? await reduceDistrict(geo.value)
+      ? await reduceDistrict(geo.value, signal)
       : await loadReleased(geo.type === "national" ? "US" : geo.value);
   cacheSet(key, data);
   return data;
