@@ -48,5 +48,7 @@ jobs:
           uv run --with "$PINS" python analysis/analyze_model_refresh.py
           uv run --with "$PINS" python analysis/make_paper_assets.py
 
+      # Numeric comparison: Linux and macOS round the last float bits
+      # differently, so a byte diff fails on noise (red since July 2026).
       - name: Verify artifacts unchanged
-        run: git diff --exit-code paper/artifacts/ paper/figures/
+        run: python3 analysis/compare_artifacts.py

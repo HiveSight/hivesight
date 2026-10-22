@@ -13,7 +13,7 @@ uv run --with "$PINS" python analysis/analyze_anchor.py         # scores registe
 uv run --with "$PINS" python analysis/analyze_anchor_v2.py      # scores v4 robustness runs + sensitivities
 uv run --with "$PINS" python analysis/analyze_model_refresh.py  # scores the October 2026 model refresh
 uv run --with "$PINS" python analysis/make_paper_assets.py      # summary.json and figures
-git diff --exit-code paper/artifacts/ paper/figures/            # clean = reproduced
+python3 analysis/compare_artifacts.py                           # match = reproduced
 cd paper && quarto render paper.qmd                                   # rebuild submission PDF/HTML
 bun run paper:site                                                    # rebuild the hivesight.ai/paper embed
 ```
@@ -28,8 +28,11 @@ Inputs consumed: `evals/anchor-bank/anchor-bank-v{1,2}.json`,
 `paper/artifacts/brfss-state-targets.json`, `public/data/v1/US.json`, and the
 committed Tier 1 outputs `paper/artifacts/ppi.json`, `ppi-richer.json` and
 `rf-baseline.json`, which Tier 0 reads as they are.
-The CI job `reproduce-artifacts` runs the four scripts above and the diff on
-every push; it does not render Quarto.
+The CI job `reproduce-artifacts` runs the four scripts above and the
+comparison on every push; it does not render Quarto. The comparison allows
+floating-point noise (relative 1e-9), because Linux and macOS round the last
+bits differently; on one platform, regenerated artifacts and figures are
+byte-identical (`git diff --exit-code paper/`).
 
 Exception: `analysis/rf_baseline.py` and the PPI study additionally need the
 respondent-level extracts (Tier 1), which GSS terms do not allow us to commit.
