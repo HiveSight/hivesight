@@ -78,7 +78,13 @@ export function AskForm() {
     .split("\n")
     .map((s) => s.trim())
     .filter(Boolean);
-  const formatInvalid = formatKind === "choice" && (choiceList.length < 2 || choiceList.length > 8);
+  const MAX_OPTION_LENGTH = 120;
+  const longOption = choiceList.find((o) => o.length > MAX_OPTION_LENGTH);
+  const duplicateOption =
+    new Set(choiceList.map((o) => o.toLowerCase())).size !== choiceList.length;
+  const formatInvalid =
+    formatKind === "choice" &&
+    (choiceList.length < 2 || choiceList.length > 8 || !!longOption || duplicateOption);
   const disabled = running || question.trim().length < 10 || districtInvalid || formatInvalid;
 
   async function run() {
@@ -101,15 +107,25 @@ export function AskForm() {
       });
       if (!res.ok || !res.body) {
         const data = await res.json().catch(() => null);
-        throw new Error(data?.error ?? `Request failed (${res.status})`);
+        const detail = data?.details?.[0]?.message;
+        throw new Error(
+          detail ? `${data.error}: ${detail}` : (data?.error ?? `Request failed (${res.status})`)
+        );
       }
       const reader = res.body.getReader();
       const decoder = new TextDecoder();
       let buffer = "";
       let eventType = "";
+      let completed = false;
       while (true) {
         const { done, value } = await reader.read();
-        if (done) break;
+        if (done) {
+          // A stream that ends without "complete" or "error" was cut off.
+          if (!completed) {
+            throw new Error("The estimate was interrupted before it finished. Please run it again.");
+          }
+          break;
+        }
         buffer += decoder.decode(value, { stream: true });
         const lines = buffer.split("\n");
         buffer = lines.pop() ?? "";
@@ -119,6 +135,7 @@ export function AskForm() {
             const data = JSON.parse(line.slice(6));
             if (eventType === "progress") setProgress(data);
             else if (eventType === "complete") {
+              completed = true;
               setResult(data.result);
               setRunId(data.runId);
             } else if (eventType === "error") throw new Error(data.message);
@@ -176,13 +193,24 @@ export function AskForm() {
               <option value="choice">Multiple choice</option>
             </select>
             {formatKind === "choice" && (
-              <textarea
-                value={choiceOptions}
-                onChange={(e) => setChoiceOptions(e.target.value)}
-                rows={3}
-                placeholder={"One option per line (2-8)"}
-                className="mt-2 w-full rounded-md border border-line bg-paper px-3 py-2 text-sm text-ink placeholder:text-faint"
-              />
+              <>
+                <textarea
+                  value={choiceOptions}
+                  onChange={(e) => setChoiceOptions(e.target.value)}
+                  rows={3}
+                  aria-label="Multiple-choice options, one per line"
+                  aria-describedby={longOption || duplicateOption ? "choice-error" : undefined}
+                  placeholder={"One option per line (2-8)"}
+                  className="mt-2 w-full rounded-md border border-line bg-paper px-3 py-2 text-sm text-ink placeholder:text-faint"
+                />
+                {(longOption || duplicateOption) && (
+                  <p id="choice-error" className="mt-1 text-xs text-ink">
+                    {longOption
+                      ? `Each option can be at most ${MAX_OPTION_LENGTH} characters.`
+                      : "Each option must be different."}
+                  </p>
+                )}
+              </>
             )}
           </div>
           <div>
@@ -227,6 +255,8 @@ export function AskForm() {
             <button
               type="button"
               onClick={() => setShowFilters((s) => !s)}
+              aria-expanded={showFilters}
+              aria-controls="segment-filters"
               className="mt-2 text-xs text-muted underline hover:text-ink"
             >
               {showFilters ? "Hide segment filters" : "Add segment filters"}
@@ -235,12 +265,12 @@ export function AskForm() {
         </div>
 
         {showFilters && (
-          <div className="mt-4 space-y-3 border-t border-line pt-4">
+          <div id="segment-filters" className="mt-4 space-y-3 border-t border-line pt-4">
             {FILTER_GROUPS.map((group) => (
               <div key={group.key} className="flex flex-wrap items-baseline gap-2">
                 <span className="eyebrow w-40 shrink-0">{group.label}</span>
                 {group.options.map((opt) => {
-                  const active = filters[group.key]?.includes(opt);
+                  const active = filters[group.key]?.includes(opt) ?? false;
                   return (
                     <button
                       key={opt}
@@ -276,7 +306,7 @@ export function AskForm() {
             {running ? "Estimating…" : "Run estimate"}
           </button>
           <span className="text-xs text-faint">
-            Free while in research preview. Estimates take about a minute.
+            Free while in research preview. Estimates usually take under a minute.
           </span>
         </div>
 

@@ -17,7 +17,8 @@ export function SiteFooter() {
           <p>
             Population structure: calibrated synthetic microdata built from the
             Current Population Survey, with state and district assignment.
-            Benchmark targets: Federal Reserve SHED 2024.
+            Benchmark targets: the 2024 General Social Survey and the Federal
+            Reserve&apos;s 2024 SHED.
           </p>
         </div>
         <div>

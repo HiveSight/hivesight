@@ -102,7 +102,7 @@ export function Honeycomb({
               style={{ background: colors[i] }}
               aria-hidden
             />
-            {optionLabel(format, id)} {Math.round((dist[id] ?? 0) * 100)}%
+            {optionLabel(format, id)} {counts[i]}%
           </span>
         ))}
       </figcaption>
