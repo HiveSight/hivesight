@@ -116,3 +116,37 @@ persona run had started. Cells and direct runs are unaffected and continue.
 
 The July registered persona results are not changed here; whether to correct
 or annotate them is a separate decision.
+
+## Amendment 2 (registered before any individual-probability run)
+
+Registered after the refresh's persona, cells and direct results for every
+model except gpt-6.1-sol's persona arm had been produced and read. The
+question below was motivated by what they showed, so its results are
+exploratory and reported as such.
+
+What they showed: the persona arm improves with newer models (subgroup MAE
+24.2 for gpt-5-mini, 18.3 for claude-opus-5-5 on the 20-item subset), but
+stays 12 to 15 points worse than cells for every model. Each persona names
+its single most likely answer. Aggregating those answers collapses a
+distribution even when every individual prediction is right: on gss_happy
+about 140 of 150 personas answer "pretty happy".
+
+Arm `persona-prob` (individual probability): the same 150 people per item as
+`persona` (same seed, equal-probability draws, same system prompt and
+description of the person), asked how likely they are to give each answer,
+with the same presented options as cells and direct and the same
+substantive-answer instruction. Replies parse with the cells parser; the
+item's estimate is the equal-weight average of the 150 individual
+distributions, and subgroup estimates average the people in each bin (bins
+with fewer than 10 people are not reported, as for `persona`).
+
+Runs: the 20-item subset, for gpt-5-mini, gpt-6-luna, gpt-6.1-sol,
+gpt-6-astra, claude-haiku-5-5, claude-sonnet-5-5 and claude-opus-5-5, with
+the settings above.
+
+- Q4: for each model, `persona-prob` minus `persona`, and `persona-prob`
+  minus `cells`, on topline and bin-pooled subgroup MAE, paired by item with
+  item-resampling bootstrap 95% CIs.
+
+The product decision rule above is unchanged; nothing in this amendment
+feeds it.

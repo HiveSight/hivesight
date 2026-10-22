@@ -521,6 +521,21 @@ REASONING: [one short sentence]`,
   };
 }
 
+/**
+ * Individual-probability prompt (amendment 2): the same person reports how
+ * likely they are to give each answer, instead of naming one.
+ */
+export function personaProbPrompt(item) {
+  const { text, shape } = optionsBlock(item);
+  const universe = item.universeNote ? `\n${item.universeNote}` : "";
+  return `Survey question: "${wordingFor(item)}"${universe}
+
+${text}
+
+How likely are you to give each of these answers? Reply with JSON only: integer percentages summing to 100, with no share for don't know or refused.
+${shape}`;
+}
+
 /** Canonical option index chosen in a persona reply, or null. */
 export function parsePersonaChoice(content, item, opts) {
   const m = content.match(/RESPONSE:\s*\**\s*\[?([A-J])\b/i);
@@ -582,6 +597,38 @@ async function runPersonaArm(item, samples, design) {
   return { topline: ok.length ? agg(ok) : null, slices, n: PERSONA_N, failures: results.length - ok.length };
 }
 
+async function runPersonaProbArm(item, samples) {
+  const rng = mulberry32(itemSeed(item.itemId, SEED));
+  const sample = equalProbabilitySample(samples, PERSONA_N, rng);
+  const user = personaProbPrompt(item);
+  const results = await mapLimit(sample, CONCURRENCY, async (p, idx) => {
+    const content = await llm(PERSONA_SYSTEM + describeSample(p), user, {
+      arm: "persona-prob", itemId: item.itemId, recordIdx: idx, variant: VARIANT, replicate: REPLICATE,
+    });
+    return { p, dist: parseDist(content, item) };
+  });
+  const ok = results.filter((r) => r.dist);
+  // Equal-probability draws from a PPS pool: average with equal weights.
+  const agg = (list) => item.options.map((_, oi) => list.reduce((s, r) => s + r.dist[oi], 0) / list.length);
+  const slices = {};
+  if (VARIANT === "default") {
+    for (const family of Object.keys(item.targets.slices ?? {})) {
+      const byLabel = new Map();
+      for (const r of ok) {
+        const label = PERSONA_SLICE[family]?.(r.p);
+        if (!label) continue;
+        (byLabel.get(label) ?? byLabel.set(label, []).get(label)).push(r);
+      }
+      slices[family] = Object.fromEntries(
+        [...byLabel.entries()]
+          .filter(([, list]) => list.length >= 10)
+          .map(([label, list]) => [label, agg(list)])
+      );
+    }
+  }
+  return { topline: ok.length ? agg(ok) : null, slices, n: PERSONA_N, failures: results.length - ok.length };
+}
+
 // -------------------------------------------------------------------- main
 
 async function main() {
@@ -618,6 +665,7 @@ async function main() {
       if (arm === "cells") res = await runCellsArm(item, cells);
       else if (arm === "naive") res = await runNaiveArm(item);
       else if (arm === "persona" || arm === "persona-july") res = await runPersonaArm(item, us.samples, arm);
+      else if (arm === "persona-prob") res = await runPersonaProbArm(item, us.samples);
       else throw new Error(`arm ${arm} not supported in v2 runner`);
       artifact.results[item.itemId][key] = { ...res, ms: Date.now() - t0 };
       writeFileSync(ARTIFACT, JSON.stringify(artifact, null, 1));
