@@ -25,9 +25,9 @@ import pandas as pd
 
 SCRATCH = os.environ.get(
     "HS_SCRATCH",
-    "/private/tmp/claude-501/-Users-maxghenis/4b986211-4583-4bc2-b435-9fa459f2ce1e/scratchpad",
+    os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..", "data", "raw"),  # gitignored; see DATA.md,
 )
-GSS_DTA = "/Users/maxghenis/HiveSight/hivesight-calibration/data/gss7224_r2.dta"
+GSS_DTA = os.environ.get("GSS_DTA", os.path.join(SCRATCH, "gss7224_r2.dta"))
 SHED_CSV = os.path.join(SCRATCH, "public2024.csv")
 OUT = os.path.join(os.path.dirname(__file__), "anchor-bank-v1.json")
 

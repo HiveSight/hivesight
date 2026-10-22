@@ -1,0 +1,1143 @@
+{
+ "Q1_personaVsReference": {
+  "claude-haiku-5-5": {
+   "bins": 183,
+   "items": 20,
+   "subgroup": {
+    "diff": -0.022102507471650233,
+    "hi": 0.02207652761819255,
+    "lo": -0.07843667748056522
+   },
+   "topline": {
+    "diff": -0.024642089578310704,
+    "hi": 0.029071479913131727,
+    "lo": -0.09146881157011447
+   }
+  },
+  "claude-opus-5-5": {
+   "bins": 183,
+   "items": 20,
+   "subgroup": {
+    "diff": -0.058404369564419065,
+    "hi": -0.012999841819129013,
+    "lo": -0.10932535904577437
+   },
+   "topline": {
+    "diff": -0.07105075701431526,
+    "hi": -0.016326128985306613,
+    "lo": -0.13580774250550268
+   }
+  },
+  "claude-sonnet-5-5": {
+   "bins": 183,
+   "items": 20,
+   "subgroup": {
+    "diff": -0.03228317462545573,
+    "hi": 0.00941008600913619,
+    "lo": -0.08287593226763966
+   },
+   "topline": {
+    "diff": -0.041050757014315264,
+    "hi": 0.00932773573127844,
+    "lo": -0.10516032449617639
+   }
+  },
+  "gpt-6-astra": {
+   "bins": 183,
+   "items": 20,
+   "subgroup": {
+    "diff": -0.026341406239273554,
+    "hi": 0.013962938586434348,
+    "lo": -0.07164904722379845
+   },
+   "topline": {
+    "diff": -0.029897361759600116,
+    "hi": 0.017988869030843745,
+    "lo": -0.08290006765566149
+   }
+  },
+  "gpt-6-luna": {
+   "bins": 183,
+   "items": 20,
+   "subgroup": {
+    "diff": -0.028102446787037463,
+    "hi": 0.021354096607484597,
+    "lo": -0.08267879352420698
+   },
+   "topline": {
+    "diff": -0.04129369136855194,
+    "hi": 0.021470225508828683,
+    "lo": -0.1099937996625861
+   }
+  },
+  "gpt-6.1-sol": {
+   "bins": 183,
+   "items": 20,
+   "subgroup": {
+    "diff": -0.025511300959525838,
+    "hi": 0.013803272376991237,
+    "lo": -0.0703468195695398
+   },
+   "topline": {
+    "diff": -0.025564028426266795,
+    "hi": 0.018988804795890223,
+    "lo": -0.07689176415754521
+   }
+  }
+ },
+ "Q2_cellsVsPersona": {
+  "claude-haiku-5-5": {
+   "bins": 183,
+   "items": 20,
+   "subgroup": {
+    "diff": -0.13500798241559483,
+    "hi": -0.09453727632854926,
+    "lo": -0.1754267791513721
+   },
+   "topline": {
+    "diff": -0.15002827240128583,
+    "hi": -0.10342369705719157,
+    "lo": -0.19453705844088728
+   }
+  },
+  "claude-opus-5-5": {
+   "bins": 183,
+   "items": 20,
+   "subgroup": {
+    "diff": -0.12431738169987973,
+    "hi": -0.08710675431028783,
+    "lo": -0.16158839982460682
+   },
+   "topline": {
+    "diff": -0.14135852899603543,
+    "hi": -0.10087103626121771,
+    "lo": -0.18128954400962646
+   }
+  },
+  "claude-sonnet-5-5": {
+   "bins": 183,
+   "items": 20,
+   "subgroup": {
+    "diff": -0.14115094611119613,
+    "hi": -0.10360649485474016,
+    "lo": -0.18089191576031888
+   },
+   "topline": {
+    "diff": -0.16479157917036585,
+    "hi": -0.11930477741836563,
+    "lo": -0.20979646540490265
+   }
+  },
+  "gpt-5-mini": {
+   "bins": 183,
+   "items": 20,
+   "subgroup": {
+    "diff": -0.1410006525926066,
+    "hi": -0.09093152371646085,
+    "lo": -0.1955339016096119
+   },
+   "topline": {
+    "diff": -0.15202577910655574,
+    "hi": -0.0931441599574954,
+    "lo": -0.21555728224154913
+   }
+  },
+  "gpt-6-astra": {
+   "bins": 183,
+   "items": 20,
+   "subgroup": {
+    "diff": -0.15230745843683668,
+    "hi": -0.10716084164614843,
+    "lo": -0.19872203813150205
+   },
+   "topline": {
+    "diff": -0.1813748913345698,
+    "hi": -0.13127065304132585,
+    "lo": -0.23128523338701368
+   }
+  },
+  "gpt-6-luna": {
+   "bins": 183,
+   "items": 20,
+   "subgroup": {
+    "diff": -0.1401710372008146,
+    "hi": -0.0969035584544451,
+    "lo": -0.1886070167597486
+   },
+   "topline": {
+    "diff": -0.15311319409067697,
+    "hi": -0.10419310204202657,
+    "lo": -0.2061164769002248
+   }
+  },
+  "gpt-6.1-sol": {
+   "bins": 183,
+   "items": 20,
+   "subgroup": {
+    "diff": -0.15222893408995342,
+    "hi": -0.10824406665691022,
+    "lo": -0.19896519189030729
+   },
+   "topline": {
+    "diff": -0.18473848958688216,
+    "hi": -0.13602266948273758,
+    "lo": -0.23249992618779494
+   }
+  }
+ },
+ "Q3_cellsVsReference": {
+  "claude-haiku-5-5": {
+   "bins": 548,
+   "items": 63,
+   "subgroup": {
+    "diff": -0.01622552861040043,
+    "hi": -0.0004161562703298983,
+    "lo": -0.032003420265007694
+   },
+   "topline": {
+    "diff": -0.019338422109717982,
+    "hi": 0.00011526121959364048,
+    "lo": -0.03825862022741754
+   }
+  },
+  "claude-opus-5-5": {
+   "bins": 192,
+   "items": 20,
+   "subgroup": {
+    "diff": -0.040162541261115035,
+    "hi": -0.023459710300496168,
+    "lo": -0.057879578297901316
+   },
+   "topline": {
+    "diff": -0.060383506903794945,
+    "hi": -0.0375847076860017,
+    "lo": -0.08552374742856218
+   }
+  },
+  "claude-sonnet-5-5": {
+   "bins": 192,
+   "items": 20,
+   "subgroup": {
+    "diff": -0.03097760262488179,
+    "hi": -0.01275877752808087,
+    "lo": -0.04989084328504914
+   },
+   "topline": {
+    "diff": -0.0538165570781254,
+    "hi": -0.027218481641563007,
+    "lo": -0.08431644440847241
+   }
+  },
+  "gpt-6-astra": {
+   "bins": 192,
+   "items": 20,
+   "subgroup": {
+    "diff": -0.03565713490518111,
+    "hi": -0.018602668454108878,
+    "lo": -0.05379304385977835
+   },
+   "topline": {
+    "diff": -0.05924647398761418,
+    "hi": -0.03271093699307636,
+    "lo": -0.08887405447408742
+   }
+  },
+  "gpt-6-luna": {
+   "bins": 548,
+   "items": 63,
+   "subgroup": {
+    "diff": -0.023002825025173982,
+    "hi": -0.007463536883284676,
+    "lo": -0.03900310486867389
+   },
+   "topline": {
+    "diff": -0.02839107405443677,
+    "hi": -0.009396925776631595,
+    "lo": -0.04813051324058869
+   }
+  },
+  "gpt-6.1-sol": {
+   "bins": 548,
+   "items": 63,
+   "subgroup": {
+    "diff": -0.03891550731233932,
+    "hi": -0.02377862880290389,
+    "lo": -0.05415274954576383
+   },
+   "topline": {
+    "diff": -0.04687013891151666,
+    "hi": -0.02986943307697635,
+    "lo": -0.06467591684686944
+   }
+  }
+ },
+ "Q4_personaProb": {
+  "claude-haiku-5-5": {
+   "vsCells": {
+    "bins": 183,
+    "items": 20,
+    "subgroup": {
+     "diff": 0.01759574335015144,
+     "hi": 0.03608680490850729,
+     "lo": -0.0008421224999796373
+    },
+    "topline": {
+     "diff": 0.02276688010799894,
+     "hi": 0.04611995346227985,
+     "lo": -0.0005224190482642266
+    }
+   },
+   "vsPersona": {
+    "bins": 183,
+    "items": 20,
+    "subgroup": {
+     "diff": -0.11741223906544342,
+     "hi": -0.08208806868345402,
+     "lo": -0.15472798904792462
+    },
+    "topline": {
+     "diff": -0.12726139229328687,
+     "hi": -0.08507574021763584,
+     "lo": -0.16833326730644332
+    }
+   }
+  },
+  "claude-opus-5-5": {
+   "vsCells": {
+    "bins": 183,
+    "items": 20,
+    "subgroup": {
+     "diff": 0.021503017118561157,
+     "hi": 0.03909587896766767,
+     "lo": 0.005677736062596425
+    },
+    "topline": {
+     "diff": 0.037653261821512296,
+     "hi": 0.06435639532375256,
+     "lo": 0.01278587779777013
+    }
+   },
+   "vsPersona": {
+    "bins": 183,
+    "items": 20,
+    "subgroup": {
+     "diff": -0.10281436458131857,
+     "hi": -0.06451609462473062,
+     "lo": -0.145431530897555
+    },
+    "topline": {
+     "diff": -0.10370526717452314,
+     "hi": -0.05601621190008936,
+     "lo": -0.15386679154864497
+    }
+   }
+  },
+  "claude-sonnet-5-5": {
+   "vsCells": {
+    "bins": 183,
+    "items": 20,
+    "subgroup": {
+     "diff": 0.027159290302745696,
+     "hi": 0.052480165282955585,
+     "lo": 0.004804399291874551
+    },
+    "topline": {
+     "diff": 0.04605788388264568,
+     "hi": 0.07983052141545174,
+     "lo": 0.01585155882022503
+    }
+   },
+   "vsPersona": {
+    "bins": 183,
+    "items": 20,
+    "subgroup": {
+     "diff": -0.11399165580845044,
+     "hi": -0.07687136084007457,
+     "lo": -0.15137314883670436
+    },
+    "topline": {
+     "diff": -0.1187336952877202,
+     "hi": -0.07206237092985818,
+     "lo": -0.16272915091824888
+    }
+   }
+  },
+  "gpt-5-mini": {
+   "vsCells": {
+    "bins": 183,
+    "items": 20,
+    "subgroup": {
+     "diff": 0.02207505425402019,
+     "hi": 0.052809720918063754,
+     "lo": -0.008991379860918802
+    },
+    "topline": {
+     "diff": 0.024421455288227555,
+     "hi": 0.06337897270130123,
+     "lo": -0.013174307920757748
+    }
+   },
+   "vsPersona": {
+    "bins": 183,
+    "items": 20,
+    "subgroup": {
+     "diff": -0.11892559833858644,
+     "hi": -0.0844562570349876,
+     "lo": -0.15538063003660896
+    },
+    "topline": {
+     "diff": -0.12760432381832815,
+     "hi": -0.08493855441062667,
+     "lo": -0.169645309476232
+    }
+   }
+  },
+  "gpt-6-astra": {
+   "vsCells": {
+    "bins": 183,
+    "items": 20,
+    "subgroup": {
+     "diff": 0.02456973184047046,
+     "hi": 0.04324453485433077,
+     "lo": 0.007050838873948771
+    },
+    "topline": {
+     "diff": 0.04406970319706034,
+     "hi": 0.07741755997818753,
+     "lo": 0.014852119572624856
+    }
+   },
+   "vsPersona": {
+    "bins": 183,
+    "items": 20,
+    "subgroup": {
+     "diff": -0.12773772659636623,
+     "hi": -0.08417824096633547,
+     "lo": -0.17538664303444668
+    },
+    "topline": {
+     "diff": -0.13730518813750947,
+     "hi": -0.08535649733692827,
+     "lo": -0.19071602485431494
+    }
+   }
+  },
+  "gpt-6-luna": {
+   "vsCells": {
+    "bins": 183,
+    "items": 20,
+    "subgroup": {
+     "diff": 0.030783882507437858,
+     "hi": 0.055591476089489986,
+     "lo": 0.007985792849089882
+    },
+    "topline": {
+     "diff": 0.042063116850232986,
+     "hi": 0.08021064274263343,
+     "lo": 0.007958609342529307
+    }
+   },
+   "vsPersona": {
+    "bins": 183,
+    "items": 20,
+    "subgroup": {
+     "diff": -0.10938715469337676,
+     "hi": -0.06973349487776277,
+     "lo": -0.1532300561374513
+    },
+    "topline": {
+     "diff": -0.11105007724044395,
+     "hi": -0.05890253552984927,
+     "lo": -0.16086760554587107
+    }
+   }
+  },
+  "gpt-6.1-sol": {
+   "vsCells": {
+    "bins": 183,
+    "items": 20,
+    "subgroup": {
+     "diff": 0.023902820485818575,
+     "hi": 0.04420141470558416,
+     "lo": 0.0045494874790486155
+    },
+    "topline": {
+     "diff": 0.043138931213642734,
+     "hi": 0.07650780316352095,
+     "lo": 0.01218664652157077
+    }
+   },
+   "vsPersona": {
+    "bins": 183,
+    "items": 20,
+    "subgroup": {
+     "diff": -0.12832611360413484,
+     "hi": -0.08439561225833873,
+     "lo": -0.17562809289961528
+    },
+    "topline": {
+     "diff": -0.14159955837323943,
+     "hi": -0.08994317502398126,
+     "lo": -0.19318442863362456
+    }
+   }
+  }
+ },
+ "generatedFrom": "analysis/analyze_model_refresh.py",
+ "instrument": "anchor bank v2, prompts v4, 149 national cells",
+ "julyRegisteredRepooled": {
+  "cells:anthropic:claude-haiku-4-5-20251001": {
+   "bins": 192,
+   "failureRate": 0.0,
+   "flaggedItems": [],
+   "items": 20,
+   "missingItems": [],
+   "subgroupMAE": 0.09666059700379419,
+   "subgroupMAE_itemMean": 0.09772148319809955,
+   "toplineMAE": 0.08369866826908653,
+   "toplineTV": 0.11088598220274042
+  },
+  "cells:openai:gpt-5-mini": {
+   "bins": 548,
+   "failureRate": 0.00010653030787258975,
+   "flaggedItems": [],
+   "items": 63,
+   "missingItems": [],
+   "subgroupMAE": 0.09907058307613262,
+   "subgroupMAE_itemMean": 0.09841447823621598,
+   "toplineMAE": 0.09178763854227942,
+   "toplineTV": 0.11715278933968291
+  },
+  "cells:openai:gpt-5.2": {
+   "bins": 192,
+   "failureRate": 0.0,
+   "flaggedItems": [],
+   "items": 20,
+   "missingItems": [],
+   "subgroupMAE": 0.08472028119332742,
+   "subgroupMAE_itemMean": 0.08515139317150756,
+   "toplineMAE": 0.07417828897743325,
+   "toplineTV": 0.08855360324474693
+  },
+  "naive:openai:gpt-5-mini": {
+   "bins": 548,
+   "failureRate": 0.0,
+   "flaggedItems": [],
+   "items": 63,
+   "missingItems": [],
+   "subgroupMAE": 0.098427811385717,
+   "subgroupMAE_itemMean": 0.09840935341300004,
+   "toplineMAE": 0.08618251989443454,
+   "toplineTV": 0.1146891485590922
+  },
+  "persona:openai:gpt-5-mini": {
+   "bins": 190,
+   "failureRate": 0.0,
+   "flaggedItems": [],
+   "items": 20,
+   "missingItems": [],
+   "subgroupMAE": 0.2523480762814251,
+   "subgroupMAE_itemMean": 0.24963758800811275,
+   "toplineMAE": 0.2503477121330608,
+   "toplineTV": 0.3202080570703796
+  }
+ },
+ "models": {
+  "claude-haiku-5-5": {
+   "cells": {
+    "all": {
+     "bins": 548,
+     "failureRate": 0.0,
+     "flaggedItems": [],
+     "items": 63,
+     "missingItems": [],
+     "subgroupMAE": 0.08501978847879295,
+     "subgroupMAE_itemMean": 0.08296038308492357,
+     "toplineMAE": 0.07316479360120483,
+     "toplineTV": 0.10466963893876009
+    },
+    "subset20": {
+     "bins": 192,
+     "failureRate": 0.0,
+     "flaggedItems": [],
+     "items": 20,
+     "missingItems": [],
+     "subgroupMAE": 0.08479822459664987,
+     "subgroupMAE_itemMean": 0.0799292427220548,
+     "toplineMAE": 0.07167137893508772,
+     "toplineTV": 0.08873550695225463
+    }
+   },
+   "cost": {
+    "calls": 15998,
+    "failedCalls": 0,
+    "tokensIn": 5077000,
+    "tokensOut": 579772,
+    "usd": 0.8
+   },
+   "naive": {
+    "all": {
+     "bins": 548,
+     "failureRate": 0.0,
+     "flaggedItems": [],
+     "items": 63,
+     "missingItems": [],
+     "subgroupMAE": 0.08641505004788683,
+     "subgroupMAE_itemMean": 0.08527500163403948,
+     "toplineMAE": 0.07790719063849949,
+     "toplineTV": 0.10308894795617933
+    },
+    "subset20": {
+     "bins": 192,
+     "failureRate": 0.0,
+     "flaggedItems": [],
+     "items": 20,
+     "missingItems": [],
+     "subgroupMAE": 0.07965736825669693,
+     "subgroupMAE_itemMean": 0.07865986838790522,
+     "toplineMAE": 0.07002070540789716,
+     "toplineTV": 0.08130372758978242
+    }
+   },
+   "persona": {
+    "all": null,
+    "subset20": {
+     "bins": 183,
+     "failureRate": 0.0,
+     "flaggedItems": [],
+     "items": 20,
+     "missingItems": [],
+     "subgroupMAE": 0.21952127178967326,
+     "subgroupMAE_itemMean": 0.21916702807668792,
+     "toplineMAE": 0.2216996513363735,
+     "toplineTV": 0.2642750596843897
+    }
+   },
+   "persona-prob": {
+    "all": null,
+    "subset20": {
+     "bins": 183,
+     "failureRate": 0.0,
+     "flaggedItems": [],
+     "items": 20,
+     "missingItems": [],
+     "subgroupMAE": 0.10210903272422985,
+     "subgroupMAE_itemMean": 0.0967169836830529,
+     "toplineMAE": 0.09443825904308667,
+     "toplineTV": 0.1125386443931371
+    }
+   }
+  },
+  "claude-opus-5-5": {
+   "cells": {
+    "all": null,
+    "subset20": {
+     "bins": 192,
+     "failureRate": 0.0,
+     "flaggedItems": [],
+     "items": 20,
+     "missingItems": [],
+     "subgroupMAE": 0.06005256906432794,
+     "subgroupMAE_itemMean": 0.0570087869302349,
+     "toplineMAE": 0.03393245490433354,
+     "toplineTV": 0.04282753263666115
+    }
+   },
+   "cost": {
+    "calls": 9192,
+    "failedCalls": 0,
+    "tokensIn": 2550006,
+    "tokensOut": 947416,
+    "usd": 29.15
+   },
+   "naive": {
+    "all": null,
+    "subset20": {
+     "bins": 192,
+     "failureRate": 0.0,
+     "flaggedItems": [],
+     "items": 20,
+     "missingItems": [],
+     "subgroupMAE": 0.045379828095346096,
+     "subgroupMAE_itemMean": 0.04517978305522412,
+     "toplineMAE": 0.026761710819335115,
+     "toplineTV": 0.03199597563610907
+    }
+   },
+   "persona": {
+    "all": null,
+    "subset20": {
+     "bins": 183,
+     "failureRate": 0.0,
+     "flaggedItems": [],
+     "items": 20,
+     "missingItems": [],
+     "subgroupMAE": 0.18321940969690448,
+     "subgroupMAE_itemMean": 0.18666127278762099,
+     "toplineMAE": 0.17529098390036899,
+     "toplineTV": 0.23259773117097549
+    }
+   },
+   "persona-prob": {
+    "all": null,
+    "subset20": {
+     "bins": 183,
+     "failureRate": 0.0003333333333333333,
+     "flaggedItems": [],
+     "items": 20,
+     "missingItems": [],
+     "subgroupMAE": 0.08040504511558587,
+     "subgroupMAE_itemMean": 0.07606663420079576,
+     "toplineMAE": 0.07158571672584584,
+     "toplineTV": 0.07940442435523476
+    }
+   }
+  },
+  "claude-sonnet-5-5": {
+   "cells": {
+    "all": null,
+    "subset20": {
+     "bins": 192,
+     "failureRate": 0.0,
+     "flaggedItems": [],
+     "items": 20,
+     "missingItems": [],
+     "subgroupMAE": 0.06923750770056118,
+     "subgroupMAE_itemMean": 0.06556850009427946,
+     "toplineMAE": 0.04049940473000309,
+     "toplineTV": 0.053963506823926886
+    }
+   },
+   "cost": {
+    "calls": 9192,
+    "failedCalls": 0,
+    "tokensIn": 2540814,
+    "tokensOut": 867497,
+    "usd": 13.76
+   },
+   "naive": {
+    "all": null,
+    "subset20": {
+     "bins": 192,
+     "failureRate": 0.0,
+     "flaggedItems": [],
+     "items": 20,
+     "missingItems": [],
+     "subgroupMAE": 0.054690593549215516,
+     "subgroupMAE_itemMean": 0.05427513120388265,
+     "toplineMAE": 0.03908513876304785,
+     "toplineTV": 0.05487340174263146
+    }
+   },
+   "persona": {
+    "all": null,
+    "subset20": {
+     "bins": 183,
+     "failureRate": 0.0,
+     "flaggedItems": [],
+     "items": 20,
+     "missingItems": [],
+     "subgroupMAE": 0.2093406046358678,
+     "subgroupMAE_itemMean": 0.21042823145810421,
+     "toplineMAE": 0.20529098390036898,
+     "toplineTV": 0.27798969632108506
+    }
+   },
+   "persona-prob": {
+    "all": null,
+    "subset20": {
+     "bins": 183,
+     "failureRate": 0.0,
+     "flaggedItems": [],
+     "items": 20,
+     "missingItems": [],
+     "subgroupMAE": 0.09534894882741733,
+     "subgroupMAE_itemMean": 0.09055480286188486,
+     "toplineMAE": 0.08655728861264875,
+     "toplineTV": 0.10365089427065835
+    }
+   }
+  },
+  "gpt-5-mini": {
+   "cells": {
+    "all": {
+     "bins": 548,
+     "failureRate": 0.0,
+     "flaggedItems": [],
+     "items": 63,
+     "missingItems": [],
+     "subgroupMAE": 0.10124531708919338,
+     "subgroupMAE_itemMean": 0.09997694855284608,
+     "toplineMAE": 0.09250321571092282,
+     "toplineTV": 0.12481935317829596
+    },
+    "subset20": {
+     "bins": 192,
+     "failureRate": 0.0,
+     "flaggedItems": [],
+     "items": 20,
+     "missingItems": [],
+     "subgroupMAE": 0.10021511032544299,
+     "subgroupMAE_itemMean": 0.0979608336330969,
+     "toplineMAE": 0.09431596180812848,
+     "toplineTV": 0.1132553349187561
+    }
+   },
+   "cost": {
+    "calls": 9000,
+    "failedCalls": 0,
+    "tokensIn": 1540554,
+    "tokensOut": 353484,
+    "usd": 1.09
+   },
+   "naive": {
+    "all": {
+     "bins": 548,
+     "failureRate": 0.0,
+     "flaggedItems": [],
+     "items": 63,
+     "missingItems": [],
+     "subgroupMAE": 0.09773349922903825,
+     "subgroupMAE_itemMean": 0.09721059601893674,
+     "toplineMAE": 0.08721104812498831,
+     "toplineTV": 0.12495314691562297
+    },
+    "subset20": {
+     "bins": 192,
+     "failureRate": 0.0,
+     "flaggedItems": [],
+     "items": 20,
+     "missingItems": [],
+     "subgroupMAE": 0.0929797553330139,
+     "subgroupMAE_itemMean": 0.09364483341313505,
+     "toplineMAE": 0.07950680316568384,
+     "toplineTV": 0.09986348927217749
+    }
+   },
+   "persona": {
+    "all": null,
+    "subset20": {
+     "bins": 183,
+     "failureRate": 0.0,
+     "flaggedItems": [],
+     "items": 20,
+     "missingItems": [],
+     "subgroupMAE": 0.24162377926132353,
+     "subgroupMAE_itemMean": 0.24049611904330698,
+     "toplineMAE": 0.24634174091468425,
+     "toplineTV": 0.32476643093993773
+    }
+   },
+   "persona-july": {
+    "all": null,
+    "subset20": {
+     "bins": 189,
+     "failureRate": 0.0,
+     "flaggedItems": [],
+     "items": 20,
+     "missingItems": [],
+     "subgroupMAE": 0.2401533784425019,
+     "subgroupMAE_itemMean": 0.2382799161950647,
+     "toplineMAE": 0.23278661807344694,
+     "toplineTV": 0.31211675944577577
+    }
+   },
+   "persona-prob": {
+    "all": null,
+    "subset20": {
+     "bins": 183,
+     "failureRate": 0.0,
+     "flaggedItems": [],
+     "items": 20,
+     "missingItems": [],
+     "subgroupMAE": 0.12269818092273707,
+     "subgroupMAE_itemMean": 0.11641910922695783,
+     "toplineMAE": 0.11873741709635603,
+     "toplineTV": 0.13774891945941425
+    }
+   }
+  },
+  "gpt-6-astra": {
+   "cells": {
+    "all": null,
+    "subset20": {
+     "bins": 192,
+     "failureRate": 0.0,
+     "flaggedItems": [],
+     "items": 20,
+     "missingItems": [],
+     "subgroupMAE": 0.06455797542026186,
+     "subgroupMAE_itemMean": 0.06241127995909281,
+     "toplineMAE": 0.03506948782051432,
+     "toplineTV": 0.04211098876371998
+    }
+   },
+   "cost": {
+    "calls": 9192,
+    "failedCalls": 0,
+    "tokensIn": 1844044,
+    "tokensOut": 541562,
+    "usd": 45.52
+   },
+   "naive": {
+    "all": null,
+    "subset20": {
+     "bins": 192,
+     "failureRate": 0.0,
+     "flaggedItems": [],
+     "items": 20,
+     "missingItems": [],
+     "subgroupMAE": 0.04591780982766654,
+     "subgroupMAE_itemMean": 0.0469744716127916,
+     "toplineMAE": 0.03171841663522375,
+     "toplineTV": 0.04278827061911639
+    }
+   },
+   "persona": {
+    "all": null,
+    "subset20": {
+     "bins": 183,
+     "failureRate": 0.0,
+     "flaggedItems": [],
+     "items": 20,
+     "missingItems": [],
+     "subgroupMAE": 0.21528237302204997,
+     "subgroupMAE_itemMean": 0.22009722865695402,
+     "toplineMAE": 0.21644437915508413,
+     "toplineTV": 0.3023919483844021
+    }
+   },
+   "persona-prob": {
+    "all": null,
+    "subset20": {
+     "bins": 183,
+     "failureRate": 0.0,
+     "flaggedItems": [],
+     "items": 20,
+     "missingItems": [],
+     "subgroupMAE": 0.08754464642568374,
+     "subgroupMAE_itemMean": 0.08344072584412862,
+     "toplineMAE": 0.07913919101757465,
+     "toplineTV": 0.09272386188591111
+    }
+   }
+  },
+  "gpt-6-luna": {
+   "cells": {
+    "all": {
+     "bins": 548,
+     "failureRate": 0.0,
+     "flaggedItems": [],
+     "items": 63,
+     "missingItems": [],
+     "subgroupMAE": 0.0782424920640194,
+     "subgroupMAE_itemMean": 0.07662695063796926,
+     "toplineMAE": 0.06411214165648604,
+     "toplineTV": 0.08400259338474977
+    },
+    "subset20": {
+     "bins": 192,
+     "failureRate": 0.0,
+     "flaggedItems": [],
+     "items": 20,
+     "missingItems": [],
+     "subgroupMAE": 0.07257565016131749,
+     "subgroupMAE_itemMean": 0.07035203303768309,
+     "toplineMAE": 0.051934855455455356,
+     "toplineTV": 0.06685967327033801
+    }
+   },
+   "cost": {
+    "calls": 15998,
+    "failedCalls": 0,
+    "tokensIn": 3612270,
+    "tokensOut": 502683,
+    "usd": 0.61
+   },
+   "naive": {
+    "all": {
+     "bins": 548,
+     "failureRate": 0.0,
+     "flaggedItems": [],
+     "items": 63,
+     "missingItems": [],
+     "subgroupMAE": 0.07462582576890744,
+     "subgroupMAE_itemMean": 0.07482125645279467,
+     "toplineMAE": 0.06307780399530857,
+     "toplineTV": 0.08686870898835063
+    },
+    "subset20": {
+     "bins": 192,
+     "failureRate": 0.0,
+     "flaggedItems": [],
+     "items": 20,
+     "missingItems": [],
+     "subgroupMAE": 0.059935952598181075,
+     "subgroupMAE_itemMean": 0.061169666693363454,
+     "toplineMAE": 0.04998397451281615,
+     "toplineTV": 0.0688620902792289
+    }
+   },
+   "persona": {
+    "all": null,
+    "subset20": {
+     "bins": 183,
+     "failureRate": 0.0,
+     "flaggedItems": [],
+     "items": 20,
+     "missingItems": [],
+     "subgroupMAE": 0.2135213324742861,
+     "subgroupMAE_itemMean": 0.21415294715547833,
+     "toplineMAE": 0.2050480495461323,
+     "toplineTV": 0.28606284130905424
+    }
+   },
+   "persona-prob": {
+    "all": null,
+    "subset20": {
+     "bins": 183,
+     "failureRate": 0.0,
+     "flaggedItems": [],
+     "items": 20,
+     "missingItems": [],
+     "subgroupMAE": 0.10413417778090928,
+     "subgroupMAE_itemMean": 0.0977108121047919,
+     "toplineMAE": 0.09399797230568833,
+     "toplineTV": 0.10470292420989051
+    }
+   }
+  },
+  "gpt-6.1-sol": {
+   "cells": {
+    "all": {
+     "bins": 548,
+     "failureRate": 0.0,
+     "flaggedItems": [],
+     "items": 63,
+     "missingItems": [],
+     "subgroupMAE": 0.06232980977685405,
+     "subgroupMAE_itemMean": 0.059970866993582506,
+     "toplineMAE": 0.04563307679940613,
+     "toplineTV": 0.0647636711157479
+    },
+    "subset20": {
+     "bins": 192,
+     "failureRate": 0.0,
+     "flaggedItems": [],
+     "items": 20,
+     "missingItems": [],
+     "subgroupMAE": 0.06541555711921841,
+     "subgroupMAE_itemMean": 0.06336213856271114,
+     "toplineMAE": 0.03603922290153529,
+     "toplineTV": 0.045118586660237964
+    }
+   },
+   "cost": {
+    "calls": 16095,
+    "failedCalls": 0,
+    "tokensIn": 3639008,
+    "tokensOut": 1285107,
+    "usd": 20.13
+   },
+   "naive": {
+    "all": {
+     "bins": 548,
+     "failureRate": 0.0,
+     "flaggedItems": [],
+     "items": 63,
+     "missingItems": [],
+     "subgroupMAE": 0.05603931309149844,
+     "subgroupMAE_itemMean": 0.0553582313323562,
+     "toplineMAE": 0.04406348344621005,
+     "toplineTV": 0.06194672103491094
+    },
+    "subset20": {
+     "bins": 192,
+     "failureRate": 0.0,
+     "flaggedItems": [],
+     "items": 20,
+     "missingItems": [],
+     "subgroupMAE": 0.047873454331211096,
+     "subgroupMAE_itemMean": 0.04887752609987636,
+     "toplineMAE": 0.03029938706566166,
+     "toplineTV": 0.04281290139161635
+    }
+   },
+   "persona": {
+    "all": null,
+    "subset20": {
+     "bins": 183,
+     "failureRate": 0.0,
+     "flaggedItems": [],
+     "items": 20,
+     "missingItems": [],
+     "subgroupMAE": 0.21611247830179772,
+     "subgroupMAE_itemMean": 0.2212114460454754,
+     "toplineMAE": 0.22077771248841738,
+     "toplineTV": 0.3033919483844021
+    }
+   },
+   "persona-prob": {
+    "all": null,
+    "subset20": {
+     "bins": 183,
+     "failureRate": 0.0,
+     "flaggedItems": [],
+     "items": 20,
+     "missingItems": [],
+     "subgroupMAE": 0.08778636469766285,
+     "subgroupMAE_itemMean": 0.08359186429202861,
+     "toplineMAE": 0.07917815411517802,
+     "toplineTV": 0.0944750101013794
+    }
+   }
+  }
+ },
+ "personaDesignEffect": {
+  "bins": 183,
+  "items": 20,
+  "subgroup": {
+   "diff": -0.0006017801452222997,
+   "hi": 0.013020550369236508,
+   "lo": -0.012692955998149458
+  },
+  "topline": {
+   "diff": -0.013555122841237355,
+   "hi": 0.005666071410774535,
+   "lo": -0.030591984190079316
+  }
+ },
+ "pooling": "subgroupMAE pools absolute errors across all reported slice bins (PAP v2); subgroupMAE_itemMean averages within item first (July publication)",
+ "productDecision": {
+  "candidates": {
+   "gpt-6-luna": {
+    "cellsSubgroupMAE": 0.0782424920640194,
+    "passes": true
+   },
+   "gpt-6.1-sol": {
+    "cellsSubgroupMAE": 0.06232980977685405,
+    "passes": true
+   }
+  },
+  "default": "gpt-6-luna",
+  "margin": 0.01,
+  "referenceCellsSubgroupMAE": 0.10124531708919338
+ },
+ "registration": "paper/pap-model-refresh-2026-10.md (tags pap-model-refresh-2026-10, -amend1, -amend2; see its post-run notes)",
+ "runNotes": [
+  "gpt-6.1-sol full-bank cells/direct was interrupted at 2026-10-22T00:28:07Z and resumed at 10:47:26Z with unchanged code; 97 calls were repeated.",
+  "Every refresh comparison is exploratory; the persona-prob arm (amendment 2) was added after the other results were read."
+ ],
+ "servedBenchmark": {
+  "gpt-6-luna": {
+   "items": 63,
+   "subgroup": 0.0782424920640194,
+   "topline": 0.06411214165648604
+  },
+  "gpt-6.1-sol": {
+   "items": 63,
+   "subgroup": 0.06232980977685405,
+   "topline": 0.04563307679940613
+  }
+ }
+}

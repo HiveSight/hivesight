@@ -53,3 +53,24 @@ export const STATES: Array<{ value: string; label: string }> = [
 ];
 
 export const DISTRICT_PATTERN = /^[A-Z]{2}-\d{1,2}$/;
+
+/**
+ * The canonical reference for a geography HiveSight covers, or null. Labels
+ * come from the value, never from the caller: the data load uses the value
+ * and the prompts use the label, so they must name the same place.
+ */
+export function canonicalGeography(
+  type: "national" | "state" | "district",
+  value: string
+): { type: "national" | "state" | "district"; value: string; label: string } | null {
+  const v = value.trim().toUpperCase();
+  if (type === "national") return v === "US" ? { type, value: "US", label: "United States" } : null;
+  if (type === "state") {
+    const state = STATES.find((s) => s.value === v);
+    return state ? { type, value: state.value, label: state.label } : null;
+  }
+  if (!DISTRICT_PATTERN.test(v) || !STATES.some((s) => s.value === v.slice(0, 2))) return null;
+  // The data release names districts with two digits (CA-01), so CA-1 is CA-01.
+  const id = v.replace(/-(\d)$/, "-0$1");
+  return { type, value: id, label: `Congressional district ${id}` };
+}

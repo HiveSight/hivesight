@@ -1,3 +1,4 @@
+import { reasoningEffortFor } from "./models";
 import type { Distribution, ResponseFormat } from "./types";
 import { optionIds } from "./types";
 
@@ -9,16 +10,28 @@ export interface LlmClient {
     model: string;
     json?: boolean;
     maxTokens?: number;
+    /** Aborts the request and any retry wait. */
+    signal?: AbortSignal;
   }): Promise<string>;
 }
+
+/**
+ * A request the model API rejected (bad key, unknown model, invalid
+ * parameter). Retrying cannot fix it, so callers stop instead of retrying.
+ */
+export class LlmRequestError extends Error {}
 
 /** Direct OpenAI-compatible client; no SDK dependency. */
 export function openAiClient(apiKey: string, baseUrl = "https://api.openai.com/v1"): LlmClient {
   return {
-    async complete({ system, user, model, json = true, maxTokens = 700 }) {
-      // gpt-5-mini supports 'minimal'; gpt-5.x point releases use 'none'.
-      let reasoningEffort: string | null = model.startsWith("gpt-5.") ? "none" : "minimal";
-      for (let attempt = 0; attempt < 4; attempt++) {
+    async complete({ system, user, model, json = true, maxTokens = 700, signal }) {
+      // The effort is part of the benchmarked configuration: if the API ever
+      // rejects it, fail loudly rather than silently serve a different one.
+      const reasoningEffort = reasoningEffortFor(model);
+      const attempts = 4;
+      let lastFailure = "";
+      for (let attempt = 0; attempt < attempts; attempt++) {
+        signal?.throwIfAborted();
         try {
           const body: Record<string, unknown> = {
             model,
@@ -37,53 +50,68 @@ export function openAiClient(apiKey: string, baseUrl = "https://api.openai.com/v
               "Content-Type": "application/json",
             },
             body: JSON.stringify(body),
+            signal,
           });
           if (res.status === 429 || res.status >= 500) {
-            await sleep(1200 * 2 ** attempt);
+            lastFailure = `HTTP ${res.status}`;
+            if (attempt < attempts - 1) await sleep(1200 * 2 ** attempt, signal);
             continue;
           }
           const data = await res.json();
-          if (data.error) {
-            // Models that reject the reasoning_effort value: drop it and retry.
-            if (
-              reasoningEffort &&
-              typeof data.error.message === "string" &&
-              data.error.message.includes("reasoning_effort")
-            ) {
-              reasoningEffort = null;
-              continue;
-            }
-            throw new Error(data.error.message);
-          }
+          if (data.error) throw new LlmRequestError(data.error.message);
           return data.choices?.[0]?.message?.content ?? "";
         } catch (err) {
-          if (attempt === 3) throw err;
-          await sleep(1200 * 2 ** attempt);
+          if (err instanceof LlmRequestError || signal?.aborted || attempt === attempts - 1) throw err;
+          await sleep(1200 * 2 ** attempt, signal);
         }
       }
-      throw new Error("unreachable");
+      throw new Error(`model API unavailable after ${attempts} attempts (${lastFailure})`);
     },
   };
 }
 
-function sleep(ms: number) {
-  return new Promise((r) => setTimeout(r, ms));
+function sleep(ms: number, signal?: AbortSignal) {
+  return new Promise<void>((resolve, reject) => {
+    if (signal?.aborted) return reject(signal.reason);
+    const timer = setTimeout(() => {
+      signal?.removeEventListener("abort", onAbort);
+      resolve();
+    }, ms);
+    function onAbort() {
+      clearTimeout(timer);
+      reject(signal!.reason);
+    }
+    signal?.addEventListener("abort", onAbort, { once: true });
+  });
 }
 
+/**
+ * Runs fn over items with at most `limit` in flight, preserving order. Once
+ * any call throws or the signal aborts, no further items start; calls already
+ * in flight settle before the first error is rethrown.
+ */
 export async function mapLimit<T, R>(
   items: T[],
   limit: number,
-  fn: (item: T, index: number) => Promise<R>
+  fn: (item: T, index: number) => Promise<R>,
+  signal?: AbortSignal
 ): Promise<R[]> {
   const results = new Array<R>(items.length);
   let next = 0;
+  let failure: { error: unknown } | null = null;
   async function worker() {
-    while (next < items.length) {
+    while (next < items.length && !failure && !signal?.aborted) {
       const i = next++;
-      results[i] = await fn(items[i], i);
+      try {
+        results[i] = await fn(items[i], i);
+      } catch (error) {
+        failure ??= { error };
+      }
     }
   }
   await Promise.all(Array.from({ length: Math.min(limit, items.length) }, worker));
+  if (failure) throw (failure as { error: unknown }).error;
+  signal?.throwIfAborted();
   return results;
 }
 
@@ -95,12 +123,26 @@ export function parseDistribution(
   content: string,
   format: ResponseFormat
 ): Distribution | null {
-  let raw: Record<string, unknown>;
+  let raw: unknown;
   try {
     raw = JSON.parse(content);
   } catch {
     return null;
   }
+  // Valid JSON that is not an object ("null", a number, an array) carries no
+  // distribution.
+  if (!raw || typeof raw !== "object" || Array.isArray(raw)) return null;
+  const obj = raw as Record<string, unknown>;
+  if (format.kind === "binary") {
+    // Elicited as the two-option choice Yes/No (BINARY_AS_CHOICE); accept the
+    // yes/no keys too.
+    const asChoice = parseObject(obj, { kind: "choice", options: ["Yes", "No"] });
+    if (asChoice) return { yes: asChoice.option_0, no: asChoice.option_1 };
+  }
+  return parseObject(obj, format);
+}
+
+function parseObject(raw: Record<string, unknown>, format: ResponseFormat): Distribution | null {
   const ids = optionIds(format);
   const values = ids.map((id) => {
     const v = raw[id];
@@ -123,7 +165,11 @@ export function parseDistribution(
 }
 
 function normalize(ids: string[], values: number[]): Distribution | null {
-  const total = values.reduce((s, v) => s + v, 0);
-  if (total <= 0) return null;
-  return Object.fromEntries(ids.map((id, i) => [id, values[i] / total]));
+  // Scale by the largest value first so finite but huge replies cannot
+  // overflow the sum to Infinity.
+  const max = Math.max(...values);
+  if (!(max > 0)) return null;
+  const scaled = values.map((v) => v / max);
+  const total = scaled.reduce((s, v) => s + v, 0);
+  return Object.fromEntries(ids.map((id, i) => [id, scaled[i] / total]));
 }

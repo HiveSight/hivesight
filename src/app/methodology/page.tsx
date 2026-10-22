@@ -1,5 +1,15 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import refresh from "../../../paper/artifacts/model-refresh.json";
+import { DEFAULT_MODEL } from "@/engine/models";
+
+type Score = { toplineMAE: number; subgroupMAE: number };
+const scores = refresh.models as unknown as Record<
+  string,
+  Record<string, { all: Score | null; subset20: Score }>
+>;
+const served = scores[DEFAULT_MODEL];
+const pts = (v: number) => Math.round(v * 100);
 
 export const metadata: Metadata = {
   title: "Methodology — HiveSight",
@@ -22,9 +32,12 @@ export default function MethodologyPage() {
             HiveSight does not simulate individual fake respondents and count
             their answers. Research consistently finds that persona roleplay
             compresses within-group variance, dramatizes hardship, and drifts
-            with prompt wording — and our own benchmark measured it at 37
-            points of topline error. Instead, HiveSight treats the language
-            model as a conditional response model over population cells:
+            with prompt wording. On the 20 benchmark questions where we ran
+            both with {DEFAULT_MODEL}, persona roleplay missed national answer
+            shares by {pts(served.persona.subset20.toplineMAE)} points on average;
+            cell estimation missed by {pts(served.cells.subset20.toplineMAE)}.
+            Instead, HiveSight treats the language model as a conditional
+            response model over population cells:
           </p>
           <ol className="mt-3 list-decimal space-y-2 pl-5 text-muted">
             <li>
@@ -61,7 +74,7 @@ export default function MethodologyPage() {
           <h2 className="text-xl font-bold tracking-tight">What the verbatims are</h2>
           <p className="mt-2 text-muted">
             Alongside the estimate, HiveSight writes a handful of illustrative
-            verbatims for weighted-sampled population profiles. They are
+            verbatims for population profiles sampled to represent the audience. They are
             synthetic, clearly labeled, and carry no weight in the numbers. No
             human respondents are surveyed anywhere in this product.
           </p>
@@ -71,10 +84,11 @@ export default function MethodologyPage() {
           <h2 className="text-xl font-bold tracking-tight">Known limits</h2>
           <ul className="mt-2 list-disc space-y-2 pl-5 text-muted">
             <li>
-              Toplines on self-report scales carry a measured level bias (about
-              17 points MAE on our SHED suite versus 6 points on subgroups).
-              Estimates are most reliable for comparisons — between segments,
-              geographies, or message variants — where level bias cancels.
+              Error is measured, not zero: across 63 benchmark questions,
+              estimates with {DEFAULT_MODEL} missed the real answer share by{" "}
+              {pts(served.cells.all!.toplineMAE)} points on average nationally and{" "}
+              {pts(served.cells.all!.subgroupMAE)} points for subgroups. Use
+              estimates for direction and comparison, not exact levels.
             </li>
             <li>
               A calibration layer that corrects levels against anchor surveys

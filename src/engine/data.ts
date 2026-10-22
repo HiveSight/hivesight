@@ -8,9 +8,17 @@ export const DATASET_VERSION = "hivesight-cells:v1";
 const HF_BASE =
   "https://huggingface.co/datasets/MaxGhenis/hivesight-persona-data/resolve/f27f20ae7d9dd255bd9d93b4ffaf3f057685c813";
 
+export const SAMPLE_POOL_SIZE = 1200;
+
 export interface GeographyData {
   table: CellTable;
   samples: SampleRecord[];
+  /**
+   * "pps": the pool is a weight-proportional sample of a larger population,
+   * so each record stands for the same share of adults. "population": the
+   * pool is every record, which still needs its weight.
+   */
+  samplePool: "pps" | "population";
 }
 
 // Small in-memory cache; cell tables are tiny, district reductions modest.
@@ -28,7 +36,12 @@ function cacheSet(key: string, data: GeographyData) {
   if (cache.size >= CACHE_MAX) {
     let oldest: string | null = null;
     let oldestAt = Infinity;
-    for (const [k, v] of cache) if (v.at < oldestAt) ((oldestAt = v.at), (oldest = k));
+    for (const [k, v] of cache) {
+      if (v.at < oldestAt) {
+        oldestAt = v.at;
+        oldest = k;
+      }
+    }
     if (oldest) cache.delete(oldest);
   }
   cache.set(key, { data, at: Date.now() });
@@ -41,23 +54,28 @@ function cacheSet(key: string, data: GeographyData) {
 async function loadReleased(geo: string): Promise<GeographyData> {
   const file = path.join(process.cwd(), "public", "data", "v1", `${geo}.json`);
   const parsed = JSON.parse(await readFile(file, "utf-8"));
-  return { table: parsed.table, samples: parsed.samples };
+  // build_cell_release.py draws a weight-proportional pool of SAMPLE_POOL_SIZE
+  // unless the geography has fewer records, in which case it keeps them all.
+  const samplePool = parsed.samples.length >= SAMPLE_POOL_SIZE ? "pps" : "population";
+  return { table: parsed.table, samples: parsed.samples, samplePool };
 }
 
 /**
  * Districts are reduced at runtime from the per-district microdata file
  * (small enough to parse in-process), using the same banding as the pipeline.
  */
-async function reduceDistrict(districtId: string): Promise<GeographyData> {
-  const res = await fetch(`${HF_BASE}/districts/${districtId}.json.gz`);
-  if (!res.ok) throw new Error(`district data fetch failed: ${res.status}`);
+async function reduceDistrict(districtId: string, signal?: AbortSignal): Promise<GeographyData> {
+  const res = await fetch(`${HF_BASE}/districts/${districtId}.json.gz`, { signal });
+  if (res.status === 404) throw new Error(`HiveSight has no data for district ${districtId}.`);
+  if (!res.ok) throw new Error("District data is temporarily unavailable. Please try again.");
   const buf = Buffer.from(await res.arrayBuffer());
   const persons = JSON.parse(gunzipSync(buf).toString("utf-8")).persons as Array<
     SampleRecord & { [k: string]: unknown }
   >;
   return {
     table: reduceToCells(persons, districtId),
-    samples: systematicSample(persons, 1200),
+    samples: systematicSample(persons, SAMPLE_POOL_SIZE),
+    samplePool: persons.length > SAMPLE_POOL_SIZE ? "pps" : "population",
   };
 }
 
@@ -130,16 +148,19 @@ export function systematicSample<T extends { weight: number }>(
   return out;
 }
 
-export async function loadGeography(geo: {
-  type: "national" | "state" | "district";
-  value: string;
-}): Promise<GeographyData> {
+export async function loadGeography(
+  geo: {
+    type: "national" | "state" | "district";
+    value: string;
+  },
+  signal?: AbortSignal
+): Promise<GeographyData> {
   const key = `${geo.type}:${geo.value}`;
   const hit = cacheGet(key);
   if (hit) return hit;
   const data =
     geo.type === "district"
-      ? await reduceDistrict(geo.value)
+      ? await reduceDistrict(geo.value, signal)
       : await loadReleased(geo.type === "national" ? "US" : geo.value);
   cacheSet(key, data);
   return data;

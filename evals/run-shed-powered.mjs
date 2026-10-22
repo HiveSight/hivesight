@@ -12,7 +12,7 @@
  *   OPENAI_API_KEY=... node evals/run-shed-powered.mjs [--dry-run] [--persona-n 150]
  */
 
-import { readFileSync, writeFileSync, mkdirSync, appendFileSync } from "node:fs";
+import { readFileSync, writeFileSync, mkdirSync, appendFileSync, existsSync } from "node:fs";
 import path from "node:path";
 
 // ---------- config ----------
@@ -22,10 +22,12 @@ const REASONING_EFFORT = "minimal";
 const CONCURRENCY = 25;
 const PERSONA_N = Number(getArg("--persona-n") ?? 150);
 const SEED = 20260707;
-const DATA_PATH =
-  process.env.US_PERSONA_PATH ??
-  "/private/tmp/claude-501/-Users-maxghenis/4b986211-4583-4bc2-b435-9fa459f2ce1e/scratchpad/US.json.gz";
 const OUT_DIR = path.join(import.meta.dirname, "results");
+// The committed pilot artifact is a registered input to the paper and the
+// benchmarks page. A rerun writes elsewhere unless --out names it.
+const REGISTERED_ARTIFACT = "shed-2024-powered-comparison-v2.json";
+const OUT_NAME = getArg("--out") ?? "shed-powered-rerun.json";
+const OUT_PATH = path.join(OUT_DIR, OUT_NAME);
 const RAW_LOG = path.join(OUT_DIR, "shed-powered-raw-calls.jsonl");
 const DRY_RUN = process.argv.includes("--dry-run");
 
@@ -204,9 +206,14 @@ function sliceLabelForCell(cell, family) {
 function loadPrep() {
   // Produced by prep_shed_data.py (the raw national JSON exceeds Node's
   // max string length, so reduction happens in Python).
-  const prep = JSON.parse(
-    readFileSync(path.join(import.meta.dirname, "results", "prep-shed.json"), "utf-8")
-  );
+  const prepPath = path.join(import.meta.dirname, "results", "prep-shed.json");
+  if (!existsSync(prepPath)) {
+    throw new Error(
+      `${prepPath} not found. Build it first: put US.json.gz in data/raw/ (see DATA.md) and run ` +
+        "`uv run --with numpy python evals/prep_shed_data.py`."
+    );
+  }
+  const prep = JSON.parse(readFileSync(prepPath, "utf-8"));
   console.log(
     `Loaded prep: ${prep.cells.length} cells, ${prep.samples.length} persona samples of n=${prep.personaN}`
   );
@@ -522,7 +529,7 @@ async function main() {
       );
     }
     artifact.questions.push({ questionId: q.questionId, prompt: q.prompt, scoring: q.scoring, sliceFamily: q.slices.family, arms: scored, stability });
-    writeFileSync(path.join(OUT_DIR, "shed-2024-powered-comparison-v2.json"), JSON.stringify(artifact, null, 2));
+    writeFileSync(OUT_PATH, JSON.stringify(artifact, null, 2));
   }
 
   // Pooled summary
@@ -536,7 +543,8 @@ async function main() {
   }
   artifact.pooled = pooled;
   artifact.usage = { calls: callCount, tokensIn, tokensOut };
-  writeFileSync(path.join(OUT_DIR, "shed-2024-powered-comparison-v2.json"), JSON.stringify(artifact, null, 2));
+  writeFileSync(OUT_PATH, JSON.stringify(artifact, null, 2));
+  console.log(`\nwrote ${OUT_NAME}${OUT_NAME === REGISTERED_ARTIFACT ? " (registered pilot artifact)" : ""}`);
   console.log("\nPooled:", JSON.stringify(pooled, null, 1));
   console.log(`Calls: ${callCount}, tokens in/out: ${tokensIn}/${tokensOut}`);
 }

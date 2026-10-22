@@ -1,7 +1,60 @@
 import type { Cell, GeographyRef, ResponseFormat, SampleRecord } from "./types";
 import { optionIds } from "./types";
 
-export const PROMPT_VERSION = "prompts:v4-core-conditional";
+export const PROMPT_VERSION = "prompts:v4.2-core-conditional";
+
+/**
+ * Yes/no questions are elicited exactly as the benchmark's Yes/No items were:
+ * as a two-option choice (v4.2). parseDistribution maps the reply back to
+ * the yes/no ids.
+ */
+export const BINARY_AS_CHOICE: ResponseFormat = { kind: "choice", options: ["Yes", "No"] };
+
+function elicitationFormat(format: ResponseFormat): ResponseFormat {
+  return format.kind === "binary" ? BINARY_AS_CHOICE : format;
+}
+
+/** Whole-option labels that are nonresponse categories, not substantive answers. */
+const NONRESPONSE_LABELS = new Set([
+  "don't know", "do not know", "dont know", "i don't know", "dk", "na", "n/a", "not sure",
+  "i'm not sure", "unsure", "not applicable", "prefer not to respond", "skip", "never heard of",
+  "undecided", "no opinion", "no preference", "no answer", "refused", "refuse to answer",
+  "decline to answer", "declined to answer", "decline to say", "prefer not to say",
+  "prefer not to answer", "rather not say", "can't choose", "can't say", "cannot say",
+  "haven't heard enough to say", "never heard of them", "never heard of it",
+]);
+
+/**
+ * True when an option is entirely a nonresponse category, including combined
+ * labels like "Don't know / Refused". Substantive options that merely contain
+ * such words ("Refuse vaccination", "I don't know how to swim") are not.
+ */
+export function isNonresponseOption(option: string): boolean {
+  const parts = option
+    .toLowerCase()
+    .replace(/[’‘]/g, "'")
+    .replace(/\s*\((?:volunteered|vol\.?)\)$/, "")
+    .replace(/[.!]+$/, "")
+    .split(/\s*(?:\/|,|;|\bor\b)\s*/)
+    .map((p) => p.trim())
+    .filter(Boolean);
+  return parts.length > 0 && parts.every((p) => NONRESPONSE_LABELS.has(p));
+}
+
+/**
+ * The benchmarked instruction conditions on a substantive answer. When the
+ * asker lists a nonresponse option themselves, that instruction would forbid
+ * one of their own options, so shares cover every listed option instead
+ * (v4.1). v4.2 also sends yes/no questions as the benchmark's Yes/No choice.
+ * Neither changes a benchmarked prompt; parity tests pin this.
+ */
+function shareInstruction(format: ResponseFormat): string {
+  const listsNonresponse = format.kind === "choice" && format.options.some(isNonresponseOption);
+  if (listsNonresponse) {
+    return "Estimate shares across all the response options listed, including any don't-know or refusal option.";
+  }
+  return "Estimate shares among respondents who give a substantive answer; do not allocate any share to don't know or refused.";
+}
 
 /**
  * Expert-predictor framing (not persona roleplay): the model estimates a
@@ -57,12 +110,13 @@ export function cellUserPrompt(
   question: string,
   format: ResponseFormat
 ): string {
-  const { optionsText, jsonShape } = formatBlock(format);
+  const elicited = elicitationFormat(format);
+  const { optionsText, jsonShape } = formatBlock(elicited);
   const stem =
     format.kind === "likert5"
       ? `Survey statement: "${question}"\nEstimate the percentage of the group below choosing each response option.`
       : `Survey question: "${question}"\nEstimate the percentage of the group below choosing each response option.`;
-  return `${stem} Estimate shares among respondents who give a substantive answer; do not allocate any share to don't know or refused.
+  return `${stem} ${shareInstruction(elicited)}
 
 Group: ${describeCell(cell, geography)}
 
@@ -107,9 +161,12 @@ export function verbatimUserPrompt(
   format: ResponseFormat
 ): string {
   const ids = optionIds(format);
+  const { optionsText } = formatBlock(format);
   return `Respondent profile: ${personaDescription}
 
 Survey question: "${question}"
+
+${optionsText}
 
 Write the answer this respondent plausibly gives. Reply with JSON only:
 {"choice": <one of ${JSON.stringify(ids)}>, "text": "<their one-or-two-sentence explanation, in their own voice>"}`;

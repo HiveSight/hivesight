@@ -112,6 +112,10 @@ export interface RunProvenance {
   cellCount: number;
   cellFailures: number;
   eligibleWeight: number;
+  /** Weight of the cells whose elicitation succeeded; the estimate rests on these. */
+  elicitedWeight: number;
+  /** elicitedWeight / eligibleWeight. Below 1 when cells failed. */
+  elicitedShare: number;
   populationShare: number; // eligible weight / geography total weight
   startedAt: string;
   completedAt: string;
@@ -128,7 +132,13 @@ export interface RunResult {
   verbatims: Verbatim[];
   provenance: RunProvenance;
   /** Benchmark-derived typical absolute error, if the eval artifact covers this format. */
-  benchmarkError: { topline: number | null; subgroup: number | null; source: string } | null;
+  benchmarkError: {
+    topline: number | null;
+    subgroup: number | null;
+    /** Benchmark questions behind the figures (absent on runs saved before October 2026). */
+    items?: number;
+    source: string;
+  } | null;
 }
 
 export interface RunProgress {

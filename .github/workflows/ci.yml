@@ -42,8 +42,13 @@ jobs:
 
       - name: Regenerate analysis artifacts from committed inputs
         run: |
-          uv run --with "numpy==2.3.4,scipy==1.16.3" python analysis/analyze_anchor.py
-          uv run --with "numpy==2.3.4,scipy==1.16.3" python analysis/analyze_anchor_v2.py
+          PINS="numpy==2.3.4,scipy==1.16.3,matplotlib==3.10.7"
+          uv run --with "$PINS" python analysis/analyze_anchor.py
+          uv run --with "$PINS" python analysis/analyze_anchor_v2.py
+          uv run --with "$PINS" python analysis/analyze_model_refresh.py
+          uv run --with "$PINS" python analysis/make_paper_assets.py
 
+      # Numeric comparison: Linux and macOS round the last float bits
+      # differently, so a byte diff fails on noise (red since July 2026).
       - name: Verify artifacts unchanged
-        run: git diff --exit-code paper/artifacts/anchor-analysis.json paper/artifacts/anchor-analysis-v2.json
+        run: python3 analysis/compare_artifacts.py

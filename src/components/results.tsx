@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useState } from "react";
 import {
   IconChevronDown,
@@ -9,6 +10,7 @@ import {
 } from "@tabler/icons-react";
 import type { RunResult, SubgroupEstimate } from "@/engine/types";
 import { optionIds, optionLabel } from "@/engine/types";
+import { allocatePercents } from "@/lib/percents";
 import { colorsForFormat, Honeycomb } from "./honeycomb";
 
 function pct(v: number): string {
@@ -36,6 +38,15 @@ function StackedBar({
   );
 }
 
+/** The share each subgroup row reports: agree, yes, or the leading choice by name. */
+function rowSummary(dist: Record<string, number>, format: RunResult["format"]): string {
+  if (format.kind === "likert5") return pct((dist.agree ?? 0) + (dist.strongly_agree ?? 0));
+  if (format.kind === "binary") return pct(dist.yes ?? 0);
+  const ids = optionIds(format);
+  const top = ids.reduce((best, id) => ((dist[id] ?? 0) > (dist[best] ?? 0) ? id : best), ids[0]);
+  return `${optionLabel(format, top)} ${pct(dist[top] ?? 0)}`;
+}
+
 function SubgroupSection({
   subgroups,
   format,
@@ -61,19 +72,38 @@ function SubgroupSection({
                 </span>
               )}
             </p>
-            <div className="space-y-2">
+            <table className="sr-only">
+              <caption>{dim}: estimated share choosing each answer</caption>
+              <thead>
+                <tr>
+                  <th scope="col">Group</th>
+                  {optionIds(format).map((id) => (
+                    <th key={id} scope="col">
+                      {optionLabel(format, id)}
+                    </th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {rows.map((row) => (
+                  <tr key={row.label}>
+                    <th scope="row">{row.label}</th>
+                    {optionIds(format).map((id) => (
+                      <td key={id}>{pct(row.dist[id] ?? 0)}</td>
+                    ))}
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+            <div className="space-y-2" aria-hidden>
               {rows.map((row) => (
-                <div key={row.label} className="grid grid-cols-[10rem_1fr_3.5rem] items-center gap-3">
+                <div key={row.label} className={`grid ${format.kind === "choice" ? "grid-cols-[10rem_1fr_9rem]" : "grid-cols-[10rem_1fr_3.5rem]"} items-center gap-3`}>
                   <span className="text-sm text-ink truncate" title={row.label}>
                     {row.label}
                   </span>
                   <StackedBar dist={row.dist} format={format} />
                   <span className="font-mono text-xs text-muted text-right">
-                    {format.kind === "likert5"
-                      ? pct((row.dist.agree ?? 0) + (row.dist.strongly_agree ?? 0))
-                      : format.kind === "binary"
-                        ? pct(row.dist.yes ?? 0)
-                        : pct(Math.max(...optionIds(format).map((id) => row.dist[id] ?? 0)))}
+                    {rowSummary(row.dist, format)}
                   </span>
                 </div>
               ))}
@@ -85,7 +115,22 @@ function SubgroupSection({
   );
 }
 
-export function Results({ result, runId }: { result: RunResult; runId: string | null }) {
+/** Plain-language list of the audience filters a run used. */
+function audienceFilters(filters: RunResult["audience"]["filters"]): string | null {
+  const parts = Object.values(filters).filter((v): v is string[] => Array.isArray(v) && v.length > 0);
+  return parts.length ? parts.map((v) => v.join(" or ")).join("; ") : null;
+}
+
+export function Results({
+  result,
+  runId,
+  showQuestion = true,
+}: {
+  result: RunResult;
+  runId: string | null;
+  /** The shared-run page shows the question as its heading already. */
+  showQuestion?: boolean;
+}) {
   const [showProvenance, setShowProvenance] = useState(false);
   const headlineLabel =
     result.format.kind === "likert5"
@@ -105,38 +150,74 @@ export function Results({ result, runId }: { result: RunResult; runId: string | 
   }
 
   const p = result.provenance;
+  // Runs saved before coverage was recorded carry no elicitedShare; it is
+  // known only when no cell failed.
+  const elicitedShare = p.elicitedShare ?? (p.cellFailures ? null : 1);
+  // The headline uses the chart's allocation, so it matches the legend.
+  const counts = allocatePercents(result.topline, result.format);
+  const ids = optionIds(result.format);
+  const headlinePct =
+    result.format.kind === "likert5"
+      ? counts[ids.indexOf("agree")] + counts[ids.indexOf("strongly_agree")]
+      : result.format.kind === "binary"
+        ? counts[ids.indexOf("yes")]
+        : (counts[result.format.options.indexOf(result.headline.label)] ?? Math.max(...counts));
+  const benchmarkItems = result.benchmarkError?.items;
+  const filtersText = audienceFilters(result.audience.filters);
 
   return (
     <section aria-label="Estimate results" className="space-y-10">
       <div className="grid gap-8 md:grid-cols-[minmax(0,1fr)_20rem]">
         <div>
           <p className="eyebrow mb-3">Estimate</p>
-          <p className="text-5xl font-extrabold tracking-tight text-ink">
-            {pct(result.headline.value)}
-          </p>
+          {showQuestion && <p className="mb-3 max-w-xl text-ink">“{result.question}”</p>}
+          <p className="text-5xl font-extrabold tracking-tight text-ink">{headlinePct}%</p>
           <p className="mt-2 text-muted">
-            of {result.audience.geography.label} adults{" "}
-            {Object.values(result.audience.filters).some((f) => f?.length)
-              ? "(filtered audience) "
-              : ""}
-            are estimated to {headlineLabel}
+            of {result.audience.geography.label} adults
+            {filtersText ? ` (${filtersText})` : ""} are estimated to {headlineLabel}
           </p>
-          {result.benchmarkError?.topline != null && (
+          {result.benchmarkError?.topline == null ? (
             <p className="mt-4 text-sm text-muted max-w-md">
-              Directional estimate. On benchmark questions this method averaged{" "}
+              Directional estimate from a language model, not a measurement of real
+              respondents. Treat it as a prior, not a poll.
+            </p>
+          ) : (
+            <p className="mt-4 text-sm text-muted max-w-md">
+              Directional estimate. On{" "}
+              <Link href="/benchmarks" className="underline hover:text-ink">
+                {benchmarkItems ? `${benchmarkItems} benchmark survey questions` : "benchmark questions"}
+              </Link>
+              , this method with {p.model} missed the real answer share by{" "}
               <span className="font-mono">
-                ±{Math.round(result.benchmarkError.topline * 100)}pts
+                {Math.round(result.benchmarkError.topline * 100)} points
               </span>{" "}
-              topline error and{" "}
-              <span className="font-mono">
-                ±{Math.round((result.benchmarkError.subgroup ?? 0) * 100)}pts
-              </span>{" "}
-              on subgroups. Treat it as a prior, not a poll.
+              on average nationally
+              {result.benchmarkError.subgroup != null && (
+                <>
+                  {" "}and{" "}
+                  <span className="font-mono">
+                    {Math.round(result.benchmarkError.subgroup * 100)} points
+                  </span>{" "}
+                  for subgroups
+                </>
+              )}
+              .
+              {result.format.kind === "likert5" &&
+                " Five-point agreement statements like this one were not among them."}{" "}
+              Treat it as a prior, not a poll.
             </p>
           )}
         </div>
         <Honeycomb dist={result.topline} format={result.format} />
       </div>
+
+      {elicitedShare != null && elicitedShare < 0.9 && (
+        <p role="note" className="rounded-lg border border-line bg-surface px-4 py-3 text-sm text-ink">
+          This estimate rests on {pct(elicitedShare)} of the audience: {p.cellFailures} of{" "}
+          {p.cellCount + p.cellFailures} population cells returned no usable answer. Groups in the
+          failed cells are missing from the topline, so treat it with extra caution or run it again.
+        </p>
+      )}
 
       {result.subgroups.length > 0 && (
         <div>
@@ -188,6 +269,7 @@ export function Results({ result, runId }: { result: RunResult; runId: string | 
               ["Model", p.model],
               ["Population cells", `${p.cellCount}${p.cellFailures ? ` (${p.cellFailures} failed)` : ""}`],
               ["Weighted audience", Math.round(p.eligibleWeight).toLocaleString()],
+              ["Audience estimated", elicitedShare == null ? "not recorded" : pct(elicitedShare)],
               ["Share of geography", pct(p.populationShare)],
               ["Seed", String(p.seed)],
               ["Started", p.startedAt],

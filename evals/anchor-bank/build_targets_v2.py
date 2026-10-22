@@ -19,16 +19,17 @@ Run: uv run --with pandas python evals/anchor-bank/build_targets_v2.py
 import gzip
 import json
 import os
+import sys
 
 import pandas as pd
 
 SCRATCH = os.environ.get(
     "HS_SCRATCH",
-    "/private/tmp/claude-501/-Users-maxghenis/4b986211-4583-4bc2-b435-9fa459f2ce1e/scratchpad",
+    os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..", "data", "raw"),  # gitignored; see DATA.md,
 )
 GSS_DTA = os.environ.get(
     "GSS_DTA",
-    "/Users/maxghenis/HiveSight/hivesight-calibration/data/gss7224_r2.dta",
+    os.path.join(SCRATCH, "gss7224_r2.dta"),
 )
 SHED_2024_CSV = os.path.join(SCRATCH, "public2024.csv")
 SHED_2023_CSV = os.path.join(SCRATCH, "public2023.csv")
@@ -392,6 +393,10 @@ def main():
         return df
 
     shed24 = load_shed(SHED_2024_CSV)
+    if not os.path.exists(SHED_2023_CSV) and "--allow-missing-2023" not in sys.argv:
+        # Without 2023 targets the contamination regression silently loses its
+        # SHED points; require an explicit opt-out.
+        sys.exit(f"{SHED_2023_CSV} not found (pass --allow-missing-2023 to build without it)")
     shed23 = load_shed(SHED_2023_CSV) if os.path.exists(SHED_2023_CSV) else None
     print(f"SHED 2024 rows {len(shed24)}; 2023 rows {len(shed23) if shed23 is not None else 'N/A'}")
     shed_slices = {"age_band": "age_band", "income_band": "income_band",

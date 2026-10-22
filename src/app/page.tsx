@@ -1,11 +1,20 @@
 import Link from "next/link";
 import { AskForm } from "@/components/ask-form";
+import refresh from "../../paper/artifacts/model-refresh.json";
+import { DEFAULT_MODEL } from "@/engine/models";
 
+type Score = { toplineMAE: number; subgroupMAE: number; items: number };
+const served = (
+  refresh.models as unknown as Record<string, Record<string, { all: Score | null; subset20: Score }>>
+)[DEFAULT_MODEL];
+
+// Rendered from the registered model-refresh artifact for the served model.
 const BENCH = [
-  { arm: "Persona roleplay (typical AI-survey approach)", topline: 25, subgroup: 25 },
-  { arm: "Direct model estimate", topline: 8.6, subgroup: 9.8 },
-  { arm: "HiveSight population cells", topline: 9.2, subgroup: 9.8 },
+  { arm: "Persona roleplay (typical AI-survey approach)", score: served.persona.subset20 },
+  { arm: "Direct model estimate", score: served.naive.all! },
+  { arm: "HiveSight population cells", score: served.cells.all! },
 ];
+const pts = (v: number) => (v * 100).toFixed(1);
 
 export default function HomePage() {
   return (
@@ -36,7 +45,7 @@ export default function HomePage() {
           {
             n: "2",
             title: "Elicit",
-            body: "For each cell, the model estimates the full response distribution directly — the approach that beats one-call-per-fake-respondent roleplay in head-to-head research, at a fraction of the cost.",
+            body: "For each cell, the model estimates the full response distribution directly, instead of role-playing one fake respondent per call — the approach that wins in head-to-head research, including our own benchmark below.",
           },
           {
             n: "3",
@@ -58,20 +67,19 @@ export default function HomePage() {
           Benchmarked against real survey data — misses included
         </h2>
         <p className="mt-2 max-w-2xl text-sm text-muted">
-          Mean absolute error against human targets from GSS 2024 and SHED
-          2024 — 63 questions, pre-registered before any model runs. Lower is
-          better. Persona roleplay, the standard synthetic-respondent
-          architecture, is not competitive. Cells match direct estimation on
-          margins and beat it on subgroup rank structure (Spearman 0.62 vs
-          0.48) — while staying coherent, composable across any audience
-          filter, and fully auditable. Error is real, which is why every
-          result ships with it attached.
+          Mean absolute error in percentage points against human targets from
+          GSS 2024 and SHED 2024: 63 questions, registered before the benchmark
+          runs, with {DEFAULT_MODEL}, the model HiveSight serves. Lower
+          is better. Cells stay coherent, compose across any audience filter,
+          and are fully auditable. Error is real, which is why every result
+          ships with it attached.
         </p>
         <div className="mt-6 overflow-x-auto">
           <table className="w-full min-w-[28rem] text-sm">
             <thead>
               <tr className="text-left text-muted">
                 <th className="py-2 pr-4 font-normal">Method</th>
+                <th className="py-2 pr-4 font-normal">Questions</th>
                 <th className="py-2 pr-4 font-normal">Topline error</th>
                 <th className="py-2 font-normal">Subgroup error</th>
               </tr>
@@ -80,8 +88,9 @@ export default function HomePage() {
               {BENCH.map((row) => (
                 <tr key={row.arm} className="border-t border-line">
                   <td className="py-2.5 pr-4 font-sans text-sm text-ink">{row.arm}</td>
-                  <td className="py-2.5 pr-4">{row.topline} pts</td>
-                  <td className="py-2.5">{row.subgroup} pts</td>
+                  <td className="py-2.5 pr-4">{row.score.items}</td>
+                  <td className="py-2.5 pr-4">{pts(row.score.toplineMAE)} pts</td>
+                  <td className="py-2.5">{pts(row.score.subgroupMAE)} pts</td>
                 </tr>
               ))}
             </tbody>

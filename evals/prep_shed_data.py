@@ -15,7 +15,7 @@ PERSONA_N = int(os.environ.get("PERSONA_N", "150"))
 N_SAMPLES = 4  # one per question
 DATA_PATH = os.environ.get(
     "US_PERSONA_PATH",
-    "/private/tmp/claude-501/-Users-maxghenis/4b986211-4583-4bc2-b435-9fa459f2ce1e/scratchpad/US.json.gz",
+    os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "data", "raw", "US.json.gz"),  # gitignored; see DATA.md,
 )
 OUT_PATH = os.path.join(os.path.dirname(__file__), "results", "prep-shed.json")
 

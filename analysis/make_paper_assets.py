@@ -36,9 +36,15 @@ plt.rcParams.update({
 })
 
 
+# Stable output: no creation dates in figure metadata and fixed SVG ids, so
+# regenerating from unchanged inputs leaves paper/figures byte-identical.
+plt.rcParams["svg.hashsalt"] = "hivesight"
+FIG_METADATA = {"pdf": {"CreationDate": None, "ModDate": None}, "svg": {"Date": None}}
+
+
 def savefig(fig, stem):
     for ext in ("pdf", "svg"):
-        fig.savefig(os.path.join(FIG, f"{stem}.{ext}"))
+        fig.savefig(os.path.join(FIG, f"{stem}.{ext}"), metadata=FIG_METADATA[ext])
 
 
 def load(name, default=None):
@@ -134,12 +140,17 @@ def main():
             mae_cells = float(np.mean(np.abs(cs_a - hs_a)))
             naive_pairs = [(r["naive"] * 100, r["human"] * 100) for r in rec["states"].values() if r.get("naive") is not None]
             mae_naive = float(np.mean([abs(a - b2) for a, b2 in naive_pairs])) if naive_pairs else None
-            const_pairs = [(rec["nationalCells"] * 100, r["human"] * 100) for r in rec["states"].values()] if rec.get("nationalCells") else []
+            # Same states as the cells arm; 0.0 is a value, not a missing one.
+            const_pairs = (
+                [(rec["nationalCells"] * 100, r["human"] * 100) for r in rec["states"].values() if r.get("cells") is not None]
+                if rec.get("nationalCells") is not None else []
+            )
             mae_const = float(np.mean([abs(a - b2) for a, b2 in const_pairs])) if const_pairs else None
             rho = float(spearmanr(cs_a, hs_a).statistic)
             b["items"][item_id] = {
-                "maeCells": mae_cells / 100, "maeNaive": (mae_naive or 0) / 100 if mae_naive else None,
-                "maeNationalConst": (mae_const or 0) / 100 if mae_const else None,
+                "maeCells": mae_cells / 100,
+                "maeNaive": mae_naive / 100 if mae_naive is not None else None,
+                "maeNationalConst": mae_const / 100 if mae_const is not None else None,
                 "spearman": rho, "states": len(hs),
             }
             ax.scatter(hs_a, cs_a, s=10, color=INDIGO, alpha=0.8)
@@ -172,10 +183,9 @@ def main():
             ys = [p[1] * 100 for p in block["points"]]
             ax.scatter(xs, ys, s=14, color=color, marker=m, alpha=0.75,
                        label=f"{arm} (slope {block['slope']:.2f})")
-            import numpy as _np
-            xr = _np.linspace(min(xs), max(xs), 10)
+            xr = np.linspace(min(xs), max(xs), 10)
             ax.plot(xr, block["intercept"] * 100 + block["slope"] * xr, color=color, lw=1.2)
-        xr_all = _np.linspace(-8, 8, 10)
+        xr_all = np.linspace(-8, 8, 10)
         ax.plot(xr_all, -xr_all, color=GRAY, lw=0.8, ls="--", label="pure recall (slope −1)")
         ax.axhline(0, color=GRAY, lw=0.5)
         ax.set_xlabel("Target movement since prior wave (pts)")
