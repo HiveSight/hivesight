@@ -15,7 +15,7 @@ import pandas as pd
 
 SCRATCH = os.environ.get(
     "HS_SCRATCH",
-    "/private/tmp/claude-501/-Users-maxghenis/4b986211-4583-4bc2-b435-9fa459f2ce1e/scratchpad",
+    os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "data", "raw"),  # gitignored; see DATA.md,
 )
 XPT = os.path.join(SCRATCH, "LLCP2023.XPT ")  # CDC ships trailing space in name
 OUT = os.path.join(os.path.dirname(__file__), "..", "paper", "artifacts", "brfss-state-targets.json")

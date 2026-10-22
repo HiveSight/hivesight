@@ -59,3 +59,6 @@ evals/results/prep-shed.json
 paper/.quarto/
 paper/paper_files/
 .env.production.backup
+
+# Raw survey and population files (not redistributed; see DATA.md)
+data/raw/

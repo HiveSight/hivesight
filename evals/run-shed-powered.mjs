@@ -24,7 +24,7 @@ const PERSONA_N = Number(getArg("--persona-n") ?? 150);
 const SEED = 20260707;
 const DATA_PATH =
   process.env.US_PERSONA_PATH ??
-  "/private/tmp/claude-501/-Users-maxghenis/4b986211-4583-4bc2-b435-9fa459f2ce1e/scratchpad/US.json.gz";
+  path.join(import.meta.dirname, "..", "data", "raw", "US.json.gz"); // gitignored; see DATA.md
 const OUT_DIR = path.join(import.meta.dirname, "results");
 const RAW_LOG = path.join(OUT_DIR, "shed-powered-raw-calls.jsonl");
 const DRY_RUN = process.argv.includes("--dry-run");

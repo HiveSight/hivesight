@@ -12,8 +12,7 @@ REPRODUCING.md.
 - Source: NORC, https://gss.norc.org/us/en/gss/get-the-data/stata.html
 - File: `gss7224_r2.dta` (Stata format, ~595 MB)
 - SHA-256: `02456dff12a84849fb0bedda2abfd441312c41d1795cad47fd5b364821dd95b7`
-- Path: set `GSS_DTA=/path/to/gss7224_r2.dta` (builder default points at the
-  authors' local copy)
+- Path: `data/raw/gss7224_r2.dta`, or set `GSS_DTA=/path/to/gss7224_r2.dta`
 - Terms: GSS data are free for research use but are **not redistributed** in
   this repository. Weights used: `wtssnrps` (2022, 2024).
 
@@ -28,7 +27,7 @@ REPRODUCING.md.
   `82897c55a7c3dc1c056270506714d174732215927419f7d571400612cdd30819`
 - SHA-256 (`public2023.csv`):
   `b83343cf6ab2662d3d8ed821e1a460ed7bd7804275b7997b727e0e2a2276b336`
-- Path: `$HS_SCRATCH/public2024.csv`, `$HS_SCRATCH/public2023.csv`
+- Path: `data/raw/public2024.csv`, `data/raw/public2023.csv` (or under `$HS_SCRATCH`)
 - Weight used: `weight`.
 
 ## BRFSS 2023
@@ -38,7 +37,7 @@ REPRODUCING.md.
   the filename inside CDC's zip**; the builder expects it verbatim.
 - SHA-256 (`LLCP2023.XPT `):
   `3d3bf8ef5195bde227828ddc4c90745b76e8b304f8f5b9a043b6d99895fd1615`
-- Path: `$HS_SCRATCH/LLCP2023.XPT ` (trailing space)
+- Path: `data/raw/LLCP2023.XPT ` (trailing space; or under `$HS_SCRATCH`)
 - Weight used: `_LLCPWT`. Kentucky and Pennsylvania did not meet BRFSS 2023
   data-collection requirements and are absent.
 
@@ -54,6 +53,9 @@ REPRODUCING.md.
 
 ## Environment variables
 
-- `HS_SCRATCH` — directory holding the downloaded raw files (defaults to a
-  session-specific temp path in the builders; set it explicitly).
-- `GSS_DTA` — full path to `gss7224_r2.dta`.
+- `HS_SCRATCH` — directory holding the downloaded raw files (default
+  `data/raw/`, which is gitignored).
+- `GSS_DTA` — full path to `gss7224_r2.dta` (default `$HS_SCRATCH/gss7224_r2.dta`).
+- `US_PERSONA_PATH` — the full US population frame `US.json.gz` from the
+  Hugging Face dataset (default `data/raw/US.json.gz`), needed only to rebuild
+  `public/data/v1` or rerun the SHED pilot.

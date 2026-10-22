@@ -6,7 +6,7 @@
   --color-surface: #ffffff;
   --color-ink: #191d2b;
   --color-muted: #565b6c;
-  --color-faint: #8a8fa0;
+  --color-faint: #6a6f81; /* 4.7:1 on paper (WCAG AA) */
   --color-line: #e4e0d5;
 
   /* Hive signature — reserved for the honeycomb, wordmark hex, and small marks */
@@ -34,7 +34,7 @@
     --color-surface: #1c2030;
     --color-ink: #edeae1;
     --color-muted: #a6abbd;
-    --color-faint: #7c8093;
+    --color-faint: #8a8ea1; /* 5.0:1 on surface */
     --color-line: #2c3145;
     --color-honey: #e8b23a;
     --color-honey-deep: #e8b23a;

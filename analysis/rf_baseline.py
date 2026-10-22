@@ -21,7 +21,7 @@ from sklearn.model_selection import train_test_split
 
 SCRATCH = os.environ.get(
     "HS_SCRATCH",
-    "/private/tmp/claude-501/-Users-maxghenis/4b986211-4583-4bc2-b435-9fa459f2ce1e/scratchpad",
+    os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "data", "raw"),  # gitignored; see DATA.md,
 )
 ROOT = os.path.join(os.path.dirname(__file__), "..")
 BANK = os.path.join(ROOT, "evals", "anchor-bank", "anchor-bank-v1.json")
