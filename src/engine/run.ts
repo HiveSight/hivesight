@@ -6,31 +6,39 @@ import {
 import { cellMatchesFilters } from "./bands";
 import { loadGeography, DATASET_VERSION } from "./data";
 import type { LlmClient } from "./elicit";
-import { mapLimit, parseDistribution } from "./elicit";
+import { LlmRequestError, mapLimit, parseDistribution } from "./elicit";
 import { CELL_SYSTEM_PROMPT, cellUserPrompt, PROMPT_VERSION } from "./prompts";
 import { generateVerbatims } from "./verbatims";
+import refresh from "../../paper/artifacts/model-refresh.json";
 import type { CellEstimate, RunProgress, RunResult, RunSpec } from "./types";
 
 export const ENGINE_VERSION = "engine:v1-cells";
 
 /**
- * Benchmark-measured typical error, from the pre-registered 63-item anchor
- * bank (GSS 2024 + SHED 2024; evals/results/anchor-bank-run-v1.json).
- * Surfaced with results so users see measured accuracy context, not implied
- * precision. Update when the eval artifact is regenerated.
+ * Benchmark-measured typical error for each served model, from the
+ * registered model refresh (paper/pap-model-refresh-2026-10.md): cells-arm
+ * absolute error of the designated answer share on the 63-item anchor bank
+ * (GSS 2024 + SHED 2024, national), subgroups pooled across bins. Surfaced
+ * with results so users see measured accuracy, not implied precision. The
+ * analysis script writes the artifact; never edit these numbers by hand.
  */
-export const BENCHMARK_ERROR = {
-  source: "63-item anchor bank (GSS 2024 + SHED 2024, national)",
-  topline: 0.092,
-  subgroup: 0.098,
-};
+export const BENCHMARK_SOURCE =
+  "63-item anchor bank (GSS 2024 + SHED 2024, national), October 2026 model refresh";
+
+export function benchmarkErrorFor(model: string): RunResult["benchmarkError"] {
+  const measured = (refresh.servedBenchmark as Record<string, { topline: number; subgroup: number }>)[model];
+  return measured
+    ? { topline: measured.topline, subgroup: measured.subgroup, source: BENCHMARK_SOURCE }
+    : null;
+}
 
 const ELICIT_CONCURRENCY = 16;
 
 export async function runEstimate(
   spec: RunSpec,
   llm: LlmClient,
-  onProgress?: (p: RunProgress) => void
+  onProgress?: (p: RunProgress) => void,
+  signal?: AbortSignal
 ): Promise<RunResult> {
   const startedAt = new Date().toISOString();
   const seed = spec.seed ?? Math.floor(Math.random() * 0xffffffff);
@@ -57,16 +65,20 @@ export async function runEstimate(
   let elicitedWeight = 0;
   let firstError: unknown = null;
   // A cell whose call fails after retries counts as a failed cell; it must
-  // not abort the other cells' work.
-  const results = await mapLimit(cells, ELICIT_CONCURRENCY, async (cell) => {
+  // not abort the other cells' work. A rejected request (bad key, unknown
+  // model) would fail every cell, and a cancelled run must stop spending, so
+  // both stop the run at once.
+  async function elicitCell(cell: (typeof cells)[number]) {
     let content = "";
     try {
       content = await llm.complete({
         system: CELL_SYSTEM_PROMPT,
         user: cellUserPrompt(cell, spec.audience.geography, spec.question, spec.format),
         model: spec.model,
+        signal,
       });
     } catch (err) {
+      if (err instanceof LlmRequestError || signal?.aborted) throw err;
       firstError ??= err;
     }
     completed++;
@@ -77,7 +89,8 @@ export async function runEstimate(
       message: `Estimating response distributions (${completed}/${cells.length} population cells)`,
     });
     return { cell, dist: parseDistribution(content, spec.format) };
-  });
+  }
+  const results = await mapLimit(cells, ELICIT_CONCURRENCY, elicitCell, signal);
   for (const r of results) {
     if (r.dist) {
       estimates.push({ cell: r.cell, dist: r.dist });
@@ -115,7 +128,9 @@ export async function runEstimate(
     format: spec.format,
     count: spec.verbatimCount ?? 6,
     seed,
+    signal,
   });
+  signal?.throwIfAborted();
 
   const result: RunResult = {
     question: spec.question,
@@ -140,11 +155,7 @@ export async function runEstimate(
       startedAt,
       completedAt: new Date().toISOString(),
     },
-    benchmarkError: {
-      topline: spec.format.kind === "likert5" ? BENCHMARK_ERROR.topline : null,
-      subgroup: spec.format.kind === "likert5" ? BENCHMARK_ERROR.subgroup : null,
-      source: BENCHMARK_ERROR.source,
-    },
+    benchmarkError: benchmarkErrorFor(spec.model),
   };
 
   onProgress?.({

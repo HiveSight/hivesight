@@ -64,11 +64,11 @@ const SUBSET20 = [
   "shed_ef1", "shed_ef7", "shed_bk1", "shed_work", "shed_housing_stress",
 ];
 // Odd-indexed items of subset20 in itemId sort order (PAP v3 addendum).
-const PARAPHRASE10 = [...SUBSET20].sort().filter((_, i) => i % 2 === 1);
+export const PARAPHRASE10 = [...SUBSET20].sort().filter((_, i) => i % 2 === 1);
 const VOLUNTEERED6 = ["gss_trust", "gss_fair", "gss_helpful", "gss_getahead", "gss_courts", "gss_divlaw"];
 
 // Meaning-preserving stem rewrites for the paraphrase probe.
-const PARAPHRASES = {
+export const PARAPHRASES = {
   gss_confed: "Thinking about the people running the executive branch of the federal government: would you say you have a great deal of confidence, only some confidence, or hardly any confidence at all in them?",
   gss_fefam: "Please say whether you strongly agree, agree, disagree, or strongly disagree with the following statement: things work out better for everyone when the man earns the money outside the home and the woman looks after the home and family.",
   gss_happy: "Considering your life these days as a whole, would you describe yourself as very happy, pretty happy, or not too happy?",
@@ -238,7 +238,7 @@ function optionsBlock(item) {
   };
 }
 
-const DK_LINE =
+export const DK_LINE =
   "Estimate shares among respondents who give a substantive answer; do not allocate any share to don't know or refused.";
 
 function cellPrompt(cell, item) {
@@ -367,6 +367,8 @@ async function runCellsArm(item, cells) {
     return { cell, dist: parseDist(content, item) };
   });
   const ok = results.filter((r) => r.dist);
+  // Never checkpoint an item no cell answered: its aggregate would be NaN.
+  if (ok.length === 0) throw new Error(`${item.itemId}: every cell elicitation failed`);
   const agg = (list) => {
     const w = list.reduce((s, r) => s + r.cell.weight, 0);
     return item.options.map((_, oi) =>
@@ -646,6 +648,12 @@ async function main() {
   else if (ITEMS_SEL === "paraphrase10") items = items.filter((i) => PARAPHRASE10.includes(i.itemId));
   else if (ITEMS_SEL === "volunteered6") items = items.filter((i) => VOLUNTEERED6.includes(i.itemId));
   else if (ITEMS_SEL !== "all") items = items.filter((i) => ITEMS_SEL.split(",").includes(i.itemId));
+  if (VARIANT === "paraphrase") {
+    // wordingFor() falls back to the original stem, which silently turned one
+    // registered paraphrase item (gss_nateduc) into an unparaphrased rerun.
+    const missing = items.filter((i) => !PARAPHRASES[i.itemId]).map((i) => i.itemId);
+    if (missing.length) throw new Error(`no paraphrase for: ${missing.join(", ")}`);
+  }
 
   const runTag = [VARIANT, `g${GRANULARITY}`, REPLICATE !== "0" ? `rep${REPLICATE}` : null]
     .filter(Boolean).join(":");

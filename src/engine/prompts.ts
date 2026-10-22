@@ -1,7 +1,27 @@
 import type { Cell, GeographyRef, ResponseFormat, SampleRecord } from "./types";
 import { optionIds } from "./types";
 
-export const PROMPT_VERSION = "prompts:v4-core-conditional";
+export const PROMPT_VERSION = "prompts:v4.1-core-conditional";
+
+/** Choice options that are themselves nonresponse categories. */
+const NONRESPONSE_OPTION =
+  /\b(don'?t|do not)\s+know\b|\bnot\s+sure\b|\bunsure\b|\brefuse|\bno\s+opinion\b|\bprefer\s+not\b/i;
+
+/**
+ * The benchmarked instruction conditions on a substantive answer. When the
+ * asker lists a nonresponse option themselves, that instruction would forbid
+ * one of their own options, so shares cover every listed option instead.
+ * (v4.1 changes only that case; every benchmarked prompt is unchanged.)
+ */
+function shareInstruction(format: ResponseFormat): string {
+  const listsNonresponse =
+    format.kind === "choice" &&
+    format.options.some((o) => NONRESPONSE_OPTION.test(o.replace(/’/g, "'")));
+  if (listsNonresponse) {
+    return "Estimate shares across all the response options listed, including any don't-know or refusal option.";
+  }
+  return "Estimate shares among respondents who give a substantive answer; do not allocate any share to don't know or refused.";
+}
 
 /**
  * Expert-predictor framing (not persona roleplay): the model estimates a
@@ -62,7 +82,7 @@ export function cellUserPrompt(
     format.kind === "likert5"
       ? `Survey statement: "${question}"\nEstimate the percentage of the group below choosing each response option.`
       : `Survey question: "${question}"\nEstimate the percentage of the group below choosing each response option.`;
-  return `${stem} Estimate shares among respondents who give a substantive answer; do not allocate any share to don't know or refused.
+  return `${stem} ${shareInstruction(format)}
 
 Group: ${describeCell(cell, geography)}
 
@@ -107,9 +127,12 @@ export function verbatimUserPrompt(
   format: ResponseFormat
 ): string {
   const ids = optionIds(format);
+  const { optionsText } = formatBlock(format);
   return `Respondent profile: ${personaDescription}
 
 Survey question: "${question}"
+
+${optionsText}
 
 Write the answer this respondent plausibly gives. Reply with JSON only:
 {"choice": <one of ${JSON.stringify(ids)}>, "text": "<their one-or-two-sentence explanation, in their own voice>"}`;

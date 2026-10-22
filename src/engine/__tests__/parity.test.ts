@@ -102,3 +102,13 @@ describe("persona sampling designs", () => {
     expect(heavyCount(picked)).toBeGreaterThan(130);
   });
 });
+
+describe("registered paraphrase probe", () => {
+  // gss_nateduc was listed in the probe but had no paraphrase, so the July
+  // run sent its original stem. The table is left as registered; the runner
+  // now refuses such a run, and this records the gap.
+  it("has a paraphrase for every probe item except the known gss_nateduc gap", () => {
+    const missing = runner.PARAPHRASE10.filter((id: string) => !(id in runner.PARAPHRASES));
+    expect(missing).toEqual(["gss_nateduc"]);
+  });
+});

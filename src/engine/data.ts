@@ -36,7 +36,12 @@ function cacheSet(key: string, data: GeographyData) {
   if (cache.size >= CACHE_MAX) {
     let oldest: string | null = null;
     let oldestAt = Infinity;
-    for (const [k, v] of cache) if (v.at < oldestAt) ((oldestAt = v.at), (oldest = k));
+    for (const [k, v] of cache) {
+      if (v.at < oldestAt) {
+        oldestAt = v.at;
+        oldest = k;
+      }
+    }
     if (oldest) cache.delete(oldest);
   }
   cache.set(key, { data, at: Date.now() });

@@ -10,15 +10,24 @@ export interface LlmClient {
     model: string;
     json?: boolean;
     maxTokens?: number;
+    /** Aborts the request and any retry wait. */
+    signal?: AbortSignal;
   }): Promise<string>;
 }
+
+/**
+ * A request the model API rejected (bad key, unknown model, invalid
+ * parameter). Retrying cannot fix it, so callers stop instead of retrying.
+ */
+export class LlmRequestError extends Error {}
 
 /** Direct OpenAI-compatible client; no SDK dependency. */
 export function openAiClient(apiKey: string, baseUrl = "https://api.openai.com/v1"): LlmClient {
   return {
-    async complete({ system, user, model, json = true, maxTokens = 700 }) {
+    async complete({ system, user, model, json = true, maxTokens = 700, signal }) {
       let reasoningEffort = reasoningEffortFor(model);
       for (let attempt = 0; attempt < 4; attempt++) {
+        signal?.throwIfAborted();
         try {
           const body: Record<string, unknown> = {
             model,
@@ -37,9 +46,10 @@ export function openAiClient(apiKey: string, baseUrl = "https://api.openai.com/v
               "Content-Type": "application/json",
             },
             body: JSON.stringify(body),
+            signal,
           });
           if (res.status === 429 || res.status >= 500) {
-            await sleep(1200 * 2 ** attempt);
+            await sleep(1200 * 2 ** attempt, signal);
             continue;
           }
           const data = await res.json();
@@ -53,12 +63,12 @@ export function openAiClient(apiKey: string, baseUrl = "https://api.openai.com/v
               reasoningEffort = null;
               continue;
             }
-            throw new Error(data.error.message);
+            throw new LlmRequestError(data.error.message);
           }
           return data.choices?.[0]?.message?.content ?? "";
         } catch (err) {
-          if (attempt === 3) throw err;
-          await sleep(1200 * 2 ** attempt);
+          if (err instanceof LlmRequestError || signal?.aborted || attempt === 3) throw err;
+          await sleep(1200 * 2 ** attempt, signal);
         }
       }
       throw new Error("unreachable");
@@ -66,24 +76,48 @@ export function openAiClient(apiKey: string, baseUrl = "https://api.openai.com/v
   };
 }
 
-function sleep(ms: number) {
-  return new Promise((r) => setTimeout(r, ms));
+function sleep(ms: number, signal?: AbortSignal) {
+  return new Promise<void>((resolve, reject) => {
+    if (signal?.aborted) return reject(signal.reason);
+    const timer = setTimeout(() => {
+      signal?.removeEventListener("abort", onAbort);
+      resolve();
+    }, ms);
+    function onAbort() {
+      clearTimeout(timer);
+      reject(signal!.reason);
+    }
+    signal?.addEventListener("abort", onAbort, { once: true });
+  });
 }
 
+/**
+ * Runs fn over items with at most `limit` in flight, preserving order. Once
+ * any call throws or the signal aborts, no further items start; calls already
+ * in flight settle before the first error is rethrown.
+ */
 export async function mapLimit<T, R>(
   items: T[],
   limit: number,
-  fn: (item: T, index: number) => Promise<R>
+  fn: (item: T, index: number) => Promise<R>,
+  signal?: AbortSignal
 ): Promise<R[]> {
   const results = new Array<R>(items.length);
   let next = 0;
+  let failure: { error: unknown } | null = null;
   async function worker() {
-    while (next < items.length) {
+    while (next < items.length && !failure && !signal?.aborted) {
       const i = next++;
-      results[i] = await fn(items[i], i);
+      try {
+        results[i] = await fn(items[i], i);
+      } catch (error) {
+        failure ??= { error };
+      }
     }
   }
   await Promise.all(Array.from({ length: Math.min(limit, items.length) }, worker));
+  if (failure) throw (failure as { error: unknown }).error;
+  signal?.throwIfAborted();
   return results;
 }
 

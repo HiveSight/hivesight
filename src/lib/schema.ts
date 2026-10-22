@@ -1,6 +1,7 @@
 import { z } from "zod/v4";
 import { DEFAULT_MODEL, SERVED_MODEL_IDS } from "@/engine/models";
 import { canonicalGeography } from "@/lib/geographies";
+import { AGE_BANDS, BENEFITS, CHILDREN, INCOME_BANDS, SEXES, TENURES } from "@/engine/bands";
 
 // The label is derived from the value (canonicalGeography), so a request
 // cannot weight one place while prompting about another.
@@ -19,13 +20,15 @@ export const GeographySchema = z
     return canonical;
   });
 
-export const FiltersSchema = z.object({
-  ageBands: z.array(z.string()).optional(),
-  incomeBands: z.array(z.string()).optional(),
-  sexes: z.array(z.string()).optional(),
-  tenure: z.array(z.string()).optional(),
-  children: z.array(z.string()).optional(),
-  benefits: z.array(z.string()).optional(),
+// Strict: an unknown key (say "sex" for "sexes") would otherwise be dropped
+// and silently widen the audience to everyone.
+export const FiltersSchema = z.strictObject({
+  ageBands: z.array(z.enum(AGE_BANDS)).optional(),
+  incomeBands: z.array(z.enum(INCOME_BANDS)).optional(),
+  sexes: z.array(z.enum(SEXES)).optional(),
+  tenure: z.array(z.enum(TENURES)).optional(),
+  children: z.array(z.enum(CHILDREN)).optional(),
+  benefits: z.array(z.enum(BENEFITS)).optional(),
 });
 
 export const FormatSchema = z.union([
@@ -33,7 +36,14 @@ export const FormatSchema = z.union([
   z.object({ kind: z.literal("binary") }),
   z.object({
     kind: z.literal("choice"),
-    options: z.array(z.string().min(1).max(120)).min(2).max(8),
+    options: z
+      .array(z.string().trim().min(1).max(120))
+      .min(2)
+      .max(8)
+      .refine(
+        (options) => new Set(options.map((o) => o.toLowerCase())).size === options.length,
+        "Choice options must be distinct"
+      ),
   }),
 ]);
 

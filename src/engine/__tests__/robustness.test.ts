@@ -1,6 +1,6 @@
 import fc from "fast-check";
-import { describe, expect, it } from "vitest";
-import { parseDistribution } from "../elicit";
+import { afterEach, describe, expect, it, vi } from "vitest";
+import { LlmRequestError, openAiClient, parseDistribution } from "../elicit";
 import type { LlmClient } from "../elicit";
 import { runEstimate } from "../run";
 import { sampleForVerbatims } from "../verbatims";
@@ -100,6 +100,19 @@ describe("runEstimate failure handling", () => {
     expect(result.provenance.elicitedShare).toBeCloseTo(1, 12);
   });
 
+  it("stops at once when the API rejects the request", async () => {
+    let calls = 0;
+    const llm: LlmClient = {
+      async complete() {
+        calls++;
+        throw new LlmRequestError("Incorrect API key provided: sk-proj-****abcd");
+      },
+    };
+    await expect(runEstimate(spec, llm)).rejects.toBeInstanceOf(LlmRequestError);
+    // At most one call per concurrent worker, not one per cell.
+    expect(calls).toBeLessThanOrEqual(16);
+  });
+
   it("fails with a plain message, not the provider's, when every cell fails", async () => {
     const llm = stubLlm(() => new Error("Incorrect API key provided: sk-proj-****abcd"));
     await expect(runEstimate(spec, llm)).rejects.toThrow(/^All cell elicitations failed\.$/);
@@ -121,6 +134,22 @@ describe("runEstimate failure handling", () => {
       }),
       { numRuns: 25 }
     );
+  });
+});
+
+describe("openAiClient errors", () => {
+  afterEach(() => vi.unstubAllGlobals());
+
+  it("does not retry a rejected request", async () => {
+    const fetchMock = vi.fn(async () => ({
+      status: 401,
+      json: async () => ({ error: { message: "Incorrect API key provided" } }),
+    }));
+    vi.stubGlobal("fetch", fetchMock);
+    await expect(
+      openAiClient("bad").complete({ system: "s", user: "u", model: "gpt-6-luna" })
+    ).rejects.toBeInstanceOf(LlmRequestError);
+    expect(fetchMock).toHaveBeenCalledTimes(1);
   });
 });
 

@@ -73,6 +73,7 @@ export async function generateVerbatims(args: {
   count: number;
   seed: number;
   concurrency?: number;
+  signal?: AbortSignal;
 }): Promise<Verbatim[]> {
   const picked = sampleForVerbatims(
     args.samples,
@@ -82,7 +83,7 @@ export async function generateVerbatims(args: {
     args.samplePool
   );
   const ids = optionIds(args.format);
-  const results = await mapLimit(picked, args.concurrency ?? 8, async (p) => {
+  async function writeVerbatim(p: SampleRecord): Promise<Verbatim> {
     const personaDescription = describeSample(p, args.audience.geography);
     try {
       const content = await args.llm.complete({
@@ -91,16 +92,18 @@ export async function generateVerbatims(args: {
         model: args.model,
         json: true,
         maxTokens: 700,
+        signal: args.signal,
       });
-      const parsed = JSON.parse(content) as { choice?: string; text?: string };
+      const parsed = JSON.parse(content) as { choice?: string; text?: string } | null;
       return {
         personaDescription,
-        choice: parsed.choice && ids.includes(parsed.choice) ? parsed.choice : null,
-        text: typeof parsed.text === "string" ? parsed.text : "",
+        choice: parsed?.choice && ids.includes(parsed.choice) ? parsed.choice : null,
+        text: typeof parsed?.text === "string" ? parsed.text : "",
       };
     } catch {
       return { personaDescription, choice: null, text: "" };
     }
-  });
+  }
+  const results = await mapLimit(picked, args.concurrency ?? 8, writeVerbatim, args.signal);
   return results.filter((v) => v.text.length > 0);
 }

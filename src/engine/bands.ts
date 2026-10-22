@@ -38,9 +38,34 @@ export function earnedIncomeBand(earned: number): string {
   return "$150k+";
 }
 
+const FILTER_DOMAINS: Record<keyof AudienceFilters, readonly string[]> = {
+  ageBands: AGE_BANDS,
+  incomeBands: INCOME_BANDS,
+  sexes: SEXES,
+  tenure: TENURES,
+  children: CHILDREN,
+  benefits: BENEFITS,
+};
+
+/**
+ * Drops dimensions whose selection is empty or covers every category: such a
+ * selection restricts nothing, and must not exclude undetailed cells.
+ */
+export function normalizeFilters(filters: AudienceFilters): AudienceFilters {
+  const out: AudienceFilters = {};
+  for (const key of Object.keys(FILTER_DOMAINS) as Array<keyof AudienceFilters>) {
+    const selected = filters[key];
+    if (!selected?.length) continue;
+    if (FILTER_DOMAINS[key].every((v) => selected.includes(v))) continue;
+    out[key] = selected;
+  }
+  return out;
+}
+
 /** Whether a cell passes the audience filters. Undetailed cells fail
  * detailed-dimension filters (they carry no tenure/children/benefits info). */
-export function cellMatchesFilters(cell: Cell, filters: AudienceFilters): boolean {
+export function cellMatchesFilters(cell: Cell, rawFilters: AudienceFilters): boolean {
+  const filters = normalizeFilters(rawFilters);
   if (filters.ageBands?.length && !filters.ageBands.includes(cell.age)) return false;
   if (filters.incomeBands?.length && !filters.incomeBands.includes(cell.income)) return false;
   if (filters.sexes?.length && !filters.sexes.includes(cell.sex)) return false;
@@ -58,7 +83,8 @@ export function cellMatchesFilters(cell: Cell, filters: AudienceFilters): boolea
   return true;
 }
 
-export function sampleMatchesFilters(p: SampleRecord, filters: AudienceFilters): boolean {
+export function sampleMatchesFilters(p: SampleRecord, rawFilters: AudienceFilters): boolean {
+  const filters = normalizeFilters(rawFilters);
   const earned = p.employment_income + p.self_employment_income;
   if (filters.ageBands?.length && !filters.ageBands.includes(ageBand(p.age))) return false;
   if (filters.incomeBands?.length && !filters.incomeBands.includes(earnedIncomeBand(earned)))

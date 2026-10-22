@@ -18,11 +18,9 @@ export async function GET() {
       message: `${table.cells.length} cells for Delaware, weight ${Math.round(table.totalWeight).toLocaleString()}`,
     });
   } catch (err) {
-    checks.push({
-      name: "cell_data",
-      status: "failed",
-      message: err instanceof Error ? err.message : "unknown",
-    });
+    // The error names filesystem paths; keep it out of the public response.
+    console.error("health: cell data failed to load:", err);
+    checks.push({ name: "cell_data", status: "failed", message: "cell data failed to load" });
   }
 
   if (storeConfigured()) {
