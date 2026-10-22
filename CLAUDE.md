@@ -22,8 +22,7 @@ MAE vs 6pts subgroup MAE for cell-based estimation (evals/results/).
 ```bash
 bun run dev          # dev server
 bun run typecheck && bun run test && bun run build
-bun run evals:shed   # powered SHED benchmark (needs OPENAI_API_KEY; ~$1)
-bun run data:release # rebuild public/data/v1 (needs numpy; ~10 min)
+bun run data:release # build missing public/data/v1 files (needs numpy; delete a file to rebuild it)
 ```
 
 ## Environment
@@ -33,11 +32,22 @@ bun run data:release # rebuild public/data/v1 (needs numpy; ~10 min)
 - `NEXT_PUBLIC_SUPABASE_URL` + `SUPABASE_SECRET_KEY` — optional persistence.
 - `CRON_SECRET` — optional, protects /api/cron/keepalive.
 
+## Models
+
+- Served models and their request settings: `src/engine/models.ts`
+  (default gpt-6-luna at reasoning effort none; gpt-6.1-sol at low). The eval
+  runners' settings are in `evals/models.mjs`; `models.test.ts` keeps them
+  equal. Verify model IDs and supported efforts against the provider's docs
+  and live API before changing them.
+
 ## Rules
 
-- Engine changes must re-run `bun run evals:shed` and update the artifact +
-  BENCHMARK_ERROR in src/engine/run.ts. The benchmarks page renders the
-  artifact directly — never hand-edit displayed accuracy numbers.
+- Model or prompt changes must re-run the anchor-bank refresh
+  (`evals/run-anchor-bank-v2.mjs`, REPRODUCING.md "Model refresh") under a
+  committed addendum, then regenerate `paper/artifacts/model-refresh.json`.
+  The product's displayed error (`benchmarkErrorFor` in src/engine/run.ts),
+  the home page, and the benchmarks page all read that artifact — never
+  hand-edit displayed accuracy numbers.
 - Copy is direct and quantitative; sentence case; no hype. Product framing is
   "pre-field directional estimation" (AAPOR-aligned), never poll replacement.
   Verbatims are always labeled synthetic/illustrative (ESOMAR).

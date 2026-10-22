@@ -19,6 +19,7 @@ Run: uv run --with pandas python evals/anchor-bank/build_targets_v2.py
 import gzip
 import json
 import os
+import sys
 
 import pandas as pd
 
@@ -392,6 +393,10 @@ def main():
         return df
 
     shed24 = load_shed(SHED_2024_CSV)
+    if not os.path.exists(SHED_2023_CSV) and "--allow-missing-2023" not in sys.argv:
+        # Without 2023 targets the contamination regression silently loses its
+        # SHED points; require an explicit opt-out.
+        sys.exit(f"{SHED_2023_CSV} not found (pass --allow-missing-2023 to build without it)")
     shed23 = load_shed(SHED_2023_CSV) if os.path.exists(SHED_2023_CSV) else None
     print(f"SHED 2024 rows {len(shed24)}; 2023 rows {len(shed23) if shed23 is not None else 'N/A'}")
     shed_slices = {"age_band": "age_band", "income_band": "income_band",

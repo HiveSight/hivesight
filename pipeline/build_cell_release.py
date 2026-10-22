@@ -153,6 +153,7 @@ def main():
     os.makedirs(OUT_DIR, exist_ok=True)
     geos = sys.argv[1:] or (["US"] + STATES)
     rng = np.random.default_rng(SEED)
+    failed = []
     for geo in geos:
         out_path = os.path.join(OUT_DIR, f"{geo}.json")
         if os.path.exists(out_path):
@@ -162,6 +163,7 @@ def main():
             persons = load_persons(geo)
         except Exception as e:
             print(f"{geo}: FAILED to load ({e})")
+            failed.append(geo)
             continue
         table = reduce_to_cells(persons, geo)
         samples = systematic_sample(persons, SAMPLE_N, rng)
@@ -169,6 +171,8 @@ def main():
             json.dump({"table": table, "samples": samples}, f)
         size_kb = os.path.getsize(out_path) / 1024
         print(f"{geo}: {len(persons)} records -> {len(table['cells'])} cells, {len(samples)} samples ({size_kb:.0f} KB)")
+    if failed:
+        sys.exit(f"failed to load {len(failed)} geographies: {', '.join(failed)}")
 
 
 if __name__ == "__main__":

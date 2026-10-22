@@ -42,8 +42,11 @@ jobs:
 
       - name: Regenerate analysis artifacts from committed inputs
         run: |
-          uv run --with "numpy==2.3.4,scipy==1.16.3" python analysis/analyze_anchor.py
-          uv run --with "numpy==2.3.4,scipy==1.16.3" python analysis/analyze_anchor_v2.py
+          PINS="numpy==2.3.4,scipy==1.16.3,matplotlib==3.10.7"
+          uv run --with "$PINS" python analysis/analyze_anchor.py
+          uv run --with "$PINS" python analysis/analyze_anchor_v2.py
+          uv run --with "$PINS" python analysis/analyze_model_refresh.py
+          uv run --with "$PINS" python analysis/make_paper_assets.py
 
       - name: Verify artifacts unchanged
-        run: git diff --exit-code paper/artifacts/anchor-analysis.json paper/artifacts/anchor-analysis-v2.json
+        run: git diff --exit-code paper/artifacts/ paper/figures/
