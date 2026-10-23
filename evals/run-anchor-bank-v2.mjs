@@ -21,11 +21,19 @@
  *   node evals/run-anchor-bank-v2.mjs --model gpt-6-luna --arms cells,naive,persona \
  *     --items all --artifact model-refresh-run.json --max-usd 10
  *
+ * Individual simulation (paper/pap-individual-sim-2026-10.md): every person in
+ * a 1,200-record pool reports how likely they are to give each answer.
+ *   node evals/run-anchor-bank-v2.mjs --model gpt-6-luna --arms persona-prob-pool \
+ *     --items all --artifact individual-sim-gpt-6-luna-pool.json --max-usd 6
+ *
  * Request settings per model (reasoning effort, thinking) come from
  * evals/models.mjs; the provider follows from the model.
  */
 
-import { readFileSync, writeFileSync, mkdirSync, appendFileSync, existsSync } from "node:fs";
+import { readFileSync, writeFileSync, mkdirSync, appendFileSync, existsSync, renameSync } from "node:fs";
+import { execSync } from "node:child_process";
+import { createHash } from "node:crypto";
+import { gunzipSync } from "node:zlib";
 import path from "node:path";
 import { pathToFileURL } from "node:url";
 import { anthropicText, costUsd, modelConfig, requestExtras } from "./models.mjs";
@@ -56,6 +64,17 @@ const ROOT = path.join(import.meta.dirname, "..");
 const OUT_DIR = path.join(import.meta.dirname, "results");
 const LOG_DIR = path.join(OUT_DIR, "logs");
 const ARTIFACT = path.join(OUT_DIR, arg("--artifact", "anchor-bank-run-v2.json"));
+
+// The OpenAI endpoint. Tests may point the runner at a local stand-in; any
+// other host would receive the API key, so only localhost is accepted.
+export const OFFICIAL_OPENAI_BASE = "https://api.openai.com/v1";
+const OPENAI_BASE = process.env.EVAL_OPENAI_BASE_URL ?? OFFICIAL_OPENAI_BASE;
+if (OPENAI_BASE !== OFFICIAL_OPENAI_BASE && !/^http:\/\/(127\.0\.0\.1|localhost)(:\d+)?(\/|$)/.test(OPENAI_BASE)) {
+  throw new Error(`EVAL_OPENAI_BASE_URL must be a localhost URL, not ${OPENAI_BASE}`);
+}
+const API_BASE = PROVIDER === "anthropic" ? "https://api.anthropic.com/v1" : OPENAI_BASE;
+// SHA-256 of evals/anchor-bank/fresh-pools-US.json.gz, as registered.
+export const FRESH_POOLS_SHA256 = "24cf78d3bad16ab633510ce55945a53ddb651e89c72825ae45dbd694f4db50fa";
 
 const SUBSET20 = [
   "gss_happy", "gss_health", "gss_satfin", "gss_trust", "gss_cappun",
@@ -110,7 +129,62 @@ let calls = 0, tokIn = 0, tokOut = 0, failedCalls = 0, spentUsd = 0;
 let logPath = null;
 
 function logCall(record) {
-  appendFileSync(logPath, JSON.stringify(record) + "\n");
+  appendFileSync(logPath, JSON.stringify({ api: API_BASE, ...record }) + "\n");
+}
+
+/** Replace a file in one step, so a crash mid-write cannot corrupt a resume file. */
+function writeAtomic(file, text) {
+  writeFileSync(`${file}.tmp`, text);
+  renameSync(`${file}.tmp`, file);
+}
+
+/**
+ * Calls, tokens and USD already in this run's log from earlier passes, so a
+ * resumed run's counts and spend cap are cumulative. A line cut off by a
+ * crash mid-write is kept, skipped and counted (the next pass starts on a new
+ * line); every complete line must have gone to this run's endpoint.
+ */
+function priorUsage(file) {
+  const prior = { calls: 0, failedCalls: 0, tokIn: 0, tokOut: 0, usd: 0, truncatedLines: 0 };
+  if (!existsSync(file)) return prior;
+  const text = readFileSync(file, "utf-8");
+  for (const line of text.split("\n").filter(Boolean)) {
+    let row;
+    try {
+      row = JSON.parse(line);
+    } catch {
+      prior.truncatedLines++;
+      continue;
+    }
+    if (row.api !== API_BASE) throw new Error(`${path.basename(file)} has calls to ${row.api}, not ${API_BASE}`);
+    if (row.usage) {
+      prior.calls++;
+      prior.tokIn += row.usage.in;
+      prior.tokOut += row.usage.out;
+      prior.usd += costUsd(MODEL, row.usage.in, row.usage.out);
+    } else prior.failedCalls++;
+  }
+  if (text && !text.endsWith("\n")) appendFileSync(file, "\n");
+  return prior;
+}
+
+// What an individual-simulation run reads: the commit it ran from, whether
+// those inputs differed from that commit, and their hashes.
+const RUN_INPUTS = [
+  "evals/run-anchor-bank-v2.mjs", "evals/models.mjs", "evals/anchor-bank/anchor-bank-v2.json",
+  "evals/anchor-bank/fresh-pools-US.json.gz", "public/data/v1/US.json",
+];
+
+function provenance() {
+  const sha = (f) => createHash("sha256").update(readFileSync(path.join(ROOT, f))).digest("hex");
+  let commit = "unknown";
+  try {
+    const git = (cmd) => execSync(cmd, { cwd: ROOT, stdio: ["ignore", "pipe", "ignore"] }).toString().trim();
+    const head = git("git rev-parse HEAD");
+    const dirty = git(`git status --porcelain --untracked-files=no -- ${RUN_INPUTS.join(" ")}`);
+    commit = dirty ? `${head}-inputs-modified` : head;
+  } catch {}
+  return { commit, inputs: Object.fromEntries(RUN_INPUTS.map((f) => [f, sha(f)])) };
 }
 
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
@@ -143,7 +217,7 @@ function requestFor(system, user, json, maxTokens) {
   };
   if (json) body.response_format = { type: "json_object" };
   return {
-    url: "https://api.openai.com/v1/chat/completions",
+    url: `${OPENAI_BASE}/chat/completions`,
     headers: {
       Authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
       "Content-Type": "application/json",
@@ -155,10 +229,12 @@ function requestFor(system, user, json, maxTokens) {
 /**
  * One elicitation. Rate limits, server errors and network failures retry with
  * backoff; after MAX_ATTEMPTS the call is logged as failed and returns "" so
- * the arm counts it as a failed elicitation. A request the API rejects (bad
- * parameter, unknown model) stops the run: retrying cannot fix it.
+ * the arm counts it as a failed elicitation, or, with `strict` (the
+ * individual-simulation arms), throws so the run stops and the item reruns on
+ * resume. A request the API rejects (bad parameter, unknown model, exhausted
+ * quota) stops the run: retrying cannot fix it.
  */
-async function llm(system, user, meta, { json = true, maxTokens = 700 } = {}) {
+async function llm(system, user, meta, { json = true, maxTokens = 700, strict = false } = {}) {
   if (spentUsd > MAX_USD) {
     throw new Error(`spend cap reached: $${spentUsd.toFixed(2)} > --max-usd ${MAX_USD}`);
   }
@@ -174,6 +250,7 @@ async function llm(system, user, meta, { json = true, maxTokens = 700 } = {}) {
       lastError = String(err);
       continue;
     }
+    if (data?.error?.code === "insufficient_quota") throw new Error(`${MODEL}: ${data.error.message}`);
     if (res.status === 429 || res.status >= 500) {
       lastError = `HTTP ${res.status}: ${data?.error?.message ?? ""}`;
       continue;
@@ -193,6 +270,9 @@ async function llm(system, user, meta, { json = true, maxTokens = 700 } = {}) {
   }
   failedCalls++;
   logCall({ at: new Date().toISOString(), responseId: null, system, user, content: null, error: lastError, ...meta });
+  if (strict) {
+    throw new Error(`${MODEL}: a call failed ${MAX_ATTEMPTS} times (${lastError}); ${meta.itemId} is not saved and reruns on resume`);
+  }
   return "";
 }
 
@@ -255,7 +335,7 @@ Reply with JSON only, integer percentages summing to 100:
 ${shape}`;
 }
 
-function parseDist(content, item) {
+export function parseDist(content, item) {
   const raw = extractJson(content);
   if (!raw) return null;
   const { opts } = optionsBlock(item);
@@ -445,6 +525,11 @@ const PERSONA_SYSTEM = `You are answering a survey as a specific American adult.
 
 `;
 
+/** System prompt for one person: the roleplay frame and their description. */
+export function personaSystemFor(p) {
+  return PERSONA_SYSTEM + describeSample(p);
+}
+
 function describeSample(p) {
   const earned = Math.round(p.employment_income + p.self_employment_income);
   const parts = [
@@ -599,18 +684,38 @@ async function runPersonaArm(item, samples, design) {
   return { topline: ok.length ? agg(ok) : null, slices, n: PERSONA_N, failures: results.length - ok.length };
 }
 
-async function runPersonaProbArm(item, samples) {
-  const rng = mulberry32(itemSeed(item.itemId, SEED));
-  const sample = equalProbabilitySample(samples, PERSONA_N, rng);
-  const user = personaProbPrompt(item);
-  const results = await mapLimit(sample, CONCURRENCY, async (p, idx) => {
-    const content = await llm(PERSONA_SYSTEM + describeSample(p), user, {
-      arm: "persona-prob", itemId: item.itemId, recordIdx: idx, variant: VARIANT, replicate: REPLICATE,
-    });
-    return { p, dist: parseDist(content, item) };
-  });
+// Individual-probability arms. "persona-prob" (model refresh, amendment 2)
+// asks 150 people drawn with equal probability from the released pool. The
+// individual-simulation study (paper/pap-individual-sim-2026-10.md) adds
+// "persona-prob-pool", which asks every record of the released pool, and
+// "persona-prob-fresh", which asks every record of an independent pool drawn
+// for the item from the full frame (pipeline/build_fresh_pools.py). Every
+// pool is a weight-proportional sample, so people are weighted equally.
+export const POOL_ARMS = ["persona-prob-pool", "persona-prob-fresh"];
+
+/** The people an individual-probability arm asks for an item: [{p, poolIdx}]. */
+export function probPeople(arm, item, samples, freshPools) {
+  if (arm === "persona-prob") {
+    const rng = mulberry32(itemSeed(item.itemId, SEED));
+    return equalProbabilitySample(samples.map((p, poolIdx) => ({ p, poolIdx })), PERSONA_N, rng);
+  }
+  if (arm === "persona-prob-pool") return samples.map((p, poolIdx) => ({ p, poolIdx }));
+  if (arm === "persona-prob-fresh") {
+    const pool = freshPools?.items?.[item.itemId]?.records;
+    if (!pool?.length) throw new Error(`${item.itemId}: no fresh pool (run pipeline/build_fresh_pools.py)`);
+    return pool.map((p, poolIdx) => ({ p, poolIdx }));
+  }
+  throw new Error(`not an individual-probability arm: ${arm}`);
+}
+
+/**
+ * Equal-weight estimates from individual distributions [{p, dist}] (dist null
+ * when the reply did not parse): the topline averages everyone who answered,
+ * each slice bin averages the people in it, and bins with fewer than 10
+ * people are not reported.
+ */
+export function aggregateIndividuals(item, results) {
   const ok = results.filter((r) => r.dist);
-  // Equal-probability draws from a PPS pool: average with equal weights.
   const agg = (list) => item.options.map((_, oi) => list.reduce((s, r) => s + r.dist[oi], 0) / list.length);
   const slices = {};
   if (VARIANT === "default") {
@@ -628,7 +733,27 @@ async function runPersonaProbArm(item, samples) {
       );
     }
   }
-  return { topline: ok.length ? agg(ok) : null, slices, n: PERSONA_N, failures: results.length - ok.length };
+  return { topline: ok.length ? agg(ok) : null, slices, n: results.length, failures: results.length - ok.length };
+}
+
+async function runPersonaProbArm(item, samples, arm, freshPools) {
+  const people = probPeople(arm, item, samples, freshPools);
+  const user = personaProbPrompt(item);
+  const results = await mapLimit(people, CONCURRENCY, async ({ p, poolIdx }, idx) => {
+    const content = await llm(personaSystemFor(p), user, {
+      arm, itemId: item.itemId, recordIdx: idx,
+      ...(arm === "persona-prob" ? {} : { poolIdx }),
+      variant: VARIANT, replicate: REPLICATE,
+    }, { strict: POOL_ARMS.includes(arm) });
+    return { p, poolIdx, dist: parseDist(content, item) };
+  });
+  const res = aggregateIndividuals(item, results);
+  // The pool arms keep every person's distribution, so the analysis can
+  // subsample people (registered K-curve) and check these aggregates.
+  if (POOL_ARMS.includes(arm)) {
+    res.people = results.map((r) => [r.poolIdx, r.dist ? r.dist.map((v) => Number(v.toFixed(6))) : null]);
+  }
+  return res;
 }
 
 // -------------------------------------------------------------------- main
@@ -641,6 +766,28 @@ async function main() {
   const bank = JSON.parse(readFileSync(path.join(import.meta.dirname, "anchor-bank", "anchor-bank-v2.json"), "utf-8"));
   const us = JSON.parse(readFileSync(path.join(ROOT, "public", "data", "v1", "US.json"), "utf-8"));
   const cells = coarsenCells(us.table.cells, GRANULARITY);
+  let freshPools = null;
+  if (ARMS.includes("persona-prob-fresh")) {
+    const raw = readFileSync(path.join(import.meta.dirname, "anchor-bank", "fresh-pools-US.json.gz"));
+    const sha = createHash("sha256").update(raw).digest("hex");
+    if (sha !== FRESH_POOLS_SHA256) throw new Error(`fresh-pools-US.json.gz is not the registered file (SHA-256 ${sha})`);
+    freshPools = JSON.parse(gunzipSync(raw).toString("utf-8"));
+  }
+
+  // Individual-simulation runs (paper/pap-individual-sim-2026-10.md): one arm
+  // per run, the registered artifact name, all items, the default variant,
+  // replicate and granularity, and a spend cap.
+  const poolArm = ARMS.find((a) => POOL_ARMS.includes(a));
+  if (poolArm) {
+    const expected = `individual-sim-${MODEL}-${poolArm.replace("persona-prob-", "")}.json`;
+    if (ARMS.length !== 1) throw new Error(`run ${poolArm} on its own, not with ${ARMS.join(",")}`);
+    if (path.basename(ARTIFACT) !== expected) throw new Error(`${poolArm} writes --artifact ${expected}`);
+    if (ITEMS_SEL !== "all") throw new Error(`${poolArm} runs --items all`);
+    if (VARIANT !== "default" || REPLICATE !== "0" || GRANULARITY !== 149) {
+      throw new Error(`${poolArm} runs the default variant, replicate 0 and granularity 149`);
+    }
+    if (!Number.isFinite(MAX_USD)) throw new Error(`${poolArm} needs --max-usd`);
+  }
   console.log(`bank v2: ${bank.items.length} items; cells at granularity ${GRANULARITY}: ${cells.length}`);
 
   let items = bank.items;
@@ -662,6 +809,20 @@ async function main() {
   const artifact = existsSync(ARTIFACT)
     ? JSON.parse(readFileSync(ARTIFACT, "utf-8"))
     : { version: "anchor-run-v2", bank: bank.version, promptVersion: PROMPT_VERSION, results: {} };
+  if (poolArm) {
+    if (existsSync(`${logPath}.gz`)) throw new Error(`${path.basename(logPath)}.gz exists: this run was finished and compressed`);
+    artifact.api ??= API_BASE;
+    if (artifact.api !== API_BASE) throw new Error(`${path.basename(ARTIFACT)} was written against ${artifact.api}, not ${API_BASE}`);
+    const prior = priorUsage(logPath);
+    ({ calls, failedCalls, tokIn, tokOut } = prior);
+    spentUsd = prior.usd;
+    if (spentUsd > 0) console.log(`resuming: $${spentUsd.toFixed(2)} already spent in ${path.basename(logPath)}`);
+    // Every pass (first run or resume) records when it started and what it ran from.
+    artifact.passes = [...(artifact.passes ?? []), {
+      startedAt: new Date().toISOString(), ...provenance(), priorTruncatedLogLines: prior.truncatedLines,
+    }];
+    writeAtomic(ARTIFACT, JSON.stringify(artifact, null, 1));
+  }
 
   for (const item of items) {
     artifact.results[item.itemId] ??= {};
@@ -673,10 +834,10 @@ async function main() {
       if (arm === "cells") res = await runCellsArm(item, cells);
       else if (arm === "naive") res = await runNaiveArm(item);
       else if (arm === "persona" || arm === "persona-july") res = await runPersonaArm(item, us.samples, arm);
-      else if (arm === "persona-prob") res = await runPersonaProbArm(item, us.samples);
+      else if (arm === "persona-prob" || POOL_ARMS.includes(arm)) res = await runPersonaProbArm(item, us.samples, arm, freshPools);
       else throw new Error(`arm ${arm} not supported in v2 runner`);
       artifact.results[item.itemId][key] = { ...res, ms: Date.now() - t0 };
-      writeFileSync(ARTIFACT, JSON.stringify(artifact, null, 1));
+      writeAtomic(ARTIFACT, JSON.stringify(artifact, null, 1));
       const pos = item.positiveOptions.reduce((s, oi) => s + (res.topline?.[oi] ?? 0), 0);
       const human = item.positiveOptions.reduce((s, oi) => s + item.targets.overall.dist[oi], 0);
       console.log(`${item.itemId} ${key}: est ${pos.toFixed(3)} vs human ${human.toFixed(3)} (err ${Math.abs(pos - human).toFixed(3)})`);
@@ -686,8 +847,10 @@ async function main() {
   artifact.usage[`${PROVIDER}:${MODEL}:${ARMS.join("+")}:${ITEMS_SEL}:${runTag}`] = {
     calls, failedCalls, tokIn, tokOut, usd: Number(spentUsd.toFixed(4)),
     request: requestExtras(MODEL), at: new Date().toISOString(), log: path.basename(logPath),
+    // Pool arms count every pass in the log, not only this one.
+    ...(poolArm ? { api: API_BASE, ...provenance(), cumulative: true } : {}),
   };
-  writeFileSync(ARTIFACT, JSON.stringify(artifact, null, 1));
+  writeAtomic(ARTIFACT, JSON.stringify(artifact, null, 1));
   console.log(`done: ${calls} calls (${failedCalls} failed), tokens ${tokIn}/${tokOut}, ~$${spentUsd.toFixed(2)}, log ${path.basename(logPath)}`);
 }
 

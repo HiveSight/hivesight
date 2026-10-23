@@ -53,6 +53,7 @@ SERVED = ["gpt-6-luna", "gpt-6.1-sol"]
 
 
 REFRESH_START = "2026-10-21"  # per-call log timestamps on/after this belong to the refresh
+REFRESH_END = "2026-10-23"  # and before this (the individual-simulation study's logs come later)
 
 
 def prices():
@@ -72,7 +73,7 @@ def log_costs(model):
     for path in sorted(glob.glob(A("evals", "results", "logs", f"v2-{PROVIDER[model]}-{model}-*.jsonl"))):
         for line in open(path):
             row = json.loads(line)
-            if row.get("at", "") < REFRESH_START:
+            if not REFRESH_START <= row.get("at", "") < REFRESH_END:
                 continue
             if row.get("content") is None and row.get("error"):
                 failed += 1
@@ -173,16 +174,23 @@ def score(items, getter, item_ids):
     }
 
 
-def paired(items, get_a, get_b, item_ids, rng):
-    """Bootstrap (items resampled) CI on A minus B: topline MAE and bin-pooled
+def item_errors(item, res):
+    """(topline abs error, {(family, label): abs error}) for one item's arm
+    result, or None when the arm produced no topline."""
+    top = topline_err(item, res)
+    return None if top is None else (top, bin_errs(item, res))
+
+
+def paired_errors(errs_a, errs_b, item_ids, rng):
+    """Bootstrap (items resampled) CI on A minus B from per-item errors
+    {itemId: (topline error, {bin: error})}: topline MAE and bin-pooled
     subgroup MAE over bins both arms estimated."""
     rows = []
     for iid in item_ids:
-        ra, rb = get_a(iid), get_b(iid)
-        ta, tb = topline_err(items[iid], ra), topline_err(items[iid], rb)
-        if ta is None or tb is None:
+        ea, eb = errs_a.get(iid), errs_b.get(iid)
+        if ea is None or eb is None:
             continue
-        ba, bb = bin_errs(items[iid], ra), bin_errs(items[iid], rb)
+        (ta, ba), (tb, bb) = ea, eb
         common = sorted(set(ba) & set(bb))
         rows.append((ta - tb, [ba[k] - bb[k] for k in common]))
     if not rows:
@@ -206,6 +214,14 @@ def paired(items, get_a, get_b, item_ids, rng):
         "topline": ci(top.mean(), boot_top),
         "subgroup": ci(bin_sums.sum() / bin_counts.sum(), boot_sub) if bin_counts.sum() else None,
     }
+
+
+def paired(items, get_a, get_b, item_ids, rng):
+    """Bootstrap (items resampled) CI on A minus B: topline MAE and bin-pooled
+    subgroup MAE over bins both arms estimated."""
+    def errs(get):
+        return {iid: item_errors(items[iid], get(iid)) for iid in item_ids}
+    return paired_errors(errs(get_a), errs(get_b), item_ids, rng)
 
 
 def main():
