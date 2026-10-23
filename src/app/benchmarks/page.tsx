@@ -210,7 +210,10 @@ type Score = { items: number; toplineMAE: number | null; subgroupMAE: number | n
  */
 function IndividualStudy() {
   const sim = individualSim as unknown as {
-    models: Record<string, Record<string, { census?: { all63?: Score }; byK?: Record<string, { all63: Score }> }>>;
+    models: Record<
+      string,
+      Record<string, { census?: { all63?: Score }; byK?: Record<string, { all63: Score }>; flaggedItems?: string[] }>
+    >;
     Q1_individualVsCells: Record<string, { all63: Paired; other43: Paired }>;
     Q2_individualVsDirect: Record<string, { all63: Paired }>;
     Q4_freshPools: { vsPool: Paired; vsCells: Paired };
@@ -236,6 +239,7 @@ function IndividualStudy() {
   const small = lunaByK?.["150"]?.all63.subgroupMAE;
   const census = lunaByK?.["1200"]?.all63.subgroupMAE;
   const flat = small != null && census != null && Math.abs(small - census) < 0.005;
+  const flagged = [...new Set(rows.flatMap((r) => sim.models[r.model][r.arm].flaggedItems ?? []))];
   return (
     <section className="mt-10">
       <h2 className="text-xl font-bold tracking-tight mb-2">Simulated people — October 2026 study</h2>
@@ -249,8 +253,8 @@ function IndividualStudy() {
         >
           registered before the runs
         </a>
-        . Error in points; the last column is the difference from the same model&apos;s population
-        cells with a 95% interval from resampling questions (positive means cells are more accurate).
+        . Error in points; the last two columns are differences from the same model&apos;s population
+        cells, with 95% intervals from resampling questions (positive means cells are more accurate).
       </p>
       <div className="overflow-x-auto rounded-lg border border-line">
         <table className="w-full min-w-[40rem] text-sm">
@@ -343,6 +347,13 @@ function IndividualStudy() {
             </>
           )}
         </p>
+        {flagged.length > 0 && (
+          <p>
+            More than one in ten simulated people gave no usable answer on {flagged.join(", ")} for
+            at least one row above, which the registered rules count as not covered; the
+            registration&apos;s post-run notes explain why.
+          </p>
+        )}
         {retest && retest.meanWithinItemPearson != null && (
           <p>
             Asked the same question twice, a simulated person&apos;s answer share correlates{" "}
