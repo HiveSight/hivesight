@@ -2,6 +2,7 @@ import Link from "next/link";
 import { AskForm } from "@/components/ask-form";
 import refresh from "../../paper/artifacts/model-refresh.json";
 import { DEFAULT_MODEL } from "@/engine/models";
+import { individualModeEnabled } from "@/engine/individual-study";
 
 type Score = { toplineMAE: number; subgroupMAE: number; items: number };
 const served = (
@@ -33,7 +34,7 @@ export default function HomePage() {
         </p>
       </section>
 
-      <AskForm />
+      <AskForm individualMode={individualModeEnabled()} />
 
       <section className="mt-24 grid gap-10 sm:grid-cols-3">
         {[

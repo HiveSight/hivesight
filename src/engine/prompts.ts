@@ -150,6 +150,63 @@ export function describeSample(p: SampleRecord, geography: GeographyRef): string
 }
 
 /**
+ * Individual mode (paper/pap-individual-sim-2026-10.md): each sampled person
+ * reports how likely they are to give each answer. The system prompt and the
+ * second-person description are the benchmark runner's persona prompts
+ * (evals/run-anchor-bank-v2.mjs), kept verbatim, including the stray period
+ * after the place ("...living in the United States. with ..."), so measured
+ * accuracy describes what the product sends. Parity tests pin this.
+ */
+export const PERSONA_SYSTEM_PROMPT = `You are answering a survey as a specific American adult. Answer as this person honestly would, based on their circumstances.
+
+`;
+
+export function describePersona(p: SampleRecord, geography: GeographyRef): string {
+  const earned = Math.round(p.employment_income + p.self_employment_income);
+  const where = geography.type === "national" ? "the United States" : geography.label;
+  const parts = [
+    `You are a ${p.age}-year-old ${p.is_female ? "woman" : "man"} living in ${where}`,
+    earned > 0
+      ? `with personal earned income of about $${earned.toLocaleString()} per year`
+      : "with no wage or self-employment income this year",
+    p.tenure_type === 1 ? "You own your home" : "You rent your home",
+    p.children_count > 0
+      ? `You have ${p.children_count} child${p.children_count > 1 ? "ren" : ""} at home`
+      : "You have no children at home",
+  ];
+  const benefits = [];
+  if (p.receives_snap) benefits.push("SNAP");
+  if (p.receives_ssi) benefits.push("SSI");
+  if (p.receives_social_security) benefits.push("Social Security");
+  if (p.receives_unemployment) benefits.push("unemployment insurance");
+  if (benefits.length) parts.push(`You receive ${benefits.join(", ")}`);
+  if (p.is_in_college) parts.push("You are in college");
+  if (p.is_disabled) parts.push("You have a disability");
+  return parts.join(". ") + ".";
+}
+
+/**
+ * The benchmarked individual-probability question. When the asker lists a
+ * nonresponse option, shares cover every listed option instead (as v4.1 does
+ * for cells).
+ */
+export function personaProbUserPrompt(question: string, format: ResponseFormat): string {
+  const elicited = elicitationFormat(format);
+  const { optionsText, jsonShape } = formatBlock(elicited);
+  const listsNonresponse = elicited.kind === "choice" && elicited.options.some(isNonresponseOption);
+  const shares = listsNonresponse
+    ? "integer percentages summing to 100 across all the answers listed, including any don't-know or refusal answer."
+    : "integer percentages summing to 100, with no share for don't know or refused.";
+  const stem = format.kind === "likert5" ? "Survey statement" : "Survey question";
+  return `${stem}: "${question}"
+
+${optionsText}
+
+How likely are you to give each of these answers? Reply with JSON only: ${shares}
+${jsonShape}`;
+}
+
+/**
  * Verbatims are illustrative color, not the estimator. The prompt asks for a
  * plausible individual voice consistent with the group's known distribution.
  */

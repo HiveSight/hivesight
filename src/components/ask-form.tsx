@@ -2,7 +2,10 @@
 
 import { useState } from "react";
 import { IconPlayerPlay } from "@tabler/icons-react";
-import type { RunProgress, RunResult } from "@/engine/types";
+import type { ElicitationMode, RunProgress, RunResult } from "@/engine/types";
+import { DEFAULT_MODEL } from "@/engine/models";
+import { individualBenchmarkFor, INDIVIDUAL_MODELS, INDIVIDUAL_PEOPLE } from "@/engine/individual-study";
+import refresh from "../../paper/artifacts/model-refresh.json";
 import {
   AGE_BANDS,
   BENEFITS,
@@ -36,7 +39,26 @@ const FILTER_GROUPS: Array<{
   { key: "benefits", label: "Means-tested benefits", options: BENEFITS, detailed: true },
 ];
 
-export function AskForm() {
+const pts = (v: number) => `${(v * 100).toFixed(1)}`;
+
+/** The opt-in individual mode, offered only when the registered study supports it for the default model. */
+function IndividualModeNote() {
+  const individual = individualBenchmarkFor(DEFAULT_MODEL);
+  const cells = (refresh.servedBenchmark as Record<string, { topline: number; subgroup: number }>)[DEFAULT_MODEL];
+  if (!individual?.topline || !individual.subgroup) return null;
+  return (
+    <p className="mt-2 text-xs text-muted">
+      Experimental. Asks up to {INDIVIDUAL_PEOPLE.toLocaleString()} simulated people from the
+      population sample how likely they are to give each answer, then averages them. Benchmark
+      error: {pts(individual.topline)} points nationally and {pts(individual.subgroup)} for subgroups
+      {cells ? ` (population cells: ${pts(cells.topline)} and ${pts(cells.subgroup)})` : ""}. Takes
+      longer than population cells.
+    </p>
+  );
+}
+
+export function AskForm({ individualMode = false }: { individualMode?: boolean }) {
+  const individualOffered = individualMode && INDIVIDUAL_MODELS.includes(DEFAULT_MODEL);
   const [question, setQuestion] = useState("");
   const [formatKind, setFormatKind] = useState<FormatKind>("likert5");
   const [choiceOptions, setChoiceOptions] = useState("");
@@ -45,6 +67,7 @@ export function AskForm() {
   const [districtValue, setDistrictValue] = useState("");
   const [filters, setFilters] = useState<Record<string, string[]>>({});
   const [showFilters, setShowFilters] = useState(false);
+  const [mode, setMode] = useState<ElicitationMode>("cells");
 
   const [running, setRunning] = useState(false);
   const [progress, setProgress] = useState<RunProgress | null>(null);
@@ -103,6 +126,7 @@ export function AskForm() {
             geography: geography(),
             filters: Object.fromEntries(Object.entries(filters).filter(([, v]) => v.length)),
           },
+          mode,
         }),
       });
       if (!res.ok || !res.body) {
@@ -290,10 +314,40 @@ export function AskForm() {
               </div>
             ))}
             <p className="text-xs text-faint">
-              Housing, children, and benefits filters apply to the detailed
-              population cells that carry those attributes.
+              {mode === "individual"
+                ? "Filters select the simulated people who match them."
+                : "Housing, children, and benefits filters apply to the detailed population cells that carry those attributes."}
             </p>
           </div>
+        )}
+
+        {individualOffered && (
+          <fieldset className="mt-5 border-t border-line pt-4">
+            <legend className="eyebrow">Method</legend>
+            <div className="mt-2 flex flex-wrap gap-2">
+              {(
+                [
+                  ["cells", "Population cells"],
+                  ["individual", "Simulated people"],
+                ] as const
+              ).map(([value, label]) => (
+                <button
+                  key={value}
+                  type="button"
+                  onClick={() => setMode(value)}
+                  aria-pressed={mode === value}
+                  className={`rounded-full border px-3 py-1 text-xs ${
+                    mode === value
+                      ? "border-indigo bg-indigo text-paper"
+                      : "border-line text-muted hover:text-ink hover:border-faint"
+                  }`}
+                >
+                  {label}
+                </button>
+              ))}
+            </div>
+            {mode === "individual" && <IndividualModeNote />}
+          </fieldset>
         )}
 
         <div className="mt-5 flex items-center gap-4">

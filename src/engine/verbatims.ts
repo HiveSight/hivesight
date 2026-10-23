@@ -14,7 +14,7 @@ import type {
 } from "./types";
 import { optionIds } from "./types";
 
-function mulberry32(seed: number) {
+export function mulberry32(seed: number) {
   let a = seed >>> 0;
   return function () {
     a |= 0;
