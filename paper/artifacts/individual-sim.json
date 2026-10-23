@@ -1,0 +1,1329 @@
+{
+ "D1_testRetest": {
+  "gpt-6-luna": {
+   "items": 20,
+   "itemsWithPearson": 20,
+   "meanWithinItemAbsDiff": 0.033889999999999997,
+   "meanWithinItemPearson": 0.8055065868780398,
+   "meanWithinItemSD": 0.13556339781333143,
+   "pairs": 3000
+  },
+  "gpt-6.1-sol": {
+   "items": 20,
+   "itemsWithPearson": 20,
+   "meanWithinItemAbsDiff": 0.015648322147651012,
+   "meanWithinItemPearson": 0.9665091611354946,
+   "meanWithinItemSD": 0.1450856056309257,
+   "pairs": 2999
+  }
+ },
+ "D4_subset20": {
+  "gpt-6-luna": {
+   "vsPersona": {
+    "bins": 183,
+    "items": 20,
+    "subgroup": {
+     "diff": -0.11172706422298222,
+     "hi": -0.07130807715961615,
+     "lo": -0.15593727804879873
+    },
+    "topline": {
+     "diff": -0.11295091057377733,
+     "hi": -0.05959564534532879,
+     "lo": -0.16377073639628234
+    }
+   },
+   "vsPersonaProb150": {
+    "bins": 183,
+    "items": 20,
+    "subgroup": {
+     "diff": -0.0023399095296054405,
+     "hi": 0.0006151960462571249,
+     "lo": -0.006049548335579556
+    },
+    "topline": {
+     "diff": -0.001900833333333407,
+     "hi": 0.0019650937499998762,
+     "lo": -0.007066718750000162
+    }
+   }
+  },
+  "gpt-6.1-sol": {
+   "vsPersona": {
+    "bins": 183,
+    "items": 20,
+    "subgroup": {
+     "diff": -0.13199081306048516,
+     "hi": -0.08761766754187479,
+     "lo": -0.1795582635519753
+    },
+    "topline": {
+     "diff": -0.14445355618973638,
+     "hi": -0.09194748864776746,
+     "lo": -0.19593112262875026
+    }
+   },
+   "vsPersonaProb150": {
+    "bins": 183,
+    "items": 20,
+    "subgroup": {
+     "diff": -0.0036646994563503347,
+     "hi": -0.0010015127743006832,
+     "lo": -0.006686860656344288
+    },
+    "topline": {
+     "diff": -0.0028539978164969907,
+     "hi": 0.0006155892164585306,
+     "lo": -0.007492190561613841
+    }
+   }
+  }
+ },
+ "D5_postStratified": {
+  "gpt-6-luna|persona-prob-fresh": {
+   "all63": {
+    "bins": 548,
+    "expectedBinsShown": 548.0,
+    "items": 63,
+    "subgroupMAE": 0.09943847787181855,
+    "subgroupMAE_itemMean": 0.09568460330201148,
+    "toplineMAE": 0.09168800104544818
+   },
+   "meanPopulationShareWithoutPoolMembers": 0.0018268989320798551,
+   "vsCensus": {
+    "bins": 548,
+    "items": 63,
+    "subgroup": {
+     "diff": -0.00022148643129485775,
+     "hi": 0.00023504093564443118,
+     "lo": -0.0007011311753902343
+    },
+    "topline": {
+     "diff": -0.0003252357843567676,
+     "hi": 0.0003571671589585061,
+     "lo": -0.0011171844987063156
+    }
+   }
+  },
+  "gpt-6-luna|persona-prob-pool": {
+   "all63": {
+    "bins": 548,
+    "expectedBinsShown": 548.0,
+    "items": 63,
+    "subgroupMAE": 0.09970090688166708,
+    "subgroupMAE_itemMean": 0.09601086338758243,
+    "toplineMAE": 0.09205984503511633
+   },
+   "meanPopulationShareWithoutPoolMembers": 0.0005997087051906989,
+   "vsCensus": {
+    "bins": 548,
+    "items": 63,
+    "subgroup": {
+     "diff": 0.0006940901065581634,
+     "hi": 0.0014631596059491644,
+     "lo": -2.0011457957036685e-05
+    },
+    "topline": {
+     "diff": 0.0004380145310504066,
+     "hi": 0.001472594894851426,
+     "lo": -0.0006519941031991776
+    }
+   }
+  },
+  "gpt-6.1-sol|persona-prob-pool": {
+   "all63": {
+    "bins": 548,
+    "expectedBinsShown": 548.0,
+    "items": 63,
+    "subgroupMAE": 0.08369802702227414,
+    "subgroupMAE_itemMean": 0.080614322557169,
+    "toplineMAE": 0.07449540966080608
+   },
+   "meanPopulationShareWithoutPoolMembers": 0.0005997087051906989,
+   "vsCensus": {
+    "bins": 548,
+    "items": 63,
+    "subgroup": {
+     "diff": 0.00031396057979496823,
+     "hi": 0.001016420267415924,
+     "lo": -0.0003630583153340279
+    },
+    "topline": {
+     "diff": -0.00019137790840735163,
+     "hi": 0.0007457305754092852,
+     "lo": -0.0010762031691849327
+    }
+   }
+  }
+ },
+ "Q1_individualVsCells": {
+  "gpt-6-luna": {
+   "all63": {
+    "bins": 548,
+    "items": 63,
+    "subgroup": {
+     "diff": 0.020764324711089518,
+     "hi": 0.03522007650439563,
+     "lo": 0.005560107862385427
+    },
+    "topline": {
+     "diff": 0.027509688847579886,
+     "hi": 0.04611106214006464,
+     "lo": 0.008484026968249302
+    }
+   },
+   "other43": {
+    "bins": 356,
+    "items": 43,
+    "subgroup": {
+     "diff": 0.016750729055065226,
+     "hi": 0.03616371559515507,
+     "lo": -0.003072458358819506
+    },
+    "topline": {
+     "diff": 0.021624761094407932,
+     "hi": 0.043285972203551466,
+     "lo": -0.0006403171893117222
+    }
+   }
+  },
+  "gpt-6.1-sol": {
+   "all63": {
+    "bins": 548,
+    "items": 63,
+    "subgroup": {
+     "diff": 0.021054256665625094,
+     "hi": 0.033293178720952506,
+     "lo": 0.008242595072880962
+    },
+    "topline": {
+     "diff": 0.02905371076980729,
+     "hi": 0.04509740707733093,
+     "lo": 0.013399049271762397
+    }
+   },
+   "other43": {
+    "bins": 356,
+    "items": 43,
+    "subgroup": {
+     "diff": 0.021639420220721812,
+     "hi": 0.037713116815248374,
+     "lo": 0.004710473355655772
+    },
+    "topline": {
+     "diff": 0.023829886291975452,
+     "hi": 0.041648032187334164,
+     "lo": 0.005975070381240412
+    }
+   }
+  }
+ },
+ "Q2_individualVsDirect": {
+  "gpt-6-luna": {
+   "all63": {
+    "bins": 548,
+    "items": 63,
+    "subgroup": {
+     "diff": 0.024380991006201478,
+     "hi": 0.040157234274071606,
+     "lo": 0.008515911256014601
+    },
+    "topline": {
+     "diff": 0.028544026508757342,
+     "hi": 0.04756237882856101,
+     "lo": 0.009919083841954003
+    }
+   },
+   "other43": {
+    "bins": 356,
+    "items": 43,
+    "subgroup": {
+     "diff": 0.01550104140787186,
+     "hi": 0.03341861166428169,
+     "lo": -0.0023861854531114527
+    },
+    "topline": {
+     "diff": 0.02223279955490551,
+     "hi": 0.042468981000557154,
+     "lo": 0.0006934108318859564
+    }
+   }
+  },
+  "gpt-6.1-sol": {
+   "all63": {
+    "bins": 548,
+    "items": 63,
+    "subgroup": {
+     "diff": 0.027344753350980706,
+     "hi": 0.04170842275746986,
+     "lo": 0.013162795583699644
+    },
+    "topline": {
+     "diff": 0.0306233041230034,
+     "hi": 0.04816359009094657,
+     "lo": 0.014159945923645383
+    }
+   },
+   "other43": {
+    "bins": 356,
+    "items": 43,
+    "subgroup": {
+     "diff": 0.021861634963074264,
+     "hi": 0.03888804858173124,
+     "lo": 0.005053122108188507
+    },
+    "topline": {
+     "diff": 0.023459831978809922,
+     "hi": 0.04276876451469055,
+     "lo": 0.004482846404373203
+    }
+   }
+  }
+ },
+ "Q3_byKVsCells": {
+  "gpt-6-luna": {
+   "1200": {
+    "bins": 548,
+    "items": 63,
+    "subgroup": {
+     "diff": 0.020764324711089518,
+     "hi": 0.03522007650439563,
+     "lo": 0.005560107862385427
+    },
+    "topline": {
+     "diff": 0.027509688847579886,
+     "hi": 0.04611106214006464,
+     "lo": 0.008484026968249302
+    }
+   },
+   "150": {
+    "bins": 548,
+    "items": 63,
+    "subgroup": {
+     "diff": 0.02108240362321375,
+     "hi": 0.03602410986235204,
+     "lo": 0.005634147017192667
+    },
+    "topline": {
+     "diff": 0.02753331959021025,
+     "hi": 0.046188538446190815,
+     "lo": 0.008452357405366762
+    }
+   },
+   "300": {
+    "bins": 548,
+    "items": 63,
+    "subgroup": {
+     "diff": 0.020929899818096554,
+     "hi": 0.0359111773350071,
+     "lo": 0.005768021635557727
+    },
+    "topline": {
+     "diff": 0.02749713028136686,
+     "hi": 0.04633959884833117,
+     "lo": 0.008848461531139952
+    }
+   },
+   "600": {
+    "bins": 548,
+    "items": 63,
+    "subgroup": {
+     "diff": 0.020875807808589778,
+     "hi": 0.035928878649958924,
+     "lo": 0.005820867557579445
+    },
+    "topline": {
+     "diff": 0.02753907788653202,
+     "hi": 0.04617717709888365,
+     "lo": 0.008852813874118277
+    }
+   }
+  },
+  "gpt-6.1-sol": {
+   "1200": {
+    "bins": 548,
+    "items": 63,
+    "subgroup": {
+     "diff": 0.021054256665625094,
+     "hi": 0.033293178720952506,
+     "lo": 0.008242595072880962
+    },
+    "topline": {
+     "diff": 0.02905371076980729,
+     "hi": 0.04509740707733093,
+     "lo": 0.013399049271762397
+    }
+   },
+   "150": {
+    "bins": 548,
+    "items": 63,
+    "subgroup": {
+     "diff": 0.021812415350086205,
+     "hi": 0.034268519125426694,
+     "lo": 0.009273778704877724
+    },
+    "topline": {
+     "diff": 0.02931558341846725,
+     "hi": 0.045710714728207445,
+     "lo": 0.013964360245236668
+    }
+   },
+   "300": {
+    "bins": 548,
+    "items": 63,
+    "subgroup": {
+     "diff": 0.02126055775149074,
+     "hi": 0.03369243268468514,
+     "lo": 0.00886263331340407
+    },
+    "topline": {
+     "diff": 0.029078306068150362,
+     "hi": 0.045528971789458174,
+     "lo": 0.013508177051769089
+    }
+   },
+   "600": {
+    "bins": 548,
+    "items": 63,
+    "subgroup": {
+     "diff": 0.021120703633239382,
+     "hi": 0.03323810050270894,
+     "lo": 0.008489873813950806
+    },
+    "topline": {
+     "diff": 0.02908352254639771,
+     "hi": 0.044695459577757134,
+     "lo": 0.013526287327799678
+    }
+   }
+  }
+ },
+ "Q4_freshPools": {
+  "vsCells": {
+   "bins": 548,
+   "items": 63,
+   "subgroup": {
+    "diff": 0.021417472239094012,
+    "hi": 0.036272611990686134,
+    "lo": 0.00608124668104865
+   },
+   "topline": {
+    "diff": 0.0279010951733189,
+    "hi": 0.04649126605612266,
+    "lo": 0.008831931419038905
+   }
+  },
+  "vsPool": {
+   "bins": 548,
+   "items": 63,
+   "subgroup": {
+    "diff": 0.0006531475280044916,
+    "hi": 0.0017747150300542892,
+    "lo": -0.00042499284695286907
+   },
+   "topline": {
+    "diff": 0.0003914063257390189,
+    "hi": 0.0016517568548395484,
+    "lo": -0.0008208002645502665
+   }
+  }
+ },
+ "Q5_lunaVsSol": {
+  "bins": 548,
+  "items": 63,
+  "subgroup": {
+   "diff": 0.015622750332629767,
+   "hi": 0.02545912114942959,
+   "lo": 0.0054644744639611225
+  },
+  "topline": {
+   "diff": 0.016935042934852488,
+   "hi": 0.029154542157457337,
+   "lo": 0.004342434257198272
+  }
+ },
+ "exploratory": {
+  "E1_satjobAbstentionsAsOutOfUniverse": {
+   "abstentions": {
+    "gpt-6-luna|persona-prob-fresh": {
+     "peopleWithNoEarnings": 457,
+     "unparsed": 387,
+     "unparsedWithNoEarnings": 387
+    },
+    "gpt-6-luna|persona-prob-pool": {
+     "peopleWithNoEarnings": 460,
+     "unparsed": 389,
+     "unparsedWithNoEarnings": 389
+    },
+    "gpt-6.1-sol|persona-prob-pool": {
+     "peopleWithNoEarnings": 460,
+     "unparsed": 0,
+     "unparsedWithNoEarnings": 0
+    }
+   },
+   "individualBenchmark": {},
+   "productRule": {
+    "addedErrorVsCensusByK": {
+     "150": {
+      "bins": 548,
+      "items": 63,
+      "subgroup": {
+       "diff": 0.0006043890379165622,
+       "hi": 0.0010389210925004124,
+       "lo": 0.0002661856528172537
+      },
+      "topline": {
+       "diff": 2.363074263036728e-05,
+       "hi": 0.00018399749557473675,
+       "lo": -0.00013027966539290908
+      }
+     },
+     "300": {
+      "bins": 548,
+      "items": 63,
+      "subgroup": {
+       "diff": 0.00024078722233366492,
+       "hi": 0.0004741870078455207,
+       "lo": 6.010694903004765e-05
+      },
+      "topline": {
+       "diff": -1.2558566213025472e-05,
+       "hi": 8.036245640413125e-05,
+       "lo": -0.00010181187309133064
+      }
+     },
+     "600": {
+      "bins": 548,
+      "items": 63,
+      "subgroup": {
+       "diff": 0.00011148309750026054,
+       "hi": 0.0002027771397177188,
+       "lo": 3.2186901689406246e-05
+      },
+      "topline": {
+       "diff": 2.938903895213864e-05,
+       "hi": 8.810476190475165e-05,
+       "lo": -2.5253818190715673e-05
+      }
+     }
+    },
+    "defaultEligible": false,
+    "defaultToplineMargin": 0.01,
+    "gate": {
+     "byModel": {
+      "gpt-6-luna": {
+       "addedErrorAtKStar": {
+        "subgroup": 0.0006043890379165622,
+        "topline": 2.363074263036728e-05
+       },
+       "complete": true,
+       "flaggedItems": [],
+       "gapToCells": {
+        "subgroup": 0.02136871374900608,
+        "topline": 0.027533319590210253
+       },
+       "passes": false
+      },
+      "gpt-6.1-sol": {
+       "addedErrorAtKStar": {
+        "subgroup": 0.0007252572134658055,
+        "topline": 0.00026187264865995704
+       },
+       "complete": true,
+       "flaggedItems": [],
+       "gapToCells": {
+        "subgroup": 0.021779513879090898,
+        "topline": 0.029315583418467246
+       },
+       "passes": false
+      }
+     },
+     "margin": 0.02
+    },
+    "kTolerance": 0.005,
+    "people": 150
+   }
+  },
+  "E2_signedToplineError": {
+   "gpt-6-luna": {
+    "largestGapsToCells": [
+     {
+      "cellsSigned": -0.10058877341504768,
+      "individualSigned": -0.3170005546115755,
+      "itemId": "shed_b2"
+     },
+     {
+      "cellsSigned": -0.08233608923122487,
+      "individualSigned": -0.2667553739987615,
+      "itemId": "shed_ef7"
+     },
+     {
+      "cellsSigned": -0.0059229581188072755,
+      "individualSigned": 0.1892378950921555,
+      "itemId": "shed_housing_stress"
+     },
+     {
+      "cellsSigned": 0.06726451685929974,
+      "individualSigned": 0.24577223261054965,
+      "itemId": "gss_fear"
+     },
+     {
+      "cellsSigned": -0.06843013512852247,
+      "individualSigned": -0.20054767331107404,
+      "itemId": "shed_ef1"
+     },
+     {
+      "cellsSigned": 0.0072316397260684395,
+      "individualSigned": -0.13552309368765306,
+      "itemId": "gss_finrela"
+     },
+     {
+      "cellsSigned": -0.014293846753904771,
+      "individualSigned": -0.14199836687596618,
+      "itemId": "gss_satjob"
+     },
+     {
+      "cellsSigned": -0.1292048988446166,
+      "individualSigned": -0.24909872339384992,
+      "itemId": "gss_getahead"
+     }
+    ],
+    "meanSignedToplineErrorByValence": {
+     "negative": {
+      "cells": 0.027838632368346206,
+      "individual": 0.19050277515013847,
+      "items": 3
+     },
+     "neutral": {
+      "cells": -0.015580930405537126,
+      "individual": 0.01845242705626572,
+      "items": 44
+     },
+     "positive": {
+      "cells": 0.04143536243880183,
+      "individual": -0.06737682376392838,
+      "items": 16
+     }
+    }
+   },
+   "gpt-6.1-sol": {
+    "largestGapsToCells": [
+     {
+      "cellsSigned": -0.04711637719274031,
+      "individualSigned": -0.24717555461157303,
+      "itemId": "shed_b2"
+     },
+     {
+      "cellsSigned": -0.016752316963196345,
+      "individualSigned": -0.20203205672718294,
+      "itemId": "gss_getahead"
+     },
+     {
+      "cellsSigned": 0.008610022440460552,
+      "individualSigned": 0.17427956175882203,
+      "itemId": "shed_housing_stress"
+     },
+     {
+      "cellsSigned": -0.02721697765684694,
+      "individualSigned": -0.1881303739987617,
+      "itemId": "shed_ef7"
+     },
+     {
+      "cellsSigned": -0.04719274075077551,
+      "individualSigned": -0.18567267331107362,
+      "itemId": "shed_ef1"
+     },
+     {
+      "cellsSigned": 0.0378066408515208,
+      "individualSigned": 0.16646879971264567,
+      "itemId": "gss_helppoor"
+     },
+     {
+      "cellsSigned": 0.026027185663872188,
+      "individualSigned": 0.14801832356361666,
+      "itemId": "gss_helpsick"
+     },
+     {
+      "cellsSigned": 0.08590706831433809,
+      "individualSigned": 0.1944305659438847,
+      "itemId": "gss_fear"
+     }
+    ],
+    "meanSignedToplineErrorByValence": {
+     "negative": {
+      "cells": 0.03285139539510718,
+      "individual": 0.15173055292791676,
+      "items": 3
+     },
+     "neutral": {
+      "cells": -0.0003143527331873994,
+      "individual": 0.009860058281853002,
+      "items": 44
+     },
+     "positive": {
+      "cells": 0.03563965666313115,
+      "individual": -0.05117574870227585,
+      "items": 16
+     }
+    }
+   }
+  },
+  "note": "Not registered. Computed after the registered results had been read; see the post-run notes."
+ },
+ "generatedFrom": "analysis/analyze_individual_sim.py",
+ "individualBenchmark": {},
+ "instrument": "anchor bank v2, prompts v4, persona-prob prompt (model refresh amendment 2)",
+ "intervals": "paired item-resampling bootstrap, 10,000 resamples; conditional on the released pool, the single cells and direct runs, and the census replies",
+ "kGrid": [
+  150,
+  300,
+  600,
+  1200
+ ],
+ "models": {
+  "gpt-6-luna": {
+   "cells": {
+    "all63": {
+     "bins": 548,
+     "failureRate": 0.0,
+     "flaggedItems": [],
+     "items": 63,
+     "missingItems": [],
+     "subgroupMAE": 0.0782424920640194,
+     "subgroupMAE_itemMean": 0.07662695063796926,
+     "toplineMAE": 0.06411214165648604,
+     "toplineTV": 0.08400259338474977
+    },
+    "other43": {
+     "bins": 356,
+     "failureRate": 0.0,
+     "flaggedItems": [],
+     "items": 43,
+     "missingItems": [],
+     "subgroupMAE": 0.08129876634862267,
+     "subgroupMAE_itemMean": 0.07954551696368378,
+     "toplineMAE": 0.06977599570347705,
+     "toplineTV": 0.09197604460075523
+    },
+    "subset20": {
+     "bins": 192,
+     "failureRate": 0.0,
+     "flaggedItems": [],
+     "items": 20,
+     "missingItems": [],
+     "subgroupMAE": 0.07257565016131749,
+     "subgroupMAE_itemMean": 0.07035203303768309,
+     "toplineMAE": 0.051934855455455356,
+     "toplineTV": 0.06685967327033801
+    }
+   },
+   "naive": {
+    "all63": {
+     "bins": 548,
+     "failureRate": 0.0,
+     "flaggedItems": [],
+     "items": 63,
+     "missingItems": [],
+     "subgroupMAE": 0.07462582576890744,
+     "subgroupMAE_itemMean": 0.07482125645279467,
+     "toplineMAE": 0.06307780399530857,
+     "toplineTV": 0.08686870898835063
+    },
+    "other43": {
+     "bins": 356,
+     "failureRate": 0.0,
+     "flaggedItems": [],
+     "items": 43,
+     "missingItems": [],
+     "subgroupMAE": 0.08254845399581603,
+     "subgroupMAE_itemMean": 0.08117083308508827,
+     "toplineMAE": 0.06916795724297946,
+     "toplineTV": 0.09524388048096535
+    },
+    "subset20": {
+     "bins": 192,
+     "failureRate": 0.0,
+     "flaggedItems": [],
+     "items": 20,
+     "missingItems": [],
+     "subgroupMAE": 0.059935952598181075,
+     "subgroupMAE_itemMean": 0.061169666693363454,
+     "toplineMAE": 0.04998397451281615,
+     "toplineTV": 0.0688620902792289
+    }
+   },
+   "persona": {
+    "subset20": {
+     "bins": 183,
+     "failureRate": 0.0,
+     "flaggedItems": [],
+     "items": 20,
+     "missingItems": [],
+     "subgroupMAE": 0.2135213324742861,
+     "subgroupMAE_itemMean": 0.21415294715547833,
+     "toplineMAE": 0.2050480495461323,
+     "toplineTV": 0.28606284130905424
+    }
+   },
+   "persona-prob": {
+    "subset20": {
+     "bins": 183,
+     "failureRate": 0.0,
+     "flaggedItems": [],
+     "items": 20,
+     "missingItems": [],
+     "subgroupMAE": 0.10413417778090928,
+     "subgroupMAE_itemMean": 0.0977108121047919,
+     "toplineMAE": 0.09399797230568833,
+     "toplineTV": 0.10470292420989051
+    }
+   },
+   "persona-prob-fresh": {
+    "byK": {
+     "1200": {
+      "all63": {
+       "bins": 548,
+       "expectedBinsShown": 548.0,
+       "items": 63,
+       "subgroupMAE": 0.0996599643031134,
+       "subgroupMAE_itemMean": 0.09594162406726063,
+       "toplineMAE": 0.09201323682980495
+      },
+      "binShowRate": 1.0,
+      "binsWithSE": 548,
+      "meanPersonSamplingSE": 0.0,
+      "other43": {
+       "bins": 356,
+       "expectedBinsShown": 356.0,
+       "items": 43,
+       "subgroupMAE": 0.09824622547024484,
+       "subgroupMAE_itemMean": 0.0965938222507088,
+       "toplineMAE": 0.09126277846892897
+      }
+     },
+     "150": {
+      "all63": {
+       "bins": 543,
+       "expectedBinsShown": 533.895,
+       "items": 63,
+       "subgroupMAE": 0.09933699993077909,
+       "subgroupMAE_itemMean": 0.09660934221314747,
+       "toplineMAE": 0.09209902820653473
+      },
+      "binShowRate": 0.9742609489051095,
+      "binsWithSE": 535,
+      "meanPersonSamplingSE": 0.012449125757726632,
+      "other43": {
+       "bins": 354,
+       "expectedBinsShown": 351.345,
+       "items": 43,
+       "subgroupMAE": 0.09696511003272223,
+       "subgroupMAE_itemMean": 0.09609128034248163,
+       "toplineMAE": 0.09132553366322997
+      }
+     },
+     "300": {
+      "all63": {
+       "bins": 548,
+       "expectedBinsShown": 540.1750000000001,
+       "items": 63,
+       "subgroupMAE": 0.09966282912872518,
+       "subgroupMAE_itemMean": 0.09651164089055854,
+       "toplineMAE": 0.0921130099728778
+      },
+      "binShowRate": 0.985720802919708,
+      "binsWithSE": 538,
+      "meanPersonSamplingSE": 0.008219265399403115,
+      "other43": {
+       "bins": 356,
+       "expectedBinsShown": 354.0,
+       "items": 43,
+       "subgroupMAE": 0.0978865583546178,
+       "subgroupMAE_itemMean": 0.09657914049929772,
+       "toplineMAE": 0.09134785052760828
+      }
+     },
+     "600": {
+      "all63": {
+       "bins": 548,
+       "expectedBinsShown": 547.57,
+       "items": 63,
+       "subgroupMAE": 0.09973562573201486,
+       "subgroupMAE_itemMean": 0.09605268544434836,
+       "toplineMAE": 0.09203364250751798
+      },
+      "binShowRate": 0.9992153284671532,
+      "binsWithSE": 548,
+      "meanPersonSamplingSE": 0.004804672073072036,
+      "other43": {
+       "bins": 356,
+       "expectedBinsShown": 355.96000000000004,
+       "items": 43,
+       "subgroupMAE": 0.09826580673098252,
+       "subgroupMAE_itemMean": 0.09661449756617857,
+       "toplineMAE": 0.09128130306650853
+      }
+     }
+    },
+    "census": {
+     "all63": {
+      "bins": 548,
+      "failureRate": 0.005119047619047619,
+      "flaggedItems": [
+       "gss_satjob"
+      ],
+      "items": 63,
+      "missingItems": [],
+      "subgroupMAE": 0.09965996430311336,
+      "subgroupMAE_itemMean": 0.09594162406726056,
+      "toplineMAE": 0.09201323682980507,
+      "toplineTV": 0.11620858790726754
+     },
+     "other43": {
+      "bins": 356,
+      "failureRate": 0.0075,
+      "flaggedItems": [
+       "gss_satjob"
+      ],
+      "items": 43,
+      "missingItems": [],
+      "subgroupMAE": 0.0982462254702448,
+      "subgroupMAE_itemMean": 0.09659382225070874,
+      "toplineMAE": 0.09126277846892883,
+      "toplineTV": 0.12182788885178394
+     },
+     "subset20": {
+      "bins": 192,
+      "failureRate": 0.0,
+      "flaggedItems": [],
+      "items": 20,
+      "missingItems": [],
+      "subgroupMAE": 0.10228127172239053,
+      "subgroupMAE_itemMean": 0.09453939797284697,
+      "toplineMAE": 0.09362672230568896,
+      "toplineTV": 0.10412709087655729
+     }
+    },
+    "cost": {
+     "calls": 75600,
+     "failedCalls": 0,
+     "log": "v2-openai-gpt-6-luna-persona-prob-fresh-all-default:g149.jsonl.gz",
+     "tokensIn": 15913842,
+     "tokensOut": 2410865,
+     "truncatedLines": 0,
+     "usd": 2.8
+    },
+    "coveredItems": 62,
+    "flaggedItems": [
+     "gss_satjob"
+    ],
+    "meanFrameSE": 0.004804672073072034
+   },
+   "persona-prob-pool": {
+    "byK": {
+     "1200": {
+      "all63": {
+       "bins": 548,
+       "expectedBinsShown": 548.0,
+       "items": 63,
+       "subgroupMAE": 0.0990068167751089,
+       "subgroupMAE_itemMean": 0.09536936990445112,
+       "toplineMAE": 0.09162183050406593
+      },
+      "binShowRate": 1.0,
+      "binsWithSE": 548,
+      "meanPersonSamplingSE": 0.0,
+      "other43": {
+       "bins": 356,
+       "expectedBinsShown": 356.0,
+       "items": 43,
+       "subgroupMAE": 0.0980494954036879,
+       "subgroupMAE_itemMean": 0.09640500293994676,
+       "toplineMAE": 0.09140075679788497
+      }
+     },
+     "150": {
+      "all63": {
+       "bins": 548,
+       "expectedBinsShown": 534.41,
+       "items": 63,
+       "subgroupMAE": 0.09890911707029493,
+       "subgroupMAE_itemMean": 0.09616276358672982,
+       "toplineMAE": 0.0916454612466963
+      },
+      "binShowRate": 0.9752007299270075,
+      "binsWithSE": 536,
+      "meanPersonSamplingSE": 0.012525073594470021,
+      "other43": {
+       "bins": 356,
+       "expectedBinsShown": 351.735,
+       "items": 43,
+       "subgroupMAE": 0.09700435318012071,
+       "subgroupMAE_itemMean": 0.09604438470182243,
+       "toplineMAE": 0.09139450893953936
+      }
+     },
+     "300": {
+      "all63": {
+       "bins": 548,
+       "expectedBinsShown": 543.9399999999999,
+       "items": 63,
+       "subgroupMAE": 0.09908695056807776,
+       "subgroupMAE_itemMean": 0.09568811875843362,
+       "toplineMAE": 0.09160927193785288
+      },
+      "binShowRate": 0.9925912408759126,
+      "binsWithSE": 548,
+      "meanPersonSamplingSE": 0.008322861236398117,
+      "other43": {
+       "bins": 356,
+       "expectedBinsShown": 354.89,
+       "items": 43,
+       "subgroupMAE": 0.09782990410567953,
+       "subgroupMAE_itemMean": 0.09637731104622083,
+       "toplineMAE": 0.09140286866599147
+      }
+     },
+     "600": {
+      "all63": {
+       "bins": 548,
+       "expectedBinsShown": 548.0,
+       "items": 63,
+       "subgroupMAE": 0.09911829987260917,
+       "subgroupMAE_itemMean": 0.09545877359447813,
+       "toplineMAE": 0.09165121954301805
+      },
+      "binShowRate": 1.0,
+      "binsWithSE": 548,
+      "meanPersonSamplingSE": 0.004805206175262354,
+      "other43": {
+       "bins": 356,
+       "expectedBinsShown": 356.0,
+       "items": 43,
+       "subgroupMAE": 0.09808118669052641,
+       "subgroupMAE_itemMean": 0.09643170391487753,
+       "toplineMAE": 0.09140460391696989
+      }
+     }
+    },
+    "census": {
+     "all63": {
+      "bins": 548,
+      "failureRate": 0.005145502645502646,
+      "flaggedItems": [
+       "gss_satjob"
+      ],
+      "items": 63,
+      "missingItems": [],
+      "subgroupMAE": 0.09900681677510888,
+      "subgroupMAE_itemMean": 0.09536936990445107,
+      "toplineMAE": 0.09162183050406615,
+      "toplineTV": 0.11595083242568167
+     },
+     "other43": {
+      "bins": 356,
+      "failureRate": 0.007538759689922481,
+      "flaggedItems": [
+       "gss_satjob"
+      ],
+      "items": 43,
+      "missingItems": [],
+      "subgroupMAE": 0.09804949540368783,
+      "subgroupMAE_itemMean": 0.09640500293994672,
+      "toplineMAE": 0.0914007567978849,
+      "toplineTV": 0.12201051841752239
+     },
+     "subset20": {
+      "bins": 192,
+      "failureRate": 0.0,
+      "flaggedItems": [],
+      "items": 20,
+      "missingItems": [],
+      "subgroupMAE": 0.10078185015128537,
+      "subgroupMAE_itemMean": 0.09314275887813543,
+      "toplineMAE": 0.0920971389723558,
+      "toplineTV": 0.1029225075432241
+     }
+    },
+    "cost": {
+     "calls": 75600,
+     "failedCalls": 0,
+     "log": "v2-openai-gpt-6-luna-persona-prob-pool-all-default:g149.jsonl.gz",
+     "tokensIn": 15917757,
+     "tokensOut": 2411010,
+     "truncatedLines": 0,
+     "usd": 2.8
+    },
+    "coveredItems": 62,
+    "flaggedItems": [
+     "gss_satjob"
+    ],
+    "meanFrameSE": 0.004805206175262354
+   }
+  },
+  "gpt-6.1-sol": {
+   "cells": {
+    "all63": {
+     "bins": 548,
+     "failureRate": 0.0,
+     "flaggedItems": [],
+     "items": 63,
+     "missingItems": [],
+     "subgroupMAE": 0.06232980977685405,
+     "subgroupMAE_itemMean": 0.059970866993582506,
+     "toplineMAE": 0.04563307679940613,
+     "toplineTV": 0.0647636711157479
+    },
+    "other43": {
+     "bins": 356,
+     "failureRate": 0.0,
+     "flaggedItems": [],
+     "items": 43,
+     "missingItems": [],
+     "subgroupMAE": 0.0606655864910845,
+     "subgroupMAE_itemMean": 0.05839353138003433,
+     "toplineMAE": 0.050095334426322816,
+     "toplineTV": 0.07390091969970605
+    },
+    "subset20": {
+     "bins": 192,
+     "failureRate": 0.0,
+     "flaggedItems": [],
+     "items": 20,
+     "missingItems": [],
+     "subgroupMAE": 0.06541555711921841,
+     "subgroupMAE_itemMean": 0.06336213856271114,
+     "toplineMAE": 0.03603922290153529,
+     "toplineTV": 0.045118586660237964
+    }
+   },
+   "naive": {
+    "all63": {
+     "bins": 548,
+     "failureRate": 0.0,
+     "flaggedItems": [],
+     "items": 63,
+     "missingItems": [],
+     "subgroupMAE": 0.05603931309149844,
+     "subgroupMAE_itemMean": 0.0553582313323562,
+     "toplineMAE": 0.04406348344621005,
+     "toplineTV": 0.06194672103491094
+    },
+    "other43": {
+     "bins": 356,
+     "failureRate": 0.0,
+     "flaggedItems": [],
+     "items": 43,
+     "missingItems": [],
+     "subgroupMAE": 0.06044337174873206,
+     "subgroupMAE_itemMean": 0.058372512835835194,
+     "toplineMAE": 0.050465388739488345,
+     "toplineTV": 0.07084617203179211
+    },
+    "subset20": {
+     "bins": 192,
+     "failureRate": 0.0,
+     "flaggedItems": [],
+     "items": 20,
+     "missingItems": [],
+     "subgroupMAE": 0.047873454331211096,
+     "subgroupMAE_itemMean": 0.04887752609987636,
+     "toplineMAE": 0.03029938706566166,
+     "toplineTV": 0.04281290139161635
+    }
+   },
+   "persona": {
+    "subset20": {
+     "bins": 183,
+     "failureRate": 0.0,
+     "flaggedItems": [],
+     "items": 20,
+     "missingItems": [],
+     "subgroupMAE": 0.21611247830179772,
+     "subgroupMAE_itemMean": 0.2212114460454754,
+     "toplineMAE": 0.22077771248841738,
+     "toplineTV": 0.3033919483844021
+    }
+   },
+   "persona-prob": {
+    "subset20": {
+     "bins": 183,
+     "failureRate": 0.0,
+     "flaggedItems": [],
+     "items": 20,
+     "missingItems": [],
+     "subgroupMAE": 0.08778636469766285,
+     "subgroupMAE_itemMean": 0.08359186429202861,
+     "toplineMAE": 0.07917815411517802,
+     "toplineTV": 0.0944750101013794
+    }
+   },
+   "persona-prob-pool": {
+    "byK": {
+     "1200": {
+      "all63": {
+       "bins": 548,
+       "expectedBinsShown": 548.0,
+       "items": 63,
+       "subgroupMAE": 0.08338406644247914,
+       "subgroupMAE_itemMean": 0.08038447945945874,
+       "toplineMAE": 0.07468678756921343
+      },
+      "binShowRate": 1.0,
+      "binsWithSE": 548,
+      "meanPersonSamplingSE": 0.0,
+      "other43": {
+       "bins": 356,
+       "expectedBinsShown": 356.0,
+       "items": 43,
+       "subgroupMAE": 0.08230500671180631,
+       "subgroupMAE_itemMean": 0.08068850453046973,
+       "toplineMAE": 0.07392522071829827
+      }
+     },
+     "150": {
+      "all63": {
+       "bins": 548,
+       "expectedBinsShown": 535.265,
+       "items": 63,
+       "subgroupMAE": 0.0829856079662862,
+       "subgroupMAE_itemMean": 0.08081843084871888,
+       "toplineMAE": 0.07494866021787337
+      },
+      "binShowRate": 0.9767609489051094,
+      "binsWithSE": 537,
+      "meanPersonSamplingSE": 0.012185487291110622,
+      "other43": {
+       "bins": 356,
+       "expectedBinsShown": 352.435,
+       "items": 43,
+       "subgroupMAE": 0.08156434772269085,
+       "subgroupMAE_itemMean": 0.08054113375550177,
+       "toplineMAE": 0.07393352452290743
+      }
+     },
+     "300": {
+      "all63": {
+       "bins": 548,
+       "expectedBinsShown": 543.88,
+       "items": 63,
+       "subgroupMAE": 0.08329954753266214,
+       "subgroupMAE_itemMean": 0.08056888574634181,
+       "toplineMAE": 0.0747113828675565
+      },
+      "binShowRate": 0.9924817518248175,
+      "binsWithSE": 548,
+      "meanPersonSamplingSE": 0.008005680748505032,
+      "other43": {
+       "bins": 356,
+       "expectedBinsShown": 354.835,
+       "items": 43,
+       "subgroupMAE": 0.08210998199284279,
+       "subgroupMAE_itemMean": 0.08067025220737724,
+       "toplineMAE": 0.07395427934807354
+      }
+     },
+     "600": {
+      "all63": {
+       "bins": 548,
+       "expectedBinsShown": 548.0,
+       "items": 63,
+       "subgroupMAE": 0.08345051341009342,
+       "subgroupMAE_itemMean": 0.08043762402179051,
+       "toplineMAE": 0.07471659934580387
+      },
+      "binShowRate": 1.0,
+      "binsWithSE": 548,
+      "meanPersonSamplingSE": 0.004622081935195585,
+      "other43": {
+       "bins": 356,
+       "expectedBinsShown": 356.0,
+       "items": 43,
+       "subgroupMAE": 0.08226842608872602,
+       "subgroupMAE_itemMean": 0.08065530106459708,
+       "toplineMAE": 0.07387311425579185
+      }
+     }
+    },
+    "census": {
+     "all63": {
+      "bins": 548,
+      "failureRate": 0.00015873015873015873,
+      "flaggedItems": [],
+      "items": 63,
+      "missingItems": [],
+      "subgroupMAE": 0.08338406644247914,
+      "subgroupMAE_itemMean": 0.08038447945945873,
+      "toplineMAE": 0.07468678756921307,
+      "toplineTV": 0.10259786575907254
+     },
+     "other43": {
+      "bins": 356,
+      "failureRate": 5.8139534883720933e-05,
+      "flaggedItems": [],
+      "items": 43,
+      "missingItems": [],
+      "subgroupMAE": 0.08230500671180634,
+      "subgroupMAE_itemMean": 0.08068850453046976,
+      "toplineMAE": 0.07392522071829812,
+      "toplineTV": 0.10765653249906464
+     },
+     "subset20": {
+      "bins": 192,
+      "failureRate": 0.000375,
+      "flaggedItems": [],
+      "items": 20,
+      "missingItems": [],
+      "subgroupMAE": 0.08538482302643498,
+      "subgroupMAE_itemMean": 0.079730825556785,
+      "toplineMAE": 0.07632415629868029,
+      "toplineTV": 0.09172173226808956
+     }
+    },
+    "cost": {
+     "calls": 76414,
+     "failedCalls": 0,
+     "log": "v2-openai-gpt-6.1-sol-persona-prob-pool-all-default:g149.jsonl.gz",
+     "tokensIn": 16069626,
+     "tokensOut": 2438681,
+     "truncatedLines": 0,
+     "usd": 56.53
+    },
+    "coveredItems": 63,
+    "flaggedItems": [],
+    "meanFrameSE": 0.004622081935195585
+   }
+  }
+ },
+ "pooling": "subgroupMAE pools absolute errors across reported slice bins (PAP v2); at K < 1,200 each bin is weighted by the share of subsamples that show it",
+ "productRule": {
+  "addedErrorVsCensusByK": {},
+  "defaultEligible": false,
+  "defaultToplineMargin": 0.01,
+  "gate": {
+   "byModel": {
+    "gpt-6-luna": {
+     "addedErrorAtKStar": null,
+     "complete": false,
+     "flaggedItems": [
+      "gss_satjob"
+     ],
+     "gapToCells": null,
+     "passes": false
+    },
+    "gpt-6.1-sol": {
+     "addedErrorAtKStar": null,
+     "complete": true,
+     "flaggedItems": [],
+     "gapToCells": null,
+     "passes": false
+    }
+   },
+   "margin": 0.02
+  },
+  "kTolerance": 0.005,
+  "people": null
+ },
+ "registration": "paper/pap-individual-sim-2026-10.md (tag pap-individual-sim-2026-10)",
+ "subsamplesPerItem": 200
+}

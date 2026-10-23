@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import refresh from "../../../paper/artifacts/model-refresh.json";
 import { DEFAULT_MODEL } from "@/engine/models";
+import { individualBenchmarkFor, individualModeEnabled, INDIVIDUAL_PEOPLE } from "@/engine/individual-study";
 
 type Score = { toplineMAE: number; subgroupMAE: number };
 const scores = refresh.models as unknown as Record<
@@ -16,6 +17,40 @@ export const metadata: Metadata = {
   description:
     "How HiveSight estimates audience responses: census-calibrated population cells, direct distribution elicitation, and weighted aggregation.",
 };
+
+/** The opt-in individual mode, described only when the product offers it. */
+function IndividualMethod() {
+  const b = individualBenchmarkFor(DEFAULT_MODEL);
+  const personaGain = (
+    refresh.Q4_personaProb as Record<string, { vsPersona: { subgroup: { diff: number } | null } | null }>
+  )[DEFAULT_MODEL]?.vsPersona?.subgroup?.diff;
+  return (
+    <section>
+      <h2 className="text-xl font-bold tracking-tight">Simulated people (experimental)</h2>
+      <p className="mt-2 text-muted">
+        As an opt-in alternative, HiveSight can build an estimate from simulated people. Up to{" "}
+        {INDIVIDUAL_PEOPLE.toLocaleString()} people are drawn at random from the audience in the
+        population sample, which represents adults in proportion to their numbers. Each is
+        described to the model in the second person and asked how likely they are to give each
+        answer, one call per person. The estimate averages those probabilities, and subgroup
+        breakdowns average the people in each group; groups with fewer than 10 people are not shown.
+        {personaGain != null &&
+          ` People report probabilities rather than a single answer: on 20 benchmark questions, averaging probabilities cut subgroup error by ${pts(-personaGain)} points against counting each person's single answer with ${DEFAULT_MODEL}.`}
+        {b?.topline != null && b.subgroup != null && (
+          <>
+            {" "}On the 63 benchmark questions with {DEFAULT_MODEL}, this method missed by{" "}
+            {pts(b.topline)} points nationally and {pts(b.subgroup)} points for subgroups.
+          </>
+        )}{" "}
+        The design and the accuracy shown come from a study registered before its runs; see{" "}
+        <Link href="/benchmarks" className="underline">
+          benchmarks
+        </Link>
+        .
+      </p>
+    </section>
+  );
+}
 
 export default function MethodologyPage() {
   return (
@@ -69,6 +104,8 @@ export default function MethodologyPage() {
             </li>
           </ol>
         </section>
+
+        {individualModeEnabled() && <IndividualMethod />}
 
         <section>
           <h2 className="text-xl font-bold tracking-tight">What the verbatims are</h2>

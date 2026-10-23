@@ -122,21 +122,24 @@ def reduce_to_cells(persons, geography):
     }
 
 
-def systematic_sample(persons, n, rng):
-    total = sum(p["weight"] for p in persons)
+def systematic_indices(persons, n, rng):
+    """Indices of a systematic weight-proportional sample of n persons (one
+    random start); every index when there are no more than n persons."""
     if len(persons) <= n:
-        picked = persons
-    else:
-        weights = np.array([p["weight"] for p in persons])
-        cumw = np.cumsum(weights)
-        step = total / n
-        targets = rng.random() * step + step * np.arange(n)
-        idx = np.searchsorted(cumw, targets)
-        picked = [persons[i] for i in idx]
-    return [
-        {k: (round(p[k], 2) if isinstance(p[k], float) else p[k]) for k in SAMPLE_FIELDS}
-        for p in picked
-    ]
+        return list(range(len(persons)))
+    weights = np.array([p["weight"] for p in persons])
+    cumw = np.cumsum(weights)
+    step = sum(p["weight"] for p in persons) / n
+    targets = rng.random() * step + step * np.arange(n)
+    return [int(i) for i in np.searchsorted(cumw, targets)]
+
+
+def sample_record(p):
+    return {k: (round(p[k], 2) if isinstance(p[k], float) else p[k]) for k in SAMPLE_FIELDS}
+
+
+def systematic_sample(persons, n, rng):
+    return [sample_record(persons[i]) for i in systematic_indices(persons, n, rng)]
 
 
 def load_persons(geo):

@@ -115,6 +115,7 @@ export async function POST(request: Request) {
             format: spec.format,
             audience: spec.audience,
             model: spec.model,
+            mode: spec.mode,
             verbatimCount: spec.verbatimCount,
           },
           llm,

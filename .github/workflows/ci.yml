@@ -46,9 +46,16 @@ jobs:
           uv run --with "$PINS" python analysis/analyze_anchor.py
           uv run --with "$PINS" python analysis/analyze_anchor_v2.py
           uv run --with "$PINS" python analysis/analyze_model_refresh.py
+          uv run --with "$PINS" python analysis/analyze_individual_sim.py
+          python3 analysis/report_individual_sim.py
           uv run --with "$PINS" python analysis/make_paper_assets.py
+
+      - name: Analysis property tests
+        run: uv run --with "numpy==2.3.4,pytest==8.4.2,hypothesis==6.140.2" pytest analysis/tests -q
 
       # Numeric comparison: Linux and macOS round the last float bits
       # differently, so a byte diff fails on noise (red since July 2026).
       - name: Verify artifacts unchanged
-        run: python3 analysis/compare_artifacts.py
+        run: |
+          python3 analysis/compare_artifacts.py
+          git diff --exit-code paper/individual-sim-results.md

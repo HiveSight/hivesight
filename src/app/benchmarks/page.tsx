@@ -2,7 +2,9 @@ import type { Metadata } from "next";
 import artifact from "../../../evals/results/shed-2024-powered-comparison-v2.json";
 import anchorAnalysis from "../../../paper/artifacts/anchor-analysis.json";
 import refresh from "../../../paper/artifacts/model-refresh.json";
+import individualSim from "../../../paper/artifacts/individual-sim.json";
 import { DEFAULT_MODEL, SERVED_MODELS } from "@/engine/models";
+import { individualModeEnabled } from "@/engine/individual-study";
 
 export const metadata: Metadata = {
   title: "Benchmarks — HiveSight",
@@ -200,6 +202,170 @@ function CurrentModels() {
   );
 }
 
+type Score = { items: number; toplineMAE: number | null; subgroupMAE: number | null; expectedBinsShown?: number; bins: number };
+
+/**
+ * The registered individual-simulation study: every simulated person reports
+ * how likely they are to give each answer, and estimates average them.
+ */
+function IndividualStudy() {
+  const sim = individualSim as unknown as {
+    models: Record<
+      string,
+      Record<string, { census?: { all63?: Score }; byK?: Record<string, { all63: Score }>; flaggedItems?: string[] }>
+    >;
+    Q1_individualVsCells: Record<string, { all63: Paired; other43: Paired }>;
+    Q2_individualVsDirect: Record<string, { all63: Paired }>;
+    Q4_freshPools: { vsPool: Paired; vsCells: Paired };
+    D1_testRetest: Record<string, { meanWithinItemPearson: number | null; meanWithinItemAbsDiff: number; items: number }>;
+    productRule: {
+      people: number | null;
+      gate: { margin: number; byModel: Record<string, { passes: boolean; gapToCells: { topline: number; subgroup: number } | null }> };
+      defaultEligible: boolean;
+    };
+  };
+  const rows: Array<{ model: string; arm: string; label: string; vsCells: Paired }> = [
+    { model: "gpt-6-luna", arm: "persona-prob-pool", label: "gpt-6-luna · released pool", vsCells: sim.Q1_individualVsCells["gpt-6-luna"]?.all63 },
+    { model: "gpt-6-luna", arm: "persona-prob-fresh", label: "gpt-6-luna · a new pool per question", vsCells: sim.Q4_freshPools?.vsCells },
+    { model: "gpt-6.1-sol", arm: "persona-prob-pool", label: "gpt-6.1-sol · released pool", vsCells: sim.Q1_individualVsCells["gpt-6.1-sol"]?.all63 },
+  ].filter((r) => sim.models[r.model]?.[r.arm]?.census?.all63);
+  if (!rows.length) return null;
+  const rule = sim.productRule;
+  const passing = Object.entries(rule.gate.byModel).filter(([, g]) => g.passes).map(([m]) => MODEL_LABELS[m] ?? m);
+  const ks = ["150", "300", "600", "1200"];
+  const retest = sim.D1_testRetest["gpt-6-luna"];
+  // Whether 150 people per question score like all 1,200 (within half a point on subgroups).
+  const lunaByK = sim.models["gpt-6-luna"]?.["persona-prob-pool"]?.byK;
+  const small = lunaByK?.["150"]?.all63.subgroupMAE;
+  const census = lunaByK?.["1200"]?.all63.subgroupMAE;
+  const flat = small != null && census != null && Math.abs(small - census) < 0.005;
+  const flagged = [...new Set(rows.flatMap((r) => sim.models[r.model][r.arm].flaggedItems ?? []))];
+  return (
+    <section className="mt-10">
+      <h2 className="text-xl font-bold tracking-tight mb-2">Simulated people — October 2026 study</h2>
+      <p className="mb-4 max-w-2xl text-sm text-muted">
+        Each of the 1,200 people in HiveSight&apos;s population sample answered all 63 questions,
+        one call per person, by giving their probability of each answer; estimates average them.
+        The design, comparisons and product rules were{" "}
+        <a
+          href="https://github.com/HiveSight/hivesight/blob/main/paper/pap-individual-sim-2026-10.md"
+          className="underline hover:text-ink"
+        >
+          registered before the runs
+        </a>
+        . Error in points; the last two columns are differences from the same model&apos;s population
+        cells, with 95% intervals from resampling questions (positive means cells are more accurate).
+      </p>
+      <div className="overflow-x-auto rounded-lg border border-line">
+        <table className="w-full min-w-[40rem] text-sm">
+          <thead className="bg-surface">
+            <tr className="text-left text-muted">
+              <th className="px-4 py-3 font-normal">Model · people</th>
+              <th className="px-4 py-3 font-normal">Topline</th>
+              <th className="px-4 py-3 font-normal">Subgroup</th>
+              <th className="px-4 py-3 font-normal">vs cells, topline</th>
+              <th className="px-4 py-3 font-normal">vs cells, subgroup</th>
+            </tr>
+          </thead>
+          <tbody className="font-mono text-xs">
+            {rows.map((r) => {
+              const c = sim.models[r.model][r.arm].census!.all63!;
+              return (
+                <tr key={r.label} className="border-t border-line">
+                  <td className="px-4 py-3 font-sans text-sm text-ink">{r.label}</td>
+                  <td className="px-4 py-3">{pts(c.toplineMAE)}</td>
+                  <td className="px-4 py-3">{pts(c.subgroupMAE)}</td>
+                  <td className="px-4 py-3">{diffCi(r.vsCells?.topline)}</td>
+                  <td className="px-4 py-3">{diffCi(r.vsCells?.subgroup)}</td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+      </div>
+      <h3 className="mt-6 mb-2 font-bold tracking-tight">People per question</h3>
+      <p className="mb-3 max-w-2xl text-sm text-muted">
+        Fewer people per question, drawn from the same answers. Topline · subgroup error; small
+        runs hide subgroups with fewer than 10 people, so the share of subgroups shown is given too.
+      </p>
+      <div className="overflow-x-auto rounded-lg border border-line">
+        <table className="w-full min-w-[36rem] text-sm">
+          <thead className="bg-surface">
+            <tr className="text-left text-muted">
+              <th className="px-4 py-3 font-normal">Model</th>
+              {ks.map((k) => (
+                <th key={k} className="px-4 py-3 font-normal">
+                  {Number(k).toLocaleString()} people
+                </th>
+              ))}
+            </tr>
+          </thead>
+          <tbody className="font-mono text-xs">
+            {["gpt-6-luna", "gpt-6.1-sol"].map((m) => {
+              const byK = sim.models[m]?.["persona-prob-pool"]?.byK;
+              if (!byK) return null;
+              const all = byK["1200"]?.all63.bins ?? 0;
+              return (
+                <tr key={m} className="border-t border-line">
+                  <td className="px-4 py-3 font-sans text-sm text-ink">{MODEL_LABELS[m]}</td>
+                  {ks.map((k) => {
+                    const s = byK[k]?.all63;
+                    const shown = s?.expectedBinsShown != null && all ? Math.round((100 * s.expectedBinsShown) / all) : null;
+                    return (
+                      <td key={k} className="px-4 py-3">
+                        {s ? `${pts(s.toplineMAE)} · ${pts(s.subgroupMAE)}` : "—"}
+                        {shown != null && shown < 100 && <span className="text-faint"> ({shown}% shown)</span>}
+                      </td>
+                    );
+                  })}
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+      </div>
+      <div className="mt-3 max-w-2xl space-y-2 text-xs text-muted">
+        <p>
+          {passing.length ? (
+            <>
+              The registered rules support simulated people with {passing.join(" and ")}, asking{" "}
+              {rule.people?.toLocaleString()} people per run: a model qualifies when it is no more than{" "}
+              {pts(rule.gate.margin)} points behind its population cells on both topline and subgroups.
+              {rule.defaultEligible
+                ? " The results meet the bar for proposing it as the default."
+                : " Population cells stay the default."}{" "}
+              {individualModeEnabled()
+                ? "HiveSight offers it as an opt-in, experimental method."
+                : "HiveSight does not offer it yet."}
+            </>
+          ) : (
+            <>
+              Neither model met the registered bar for offering simulated people in HiveSight: no more
+              than {pts(rule.gate.margin)} points behind its own population cells on both topline and
+              subgroups{flat ? ", and asking more people per question did not narrow the gap" : ""}.
+              Population cells remain the method.
+            </>
+          )}
+        </p>
+        {flagged.length > 0 && (
+          <p>
+            More than one in ten simulated people gave no usable answer on {flagged.join(", ")} for
+            at least one row above, which the registered rules count as not covered; the
+            registration&apos;s post-run notes explain why.
+          </p>
+        )}
+        {retest && retest.meanWithinItemPearson != null && (
+          <p>
+            Asked the same question twice, a simulated person&apos;s answer share correlates{" "}
+            {retest.meanWithinItemPearson.toFixed(2)} with their first answer within a question (gpt-6-luna,{" "}
+            {retest.items} questions), differing by {pts(retest.meanWithinItemAbsDiff)} points on average.
+          </p>
+        )}
+      </div>
+    </section>
+  );
+}
+
 export default function BenchmarksPage() {
   const questions = artifact.questions as Array<{
     questionId: string;
@@ -237,6 +403,8 @@ export default function BenchmarksPage() {
       </p>
 
       <CurrentModels />
+
+      <IndividualStudy />
 
       <section className="mt-10">
         <h2 className="text-xl font-bold tracking-tight mb-2">

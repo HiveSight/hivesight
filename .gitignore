@@ -66,3 +66,6 @@ data/raw/
 # Environment files (keep the example)
 .env*
 !.env.example
+
+# Analysis outputs from mock end-to-end tests (never commit)
+*.MOCK.json

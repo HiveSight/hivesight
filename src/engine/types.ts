@@ -103,7 +103,16 @@ export interface Verbatim {
   text: string;
 }
 
+/**
+ * "cells" (default): one elicitation per post-stratification cell, weighted
+ * by population. "individual" (opt-in): one elicitation per sampled person,
+ * each reporting how likely they are to give each answer.
+ */
+export type ElicitationMode = "cells" | "individual";
+
 export interface RunProvenance {
+  /** Absent on runs saved before the individual mode existed (all cells). */
+  mode?: ElicitationMode;
   engineVersion: string;
   promptVersion: string;
   datasetVersion: string;
@@ -117,8 +126,22 @@ export interface RunProvenance {
   /** elicitedWeight / eligibleWeight. Below 1 when cells failed. */
   elicitedShare: number;
   populationShare: number; // eligible weight / geography total weight
+  /** Individual mode: the geography's pool records that match the audience, and who was asked. */
+  people?: {
+    eligible: number;
+    asked: number;
+    answered: number;
+    pool: "pps" | "population";
+  };
   startedAt: string;
   completedAt: string;
+}
+
+/** What an elicitation mode contributes to a run, before verbatims. */
+export interface EstimateCore {
+  topline: Distribution;
+  subgroups: SubgroupEstimate[];
+  provenance: Pick<RunProvenance, "cellCount" | "cellFailures" | "eligibleWeight" | "elicitedWeight" | "people">;
 }
 
 export interface RunResult {
@@ -137,6 +160,8 @@ export interface RunResult {
     subgroup: number | null;
     /** Benchmark questions behind the figures (absent on runs saved before October 2026). */
     items?: number;
+    /** Individual mode: people per benchmark estimate. */
+    people?: number;
     source: string;
   } | null;
 }
@@ -153,6 +178,8 @@ export interface RunSpec {
   format: ResponseFormat;
   audience: AudienceSpec;
   model: string;
+  /** Defaults to "cells". */
+  mode?: ElicitationMode;
   seed?: number;
   verbatimCount?: number;
 }

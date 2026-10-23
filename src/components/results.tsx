@@ -150,6 +150,7 @@ export function Results({
   }
 
   const p = result.provenance;
+  const people = p.mode === "individual" ? p.people : undefined;
   // Runs saved before coverage was recorded carry no elicitedShare; it is
   // known only when no cell failed.
   const elicitedShare = p.elicitedShare ?? (p.cellFailures ? null : 1);
@@ -187,7 +188,11 @@ export function Results({
               <Link href="/benchmarks" className="underline hover:text-ink">
                 {benchmarkItems ? `${benchmarkItems} benchmark survey questions` : "benchmark questions"}
               </Link>
-              , this method with {p.model} missed the real answer share by{" "}
+              ,{" "}
+              {people
+                ? `asking ${result.benchmarkError.people?.toLocaleString() ?? "the same number of"} simulated people with ${p.model}`
+                : `this method with ${p.model}`}{" "}
+              missed the real answer share by{" "}
               <span className="font-mono">
                 {Math.round(result.benchmarkError.topline * 100)} points
               </span>{" "}
@@ -211,7 +216,18 @@ export function Results({
         <Honeycomb dist={result.topline} format={result.format} />
       </div>
 
-      {elicitedShare != null && elicitedShare < 0.9 && (
+      {people && (
+        <p role="note" className="rounded-lg border border-line bg-surface px-4 py-3 text-sm text-ink">
+          Experimental simulated-people estimate: {people.answered.toLocaleString()} of{" "}
+          {people.asked.toLocaleString()} simulated people
+          {people.asked < people.eligible ? `, drawn from ${people.eligible.toLocaleString()} who match the audience,` : ""}{" "}
+          reported how likely they are to give each answer, and the estimate averages them.
+          {people.answered < people.asked * 0.9 &&
+            " More than one in ten gave no usable answer, so treat it with extra caution or run it again."}
+        </p>
+      )}
+
+      {!people && elicitedShare != null && elicitedShare < 0.9 && (
         <p role="note" className="rounded-lg border border-line bg-surface px-4 py-3 text-sm text-ink">
           This estimate rests on {pct(elicitedShare)} of the audience: {p.cellFailures} of{" "}
           {p.cellCount + p.cellFailures} population cells returned no usable answer. Groups in the
@@ -267,7 +283,9 @@ export function Results({
               ["Prompts", p.promptVersion],
               ["Dataset", p.datasetVersion],
               ["Model", p.model],
-              ["Population cells", `${p.cellCount}${p.cellFailures ? ` (${p.cellFailures} failed)` : ""}`],
+              people
+                ? ["Simulated people", `${people.answered} answered of ${people.asked} asked (${people.eligible} eligible)`]
+                : ["Population cells", `${p.cellCount}${p.cellFailures ? ` (${p.cellFailures} failed)` : ""}`],
               ["Weighted audience", Math.round(p.eligibleWeight).toLocaleString()],
               ["Audience estimated", elicitedShare == null ? "not recorded" : pct(elicitedShare)],
               ["Share of geography", pct(p.populationShare)],

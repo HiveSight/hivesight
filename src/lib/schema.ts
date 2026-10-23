@@ -1,5 +1,6 @@
 import { z } from "zod/v4";
 import { DEFAULT_MODEL, SERVED_MODEL_IDS } from "@/engine/models";
+import { INDIVIDUAL_MODELS, individualModeEnabled } from "@/engine/individual-study";
 import { canonicalGeography } from "@/lib/geographies";
 import { AGE_BANDS, BENEFITS, CHILDREN, INCOME_BANDS, SEXES, TENURES } from "@/engine/bands";
 
@@ -47,15 +48,22 @@ export const FormatSchema = z.union([
   }),
 ]);
 
-export const RunRequestSchema = z.object({
-  question: z.string().min(10).max(500),
-  format: FormatSchema,
-  audience: z.object({
-    geography: GeographySchema,
-    filters: FiltersSchema.default({}),
-  }),
-  model: z.enum(SERVED_MODEL_IDS).default(DEFAULT_MODEL),
-  verbatimCount: z.number().int().min(0).max(12).default(6),
-});
+export const RunRequestSchema = z
+  .object({
+    question: z.string().min(10).max(500),
+    format: FormatSchema,
+    audience: z.object({
+      geography: GeographySchema,
+      filters: FiltersSchema.default({}),
+    }),
+    model: z.enum(SERVED_MODEL_IDS).default(DEFAULT_MODEL),
+    // Population cells unless the asker opts in to the individual mode.
+    mode: z.enum(["cells", "individual"]).default("cells"),
+    verbatimCount: z.number().int().min(0).max(12).default(6),
+  })
+  .refine((r) => r.mode === "cells" || (individualModeEnabled() && INDIVIDUAL_MODELS.includes(r.model)), {
+    message: "Individual mode is not offered with this model",
+    path: ["mode"],
+  });
 
 export type RunRequest = z.infer<typeof RunRequestSchema>;

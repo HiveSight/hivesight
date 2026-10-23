@@ -103,6 +103,31 @@ uv run python evals/merge_refresh_artifacts.py
 uv run --with "numpy==2.3.4" python analysis/analyze_model_refresh.py
 ```
 
+### Individual simulation (October 2026)
+
+Registered in `paper/pap-individual-sim-2026-10.md` (tag
+`pap-individual-sim-2026-10`). The fresh per-item pools are built once from
+the pinned frame (Tier 1 data: `data/raw/US.json.gz`, see DATA.md) and
+committed; the runs need only API keys:
+
+```bash
+uv run --with "numpy==2.3.4" python pipeline/build_fresh_pools.py   # evals/anchor-bank/fresh-pools-US.json.gz
+node evals/extract-persona-prob-people.mjs                          # amendment 2's people, for test-retest
+node evals/run-anchor-bank-v2.mjs --model gpt-6-luna --items all --arms persona-prob-pool \
+  --artifact individual-sim-gpt-6-luna-pool.json --max-usd 6
+node evals/run-anchor-bank-v2.mjs --model gpt-6-luna --items all --arms persona-prob-fresh \
+  --artifact individual-sim-gpt-6-luna-fresh.json --max-usd 6
+node evals/run-anchor-bank-v2.mjs --model gpt-6.1-sol --items all --arms persona-prob-pool \
+  --artifact individual-sim-gpt-6.1-sol-pool.json --max-usd 75
+gzip -9 -n evals/results/logs/v2-openai-*-persona-prob-{pool,fresh}-all-*.jsonl
+uv run --with "numpy==2.3.4" python analysis/analyze_individual_sim.py
+uv run --with "numpy==2.3.4" --with pytest --with hypothesis pytest analysis/tests -q
+```
+
+Each person is a separate call; each run is 75,600 calls. The analysis checks
+that the runner's stored aggregates equal the means of the stored people
+before scoring.
+
 Request settings per model (reasoning effort, Anthropic thinking) live in
 `evals/models.mjs`; the product's served models (`src/engine/models.ts`) must
 match them, which a unit test enforces. `--max-usd` stops a run once its
@@ -127,7 +152,8 @@ Approximate cost to re-run the July Tier 2 runs: ~$20 at July 2026 prices. The O
   `paper/pap-v3-addendum.md` (tag `pap-v3-addendum`, commit `5c301b6`),
   `paper/pap-model-refresh-2026-10.md` (tags `pap-model-refresh-2026-10`,
   `pap-model-refresh-2026-10-amend1`, `pap-model-refresh-2026-10-amend2`;
-  its post-run notes record one interrupted and resumed run) —
+  its post-run notes record one interrupted and resumed run),
+  `paper/pap-individual-sim-2026-10.md` (tag `pap-individual-sim-2026-10`) —
   committed and pushed before the runs they specify; ordering is auditable
   against run-artifact timestamps and per-call log timestamps.
 - The production site's benchmarks page imports the same

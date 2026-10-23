@@ -9,10 +9,12 @@ import type { LlmClient } from "./elicit";
 import { LlmRequestError, mapLimit, parseDistribution } from "./elicit";
 import { CELL_SYSTEM_PROMPT, cellUserPrompt, PROMPT_VERSION } from "./prompts";
 import { generateVerbatims } from "./verbatims";
+import { estimateFromPeople, individualBenchmarkFor, INDIVIDUAL_PROMPT_VERSION } from "./individual";
 import refresh from "../../paper/artifacts/model-refresh.json";
-import type { CellEstimate, RunProgress, RunResult, RunSpec } from "./types";
+import type { CellEstimate, CellTable, EstimateCore, RunProgress, RunResult, RunSpec } from "./types";
 
 export const ENGINE_VERSION = "engine:v1-cells";
+export const INDIVIDUAL_ENGINE_VERSION = "engine:v1-individual";
 
 /**
  * Benchmark-measured typical error for each served model, from the
@@ -58,6 +60,73 @@ export async function runEstimate(
   });
 
   const { table, samples, samplePool } = await loadGeography(spec.audience.geography, signal);
+  const mode = spec.mode ?? "cells";
+  const { topline, subgroups, provenance } =
+    mode === "individual"
+      ? await estimateFromPeople({ spec, table, samples, samplePool, seed, llm, onProgress, signal })
+      : await estimateFromCells(spec, table, llm, onProgress, signal);
+
+  onProgress?.({
+    stage: "verbatims",
+    completed: 0,
+    total: spec.verbatimCount ?? 6,
+    message: "Writing illustrative synthetic verbatims",
+  });
+  const verbatims = await generateVerbatims({
+    llm,
+    model: spec.model,
+    samples,
+    samplePool,
+    audience: spec.audience,
+    question: spec.question,
+    format: spec.format,
+    count: spec.verbatimCount ?? 6,
+    seed,
+    signal,
+  });
+  signal?.throwIfAborted();
+
+  const result: RunResult = {
+    question: spec.question,
+    format: spec.format,
+    audience: spec.audience,
+    topline,
+    headline: headlineFromDistribution(topline, spec.format),
+    subgroups,
+    verbatims,
+    provenance: {
+      mode,
+      engineVersion: mode === "individual" ? INDIVIDUAL_ENGINE_VERSION : ENGINE_VERSION,
+      promptVersion: mode === "individual" ? INDIVIDUAL_PROMPT_VERSION : PROMPT_VERSION,
+      datasetVersion: table.datasetVersion ?? DATASET_VERSION,
+      model: spec.model,
+      seed,
+      ...provenance,
+      elicitedShare: provenance.elicitedWeight / provenance.eligibleWeight,
+      populationShare: provenance.eligibleWeight / table.totalWeight,
+      startedAt,
+      completedAt: new Date().toISOString(),
+    },
+    benchmarkError: mode === "individual" ? individualBenchmarkFor(spec.model) : benchmarkErrorFor(spec.model),
+  };
+
+  onProgress?.({
+    stage: "complete",
+    completed: 1,
+    total: 1,
+    message: "Estimate complete",
+  });
+  return result;
+}
+
+/** Population-cell elicitation: one call per cell, weighted by population. */
+async function estimateFromCells(
+  spec: RunSpec,
+  table: CellTable,
+  llm: LlmClient,
+  onProgress?: (p: RunProgress) => void,
+  signal?: AbortSignal
+): Promise<EstimateCore> {
   const cells = table.cells.filter((c) => cellMatchesFilters(c, spec.audience.filters));
   if (cells.length === 0) {
     throw new Error(
@@ -116,60 +185,9 @@ export async function runEstimate(
     total: cells.length,
     message: "Aggregating with calibrated population weights",
   });
-  const topline = weightedDistribution(estimates, spec.format);
-  const subgroups = subgroupBreakdowns(estimates, spec.format);
-
-  onProgress?.({
-    stage: "verbatims",
-    completed: 0,
-    total: spec.verbatimCount ?? 6,
-    message: "Writing illustrative synthetic verbatims",
-  });
-  const verbatims = await generateVerbatims({
-    llm,
-    model: spec.model,
-    samples,
-    samplePool,
-    audience: spec.audience,
-    question: spec.question,
-    format: spec.format,
-    count: spec.verbatimCount ?? 6,
-    seed,
-    signal,
-  });
-  signal?.throwIfAborted();
-
-  const result: RunResult = {
-    question: spec.question,
-    format: spec.format,
-    audience: spec.audience,
-    topline,
-    headline: headlineFromDistribution(topline, spec.format),
-    subgroups,
-    verbatims,
-    provenance: {
-      engineVersion: ENGINE_VERSION,
-      promptVersion: PROMPT_VERSION,
-      datasetVersion: table.datasetVersion ?? DATASET_VERSION,
-      model: spec.model,
-      seed,
-      cellCount: estimates.length,
-      cellFailures: failures,
-      eligibleWeight,
-      elicitedWeight,
-      elicitedShare: elicitedWeight / eligibleWeight,
-      populationShare: eligibleWeight / table.totalWeight,
-      startedAt,
-      completedAt: new Date().toISOString(),
-    },
-    benchmarkError: benchmarkErrorFor(spec.model),
+  return {
+    topline: weightedDistribution(estimates, spec.format),
+    subgroups: subgroupBreakdowns(estimates, spec.format),
+    provenance: { cellCount: estimates.length, cellFailures: failures, eligibleWeight, elicitedWeight },
   };
-
-  onProgress?.({
-    stage: "complete",
-    completed: 1,
-    total: 1,
-    message: "Estimate complete",
-  });
-  return result;
 }
