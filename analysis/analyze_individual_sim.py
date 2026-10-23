@@ -547,67 +547,128 @@ def main():
     out["D5_postStratified"] = d5
 
     # ---- registered product rules
-    # K*: the smallest K whose error, compared with the census's on the same
-    # items and the bins a K-person run shows, is at most K_TOLERANCE higher
-    # on both topline and subgroups (gpt-6-luna, all 63 items covered).
-    luna_cov = coverage.get((DEFAULT_MODEL, POOL), {"covered": []})
-    k_star, added = None, {}
-    if len(luna_cov["covered"]) == len(all63):
-        census = k_errs(DEFAULT_MODEL, POOL, CENSUS)
-        for k in K_GRID:
-            d = paired(k_errs(DEFAULT_MODEL, POOL, k), census, all63, f"K|{DEFAULT_MODEL}|{k}")
-            added[str(k)] = d
-            if k_star is None and d["topline"]["diff"] <= K_TOLERANCE and d["subgroup"]["diff"] <= K_TOLERANCE:
-                k_star = k
-        k_star = k_star or CENSUS
-    rule = {"addedErrorVsCensusByK": added, "kTolerance": K_TOLERANCE, "people": k_star,
-            "gate": {"margin": GATE_MARGIN, "byModel": {}}}
+    def product_rules(coverage):
+        # K*: the smallest K whose error, compared with the census's on the same
+        # items and the bins a K-person run shows, is at most K_TOLERANCE higher
+        # on both topline and subgroups (gpt-6-luna, all 63 items covered).
+        luna_cov = coverage.get((DEFAULT_MODEL, POOL), {"covered": []})
+        k_star, added = None, {}
+        if len(luna_cov["covered"]) == len(all63):
+            census = k_errs(DEFAULT_MODEL, POOL, CENSUS)
+            for k in K_GRID:
+                d = paired(k_errs(DEFAULT_MODEL, POOL, k), census, all63, f"K|{DEFAULT_MODEL}|{k}")
+                added[str(k)] = d
+                if k_star is None and d["topline"]["diff"] <= K_TOLERANCE and d["subgroup"]["diff"] <= K_TOLERANCE:
+                    k_star = k
+            k_star = k_star or CENSUS
+        rule = {"addedErrorVsCensusByK": added, "kTolerance": K_TOLERANCE, "people": k_star,
+                "gate": {"margin": GATE_MARGIN, "byModel": {}}}
 
-    # Rules 2-4 score a K*-person run as the census on all bins plus the error
-    # asking K* people adds on the bins such a run shows (zero at K* = 1,200),
-    # so subgroups a small run hides cannot flatter it.
-    def added_at(model):
-        if k_star in (None, CENSUS):
-            return {"topline": 0.0, "subgroup": 0.0}
-        d = paired(k_errs(model, POOL, k_star), k_errs(model, POOL, CENSUS), all63, f"K|{model}|{k_star}")
-        return {"topline": d["topline"]["diff"], "subgroup": d["subgroup"]["diff"]}
+        # Rules 2-4 score a K*-person run as the census on all bins plus the error
+        # asking K* people adds on the bins such a run shows (zero at K* = 1,200),
+        # so subgroups a small run hides cannot flatter it.
+        def added_at(model):
+            if k_star in (None, CENSUS):
+                return {"topline": 0.0, "subgroup": 0.0}
+            d = paired(k_errs(model, POOL, k_star), k_errs(model, POOL, CENSUS), all63, f"K|{model}|{k_star}")
+            return {"topline": d["topline"]["diff"], "subgroup": d["subgroup"]["diff"]}
 
-    for model in MODELS:
-        cov = coverage.get((model, POOL), {"covered": [], "flagged": []})
-        complete = len(cov["covered"]) == len(all63)
-        q = q1[model]["all63"]
-        add = added_at(model) if k_star and complete else None
-        gap = ({"topline": q["topline"]["diff"] + add["topline"], "subgroup": q["subgroup"]["diff"] + add["subgroup"]}
-               if add and q and q["subgroup"] else None)
-        rule["gate"]["byModel"][model] = {
-            "complete": complete,
-            "flaggedItems": cov["flagged"],
-            "addedErrorAtKStar": add,
-            "gapToCells": gap,
-            "passes": bool(gap and gap["topline"] <= GATE_MARGIN and gap["subgroup"] <= GATE_MARGIN),
-        }
-    luna = rule["gate"]["byModel"][DEFAULT_MODEL]
-    q = q1[DEFAULT_MODEL]["all63"]
-    rule["defaultEligible"] = bool(luna["passes"]
-                                   and q["subgroup"]["hi"] + luna["addedErrorAtKStar"]["subgroup"] < 0
-                                   and q["topline"]["hi"] + luna["addedErrorAtKStar"]["topline"] < DEFAULT_TOPLINE_MARGIN)
-    rule["defaultToplineMargin"] = DEFAULT_TOPLINE_MARGIN
-    out["productRule"] = rule
-
-    # ---- accuracy the individual mode displays, per model that passes the gate
-    out["individualBenchmark"] = {}
-    for model in MODELS:
-        g = rule["gate"]["byModel"][model]
-        if g["passes"]:
-            census = score_errors(k_errs(model, POOL, CENSUS), all63)
-            at_k = score_errors(k_errs(model, POOL, k_star), all63)
-            out["individualBenchmark"][model] = {
-                "topline": census["toplineMAE"] + g["addedErrorAtKStar"]["topline"],
-                "subgroup": census["subgroupMAE"] + g["addedErrorAtKStar"]["subgroup"],
-                "items": census["items"],
-                "people": k_star,
-                "shareOfSubgroupsShown": at_k["expectedBinsShown"] / census["bins"],
+        for model in MODELS:
+            cov = coverage.get((model, POOL), {"covered": [], "flagged": []})
+            complete = len(cov["covered"]) == len(all63)
+            q = q1[model]["all63"]
+            add = added_at(model) if k_star and complete else None
+            gap = ({"topline": q["topline"]["diff"] + add["topline"], "subgroup": q["subgroup"]["diff"] + add["subgroup"]}
+                   if add and q and q["subgroup"] else None)
+            rule["gate"]["byModel"][model] = {
+                "complete": complete,
+                "flaggedItems": cov["flagged"],
+                "addedErrorAtKStar": add,
+                "gapToCells": gap,
+                "passes": bool(gap and gap["topline"] <= GATE_MARGIN and gap["subgroup"] <= GATE_MARGIN),
             }
+        luna = rule["gate"]["byModel"][DEFAULT_MODEL]
+        q = q1[DEFAULT_MODEL]["all63"]
+        rule["defaultEligible"] = bool(luna["passes"]
+                                       and q["subgroup"]["hi"] + luna["addedErrorAtKStar"]["subgroup"] < 0
+                                       and q["topline"]["hi"] + luna["addedErrorAtKStar"]["topline"] < DEFAULT_TOPLINE_MARGIN)
+        rule["defaultToplineMargin"] = DEFAULT_TOPLINE_MARGIN
+
+        # Accuracy the individual mode displays, per model that passes the gate.
+        bench = {}
+        for model in MODELS:
+            g = rule["gate"]["byModel"][model]
+            if g["passes"]:
+                census = score_errors(k_errs(model, POOL, CENSUS), all63)
+                at_k = score_errors(k_errs(model, POOL, k_star), all63)
+                bench[model] = {
+                    "topline": census["toplineMAE"] + g["addedErrorAtKStar"]["topline"],
+                    "subgroup": census["subgroupMAE"] + g["addedErrorAtKStar"]["subgroup"],
+                    "items": census["items"],
+                    "people": k_star,
+                    "shareOfSubgroupsShown": at_k["expectedBinsShown"] / census["bins"],
+                }
+        return rule, bench
+
+    out["productRule"], out["individualBenchmark"] = product_rules(coverage)
+    rule, k_star, added = out["productRule"], out["productRule"]["people"], out["productRule"]["addedErrorVsCensusByK"]
+
+    # ---- exploratory, not registered: computed after the registered results were read
+    exploratory = {"note": "Not registered. Computed after the registered results had been read; see the post-run notes."}
+    # E1: gpt-6-luna gave an all-zero distribution, which the parser rejects,
+    # for every person with no earnings on gss_satjob, a question asked only
+    # of people who work for pay. Treated as out-of-universe abstentions
+    # rather than failures, the item is covered by the people who answered.
+    abstain = {}
+    for model, arm in RUNS:
+        res = study_get(model, arm)("gss_satjob")
+        if res and "people" in res:
+            records = pool_records if arm == POOL else fresh_pools["gss_satjob"]["records"]
+            failed = [i for i, d in res["people"] if d is None]
+            abstain[f"{model}|{arm}"] = {
+                "unparsed": len(failed),
+                "unparsedWithNoEarnings": sum(records[i]["employment_income"] + records[i]["self_employment_income"] <= 0 for i in failed),
+            }
+    relaxed = {key: {**cov, "covered": sorted(set(cov["covered"]) | ({"gss_satjob"} if "gss_satjob" in cov["flagged"] else set())),
+                     "flagged": [i for i in cov["flagged"] if i != "gss_satjob"]}
+               for key, cov in coverage.items()}
+    e1_rule, e1_bench = product_rules(relaxed)
+    exploratory["E1_satjobAbstentionsAsOutOfUniverse"] = {"abstentions": abstain, "productRule": e1_rule, "individualBenchmark": e1_bench}
+
+    # E2: signed topline error (estimate minus human share) by item valence,
+    # individual (released pool, census) against cells.
+    def signed(get, iid):
+        res = get(iid)
+        if not res or not res.get("topline"):
+            return None
+        pos = bank[iid]["positiveOptions"]
+        return pos_share(res["topline"], pos) - pos_share(bank[iid]["targets"]["overall"]["dist"], pos)
+
+    e2 = {}
+    for model in MODELS:
+        by_valence = {}
+        gaps = []
+        for iid in all63:
+            si, sc = signed(study_get(model, POOL), iid), signed(refresh_get(model, "cells"), iid)
+            if si is None or sc is None:
+                continue
+            v = by_valence.setdefault(bank[iid].get("valence") or "none", {"items": 0, "individual": [], "cells": []})
+            v["items"] += 1
+            v["individual"].append(si)
+            v["cells"].append(sc)
+            gaps.append((abs(si) - abs(sc), iid, si, sc))
+        e2[model] = {
+            "meanSignedToplineErrorByValence": {
+                k: {"items": v["items"], "individual": mean(v["individual"]), "cells": mean(v["cells"])}
+                for k, v in sorted(by_valence.items())
+            },
+            "largestGapsToCells": [
+                {"itemId": iid, "individualSigned": si, "cellsSigned": sc}
+                for _, iid, si, sc in sorted(gaps, reverse=True)[:8]
+            ],
+        }
+    exploratory["E2_signedToplineError"] = e2
+    out["exploratory"] = exploratory
 
     with open(MOCK_OUT if MOCK else OUT, "w") as f:
         json.dump(out, f, indent=1, sort_keys=True)

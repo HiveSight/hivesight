@@ -279,3 +279,58 @@ these rules fix only what the results can support.
 Run order: the three runs, then the analysis. Deviations, interruptions and
 corrections go in post-run notes appended below, never by editing the
 registered text.
+
+## Post-run notes (2026-10-23; disclosures, not a registration)
+
+Written after the runs and the registered analysis. None changes the
+registered text; each records what happened or what the results show beyond
+it.
+
+1. **Order.** The registration commit (0908c5b) and tag were pushed, and the
+   draft PR opened at 11:38:41Z, before the first study call at 11:38:55Z.
+   Every pass recorded commit 0908c5b with its inputs unmodified.
+2. **Runs.** gpt-6-luna released pool: one pass, 75,600 calls, no failed
+   calls, $2.80. gpt-6-luna fresh pools: one pass, 75,600 calls, no failed
+   calls, $2.80. gpt-6.1-sol released pool: started at concurrency 30, stopped
+   by the operator at 11:41Z after one saved item to raise concurrency to 60,
+   and resumed with unchanged code at 11:41:55Z; the 814 calls of the
+   unsaved second item (gss_health) were repeated, so the log holds 76,414
+   answered calls, no failed calls, $56.53 (cumulative, against the $75 cap).
+   No log line was cut off.
+3. **gss_satjob is flagged for gpt-6-luna, so rules 1 to 4 did not apply.**
+   For this item, which the GSS asks only of people who work for pay
+   (universe note: "Asked of respondents who work for pay; estimate among
+   employed members of this group"), gpt-6-luna replied with every
+   percentage zero for each simulated person with no earnings: 389 of 1,200
+   in the released pool and 387 of 1,200 in its fresh pool, and no one else.
+   gpt-6.1-sol answered for everyone. The parser treats an all-zero reply as
+   unparsed, so 32% of gpt-6-luna's elicitations on the item failed, the item
+   was flagged, and, as registered, gpt-6-luna's run did not cover all 63
+   items: K* was not computed and neither model passes the gate. The
+   individual mode is therefore not supported, and cells stay the default.
+   The abstentions are arguably correct (the estimate then rests on the
+   people the question applies to), but the registered rule counts them as
+   failures and is applied as written.
+4. **The gate fails without that item too (exploratory E1).** Treating the
+   abstentions as out of universe, K* would be 150 (asking 150 people adds
+   0.00 topline and 0.06 subgroup points to the census), and both models
+   would still fail rule 2 on both metrics: gpt-6-luna +2.75 topline and +2.14
+   subgroup points behind its cells, gpt-6.1-sol +2.93 and +2.18, against a
+   2.0-point margin. The registered conclusion does not depend on gss_satjob.
+5. **What the results show (from the registered artifact).** With every
+   person in the pool, individual probabilities remain about 2 to 3 points
+   behind cells and direct estimation for both models (Q1, Q2; all intervals
+   on all 63 items exclude zero). Asking more people does not close the gap:
+   150 people score like 1,200 (Q3), and 1,200 people score within 0.2 to 0.4
+   points of amendment 2's 150 on the same 20 items (D4). Independent pools
+   (Q4) and reweighting to the population's age × income × sex composition
+   (D5) change nothing. The remaining error is therefore not person-sampling
+   noise. Individual reports are stable: asked twice, a person's answer share
+   correlates 0.81 (gpt-6-luna) and 0.97 (gpt-6.1-sol) with their first
+   answer within an item (D1).
+6. **Where the error sits (exploratory E2).** Simulated individuals overstate
+   hardship: mean signed topline error is about −5 to −7 points on
+   positive-valence items and +15 to +19 points on the three negative-valence
+   items, against about +3 to +4 for cells on both. The largest gaps to cells
+   are financial-wellbeing items (shed_b2, shed_ef7, shed_ef1,
+   shed_housing_stress) and gss_fear.
