@@ -64,9 +64,9 @@ each bin by the share of runs that show it.
 
 - D1 test-retest, gpt-6-luna: within-item correlation 0.81 over 20 items (3,000 person pairs); mean absolute difference 3.4 points, against a within-item SD of first answers of 13.6.
 - D1 test-retest, gpt-6.1-sol: within-item correlation 0.97 over 20 items (2,999 person pairs); mean absolute difference 1.6 points, against a within-item SD of first answers of 14.5.
-- D2 sampling error, gpt-6-luna persona-prob-pool: mean person-sampling SE of bin estimates K = 150: 1.3 (537 bins), K = 300: 0.8 (548 bins), K = 600: 0.5 (548 bins), K = 1,200: 0.0 (548 bins); census bins as samples of the population 0.5.
+- D2 sampling error, gpt-6-luna persona-prob-pool: mean person-sampling SE of bin estimates K = 150: 1.3 (536 bins), K = 300: 0.8 (548 bins), K = 600: 0.5 (548 bins), K = 1,200: 0.0 (548 bins); census bins as samples of the population 0.5.
 - D3 gpt-6-luna persona-prob-pool: 75,600 answered calls, 0 failed, 0 cut-off log lines; failure rate of elicitations 0.51%; flagged items: gss_satjob; cost $2.80.
-- D2 sampling error, gpt-6-luna persona-prob-fresh: mean person-sampling SE of bin estimates K = 150: 1.2 (536 bins), K = 300: 0.8 (538 bins), K = 600: 0.5 (548 bins), K = 1,200: 0.0 (548 bins); census bins as samples of the population 0.5.
+- D2 sampling error, gpt-6-luna persona-prob-fresh: mean person-sampling SE of bin estimates K = 150: 1.2 (535 bins), K = 300: 0.8 (538 bins), K = 600: 0.5 (548 bins), K = 1,200: 0.0 (548 bins); census bins as samples of the population 0.5.
 - D3 gpt-6-luna persona-prob-fresh: 75,600 answered calls, 0 failed, 0 cut-off log lines; failure rate of elicitations 0.51%; flagged items: gss_satjob; cost $2.80.
 - D2 sampling error, gpt-6.1-sol persona-prob-pool: mean person-sampling SE of bin estimates K = 150: 1.2 (537 bins), K = 300: 0.8 (548 bins), K = 600: 0.5 (548 bins), K = 1,200: 0.0 (548 bins); census bins as samples of the population 0.5.
 - D3 gpt-6.1-sol persona-prob-pool: 76,414 answered calls, 0 failed, 0 cut-off log lines; failure rate of elicitations 0.02%; flagged items: none; cost $56.53.
@@ -78,10 +78,10 @@ each bin by the share of runs that show it.
 
 Not registered. Computed after the registered results had been read; see the post-run notes.
 
-- E1 gpt-6-luna persona-prob-fresh: 387 unparsed gss_satjob replies, 387 of them from people with no earnings.
-- E1 gpt-6-luna persona-prob-pool: 389 unparsed gss_satjob replies, 389 of them from people with no earnings.
-- E1 gpt-6.1-sol persona-prob-pool: 0 unparsed gss_satjob replies, 0 of them from people with no earnings.
-- E1 with those abstentions treated as out of universe: K* = 150.
+- E1 gpt-6-luna persona-prob-fresh: 387 unparsed gss_satjob replies, 387 of them from the 457 people with no earnings.
+- E1 gpt-6-luna persona-prob-pool: 389 unparsed gss_satjob replies, 389 of them from the 460 people with no earnings.
+- E1 gpt-6.1-sol persona-prob-pool: 0 unparsed gss_satjob replies, 0 of them from the 460 people with no earnings.
+- E1 with those abstentions exempted from flagging (the item's scores unchanged): K* = 150.
   - gpt-6-luna: gate fails (+2.8 topline, +2.1 subgroup points behind cells).
   - gpt-6.1-sol: gate fails (+2.9 topline, +2.2 subgroup points behind cells).
 - E2 mean signed topline error by valence, gpt-6-luna: negative (3 items): individual +19.1, cells +2.8, neutral (44 items): individual +1.8, cells -1.6, positive (16 items): individual -6.7, cells +4.1.

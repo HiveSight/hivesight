@@ -155,10 +155,10 @@ def main(src=SRC, out=OUT):
         if e1:
             for key, v in e1["abstentions"].items():
                 lines.append(f"- E1 {key.replace('|', ' ')}: {v['unparsed']} unparsed gss_satjob replies, "
-                             f"{v['unparsedWithNoEarnings']} of them from people with no earnings.")
+                             f"{v['unparsedWithNoEarnings']} of them from the {v['peopleWithNoEarnings']} people with no earnings.")
             r = e1["productRule"]
-            lines.append(f"- E1 with those abstentions treated as out of universe: K* = {r['people']:,}." if r["people"] else
-                         "- E1 with those abstentions treated as out of universe: K* not computed.")
+            lines.append(f"- E1 with those abstentions exempted from flagging (the item's scores unchanged): K* = {r['people']:,}." if r["people"] else
+                         "- E1 with those abstentions exempted from flagging: K* not computed.")
             for model, g in r["gate"]["byModel"].items():
                 gap = g["gapToCells"]
                 lines.append(f"  - {model}: gate {'passes' if g['passes'] else 'fails'}"

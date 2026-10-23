@@ -110,6 +110,18 @@ def test_person_sampling_se_vanishes_at_the_census(rows):
     assert all(v == 0 for v in p.sampling_se(len(rows)))
 
 
+def test_person_sampling_se_counts_failed_replies_as_drawn():
+    # 40 women and 40 men answer, 40 people fail: drawing 80 of the 120
+    # records leaves some answering people out, so the SE is not zero.
+    rows = [(True, 40, [30 + (j % 7), 40, 30]) for j in range(40)]
+    rows += [(False, 40, [10 + (j % 5), 50, 40]) for j in range(40)]
+    rows += [(True, 40, None)] * 40
+    p = build(rows)
+    se = p.sampling_se(80)
+    assert se and all(v > 0 for v in se)
+    assert all(v == 0 for v in p.sampling_se(120))
+
+
 @settings(max_examples=40, deadline=None)
 @given(people_strategy, st.floats(0.1, 10))
 def test_equal_weights_reproduce_the_unweighted_estimate(rows, c):

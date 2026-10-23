@@ -446,14 +446,17 @@
   "E1_satjobAbstentionsAsOutOfUniverse": {
    "abstentions": {
     "gpt-6-luna|persona-prob-fresh": {
+     "peopleWithNoEarnings": 457,
      "unparsed": 387,
      "unparsedWithNoEarnings": 387
     },
     "gpt-6-luna|persona-prob-pool": {
+     "peopleWithNoEarnings": 460,
      "unparsed": 389,
      "unparsedWithNoEarnings": 389
     },
     "gpt-6.1-sol|persona-prob-pool": {
+     "peopleWithNoEarnings": 460,
      "unparsed": 0,
      "unparsedWithNoEarnings": 0
     }
@@ -808,8 +811,8 @@
        "toplineMAE": 0.09209902820653473
       },
       "binShowRate": 0.9742609489051095,
-      "binsWithSE": 536,
-      "meanPersonSamplingSE": 0.012430606818906257,
+      "binsWithSE": 535,
+      "meanPersonSamplingSE": 0.012449125757726632,
       "other43": {
        "bins": 354,
        "expectedBinsShown": 351.345,
@@ -830,7 +833,7 @@
       },
       "binShowRate": 0.985720802919708,
       "binsWithSE": 538,
-      "meanPersonSamplingSE": 0.008188285904169148,
+      "meanPersonSamplingSE": 0.008219265399403115,
       "other43": {
        "bins": 356,
        "expectedBinsShown": 354.0,
@@ -851,7 +854,7 @@
       },
       "binShowRate": 0.9992153284671532,
       "binsWithSE": 548,
-      "meanPersonSamplingSE": 0.00477570556509865,
+      "meanPersonSamplingSE": 0.004804672073072036,
       "other43": {
        "bins": 356,
        "expectedBinsShown": 355.96000000000004,
@@ -949,8 +952,8 @@
        "toplineMAE": 0.0916454612466963
       },
       "binShowRate": 0.9752007299270075,
-      "binsWithSE": 537,
-      "meanPersonSamplingSE": 0.01251228685803989,
+      "binsWithSE": 536,
+      "meanPersonSamplingSE": 0.012525073594470021,
       "other43": {
        "bins": 356,
        "expectedBinsShown": 351.735,
@@ -971,7 +974,7 @@
       },
       "binShowRate": 0.9925912408759126,
       "binsWithSE": 548,
-      "meanPersonSamplingSE": 0.008290045676842103,
+      "meanPersonSamplingSE": 0.008322861236398117,
       "other43": {
        "bins": 356,
        "expectedBinsShown": 354.89,
@@ -992,7 +995,7 @@
       },
       "binShowRate": 1.0,
       "binsWithSE": 548,
-      "meanPersonSamplingSE": 0.004773923856931602,
+      "meanPersonSamplingSE": 0.004805206175262354,
       "other43": {
        "bins": 356,
        "expectedBinsShown": 356.0,
@@ -1189,7 +1192,7 @@
       },
       "binShowRate": 0.9767609489051094,
       "binsWithSE": 537,
-      "meanPersonSamplingSE": 0.012184684394002892,
+      "meanPersonSamplingSE": 0.012185487291110622,
       "other43": {
        "bins": 356,
        "expectedBinsShown": 352.435,
@@ -1210,7 +1213,7 @@
       },
       "binShowRate": 0.9924817518248175,
       "binsWithSE": 548,
-      "meanPersonSamplingSE": 0.008005079665297966,
+      "meanPersonSamplingSE": 0.008005680748505032,
       "other43": {
        "bins": 356,
        "expectedBinsShown": 354.835,
@@ -1231,7 +1234,7 @@
       },
       "binShowRate": 1.0,
       "binsWithSE": 548,
-      "meanPersonSamplingSE": 0.004621560866115488,
+      "meanPersonSamplingSE": 0.004622081935195585,
       "other43": {
        "bins": 356,
        "expectedBinsShown": 356.0,

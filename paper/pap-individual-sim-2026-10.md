@@ -301,18 +301,21 @@ it.
    For this item, which the GSS asks only of people who work for pay
    (universe note: "Asked of respondents who work for pay; estimate among
    employed members of this group"), gpt-6-luna replied with every
-   percentage zero for each simulated person with no earnings: 389 of 1,200
-   in the released pool and 387 of 1,200 in its fresh pool, and no one else.
+   percentage zero for most simulated people with no earnings and for no one
+   else: 389 of the 460 people with no earnings in the released pool (the
+   other 71 answered) and 387 of 457 in its fresh pool (70 answered).
    gpt-6.1-sol answered for everyone. The parser treats an all-zero reply as
    unparsed, so 32% of gpt-6-luna's elicitations on the item failed, the item
    was flagged, and, as registered, gpt-6-luna's run did not cover all 63
    items: K* was not computed and neither model passes the gate. The
    individual mode is therefore not supported, and cells stay the default.
-   The abstentions are arguably correct (the estimate then rests on the
-   people the question applies to), but the registered rule counts them as
+   The abstentions can be read as out-of-universe answers, but the estimate
+   still includes the 71 people with no earnings who answered, so it is not
+   restricted to workers; the registered rule counts the abstentions as
    failures and is applied as written.
-4. **The gate fails without that item too (exploratory E1).** Treating the
-   abstentions as out of universe, K* would be 150 (asking 150 people adds
+4. **The gate still fails if these abstentions are exempted (exploratory
+   E1).** Exempting gss_satjob from flagging, with its scores unchanged, K*
+   would be 150 (asking 150 people adds
    0.00 topline and 0.06 subgroup points to the census), and both models
    would still fail rule 2 on both metrics: gpt-6-luna +2.75 topline and +2.14
    subgroup points behind its cells, gpt-6.1-sol +2.93 and +2.18, against a
@@ -324,8 +327,8 @@ it.
    150 people score like 1,200 (Q3), and 1,200 people score within 0.2 to 0.4
    points of amendment 2's 150 on the same 20 items (D4). Independent pools
    (Q4) and reweighting to the population's age × income × sex composition
-   (D5) change nothing. The remaining error is therefore not person-sampling
-   noise. Individual reports are stable: asked twice, a person's answer share
+   (D5) change nothing. These sampling and reweighting checks did not
+   materially close the gap. Individual reports are stable: asked twice, a person's answer share
    correlates 0.81 (gpt-6-luna) and 0.97 (gpt-6.1-sol) with their first
    answer within an item (D1).
 6. **Where the error sits (exploratory E2).** Simulated individuals overstate
@@ -334,3 +337,11 @@ it.
    items, against about +3 to +4 for cells on both. The largest gaps to cells
    are financial-wellbeing items (shed_b2, shed_ef7, shed_ef1,
    shed_housing_stress) and gss_fear.
+7. **Corrections after review (2026-10-23).** An independent review of the
+   PR found that note 3 first said every person with no earnings abstained
+   (corrected above: 389 of 460), and that D2's person-sampling standard
+   errors treated only the people who answered as the population K is drawn
+   from, although K is drawn from every record. D2 now uses every record; its
+   mean standard errors changed by less than 0.01 points and no registered
+   comparison or rule outcome changed. Note 4's heading and note 5's sentence
+   on what the sampling checks show were reworded to describe them exactly.

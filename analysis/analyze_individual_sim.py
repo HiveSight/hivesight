@@ -166,8 +166,9 @@ class People:
     def sampling_se(self, k):
         """Person-sampling standard errors of bin estimates when k of the
         people are drawn without replacement (finite-population corrected; 0
-        at the census), for bins expecting at least MIN_BIN answering people."""
-        n = int(self.ok.sum())
+        at the census), for bins expecting at least MIN_BIN answering people.
+        The k are drawn from every record, failed replies included."""
+        n = len(self.pos)
         out = []
         for members, _ in self.bins.values():
             vals = self.pos[members & self.ok]
@@ -615,19 +616,23 @@ def main():
 
     # ---- exploratory, not registered: computed after the registered results were read
     exploratory = {"note": "Not registered. Computed after the registered results had been read; see the post-run notes."}
-    # E1: gpt-6-luna gave an all-zero distribution, which the parser rejects,
-    # for every person with no earnings on gss_satjob, a question asked only
-    # of people who work for pay. Treated as out-of-universe abstentions
-    # rather than failures, the item is covered by the people who answered.
+    # E1: on gss_satjob, a question asked only of people who work for pay,
+    # gpt-6-luna gave an all-zero distribution, which the parser rejects, for
+    # most people with no earnings and for no one else. Treated as
+    # out-of-universe abstentions rather than failures, the item is covered
+    # by the people who answered (its scores are unchanged).
     abstain = {}
     for model, arm in RUNS:
         res = study_get(model, arm)("gss_satjob")
         if res and "people" in res:
             records = pool_records if arm == POOL else fresh_pools["gss_satjob"]["records"]
+            no_earnings = {i for i, _ in res["people"]
+                           if records[i]["employment_income"] + records[i]["self_employment_income"] <= 0}
             failed = [i for i, d in res["people"] if d is None]
             abstain[f"{model}|{arm}"] = {
                 "unparsed": len(failed),
-                "unparsedWithNoEarnings": sum(records[i]["employment_income"] + records[i]["self_employment_income"] <= 0 for i in failed),
+                "unparsedWithNoEarnings": sum(i in no_earnings for i in failed),
+                "peopleWithNoEarnings": len(no_earnings),
             }
     relaxed = {key: {**cov, "covered": sorted(set(cov["covered"]) | ({"gss_satjob"} if "gss_satjob" in cov["flagged"] else set())),
                      "flagged": [i for i in cov["flagged"] if i != "gss_satjob"]}
