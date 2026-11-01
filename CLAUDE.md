@@ -39,6 +39,27 @@ bun run data:release # build missing public/data/v1 files (needs numpy; delete a
   restarts the day's per-visitor counts.
 - `CRON_SECRET` — optional, protects /api/cron/keepalive.
 
+## Monitoring
+
+Nothing on Vercel can report that the site stopped serving estimates, so two
+things outside it watch `/api/health`:
+
+- `.github/workflows/health-monitor.yml` (`scripts/health-monitor.mjs`) runs
+  every 15 minutes, retries a failure twice, and keeps one open issue labeled
+  `health-alert` per problem. A later failure edits that issue, which notifies
+  nobody. The issue closes itself after 30 minutes without a failure.
+  `database_size` turns to `warning` at 400 MB and opens its own issue; health
+  stays 200 for it.
+- GitHub's email for this repo goes unread, so `~/chief-of-staff/bin/hivesight-health-watch`
+  (launchd, every 5 minutes on Max's Mac) sends each new issue through `say` to
+  Telegram, once. It also alerts when scheduled runs stop succeeding for 6 hours.
+  `say` holds alerts from 22:00 to 07:00 for the morning card.
+
+Test the whole path with
+`gh workflow run health-monitor.yml -R HiveSight/hivesight -f drill=true`, which
+reads the failing `scripts/health-drill.json`. It opens a `[drill]` issue that
+closes itself, and doesn't touch a real outage's issue.
+
 ## Migrations
 
 Apply migrations before deploying the code that needs them: production refuses

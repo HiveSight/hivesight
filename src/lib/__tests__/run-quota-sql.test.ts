@@ -225,6 +225,7 @@ describe("run quota migrations", { timeout: 60_000 }, () => {
       for (const [sql, denied] of [
         ["select public.claim_run('a', 1, 1, 1)", "function claim_run"],
         ["select public.purge_old_records(1)", "function purge_old_records"],
+        ["select public.database_bytes()", "function database_bytes"],
         ["select * from public.run_quota", "table run_quota"],
         ["update public.run_quota set used = 0", "table run_quota"],
         ["select * from public.runs", "table runs"],
@@ -242,11 +243,13 @@ describe("run quota migrations", { timeout: 60_000 }, () => {
       "insert into public.runs (payload) values ('{}') returning id"
     );
     const read = await db.query("select payload from public.runs where id = $1", [saved.rows[0].id]);
+    const size = await db.query<{ bytes: string }>("select public.database_bytes() as bytes");
     await db.exec("reset role");
     expect(read.rows).toHaveLength(1);
+    expect(Number(size.rows[0].bytes)).toBeGreaterThan(0);
   });
 
-  it("keeps row security on and runs both functions as the caller", async () => {
+  it("keeps row security on and runs every function as the caller", async () => {
     const tables = await db.query<{ relrowsecurity: boolean }>(
       "select relrowsecurity from pg_class where oid in ('public.run_quota'::regclass, 'public.runs'::regclass)"
     );
@@ -254,10 +257,11 @@ describe("run quota migrations", { timeout: 60_000 }, () => {
     const functions = await db.query<{ prosecdef: boolean; proconfig: string[] }>(
       `select prosecdef, proconfig from pg_proc where oid in (
         'public.claim_run(text, integer, integer, integer)'::regprocedure,
-        'public.purge_old_records(integer)'::regprocedure
+        'public.purge_old_records(integer)'::regprocedure,
+        'public.database_bytes()'::regprocedure
       )`
     );
-    expect(functions.rows).toHaveLength(2);
+    expect(functions.rows).toHaveLength(3);
     for (const fn of functions.rows) {
       expect(fn.prosecdef).toBe(false);
       expect(fn.proconfig).toEqual(['search_path=""']);

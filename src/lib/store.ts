@@ -161,14 +161,36 @@ export async function pingStore(): Promise<{ ok: boolean; message: string }> {
   return { ok: false, message: "store unreachable" };
 }
 
-// /api/health is public and each ping takes the site row's lock, so one
-// instance sends at most one ping per interval, however much traffic it gets.
-const PING_INTERVAL_MS = 30_000;
-let lastPing: { at: number; result: ReturnType<typeof pingStore> } | undefined;
-
-export function recentPing(): ReturnType<typeof pingStore> {
-  if (!lastPing || Date.now() - lastPing.at >= PING_INTERVAL_MS) {
-    lastPing = { at: Date.now(), result: pingStore() };
+/** The database's size, or null when it can't say. */
+export async function databaseBytes(): Promise<number | null> {
+  const db = getClient();
+  if (!db) return null;
+  try {
+    const { data, error } = await db
+      .rpc("database_bytes")
+      .abortSignal(AbortSignal.timeout(STORE_TIMEOUT_MS));
+    if (!error && typeof data === "number") return data;
+    console.error("databaseBytes failed:", error?.message ?? "unexpected answer");
+  } catch (err) {
+    console.error("databaseBytes failed:", err);
   }
-  return lastPing.result;
+  return null;
 }
+
+// /api/health is public and each ping takes the site row's lock, so one
+// instance sends each query at most once per interval, however much traffic
+// it gets.
+const PING_INTERVAL_MS = 30_000;
+
+function recent<T>(query: () => Promise<T>): () => Promise<T> {
+  let last: { at: number; result: Promise<T> } | undefined;
+  return () => {
+    if (!last || Date.now() - last.at >= PING_INTERVAL_MS) {
+      last = { at: Date.now(), result: query() };
+    }
+    return last.result;
+  };
+}
+
+export const recentPing = recent(pingStore);
+export const recentDatabaseBytes = recent(databaseBytes);

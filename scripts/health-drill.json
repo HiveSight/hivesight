@@ -1,0 +1,10 @@
+{
+  "status": "degraded",
+  "service": "hivesight",
+  "checkedAt": "2026-11-01T00:00:00.000Z",
+  "checks": [
+    { "name": "model_config", "status": "ok", "message": "OPENAI_API_KEY configured" },
+    { "name": "cell_data", "status": "ok", "message": "139 cells for Delaware, weight 806,617" },
+    { "name": "store", "status": "failed", "message": "store unreachable" }
+  ]
+}

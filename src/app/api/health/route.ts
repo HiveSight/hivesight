@@ -1,5 +1,22 @@
 import { loadGeography } from "@/engine/data";
-import { recentPing, storeConfigured } from "@/lib/store";
+import { recentDatabaseBytes, recentPing, storeConfigured } from "@/lib/store";
+
+// Supabase counts every project in the organization against the free plan's
+// 500 MB. This warns at 80%, while there's still time to act: at the site's
+// daily allowance the largest estimates add under 24 MB a day.
+const DATABASE_QUOTA_BYTES = 500_000_000;
+const DATABASE_WARNING_BYTES = 400_000_000;
+
+function databaseSizeCheck(bytes: number | null) {
+  if (bytes === null) {
+    return { name: "database_size", status: "unknown", message: "database size unavailable" };
+  }
+  return {
+    name: "database_size",
+    status: bytes >= DATABASE_WARNING_BYTES ? "warning" : "ok",
+    message: `${Math.round(bytes / 1_000_000)} MB of ${DATABASE_QUOTA_BYTES / 1_000_000} MB`,
+  };
+}
 
 export async function GET() {
   const checks: Array<{ name: string; status: string; message: string }> = [];
@@ -24,12 +41,13 @@ export async function GET() {
   }
 
   if (storeConfigured()) {
-    const ping = await recentPing();
+    const [ping, bytes] = await Promise.all([recentPing(), recentDatabaseBytes()]);
     checks.push({
       name: "store",
       status: ping.ok ? "ok" : "failed",
       message: ping.message,
     });
+    checks.push(databaseSizeCheck(bytes));
   } else if (process.env.NODE_ENV === "production") {
     checks.push({
       name: "store",

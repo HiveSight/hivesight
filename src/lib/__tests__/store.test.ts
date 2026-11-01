@@ -267,3 +267,89 @@ describe("recentPing", () => {
     expect((await recentPing()).ok).toBe(true);
   });
 });
+
+describe("databaseBytes", () => {
+  beforeEach(() => {
+    vi.spyOn(console, "error").mockImplementation(() => {});
+    rpc.mockReset();
+    vi.stubEnv("NEXT_PUBLIC_SUPABASE_URL", "https://example.supabase.co");
+    vi.stubEnv("SUPABASE_SECRET_KEY", "test-secret");
+  });
+  afterEach(() => {
+    vi.unstubAllEnvs();
+    vi.restoreAllMocks();
+  });
+
+  it("returns the database's answer", async () => {
+    answers({ data: 12_274_835, error: null });
+    const { databaseBytes } = await loadStore();
+    expect(await databaseBytes()).toBe(12_274_835);
+    expect(rpc).toHaveBeenCalledWith("database_bytes");
+  });
+
+  it.each([
+    ["an error", { data: null, error: { message: "boom" } }],
+    ["an error with data", { data: 1, error: { message: "boom" } }],
+    ["no data", { data: null, error: null }],
+    ["text", { data: "12", error: null }],
+  ])("answers null on %s", async (_name, result) => {
+    answers(result);
+    const { databaseBytes } = await loadStore();
+    expect(await databaseBytes()).toBeNull();
+  });
+
+  it("answers null on a rejected call", async () => {
+    rpc.mockReturnValue({ abortSignal: () => Promise.reject(new Error("offline")) });
+    const { databaseBytes } = await loadStore();
+    expect(await databaseBytes()).toBeNull();
+  });
+
+  it("gives up on a database that never answers", { timeout: 10_000 }, async () => {
+    rpc.mockReturnValue({
+      abortSignal: (signal: AbortSignal) =>
+        new Promise((_, reject) => {
+          signal.addEventListener("abort", () => reject(signal.reason));
+        }),
+    });
+    const { databaseBytes } = await loadStore();
+    expect(await databaseBytes()).toBeNull();
+  });
+
+  it("answers null without a database", async () => {
+    vi.stubEnv("NEXT_PUBLIC_SUPABASE_URL", "");
+    const { databaseBytes } = await loadStore();
+    expect(await databaseBytes()).toBeNull();
+    expect(rpc).not.toHaveBeenCalled();
+  });
+});
+
+describe("recentDatabaseBytes", () => {
+  beforeEach(() => {
+    vi.useFakeTimers({ toFake: ["Date"] });
+    rpc.mockReset();
+    vi.stubEnv("NEXT_PUBLIC_SUPABASE_URL", "https://example.supabase.co");
+    vi.stubEnv("SUPABASE_SECRET_KEY", "test-secret");
+  });
+  afterEach(() => {
+    vi.useRealTimers();
+    vi.unstubAllEnvs();
+  });
+
+  it("asks once for a burst of health checks and again after 30 seconds", async () => {
+    answers({ data: 1, error: null });
+    const { recentDatabaseBytes } = await loadStore();
+    await Promise.all(Array.from({ length: 500 }, () => recentDatabaseBytes()));
+    expect(rpc).toHaveBeenCalledOnce();
+    vi.advanceTimersByTime(30_000);
+    await recentDatabaseBytes();
+    expect(rpc).toHaveBeenCalledTimes(2);
+  });
+
+  it("shares no answer with the ping", async () => {
+    answers({ data: "site", error: null });
+    const { recentDatabaseBytes, recentPing } = await loadStore();
+    await recentPing();
+    answers({ data: 7, error: null });
+    expect(await recentDatabaseBytes()).toBe(7);
+  });
+});

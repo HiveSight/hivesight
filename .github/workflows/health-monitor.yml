@@ -1,0 +1,46 @@
+name: Health monitor
+
+# Reads /api/health from outside Vercel and keeps one open issue per problem.
+# This job fails only when the monitor itself breaks, never for an outage:
+# ~/chief-of-staff/bin/hivesight-health-watch alerts when scheduled runs stop
+# succeeding, and it sends each new issue to Max.
+
+on:
+  schedule:
+    # Off the hour: GitHub warns that runs at the top of the hour face delays.
+    - cron: "7,22,37,52 * * * *"
+  workflow_dispatch:
+    inputs:
+      drill:
+        description: Test the alert path against scripts/health-drill.json
+        type: boolean
+        default: false
+
+permissions:
+  actions: write
+  contents: read
+  issues: write
+
+# Two runs at once could both find no issue and both open one.
+concurrency:
+  group: health-monitor
+  cancel-in-progress: false
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check hivesight.ai
+        run: node scripts/health-monitor.mjs
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          HEALTH_DRILL: ${{ inputs.drill }}
+
+      # GitHub disables schedules on a public repo after 60 days with no activity.
+      - name: Keep this schedule enabled
+        run: gh api -X PUT "repos/$GITHUB_REPOSITORY/actions/workflows/health-monitor.yml/enable"
+        env:
+          GH_TOKEN: ${{ github.token }}
