@@ -59,8 +59,10 @@ the shell) and the body `{"query": "<sql>"}`. Then insert `(version, name)` into
   runners' settings are in `evals/models.mjs`; `models.test.ts` keeps them
   equal. Verify model IDs and supported efforts against the provider's docs
   and live API before changing them.
-- `/api/run` accepts only the default model (`RunRequestSchema`). Opening
-  another model to the public needs a visitor allowance that counts units.
+- `/api/run` accepts every served model, and the form sends none, so visitors
+  get the default. `paper/pap-model-refresh-2026-10.md` registers Sol as a second
+  model through the API. Each model sets its own `visitorLimit` and `siteUnits`,
+  and `models.test.ts` holds one visitor to a fifth of the site's allowance.
 
 ## Rules
 

@@ -1,7 +1,6 @@
 /**
- * Models the product can serve, with the request settings the benchmark
- * measured them under. /api/run offers only DEFAULT_MODEL (RunRequestSchema).
- * evals/models.mjs holds the same settings for the eval runners;
+ * Models the product serves, with the request settings the benchmark measured
+ * them under. evals/models.mjs holds the same settings for the eval runners;
  * __tests__/models.test.ts keeps the two in agreement so published accuracy
  * describes the shipped configuration.
  *
@@ -24,7 +23,15 @@ export interface ServedModel {
    * makes different calls and needs its own figure before it ships.
    */
   siteUnits: number;
+  /**
+   * Estimates of this model one visitor may run per UTC day. The limits across
+   * all models keep one visitor to a fifth of the site's allowance.
+   */
+  visitorLimit: number;
 }
+
+/** Units the whole site may spend per UTC day. */
+export const SITE_UNITS_PER_DAY = 500;
 
 export const SERVED_MODELS = {
   "gpt-6-luna": {
@@ -33,6 +40,7 @@ export const SERVED_MODELS = {
     reasoningEffort: "none",
     price: [0.1, 0.5],
     siteUnits: 1,
+    visitorLimit: 20,
   },
   "gpt-6.1-sol": {
     label: "GPT-6.1 Sol",
@@ -40,6 +48,7 @@ export const SERVED_MODELS = {
     reasoningEffort: "low",
     price: [2, 10],
     siteUnits: 40,
+    visitorLimit: 2,
   },
 } as const satisfies Record<string, ServedModel>;
 

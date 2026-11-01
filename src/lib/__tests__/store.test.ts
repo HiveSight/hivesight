@@ -261,6 +261,8 @@ describe("recentPing", () => {
     const { recentPing } = await loadStore();
     expect((await recentPing()).ok).toBe(false);
     answers({ data: "site", error: null });
+    expect((await recentPing()).ok).toBe(false);
+    expect(rpc).toHaveBeenCalledOnce();
     vi.advanceTimersByTime(30_000);
     expect((await recentPing()).ok).toBe(true);
   });

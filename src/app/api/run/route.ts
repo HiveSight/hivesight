@@ -1,5 +1,5 @@
 import { LlmRequestError, openAiClient } from "@/engine/elicit";
-import { SERVED_MODELS } from "@/engine/models";
+import { SERVED_MODELS, SITE_UNITS_PER_DAY, type ServedModel } from "@/engine/models";
 import { runEstimate } from "@/engine/run";
 import { RunRequestSchema } from "@/lib/schema";
 import { type RunClaim, claimRun, saveRun } from "@/lib/store";
@@ -7,33 +7,36 @@ import { clientIp, visitorNetwork } from "@/lib/visitor";
 
 export const maxDuration = 300;
 
-// Daily allowances, counted in the database. A typical Luna estimate costs about
-// $0.0064 (155 calls at the per-call cost in evals/results/model-refresh-run.json),
-// so a full site allowance typically spends about $3.20. The largest requests,
-// with every call at the token ceiling, would spend about $38 on English text
-// and about $75 on text written to use the most tokens.
-const ESTIMATES_PER_VISITOR_PER_DAY = 20;
-const SITE_UNITS_PER_DAY = 500;
+// The database counts daily allowances, which models.ts sets. A typical Luna
+// estimate costs about $0.0064 (155 calls at the per-call cost in
+// evals/results/model-refresh-run.json), so a full site allowance typically
+// spends about $3.20. The largest requests, with every call at the token
+// ceiling, would spend about $38 on English text and about $75 on text written
+// to use the most tokens. Sol's units cover its measured cost and its token
+// prices, so Sol requests don't raise these figures.
+
 // Per-instance limits on work in flight.
 const MAX_ACTIVE_PER_IP = 2;
 const MAX_ACTIVE_PER_INSTANCE = 8;
 // Stop spending before the platform kills the function at maxDuration.
 const RUN_DEADLINE_MS = 270_000;
 
-const REFUSALS: Record<Exclude<RunClaim, "ok">, { status: number; error: string }> = {
-  visitor: {
-    status: 429,
-    error: `Your network has used today's ${ESTIMATES_PER_VISITOR_PER_DAY} free estimates, and HiveSight offers ${ESTIMATES_PER_VISITOR_PER_DAY} more at midnight UTC.`,
-  },
-  site: {
-    status: 429,
-    error: "HiveSight has run all of today's free estimates and offers more at midnight UTC.",
-  },
-  unavailable: {
-    status: 503,
-    error: "HiveSight has paused new estimates. Please try again later.",
-  },
-};
+function refusal(claim: Exclude<RunClaim, "ok">, model: ServedModel) {
+  switch (claim) {
+    case "visitor":
+      return {
+        status: 429,
+        error: `Your network has used today's ${model.visitorLimit} free ${model.label} estimates, and HiveSight offers ${model.visitorLimit} more at midnight UTC.`,
+      };
+    case "site":
+      return {
+        status: 429,
+        error: "HiveSight can't fit this estimate into today's free allowance and offers more at midnight UTC.",
+      };
+    case "unavailable":
+      return { status: 503, error: "HiveSight has paused new estimates. Please try again later." };
+  }
+}
 
 const activeByIp = new Map<string, number>();
 let activeRuns = 0;
@@ -96,14 +99,16 @@ export async function POST(request: Request) {
     );
   }
   const spec = parsed.data;
-  const claim = await claimRun(ip, {
-    visitorLimit: ESTIMATES_PER_VISITOR_PER_DAY,
-    siteCost: SERVED_MODELS[spec.model].siteUnits,
+  const model = SERVED_MODELS[spec.model];
+  // A visitor holds a separate daily allowance for each model.
+  const claim = await claimRun(`${ip} ${spec.model}`, {
+    visitorLimit: model.visitorLimit,
+    siteCost: model.siteUnits,
     siteLimit: SITE_UNITS_PER_DAY,
   });
   if (claim !== "ok") {
     release();
-    const { status, error } = REFUSALS[claim];
+    const { status, error } = refusal(claim, model);
     return Response.json({ error }, { status });
   }
   const llm = openAiClient(apiKey);

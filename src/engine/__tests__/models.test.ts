@@ -3,7 +3,13 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import * as evalModels from "../../../evals/models.mjs";
 import { LlmRequestError, openAiClient } from "../elicit";
 import { benchmarkErrorFor } from "../run";
-import { DEFAULT_MODEL, SERVED_MODEL_IDS, SERVED_MODELS, reasoningEffortFor } from "../models";
+import {
+  DEFAULT_MODEL,
+  SERVED_MODEL_IDS,
+  SERVED_MODELS,
+  SITE_UNITS_PER_DAY,
+  reasoningEffortFor,
+} from "../models";
 import { RunRequestSchema } from "@/lib/schema";
 
 const baseRequest = {
@@ -43,6 +49,29 @@ describe("served models", () => {
   it("default to a served model", () => {
     expect(SERVED_MODEL_IDS).toContain(DEFAULT_MODEL);
     expect(RunRequestSchema.parse(baseRequest).model).toBe(DEFAULT_MODEL);
+  });
+
+  it("spend no more per unit than the default at the token ceiling", () => {
+    const [input, output] = SERVED_MODELS[DEFAULT_MODEL].price;
+    for (const id of SERVED_MODEL_IDS) {
+      const { price, siteUnits } = SERVED_MODELS[id];
+      expect(price[0] / siteUnits).toBeLessThanOrEqual(input);
+      expect(price[1] / siteUnits).toBeLessThanOrEqual(output);
+    }
+  });
+
+  it("hold one visitor to a fifth of the site's allowance across all models", () => {
+    const models = Object.values(SERVED_MODELS);
+    const oneVisitor = models.reduce((sum, m) => sum + m.visitorLimit * m.siteUnits, 0);
+    expect(oneVisitor).toBeLessThanOrEqual(SITE_UNITS_PER_DAY / 5);
+  });
+
+  it("accept Sol through the API, as the refresh plan registers", () => {
+    const parsed = RunRequestSchema.parse({ ...baseRequest, model: "gpt-6.1-sol" });
+    expect(parsed.model).toBe("gpt-6.1-sol");
+    expect(readFileSync("paper/pap-model-refresh-2026-10.md", "utf8")).toMatch(
+      /gpt-6\.1-sol is offered as a second model through the API/
+    );
   });
 
   it("reject models the product no longer serves", () => {

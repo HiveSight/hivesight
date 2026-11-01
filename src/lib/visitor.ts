@@ -34,7 +34,7 @@ export function visitorNetwork(ip: string): string {
   return `${groups.slice(0, 4).map((g) => g.toString(16)).join(":")}::/64`;
 }
 
-/** Keyed hash of a visitor's network, so run_quota never holds an address. */
-export function visitorKey(network: string, secret: string): string {
-  return createHmac("sha256", secret).update(`hivesight:run-quota:${network}`).digest("hex");
+/** Keyed hash of a visitor, so run_quota never holds an address. */
+export function visitorKey(visitor: string, secret: string): string {
+  return createHmac("sha256", secret).update(`hivesight:run-quota:${visitor}`).digest("hex");
 }

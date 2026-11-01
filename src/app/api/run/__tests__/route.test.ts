@@ -18,6 +18,8 @@ const body = JSON.stringify({
   audience: { geography: { type: "national", value: "US" } },
 });
 
+const sol = JSON.stringify({ ...JSON.parse(body), model: "gpt-6.1-sol" });
+
 function post(ip: string, payload = body) {
   return new Request("http://localhost/api/run", {
     method: "POST",
@@ -76,8 +78,8 @@ describe("POST /api/run", { timeout: 20_000 }, () => {
   });
 
   it.each([
-    ["visitor", 429, "20 free estimates"],
-    ["site", 429, "all of today's free estimates"],
+    ["visitor", 429, "today's 20 free GPT-6 Luna estimates"],
+    ["site", 429, "today's free allowance"],
     ["unavailable", 503, "paused new estimates"],
   ])("refuses a %s claim before spending and frees its slot", async (claim, status, message) => {
     claimRun.mockResolvedValue(claim);
@@ -90,20 +92,28 @@ describe("POST /api/run", { timeout: 20_000 }, () => {
     expect(runEstimate).not.toHaveBeenCalled();
   });
 
-  it("claims the default model's share of the site allowance for the caller's network", async () => {
+  it("claims each model's allowance for the caller's network", async () => {
     runEstimate.mockResolvedValue({});
     await (await POST(post("2001:db8:1:2:3:4:5:6"))).text();
-    expect(claimRun).toHaveBeenLastCalledWith("2001:db8:1:2::/64", {
+    expect(claimRun).toHaveBeenLastCalledWith("2001:db8:1:2::/64 gpt-6-luna", {
       visitorLimit: 20,
       siteCost: 1,
       siteLimit: 500,
     });
+    await (await POST(post("7.7.7.7", sol))).text();
+    expect(claimRun).toHaveBeenLastCalledWith("7.7.7.7 gpt-6.1-sol", {
+      visitorLimit: 2,
+      siteCost: 40,
+      siteLimit: 500,
+    });
   });
 
-  it("turns away Sol, which one visitor could use to drain the site's allowance", async () => {
-    const sol = JSON.stringify({ ...JSON.parse(body), model: "gpt-6.1-sol" });
-    expect((await POST(post("7.7.7.7", sol))).status).toBe(400);
-    expect(claimRun).not.toHaveBeenCalled();
+  it("names the model and its limit when a visitor runs out", async () => {
+    claimRun.mockResolvedValue("visitor");
+    const response = await POST(post("7.7.7.8", sol));
+    expect((await response.json()).error).toBe(
+      "Your network has used today's 2 free GPT-6.1 Sol estimates, and HiveSight offers 2 more at midnight UTC."
+    );
   });
 
   it("rejects invalid requests before counting them against the daily allowance", async () => {

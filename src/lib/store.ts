@@ -50,13 +50,13 @@ export interface RunLimits {
 export type RunClaim = "ok" | "visitor" | "site" | "unavailable";
 
 /** Counts one estimate. Anything but a clear answer returns "unavailable". */
-export async function claimRun(network: string, limits: RunLimits): Promise<RunClaim> {
+export async function claimRun(visitor: string, limits: RunLimits): Promise<RunClaim> {
   const db = getClient();
   if (!db) return process.env.NODE_ENV === "production" ? "unavailable" : "ok";
   try {
     const { data, error } = await db
       .rpc("claim_run", {
-        p_visitor: visitorKey(network, process.env.SUPABASE_SECRET_KEY as string),
+        p_visitor: visitorKey(visitor, process.env.SUPABASE_SECRET_KEY as string),
         p_visitor_limit: limits.visitorLimit,
         p_site_cost: limits.siteCost,
         p_site_limit: limits.siteLimit,
@@ -161,8 +161,8 @@ export async function pingStore(): Promise<{ ok: boolean; message: string }> {
   return { ok: false, message: "store unreachable" };
 }
 
-// /api/health is public and each ping takes the site row's lock, so it reuses a
-// recent ping and traffic can't queue claims behind it.
+// /api/health is public and each ping takes the site row's lock, so one
+// instance sends at most one ping per interval, however much traffic it gets.
 const PING_INTERVAL_MS = 30_000;
 let lastPing: { at: number; result: ReturnType<typeof pingStore> } | undefined;
 
