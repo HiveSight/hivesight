@@ -360,8 +360,8 @@ export function AskForm({ individualMode = false }: { individualMode?: boolean }
             {running ? "Estimating…" : "Run estimate"}
           </button>
           <span className="text-xs text-faint">
-            Free while in research preview. Estimates usually take under a minute. HiveSight saves
-            each estimate so you can share it, and anyone with the link can open it.
+            Free while in research preview. Estimates usually take under a minute. HiveSight keeps
+            recent estimates at links you can share, and anyone with a link can open that estimate.
           </span>
         </div>
 

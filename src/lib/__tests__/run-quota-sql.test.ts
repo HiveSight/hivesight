@@ -5,9 +5,11 @@ import fc from "fast-check";
 import pg from "pg";
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest";
 
-// These tests run the real migrations. Supabase grants its public roles access
-// to new tables and functions by default, so the setup does too: otherwise a
-// migration that forgot to revoke them would still pass.
+// These tests run the real migrations against the hardest default for each role.
+// Older Supabase projects grant the public roles access to new tables and
+// functions, so the setup does too: otherwise a migration that forgot to revoke
+// them would still pass. New projects give the service role nothing, so the
+// setup gives it nothing and the migrations must grant what the app needs.
 const SUPABASE_ROLES = `
   do $$
   begin
@@ -19,8 +21,8 @@ const SUPABASE_ROLES = `
   end;
   $$;
   grant usage on schema public to anon, authenticated, service_role;
-  alter default privileges in schema public grant all on tables to anon, authenticated, service_role;
-  alter default privileges in schema public grant all on functions to anon, authenticated, service_role;
+  alter default privileges in schema public grant all on tables to anon, authenticated;
+  alter default privileges in schema public grant all on functions to anon, authenticated;
 `;
 
 const MIGRATIONS_DIR = path.resolve("supabase/migrations");
@@ -128,6 +130,33 @@ describe("run quota migrations", { timeout: 60_000 }, () => {
     expect(stored.get("visitor:a")).toBe(1);
   });
 
+  it("counts the UTC day whatever the session's time zone", async () => {
+    // Between them these zones disagree with UTC's date at every hour.
+    for (const zone of ["Pacific/Kiritimati", "Etc/GMT+12"]) {
+      await db.exec(`set time zone '${zone}'`);
+      expect(await claim(zone, 1, 1, 10)).toBe("ok");
+      await db.exec("reset time zone");
+      expect((await counts()).get(`visitor:${zone}`)).toBe(1);
+    }
+    expect((await counts()).get("site")).toBe(2);
+  });
+
+  it("answers the store ping's oversized claim without counting it", async () => {
+    expect(await claim("ping", 1, 2, 1)).toBe("site");
+    expect((await counts()).get("site")).toBe(0);
+    expect(await claim("a", 20, 1, 500)).toBe("ok");
+    expect(await claim("ping", 1, 2, 1)).toBe("site");
+    const stored = await counts();
+    expect(stored.get("site")).toBe(1);
+    expect(stored.has("visitor:ping")).toBe(false);
+  });
+
+  it("fails the store ping on a read-only database", async () => {
+    await db.exec("set default_transaction_read_only = on");
+    await expect(claim("ping", 1, 2, 1)).rejects.toThrow("read-only");
+    await db.exec("reset role; reset default_transaction_read_only");
+  });
+
   it("refuses limits below one instead of counting past them", async () => {
     await expect(claim("a", 0, 1, 10)).rejects.toThrow("must be positive");
     await db.exec("reset role");
@@ -142,18 +171,54 @@ describe("run quota migrations", { timeout: 60_000 }, () => {
     await db.exec("insert into public.runs (payload) values ('{}')");
     for (const role of ["anon", "authenticated"]) {
       await db.exec(`set role ${role}`);
-      for (const sql of [
-        "select public.claim_run('a', 1, 1, 1)",
-        "select public.purge_old_records(1)",
-        "select * from public.run_quota",
-        "update public.run_quota set used = 0",
-        "select * from public.runs",
-        "insert into public.runs (payload) values ('{}')",
+      for (const [sql, denied] of [
+        ["select public.claim_run('a', 1, 1, 1)", "function claim_run"],
+        ["select public.purge_old_records(1)", "function purge_old_records"],
+        ["select * from public.run_quota", "table run_quota"],
+        ["update public.run_quota set used = 0", "table run_quota"],
+        ["select * from public.runs", "table runs"],
+        ["insert into public.runs (payload) values ('{}')", "table runs"],
       ]) {
-        await expect(db.query(sql), `${role}: ${sql}`).rejects.toThrow("permission denied");
+        await expect(db.query(sql), `${role}: ${sql}`).rejects.toThrow(`permission denied for ${denied}`);
       }
       await db.exec("reset role");
     }
+  });
+
+  it("gives the service role what the app needs", async () => {
+    await db.exec("set role service_role");
+    const saved = await db.query<{ id: string }>(
+      "insert into public.runs (payload) values ('{}') returning id"
+    );
+    const read = await db.query("select payload from public.runs where id = $1", [saved.rows[0].id]);
+    await db.exec("reset role");
+    expect(read.rows).toHaveLength(1);
+  });
+
+  it("keeps row security on and runs both functions as the caller", async () => {
+    const tables = await db.query<{ relrowsecurity: boolean }>(
+      "select relrowsecurity from pg_class where oid in ('public.run_quota'::regclass, 'public.runs'::regclass)"
+    );
+    expect(tables.rows.map((t) => t.relrowsecurity)).toEqual([true, true]);
+    const functions = await db.query<{ prosecdef: boolean; proconfig: string[] }>(
+      `select prosecdef, proconfig from pg_proc where oid in (
+        'public.claim_run(text, integer, integer, integer)'::regprocedure,
+        'public.purge_old_records(integer)'::regprocedure
+      )`
+    );
+    expect(functions.rows).toHaveLength(2);
+    for (const fn of functions.rows) {
+      expect(fn.prosecdef).toBe(false);
+      expect(fn.proconfig).toEqual(['search_path=""']);
+    }
+  });
+
+  it.each(["null", "0", "-1"])("refuses to purge with a count of %s", async (count) => {
+    await db.exec("insert into public.runs (payload) values ('{}')");
+    await db.exec("set role service_role");
+    await expect(db.query(`select public.purge_old_records(${count})`)).rejects.toThrow("positive count");
+    await db.exec("reset role");
+    expect((await db.query("select id from public.runs")).rows).toHaveLength(1);
   });
 
   it("purges visitor keys after a day and saved estimates beyond the newest", async () => {
@@ -182,36 +247,61 @@ describe("run quota migrations", { timeout: 60_000 }, () => {
 });
 
 describe("legacy table lockdown", { timeout: 60_000 }, () => {
+  const LEGACY_TABLES = [
+    "profiles",
+    "surveys",
+    "respondents",
+    "responses",
+    "credit_transactions",
+    "rate_limits",
+  ];
+  const PUBLIC_ROLES = ["anon", "authenticated"];
+
   it("closes public access to the old tables and keeps their rows", async () => {
     const db = new PGlite();
     await db.exec(SUPABASE_ROLES);
+    for (const table of LEGACY_TABLES) {
+      await db.exec(`
+        create table public.${table} (id serial primary key, note text);
+        insert into public.${table} (note) values ('old row');
+      `);
+    }
     await db.exec(`
-      create table public.rate_limits (id serial primary key, ip_address text);
-      create table public.surveys (id serial primary key, question text);
-      insert into public.rate_limits (ip_address) values ('192.0.2.1');
-      insert into public.surveys (question) values ('Old question');
       alter table public.surveys enable row level security;
       create policy "Anyone can view surveys by id" on public.surveys for select using (true);
       create function public.handle_new_user() returns trigger language plpgsql as
         $$ begin return new; end; $$;
     `);
-    await db.exec("set role anon");
-    expect((await db.query("select * from public.rate_limits")).rows).toHaveLength(1);
-    expect((await db.query("select * from public.surveys")).rows).toHaveLength(1);
-    await db.exec("reset role");
+    for (const role of PUBLIC_ROLES) {
+      await db.exec(`set role ${role}`);
+      for (const table of LEGACY_TABLES) {
+        expect((await db.query(`select * from public.${table}`)).rows).toHaveLength(1);
+      }
+      await db.exec("reset role");
+    }
 
     await db.exec(migrations.find((sql) => sql.includes("legacy text"))!);
 
-    for (const table of ["rate_limits", "surveys"]) {
-      await db.exec("set role anon");
-      await expect(db.query(`select * from public.${table}`)).rejects.toThrow("permission denied");
-      await db.exec("reset role");
+    for (const table of LEGACY_TABLES) {
+      for (const role of PUBLIC_ROLES) {
+        await db.exec(`set role ${role}`);
+        await expect(db.query(`select * from public.${table}`), `${role}: ${table}`).rejects.toThrow(
+          "permission denied"
+        );
+        await db.exec("reset role");
+      }
       expect((await db.query(`select * from public.${table}`)).rows).toHaveLength(1);
+      const rls = await db.query<{ relrowsecurity: boolean }>(
+        `select relrowsecurity from pg_class where oid = 'public.${table}'::regclass`
+      );
+      expect(rls.rows[0].relrowsecurity, table).toBe(true);
     }
-    const rls = await db.query<{ relrowsecurity: boolean }>(
-      "select relrowsecurity from pg_class where oid = 'public.rate_limits'::regclass"
-    );
-    expect(rls.rows[0].relrowsecurity).toBe(true);
+    for (const role of PUBLIC_ROLES) {
+      const fn = await db.query<{ allowed: boolean }>(
+        `select has_function_privilege('${role}', 'public.handle_new_user()', 'execute') as allowed`
+      );
+      expect(fn.rows[0].allowed, role).toBe(false);
+    }
     await db.close();
   });
 });

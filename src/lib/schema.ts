@@ -1,5 +1,5 @@
 import { z } from "zod/v4";
-import { DEFAULT_MODEL, SERVED_MODEL_IDS } from "@/engine/models";
+import { DEFAULT_MODEL } from "@/engine/models";
 import { INDIVIDUAL_MODELS, individualModeEnabled } from "@/engine/individual-study";
 import { canonicalGeography } from "@/lib/geographies";
 import { AGE_BANDS, BENEFITS, CHILDREN, INCOME_BANDS, SEXES, TENURES } from "@/engine/bands";
@@ -56,7 +56,10 @@ export const RunRequestSchema = z
       geography: GeographySchema,
       filters: FiltersSchema.default({}),
     }),
-    model: z.enum(SERVED_MODEL_IDS).default(DEFAULT_MODEL),
+    // The form sends no model. The visitor allowance counts estimates and the
+    // site allowance counts units, so a public Sol would let one visitor spend
+    // 480 of the site's 500 units.
+    model: z.literal(DEFAULT_MODEL).default(DEFAULT_MODEL),
     // Population cells unless the asker opts in to the individual mode.
     mode: z.enum(["cells", "individual"]).default("cells"),
     verbatimCount: z.number().int().min(0).max(12).default(6),

@@ -7,9 +7,10 @@ import { clientIp, visitorNetwork } from "@/lib/visitor";
 
 export const maxDuration = 300;
 
-// Daily allowances, counted in the database. At the $0.0064 a Luna estimate
-// costs (evals/results/model-refresh-run.json), the site allowance caps model
-// spending near $3.20 a day.
+// Daily allowances, counted in the database. A typical Luna estimate costs about
+// $0.0064 (155 calls at the per-call cost in evals/results/model-refresh-run.json),
+// so a full site allowance typically spends about $3.20. The largest requests,
+// with every call at the token ceiling, would spend about $38.
 const ESTIMATES_PER_VISITOR_PER_DAY = 20;
 const SITE_UNITS_PER_DAY = 500;
 // Per-instance limits on work in flight.
@@ -21,16 +22,15 @@ const RUN_DEADLINE_MS = 270_000;
 const REFUSALS: Record<Exclude<RunClaim, "ok">, { status: number; error: string }> = {
   visitor: {
     status: 429,
-    error: `HiveSight allows ${ESTIMATES_PER_VISITOR_PER_DAY} free estimates per day and resets the count at midnight UTC.`,
+    error: `Your network has used today's ${ESTIMATES_PER_VISITOR_PER_DAY} free estimates, and HiveSight offers ${ESTIMATES_PER_VISITOR_PER_DAY} more at midnight UTC.`,
   },
   site: {
     status: 429,
-    error: "HiveSight has run all of today's free estimates and resets the count at midnight UTC.",
+    error: "HiveSight has run all of today's free estimates and offers more at midnight UTC.",
   },
   unavailable: {
     status: 503,
-    error:
-      "HiveSight can't check today's estimate count, so it has paused new estimates. Please try again in a few minutes.",
+    error: "HiveSight has paused new estimates. Please try again later.",
   },
 };
 
@@ -70,6 +70,11 @@ export async function POST(request: Request) {
   const apiKey = process.env.OPENAI_API_KEY;
   if (!apiKey) {
     return Response.json({ error: "Model API not configured" }, { status: 503 });
+  }
+  // Browsers preflight cross-site JSON and this route grants no cross-site
+  // access, so other sites can't spend their visitors' allowances.
+  if (!request.headers.get("content-type")?.toLowerCase().startsWith("application/json")) {
+    return Response.json({ error: "Send the request as JSON." }, { status: 415 });
   }
 
   const ip = visitorNetwork(clientIp(request.headers));

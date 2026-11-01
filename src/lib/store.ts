@@ -14,9 +14,10 @@ let client: SupabaseClient | null | undefined;
 // Persistence must never hold up a finished estimate.
 const STORE_TIMEOUT_MS = 2000;
 
-// The largest request saves about 42 KB, so this keeps the runs table near
-// 420 MB at worst. A full 500 MB free-tier database would refuse every claim.
-const KEEP_RUNS = 10_000;
+// The largest request stores about 47 KB, so this holds the runs table near
+// 460 MB at worst, dead rows included. An organization over the free plan's
+// 500 MB can have its requests refused, and that would stop every claim.
+const KEEP_RUNS = 8_000;
 
 function getClient(): SupabaseClient | null {
   if (client !== undefined) return client;
@@ -25,7 +26,7 @@ function getClient(): SupabaseClient | null {
   try {
     client = url && key ? createClient(url, key, { auth: { persistSession: false } }) : null;
   } catch (err) {
-    // A malformed URL makes createClient throw; run without persistence.
+    // A malformed URL makes createClient throw; treat that as no database.
     console.error("store misconfigured:", err);
     client = null;
   }
@@ -145,14 +146,14 @@ export async function pingStore(): Promise<{ ok: boolean; message: string }> {
   if (!db) return { ok: false, message: "store not configured" };
   // Public health and cron responses get a fixed message; details go to logs.
   try {
-    // run_quota because a database without it stops every estimate.
-    const { error } = await db
-      .from("run_quota")
-      .select("bucket")
-      .limit(1)
+    // A claim too large for any site allowance runs the real function, with its
+    // write and row lock, and counts nothing. A plain read would pass on a
+    // database that refuses every claim.
+    const { data, error } = await db
+      .rpc("claim_run", { p_visitor: "ping", p_visitor_limit: 1, p_site_cost: 2, p_site_limit: 1 })
       .abortSignal(AbortSignal.timeout(STORE_TIMEOUT_MS));
-    if (!error) return { ok: true, message: "ok" };
-    console.error("store ping failed:", error.message);
+    if (data === "site") return { ok: true, message: "ok" };
+    console.error("store ping failed:", error?.message ?? "unexpected answer");
   } catch (err) {
     console.error("store ping failed:", err);
   }

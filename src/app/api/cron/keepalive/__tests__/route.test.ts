@@ -51,9 +51,20 @@ describe("GET /api/cron/keepalive", () => {
     expect(await response.json()).toMatchObject({ message: "purge failed" });
   });
 
-  it("skips everything without a database", async () => {
+  it("skips everything in local development without a database", async () => {
     storeConfigured.mockReturnValue(false);
-    expect(await (await get()).json()).toMatchObject({ status: "skipped" });
+    const response = await get();
+    expect(response.status).toBe(200);
+    expect(await response.json()).toMatchObject({ status: "skipped" });
+    expect(pingStore).not.toHaveBeenCalled();
+  });
+
+  it("fails when production has no database", async () => {
+    vi.stubEnv("NODE_ENV", "production");
+    storeConfigured.mockReturnValue(false);
+    const response = await get();
+    expect(response.status).toBe(503);
+    expect(await response.json()).toMatchObject({ status: "failed", message: "store not configured" });
     expect(pingStore).not.toHaveBeenCalled();
   });
 });

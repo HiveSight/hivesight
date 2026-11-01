@@ -1,5 +1,6 @@
 import fc from "fast-check";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { visitorKey } from "../visitor";
 
 const rpc = vi.fn();
 const createClient = vi.fn(() => ({ rpc: (...args: unknown[]) => rpc(...args) }));
@@ -43,7 +44,7 @@ describe("claimRun", () => {
     const [name, args] = rpc.mock.calls[0];
     expect(name).toBe("claim_run");
     expect(args).toMatchObject({ p_visitor_limit: 20, p_site_cost: 1, p_site_limit: 500 });
-    expect(args.p_visitor).toMatch(/^[0-9a-f]{64}$/);
+    expect(args.p_visitor).toBe(visitorKey("203.0.113.9", "test-secret"));
     expect(JSON.stringify(args)).not.toContain("203.0.113.9");
   });
 
@@ -71,6 +72,21 @@ describe("claimRun", () => {
     rpc.mockReturnValue({ abortSignal: () => Promise.reject(new Error("timed out")) });
     const { claimRun } = await loadStore();
     expect(await claimRun("203.0.113.9", limits)).toBe("unavailable");
+  });
+
+  it("gives up on a database that never answers", { timeout: 10_000 }, async () => {
+    let signal: AbortSignal | undefined;
+    rpc.mockReturnValue({
+      abortSignal: (s: AbortSignal) => {
+        signal = s;
+        return new Promise((_, reject) => s.addEventListener("abort", () => reject(s.reason)));
+      },
+    });
+    const { claimRun } = await loadStore();
+    const started = Date.now();
+    expect(await claimRun("203.0.113.9", limits)).toBe("unavailable");
+    expect(signal?.aborted).toBe(true);
+    expect(Date.now() - started).toBeLessThan(8_000);
   });
 
   it("treats a client that throws as unavailable", async () => {
@@ -121,7 +137,7 @@ describe("purgeOldRecords", () => {
     const { purgeOldRecords } = await loadStore();
     answers({ error: null });
     expect(await purgeOldRecords()).toBe(true);
-    expect(rpc.mock.calls[0][0]).toBe("purge_old_records");
+    expect(rpc.mock.calls[0]).toEqual(["purge_old_records", { p_keep_runs: 8_000 }]);
     answers({ error: { message: "boom" } });
     expect(await purgeOldRecords()).toBe(false);
     rpc.mockReturnValue({ abortSignal: () => Promise.reject(new Error("timed out")) });
@@ -132,6 +148,52 @@ describe("purgeOldRecords", () => {
     vi.stubEnv("NEXT_PUBLIC_SUPABASE_URL", "");
     const { purgeOldRecords } = await loadStore();
     expect(await purgeOldRecords()).toBe(false);
+    expect(rpc).not.toHaveBeenCalled();
+  });
+});
+
+describe("pingStore", () => {
+  beforeEach(() => {
+    vi.spyOn(console, "error").mockImplementation(() => {});
+    rpc.mockReset();
+    vi.stubEnv("NEXT_PUBLIC_SUPABASE_URL", "https://example.supabase.co");
+    vi.stubEnv("SUPABASE_SECRET_KEY", "test-secret");
+  });
+  afterEach(() => {
+    vi.unstubAllEnvs();
+    vi.restoreAllMocks();
+  });
+
+  it("sends a claim too large for the site and expects the site's refusal", async () => {
+    answers({ data: "site", error: null });
+    const { pingStore } = await loadStore();
+    expect(await pingStore()).toEqual({ ok: true, message: "ok" });
+    const [name, args] = rpc.mock.calls[0];
+    expect(name).toBe("claim_run");
+    expect(args.p_site_cost).toBeGreaterThan(args.p_site_limit);
+  });
+
+  it.each([
+    [{ data: "ok", error: null }],
+    [{ data: "visitor", error: null }],
+    [{ data: null, error: null }],
+    [{ data: null, error: { message: "cannot execute INSERT in a read-only transaction" } }],
+  ])("fails on %j", async (answer) => {
+    answers(answer);
+    const { pingStore } = await loadStore();
+    expect(await pingStore()).toEqual({ ok: false, message: "store unreachable" });
+  });
+
+  it("fails on a rejected call", async () => {
+    rpc.mockReturnValue({ abortSignal: () => Promise.reject(new Error("timed out")) });
+    const { pingStore } = await loadStore();
+    expect(await pingStore()).toEqual({ ok: false, message: "store unreachable" });
+  });
+
+  it("reports a missing database", async () => {
+    vi.stubEnv("NEXT_PUBLIC_SUPABASE_URL", "");
+    const { pingStore } = await loadStore();
+    expect(await pingStore()).toEqual({ ok: false, message: "store not configured" });
     expect(rpc).not.toHaveBeenCalled();
   });
 });

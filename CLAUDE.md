@@ -17,8 +17,8 @@ MAE vs 6pts subgroup MAE for cell-based estimation (evals/results/).
   (`run_quota`, `claim_run`). Production stops estimates whenever `claim_run`
   can't answer, so it needs this database; `bun run dev` runs without it, with
   no allowances or share links. Free-tier projects auto-pause on inactivity,
-  and the daily keepalive cron in vercel.json prevents that and purges old
-  records.
+  so the daily keepalive cron in vercel.json queries the database to keep it
+  active, and purges old records.
 - The hosted project also keeps the pre-rebuild tables (surveys, responses,
   and others) with their rows. Public roles have no access to them.
 
@@ -41,11 +41,15 @@ bun run data:release # build missing public/data/v1 files (needs numpy; delete a
 
 ## Migrations
 
+Apply migrations before deploying the code that needs them: production refuses
+every estimate while `claim_run` can't answer.
+
 The hosted project's migration history starts with `00001`–`00005` from the
 pre-rebuild schema, which this repo doesn't carry, so `supabase db push` refuses
-to run. Apply new files in `supabase/migrations/` through the Management API
-(`POST /v1/projects/<ref>/database/query`), then record the version in
-`supabase_migrations.schema_migrations`.
+to run. Apply new files in `supabase/migrations/` through the Management API:
+`POST https://api.supabase.com/v1/projects/<ref>/database/query` with
+`Authorization: Bearer $SUPABASE_ACCESS_TOKEN` and the body `{"query": "<sql>"}`.
+Then insert the version into `supabase_migrations.schema_migrations`.
 
 ## Models
 
@@ -54,6 +58,8 @@ to run. Apply new files in `supabase/migrations/` through the Management API
   runners' settings are in `evals/models.mjs`; `models.test.ts` keeps them
   equal. Verify model IDs and supported efforts against the provider's docs
   and live API before changing them.
+- `/api/run` accepts only the default model (`RunRequestSchema`). Opening
+  another model to the public needs a visitor allowance that counts units.
 
 ## Rules
 

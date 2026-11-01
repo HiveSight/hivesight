@@ -49,8 +49,9 @@ estimate (9.3pts topline) is surfaced in provenance as a cross-check.
   HF per-district files with in-memory caching.
 - **Database**: Supabase holds saved estimates for share links and the daily
   allowances that cap spending, and production stops estimates when it can't
-  reach them. Daily keepalive cron prevents free-tier auto-pause (the outage
-  that took the old product down).
+  reach them. A daily keepalive cron queries the database to keep it active,
+  since free-tier projects auto-pause on inactivity (the outage that took the
+  old product down).
 - **Dropped from v0**: accounts, credits, Stripe — reintroduce post-launch
   behind the same storage adapter.
 

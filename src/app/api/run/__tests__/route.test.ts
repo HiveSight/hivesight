@@ -90,7 +90,7 @@ describe("POST /api/run", { timeout: 20_000 }, () => {
     expect(runEstimate).not.toHaveBeenCalled();
   });
 
-  it("claims the model's share of the site allowance for the caller's network", async () => {
+  it("claims the default model's share of the site allowance for the caller's network", async () => {
     runEstimate.mockResolvedValue({});
     await (await POST(post("2001:db8:1:2:3:4:5:6"))).text();
     expect(claimRun).toHaveBeenLastCalledWith("2001:db8:1:2::/64", {
@@ -98,24 +98,45 @@ describe("POST /api/run", { timeout: 20_000 }, () => {
       siteCost: 1,
       siteLimit: 500,
     });
+  });
+
+  it("turns away Sol, which one visitor could use to drain the site's allowance", async () => {
     const sol = JSON.stringify({ ...JSON.parse(body), model: "gpt-6.1-sol" });
-    await (await POST(post("7.7.7.7", sol))).text();
-    expect(claimRun).toHaveBeenLastCalledWith("7.7.7.7", {
-      visitorLimit: 20,
-      siteCost: 40,
-      siteLimit: 500,
-    });
+    expect((await POST(post("7.7.7.7", sol))).status).toBe(400);
+    expect(claimRun).not.toHaveBeenCalled();
   });
 
   it("rejects invalid requests before counting them against the daily allowance", async () => {
-    const bad = new Request("http://localhost/api/run", {
-      method: "POST",
-      headers: { "x-forwarded-for": "3.3.3.3" },
-      body: JSON.stringify({ question: "short" }),
-    });
-    expect((await POST(bad)).status).toBe(400);
+    expect((await POST(post("3.3.3.3", JSON.stringify({ question: "short" })))).status).toBe(400);
     expect(runEstimate).not.toHaveBeenCalled();
     expect(claimRun).not.toHaveBeenCalled();
+  });
+
+  it.each([
+    ["text/plain;charset=UTF-8"],
+    ["application/x-www-form-urlencoded"],
+    ["multipart/form-data; boundary=x"],
+    [null],
+  ])("refuses content type %s, which other sites could send with no preflight", async (type) => {
+    const request = new Request("http://localhost/api/run", {
+      method: "POST",
+      headers: type ? { "content-type": type, "x-forwarded-for": "8.8.8.8" } : { "x-forwarded-for": "8.8.8.8" },
+      body: type ? body : new TextEncoder().encode(body),
+    });
+    expect((await POST(request)).status).toBe(415);
+    expect(claimRun).not.toHaveBeenCalled();
+  });
+
+  it("accepts JSON however the header spells it", async () => {
+    runEstimate.mockResolvedValue({});
+    const request = new Request("http://localhost/api/run", {
+      method: "POST",
+      headers: { "content-type": "Application/JSON; charset=utf-8", "x-forwarded-for": "9.9.9.9" },
+      body,
+    });
+    const response = await POST(request);
+    expect(response.status).toBe(200);
+    await response.text();
   });
 
   it("streams a plain message, not the provider's, when the model API rejects the request", async () => {

@@ -18,8 +18,9 @@ export interface ServedModel {
   /** USD per million tokens [input, output]. */
   price: [number, number];
   /**
-   * Units one estimate draws from the site's daily allowance, covering its
-   * measured cost relative to a Luna estimate.
+   * Units one population-cell estimate draws from the site's daily allowance,
+   * covering its measured cost relative to a Luna estimate. Individual mode
+   * makes different calls and needs its own figure before it ships.
    */
   siteUnits: number;
 }
