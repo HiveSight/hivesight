@@ -6,7 +6,11 @@ import { POST } from "../route";
 // test; the estimator is replaced by a stub that waits until aborted.
 const runEstimate = vi.fn();
 vi.mock("@/engine/run", () => ({ runEstimate: (...args: unknown[]) => runEstimate(...args) }));
-vi.mock("@/lib/store", () => ({ saveRun: async () => null }));
+const claimRun = vi.fn();
+vi.mock("@/lib/store", () => ({
+  saveRun: async () => null,
+  claimRun: (...args: unknown[]) => claimRun(...args),
+}));
 
 const body = JSON.stringify({
   question: "Do you support a four-day work week?",
@@ -14,11 +18,13 @@ const body = JSON.stringify({
   audience: { geography: { type: "national", value: "US" } },
 });
 
-function post(ip: string) {
+const sol = JSON.stringify({ ...JSON.parse(body), model: "gpt-6.1-sol" });
+
+function post(ip: string, payload = body) {
   return new Request("http://localhost/api/run", {
     method: "POST",
     headers: { "content-type": "application/json", "x-forwarded-for": ip },
-    body,
+    body: payload,
   });
 }
 
@@ -33,6 +39,7 @@ describe("POST /api/run", { timeout: 20_000 }, () => {
   beforeEach(() => {
     vi.stubEnv("OPENAI_API_KEY", "test-key");
     runEstimate.mockReset();
+    claimRun.mockReset().mockResolvedValue("ok");
   });
   afterEach(() => vi.unstubAllEnvs());
 
@@ -56,13 +63,13 @@ describe("POST /api/run", { timeout: 20_000 }, () => {
   });
 
   it("does not count requests turned away while others run against the daily allowance", async () => {
-    const signals: AbortSignal[] = [];
-    runEstimate.mockImplementation((_spec, _llm, _progress, signal: AbortSignal) => {
-      signals.push(signal);
-      return waitForAbort(signal);
-    });
+    runEstimate.mockImplementation((_spec, _llm, _progress, signal: AbortSignal) =>
+      waitForAbort(signal)
+    );
     const held = [await POST(post("5.5.5.5")), await POST(post("5.5.5.5"))];
+    expect(claimRun).toHaveBeenCalledTimes(2);
     for (let i = 0; i < 25; i++) expect((await POST(post("5.5.5.5"))).status).toBe(429);
+    expect(claimRun).toHaveBeenCalledTimes(2);
     for (const r of held) await r.body!.cancel();
     await new Promise((r) => setTimeout(r, 0));
     const next = await POST(post("5.5.5.5"));
@@ -70,14 +77,85 @@ describe("POST /api/run", { timeout: 20_000 }, () => {
     await next.body!.cancel();
   });
 
-  it("rejects invalid requests before counting them against the daily allowance", async () => {
-    const bad = new Request("http://localhost/api/run", {
-      method: "POST",
-      headers: { "x-forwarded-for": "3.3.3.3" },
-      body: JSON.stringify({ question: "short" }),
-    });
-    expect((await POST(bad)).status).toBe(400);
+  it.each([
+    ["visitor", 429, "today's 20 free GPT-6 Luna estimates"],
+    ["site", 429, "today's free allowance"],
+    ["unavailable", 503, "paused new estimates"],
+  ])("refuses a %s claim before spending and frees its slot", async (claim, status, message) => {
+    claimRun.mockResolvedValue(claim);
+    // Three refusals in a row: a leaked slot would answer the third "too many running".
+    for (let i = 0; i < 3; i++) {
+      const response = await POST(post("6.6.6.6"));
+      expect(response.status).toBe(status);
+      expect((await response.json()).error).toContain(message);
+    }
     expect(runEstimate).not.toHaveBeenCalled();
+  });
+
+  it("claims each model's allowance for the caller's network", async () => {
+    runEstimate.mockResolvedValue({});
+    await (await POST(post("2001:db8:1:2:3:4:5:6"))).text();
+    expect(claimRun).toHaveBeenLastCalledWith("2001:db8:1:2::/64 gpt-6-luna", {
+      visitorLimit: 20,
+      siteCost: 1,
+      siteLimit: 500,
+    });
+    await (await POST(post("7.7.7.7", sol))).text();
+    expect(claimRun).toHaveBeenLastCalledWith("7.7.7.7 gpt-6.1-sol", {
+      visitorLimit: 2,
+      siteCost: 40,
+      siteLimit: 200,
+    });
+  });
+
+  it("runs the model its claim covered", async () => {
+    runEstimate.mockResolvedValue({});
+    await (await POST(post("7.7.7.9"))).text();
+    expect(runEstimate.mock.calls.at(-1)?.[0].model).toBe("gpt-6-luna");
+    await (await POST(post("7.7.7.9", sol))).text();
+    expect(runEstimate.mock.calls.at(-1)?.[0].model).toBe("gpt-6.1-sol");
+  });
+
+  it("names the model and its limit when a visitor runs out", async () => {
+    claimRun.mockResolvedValue("visitor");
+    const response = await POST(post("7.7.7.8", sol));
+    expect((await response.json()).error).toBe(
+      "Your network has used today's 2 free GPT-6.1 Sol estimates, and HiveSight offers 2 more at midnight UTC."
+    );
+  });
+
+  it("rejects invalid requests before counting them against the daily allowance", async () => {
+    expect((await POST(post("3.3.3.3", JSON.stringify({ question: "short" })))).status).toBe(400);
+    expect(runEstimate).not.toHaveBeenCalled();
+    expect(claimRun).not.toHaveBeenCalled();
+  });
+
+  it.each([
+    ["text/plain;charset=UTF-8"],
+    ["text/plain; x=application/json"],
+    ["application/x-www-form-urlencoded"],
+    ["multipart/form-data; boundary=x"],
+    [null],
+  ])("refuses content type %s, which other sites could send with no preflight", async (type) => {
+    const request = new Request("http://localhost/api/run", {
+      method: "POST",
+      headers: type ? { "content-type": type, "x-forwarded-for": "8.8.8.8" } : { "x-forwarded-for": "8.8.8.8" },
+      body: type ? body : new TextEncoder().encode(body),
+    });
+    expect((await POST(request)).status).toBe(415);
+    expect(claimRun).not.toHaveBeenCalled();
+  });
+
+  it("accepts JSON however the header spells it", async () => {
+    runEstimate.mockResolvedValue({});
+    const request = new Request("http://localhost/api/run", {
+      method: "POST",
+      headers: { "content-type": "Application/JSON; charset=utf-8", "x-forwarded-for": "9.9.9.9" },
+      body,
+    });
+    const response = await POST(request);
+    expect(response.status).toBe(200);
+    await response.text();
   });
 
   it("streams a plain message, not the provider's, when the model API rejects the request", async () => {

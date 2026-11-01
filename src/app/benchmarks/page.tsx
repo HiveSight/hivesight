@@ -102,9 +102,9 @@ function CurrentModels() {
         registered before the refresh runs (it also records a one-item plumbing check, two
         amendments and one interrupted run). The refresh registered no confirmatory hypotheses,
         so all its comparisons are exploratory. Subgroup error pools every reported subgroup, as
-        the original plan registered.
-        HiveSight serves {SERVED_MODELS[DEFAULT_MODEL].label} by default
-        {decision.default === DEFAULT_MODEL ? ", the model the registered rule selects" : ""}.
+        the original plan registered.{" "}
+        {decision.default === DEFAULT_MODEL ? "Under the addendum's decision rule, " : ""}HiveSight
+        serves {SERVED_MODELS[DEFAULT_MODEL].label} by default.
       </p>
       <div className="overflow-x-auto rounded-lg border border-line">
         <table className="w-full min-w-[40rem] text-sm">

@@ -1,8 +1,9 @@
-import { pingStore, storeConfigured } from "@/lib/store";
+import { pingStore, purgeOldRecords, storeConfigured } from "@/lib/store";
 
 /**
- * Daily cron (vercel.json): a tiny read keeps the free-tier database from
- * auto-pausing on inactivity, which previously took production down.
+ * Daily cron (vercel.json): Supabase pauses free-tier projects on inactivity,
+ * so this queries the database each day, and the purge limits what it holds.
+ * Production runs no estimates while the database is away.
  */
 export async function GET(request: Request) {
   const secret = process.env.CRON_SECRET;
@@ -10,11 +11,16 @@ export async function GET(request: Request) {
     return Response.json({ error: "unauthorized" }, { status: 401 });
   }
   if (!storeConfigured()) {
-    return Response.json({ status: "skipped", message: "store not configured" });
+    const production = process.env.NODE_ENV === "production";
+    return Response.json(
+      { status: production ? "failed" : "skipped", message: "store not configured" },
+      { status: production ? 503 : 200 }
+    );
   }
   const ping = await pingStore();
+  const purged = ping.ok && (await purgeOldRecords());
   return Response.json(
-    { status: ping.ok ? "ok" : "failed", message: ping.message },
-    { status: ping.ok ? 200 : 503 }
+    { status: purged ? "ok" : "failed", message: ping.ok && !purged ? "purge failed" : ping.message },
+    { status: purged ? 200 : 503 }
   );
 }

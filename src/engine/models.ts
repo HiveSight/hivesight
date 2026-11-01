@@ -17,7 +17,26 @@ export interface ServedModel {
   reasoningEffort: "none" | "low";
   /** USD per million tokens [input, output]. */
   price: [number, number];
+  /**
+   * Units one population-cell estimate draws from the site's daily allowance,
+   * covering its measured cost relative to a Luna estimate. Individual mode
+   * makes different calls and needs its own figure before it ships.
+   */
+  siteUnits: number;
+  /**
+   * Estimates of this model one visitor may run per UTC day. The limits across
+   * all models keep one visitor to a fifth of the site's allowance.
+   */
+  visitorLimit: number;
+  /**
+   * The day's site total this model's estimates may reach. The form runs the
+   * default model, so a lower limit here holds the rest of the day for the form.
+   */
+  siteLimit: number;
 }
+
+/** Units the whole site may spend per UTC day. */
+export const SITE_UNITS_PER_DAY = 500;
 
 export const SERVED_MODELS = {
   "gpt-6-luna": {
@@ -25,12 +44,18 @@ export const SERVED_MODELS = {
     provider: "openai",
     reasoningEffort: "none",
     price: [0.1, 0.5],
+    siteUnits: 1,
+    visitorLimit: 20,
+    siteLimit: SITE_UNITS_PER_DAY,
   },
   "gpt-6.1-sol": {
     label: "GPT-6.1 Sol",
     provider: "openai",
     reasoningEffort: "low",
     price: [2, 10],
+    siteUnits: 40,
+    visitorLimit: 2,
+    siteLimit: 200,
   },
 } as const satisfies Record<string, ServedModel>;
 

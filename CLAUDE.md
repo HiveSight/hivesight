@@ -12,10 +12,15 @@ MAE vs 6pts subgroup MAE for cell-based estimation (evals/results/).
 - Data release: `public/data/v1/{US,<state>}.json` built by
   `pipeline/build_cell_release.py` from HF `MaxGhenis/hivesight-persona-data`.
   Districts reduce at request time in `src/engine/data.ts`.
-- Persistence (optional): Supabase project `nbtaqmnxvwftbooxjhnd`. The app
-  runs stateless without it — only share links and history need the DB.
-  Free-tier projects auto-pause on inactivity; the daily keepalive cron in
-  vercel.json prevents this once the project is restored/upgraded.
+- Database: Supabase project `nbtaqmnxvwftbooxjhnd` (org PolicyEngine-test, free
+  plan). It holds saved estimates (`runs`) and the daily allowances
+  (`run_quota`, `claim_run`). Production stops estimates whenever `claim_run`
+  can't answer, so it needs this database; `bun run dev` runs without it, with
+  no allowances or share links. Free-tier projects auto-pause on inactivity,
+  so the daily keepalive cron in vercel.json queries the database to keep it
+  active, and purges old records.
+- The hosted project also keeps the pre-rebuild tables (surveys, responses,
+  and others) with their rows. Public roles have no access to them.
 
 ## Commands
 
@@ -29,8 +34,23 @@ bun run data:release # build missing public/data/v1 files (needs numpy; delete a
 
 - `OPENAI_API_KEY` — required. Local dev: in `.env.local` (real key in the
   `claude-env` keychain via `~/.claude/manage-secret.sh get OPENAI_API_KEY`).
-- `NEXT_PUBLIC_SUPABASE_URL` + `SUPABASE_SECRET_KEY` — optional persistence.
+- `NEXT_PUBLIC_SUPABASE_URL` + `SUPABASE_SECRET_KEY` — required in production
+  (see Stack). `SUPABASE_SECRET_KEY` also keys the visitor hash, so rotating it
+  restarts the day's per-visitor counts.
 - `CRON_SECRET` — optional, protects /api/cron/keepalive.
+
+## Migrations
+
+Apply migrations before deploying the code that needs them: production refuses
+every estimate while `claim_run` can't answer.
+
+The hosted project's migration history starts with `00001`–`00005` from the
+pre-rebuild schema, which this repo doesn't carry, so `supabase db push` refuses
+to run. Apply new files in `supabase/migrations/` through the Management API:
+`POST https://api.supabase.com/v1/projects/<ref>/database/query` with
+`Authorization: Bearer $SUPABASE_ACCESS_TOKEN` (a personal access token, set in
+the shell) and the body `{"query": "<sql>"}`. Then insert `(version, name)` into
+`supabase_migrations.schema_migrations`.
 
 ## Models
 
@@ -39,6 +59,11 @@ bun run data:release # build missing public/data/v1 files (needs numpy; delete a
   runners' settings are in `evals/models.mjs`; `models.test.ts` keeps them
   equal. Verify model IDs and supported efforts against the provider's docs
   and live API before changing them.
+- `/api/run` accepts every served model, and the form sends none, so visitors
+  get the default. We registered Sol as a second model through the API in
+  `paper/pap-model-refresh-2026-10.md`. Each model sets its own `visitorLimit`,
+  `siteUnits` and `siteLimit`. `models.test.ts` holds one visitor to a fifth of
+  the site's allowance and holds most of the allowance for the default model.
 
 ## Rules
 

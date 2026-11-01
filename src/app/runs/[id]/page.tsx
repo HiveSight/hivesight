@@ -1,6 +1,10 @@
+import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { Results } from "@/components/results";
 import { getRun } from "@/lib/store";
+
+// Visitors write these questions, and only people with the link should find them.
+export const metadata: Metadata = { robots: { index: false } };
 
 export default async function RunPage({
   params,

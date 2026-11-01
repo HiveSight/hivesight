@@ -1,33 +1,45 @@
 import { LlmRequestError, openAiClient } from "@/engine/elicit";
+import { SERVED_MODELS, type ServedModel } from "@/engine/models";
 import { runEstimate } from "@/engine/run";
 import { RunRequestSchema } from "@/lib/schema";
-import { saveRun } from "@/lib/store";
+import { type RunClaim, claimRun, saveRun } from "@/lib/store";
+import { clientIp, visitorNetwork } from "@/lib/visitor";
 
 export const maxDuration = 300;
 
-// Best-effort per-instance limits for the free demo. Not a security boundary:
-// each serverless instance keeps its own counters; a durable limiter arrives
-// with accounts.
-const RATE_LIMIT_PER_DAY = 20;
+// The database counts daily allowances, which models.ts sets. A typical Luna
+// estimate costs about $0.0064 (155 calls at the per-call cost in
+// evals/results/model-refresh-run.json), so 500 of them cost about $3.20. With
+// every call at the token ceiling, 500 of the largest requests would cost about
+// $38 on English text and about $75 on text a caller writes to use the most
+// tokens. We set Sol's units above its mean measured cost and its token prices,
+// so Sol requests don't raise these figures.
+
+// Per-instance limits on work in flight.
 const MAX_ACTIVE_PER_IP = 2;
 const MAX_ACTIVE_PER_INSTANCE = 8;
 // Stop spending before the platform kills the function at maxDuration.
 const RUN_DEADLINE_MS = 270_000;
 
-const hits = new Map<string, { count: number; day: string }>();
+function refusal(claim: Exclude<RunClaim, "ok">, model: ServedModel) {
+  switch (claim) {
+    case "visitor":
+      return {
+        status: 429,
+        error: `Your network has used today's ${model.visitorLimit} free ${model.label} estimates, and HiveSight offers ${model.visitorLimit} more at midnight UTC.`,
+      };
+    case "site":
+      return {
+        status: 429,
+        error: "HiveSight can't fit this estimate into today's free allowance and offers more at midnight UTC.",
+      };
+    case "unavailable":
+      return { status: 503, error: "HiveSight has paused new estimates. Please try again later." };
+  }
+}
+
 const activeByIp = new Map<string, number>();
 let activeRuns = 0;
-
-function rateLimited(ip: string): boolean {
-  const day = new Date().toISOString().slice(0, 10);
-  const cur = hits.get(ip);
-  if (!cur || cur.day !== day) {
-    hits.set(ip, { count: 1, day });
-    return false;
-  }
-  cur.count++;
-  return cur.count > RATE_LIMIT_PER_DAY;
-}
 
 function admit(ip: string): (() => void) | null {
   const mine = activeByIp.get(ip) ?? 0;
@@ -63,8 +75,13 @@ export async function POST(request: Request) {
   if (!apiKey) {
     return Response.json({ error: "Model API not configured" }, { status: 503 });
   }
+  // Browsers preflight cross-site JSON and this route grants no cross-site
+  // access, so other sites can't spend their visitors' allowances.
+  if (!request.headers.get("content-type")?.toLowerCase().startsWith("application/json")) {
+    return Response.json({ error: "Send the request as JSON." }, { status: 415 });
+  }
 
-  const ip = request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ?? "unknown";
+  const ip = visitorNetwork(clientIp(request.headers));
   const parsed = RunRequestSchema.safeParse(await request.json().catch(() => null));
   if (!parsed.success) {
     return Response.json(
@@ -81,14 +98,19 @@ export async function POST(request: Request) {
       { status: 429 }
     );
   }
-  if (rateLimited(ip)) {
-    release();
-    return Response.json(
-      { error: `Free demo allows ${RATE_LIMIT_PER_DAY} estimates per day.` },
-      { status: 429 }
-    );
-  }
   const spec = parsed.data;
+  const model = SERVED_MODELS[spec.model];
+  // A visitor holds a separate daily allowance for each model.
+  const claim = await claimRun(`${ip} ${spec.model}`, {
+    visitorLimit: model.visitorLimit,
+    siteCost: model.siteUnits,
+    siteLimit: model.siteLimit,
+  });
+  if (claim !== "ok") {
+    release();
+    const { status, error } = refusal(claim, model);
+    return Response.json({ error }, { status });
+  }
   const llm = openAiClient(apiKey);
 
   // One signal stops all upstream work: the client disconnecting, the
