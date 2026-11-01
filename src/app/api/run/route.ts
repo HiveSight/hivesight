@@ -1,5 +1,5 @@
 import { LlmRequestError, openAiClient } from "@/engine/elicit";
-import { SERVED_MODELS, SITE_UNITS_PER_DAY, type ServedModel } from "@/engine/models";
+import { SERVED_MODELS, type ServedModel } from "@/engine/models";
 import { runEstimate } from "@/engine/run";
 import { RunRequestSchema } from "@/lib/schema";
 import { type RunClaim, claimRun, saveRun } from "@/lib/store";
@@ -9,11 +9,11 @@ export const maxDuration = 300;
 
 // The database counts daily allowances, which models.ts sets. A typical Luna
 // estimate costs about $0.0064 (155 calls at the per-call cost in
-// evals/results/model-refresh-run.json), so a full site allowance typically
-// spends about $3.20. The largest requests, with every call at the token
-// ceiling, would spend about $38 on English text and about $75 on text written
-// to use the most tokens. Sol's units cover its measured cost and its token
-// prices, so Sol requests don't raise these figures.
+// evals/results/model-refresh-run.json), so 500 of them cost about $3.20. With
+// every call at the token ceiling, 500 of the largest requests would cost about
+// $38 on English text and about $75 on text a caller writes to use the most
+// tokens. We set Sol's units above its mean measured cost and its token prices,
+// so Sol requests don't raise these figures.
 
 // Per-instance limits on work in flight.
 const MAX_ACTIVE_PER_IP = 2;
@@ -104,7 +104,7 @@ export async function POST(request: Request) {
   const claim = await claimRun(`${ip} ${spec.model}`, {
     visitorLimit: model.visitorLimit,
     siteCost: model.siteUnits,
-    siteLimit: SITE_UNITS_PER_DAY,
+    siteLimit: model.siteLimit,
   });
   if (claim !== "ok") {
     release();

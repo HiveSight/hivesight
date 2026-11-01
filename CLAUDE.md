@@ -60,9 +60,10 @@ the shell) and the body `{"query": "<sql>"}`. Then insert `(version, name)` into
   equal. Verify model IDs and supported efforts against the provider's docs
   and live API before changing them.
 - `/api/run` accepts every served model, and the form sends none, so visitors
-  get the default. `paper/pap-model-refresh-2026-10.md` registers Sol as a second
-  model through the API. Each model sets its own `visitorLimit` and `siteUnits`,
-  and `models.test.ts` holds one visitor to a fifth of the site's allowance.
+  get the default. We registered Sol as a second model through the API in
+  `paper/pap-model-refresh-2026-10.md`. Each model sets its own `visitorLimit`,
+  `siteUnits` and `siteLimit`. `models.test.ts` holds one visitor to a fifth of
+  the site's allowance and holds most of the allowance for the default model.
 
 ## Rules
 

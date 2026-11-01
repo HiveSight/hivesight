@@ -39,11 +39,11 @@ export function storeConfigured(): boolean {
 }
 
 export interface RunLimits {
-  /** Estimates one visitor may run per UTC day. */
+  /** Estimates of one model one visitor may run per UTC day. */
   visitorLimit: number;
   /** Units this estimate draws from the site's daily allowance. */
   siteCost: number;
-  /** Units the whole site may spend per UTC day. */
+  /** The day's site total this estimate may reach. */
   siteLimit: number;
 }
 

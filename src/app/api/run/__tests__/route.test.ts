@@ -104,8 +104,16 @@ describe("POST /api/run", { timeout: 20_000 }, () => {
     expect(claimRun).toHaveBeenLastCalledWith("7.7.7.7 gpt-6.1-sol", {
       visitorLimit: 2,
       siteCost: 40,
-      siteLimit: 500,
+      siteLimit: 200,
     });
+  });
+
+  it("runs the model its claim covered", async () => {
+    runEstimate.mockResolvedValue({});
+    await (await POST(post("7.7.7.9"))).text();
+    expect(runEstimate.mock.calls.at(-1)?.[0].model).toBe("gpt-6-luna");
+    await (await POST(post("7.7.7.9", sol))).text();
+    expect(runEstimate.mock.calls.at(-1)?.[0].model).toBe("gpt-6.1-sol");
   });
 
   it("names the model and its limit when a visitor runs out", async () => {

@@ -83,24 +83,25 @@ describe("run quota migrations", { timeout: 60_000 }, () => {
     await fc.assert(
       fc.asyncProperty(
         fc.integer({ min: 1, max: 5 }),
-        fc.integer({ min: 1, max: 60 }),
         fc.array(
           fc.record({
             visitor: fc.constantFrom("a", "b", "c"),
             cost: fc.integer({ min: 1, max: 40 }),
+            // Each model sets its own site limit.
+            siteLimit: fc.integer({ min: 1, max: 60 }),
           }),
           { maxLength: 30 }
         ),
-        async (visitorLimit, siteLimit, claims) => {
+        async (visitorLimit, claims) => {
           await db.exec("delete from public.run_quota");
           const state = { site: 0, visitors: new Map<string, number>() };
           for (const c of claims) {
-            const expected = referenceClaim(state, c, { visitorLimit, siteLimit });
-            expect(await claim(c.visitor, visitorLimit, c.cost, siteLimit)).toBe(expected);
+            const expected = referenceClaim(state, c, { visitorLimit, siteLimit: c.siteLimit });
+            expect(await claim(c.visitor, visitorLimit, c.cost, c.siteLimit)).toBe(expected);
           }
           const stored = await counts();
           expect(stored.get("site") ?? 0).toBe(state.site);
-          expect(state.site).toBeLessThanOrEqual(siteLimit);
+          expect(state.site).toBeLessThanOrEqual(Math.max(0, ...claims.map((c) => c.siteLimit)));
           for (const [visitor, used] of state.visitors) {
             expect(stored.get(`visitor:${visitor}`)).toBe(used);
             expect(used).toBeLessThanOrEqual(visitorLimit);
@@ -109,6 +110,15 @@ describe("run quota migrations", { timeout: 60_000 }, () => {
       ),
       { numRuns: 40 }
     );
+  });
+
+  it("stops Sol at its own site limit while the default keeps running", async () => {
+    for (const visitor of ["a", "a", "b", "b", "c"]) {
+      expect(await claim(visitor, 2, 40, 200)).toBe("ok");
+    }
+    expect(await claim("c", 2, 40, 200)).toBe("site");
+    expect(await claim("luna", 20, 1, 500)).toBe("ok");
+    expect((await counts()).get("site")).toBe(201);
   });
 
   it("leaves both counts alone when either allowance refuses", async () => {

@@ -28,6 +28,11 @@ export interface ServedModel {
    * all models keep one visitor to a fifth of the site's allowance.
    */
   visitorLimit: number;
+  /**
+   * The day's site total this model's estimates may reach. The form runs the
+   * default model, so a lower limit here holds the rest of the day for the form.
+   */
+  siteLimit: number;
 }
 
 /** Units the whole site may spend per UTC day. */
@@ -41,6 +46,7 @@ export const SERVED_MODELS = {
     price: [0.1, 0.5],
     siteUnits: 1,
     visitorLimit: 20,
+    siteLimit: SITE_UNITS_PER_DAY,
   },
   "gpt-6.1-sol": {
     label: "GPT-6.1 Sol",
@@ -49,6 +55,7 @@ export const SERVED_MODELS = {
     price: [2, 10],
     siteUnits: 40,
     visitorLimit: 2,
+    siteLimit: 200,
   },
 } as const satisfies Record<string, ServedModel>;
 

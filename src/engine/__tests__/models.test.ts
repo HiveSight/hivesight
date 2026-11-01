@@ -2,7 +2,7 @@ import { readFileSync } from "node:fs";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import * as evalModels from "../../../evals/models.mjs";
 import { LlmRequestError, openAiClient } from "../elicit";
-import { benchmarkErrorFor } from "../run";
+import { benchmarkErrorFor, runEstimate } from "../run";
 import {
   DEFAULT_MODEL,
   SERVED_MODEL_IDS,
@@ -10,6 +10,7 @@ import {
   SITE_UNITS_PER_DAY,
   reasoningEffortFor,
 } from "../models";
+import { canonicalGeography } from "@/lib/geographies";
 import { RunRequestSchema } from "@/lib/schema";
 
 const baseRequest = {
@@ -32,6 +33,7 @@ describe("served models", () => {
   });
 
   it("draw from the site allowance at least their measured cost", () => {
+    // This usage entry covers the run's resumed segment (the addendum's post-run notes).
     const { usage } = JSON.parse(readFileSync("evals/results/model-refresh-run.json", "utf8"));
     const costPerCall = (id: string) => {
       const arm = usage[`openai:${id}:cells+naive:all:default:g149`];
@@ -66,12 +68,27 @@ describe("served models", () => {
     expect(oneVisitor).toBeLessThanOrEqual(SITE_UNITS_PER_DAY / 5);
   });
 
+  it("hold most of the site's allowance for the default model", () => {
+    expect(SERVED_MODELS[DEFAULT_MODEL].siteLimit).toBe(SITE_UNITS_PER_DAY);
+    for (const id of SERVED_MODEL_IDS) {
+      if (id === DEFAULT_MODEL) continue;
+      expect(SERVED_MODELS[id].siteLimit).toBeLessThanOrEqual(SITE_UNITS_PER_DAY * 0.4);
+    }
+  });
+
   it("accept Sol through the API, as the refresh plan registers", () => {
     const parsed = RunRequestSchema.parse({ ...baseRequest, model: "gpt-6.1-sol" });
     expect(parsed.model).toBe("gpt-6.1-sol");
     expect(readFileSync("paper/pap-model-refresh-2026-10.md", "utf8")).toMatch(
       /gpt-6\.1-sol is offered as a second model through the API/
     );
+  });
+
+  it("hold a request to the size the spending figures assume", () => {
+    const largest = { ...baseRequest, question: "q".repeat(500), verbatimCount: 12 };
+    expect(RunRequestSchema.safeParse(largest).success).toBe(true);
+    expect(RunRequestSchema.safeParse({ ...largest, question: "q".repeat(501) }).success).toBe(false);
+    expect(RunRequestSchema.safeParse({ ...largest, verbatimCount: 13 }).success).toBe(false);
   });
 
   it("reject models the product no longer serves", () => {
@@ -108,6 +125,28 @@ describe("openAiClient", () => {
     await openAiClient("test-key").complete({ system: "s", user: "u", model });
     expect(bodies[0].reasoning_effort).toBe(SERVED_MODELS[model].reasoningEffort);
     expect(bodies[0].model).toBe(model);
+  });
+
+  it.each(SERVED_MODEL_IDS)("keeps a %s estimate on that model and under the token ceiling", async (model) => {
+    const bodies = stubFetch([
+      { choices: [{ message: { content: '{"yes": 60, "no": 40, "choice": "yes", "text": "ok"}' } }] },
+    ]);
+    await runEstimate(
+      {
+        question: "Do you support a four-day work week?",
+        format: { kind: "binary" },
+        audience: { geography: canonicalGeography("national", "US")!, filters: {} },
+        model,
+        mode: "cells",
+        verbatimCount: 6,
+      },
+      openAiClient("test-key")
+    );
+    expect(bodies).toHaveLength(155);
+    for (const body of bodies) {
+      expect(body.model).toBe(model);
+      expect(body.max_completion_tokens).toBe(700);
+    }
   });
 
   it("fails loudly, without retrying at another effort, when the API rejects the effort", async () => {

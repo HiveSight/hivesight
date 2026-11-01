@@ -70,7 +70,7 @@ export default function HomePage() {
         <p className="mt-2 max-w-2xl text-sm text-muted">
           Mean absolute error in percentage points against human targets from
           GSS 2024 and SHED 2024: 63 questions, registered before the benchmark
-          runs, with {DEFAULT_MODEL}, the model HiveSight serves. Lower
+          runs, with {DEFAULT_MODEL}, the model HiveSight serves by default. Lower
           is better. Cells stay coherent, compose across any audience filter,
           and are fully auditable. Error is real, which is why every result
           ships with it attached.
