@@ -12,10 +12,15 @@ MAE vs 6pts subgroup MAE for cell-based estimation (evals/results/).
 - Data release: `public/data/v1/{US,<state>}.json` built by
   `pipeline/build_cell_release.py` from HF `MaxGhenis/hivesight-persona-data`.
   Districts reduce at request time in `src/engine/data.ts`.
-- Persistence (optional): Supabase project `nbtaqmnxvwftbooxjhnd`. The app
-  runs stateless without it — only share links and history need the DB.
-  Free-tier projects auto-pause on inactivity; the daily keepalive cron in
-  vercel.json prevents this once the project is restored/upgraded.
+- Database: Supabase project `nbtaqmnxvwftbooxjhnd` (org PolicyEngine-test, free
+  plan). It holds saved estimates (`runs`) and the daily allowances
+  (`run_quota`, `claim_run`). Production stops estimates whenever `claim_run`
+  can't answer, so it needs this database; `bun run dev` runs without it, with
+  no allowances or share links. Free-tier projects auto-pause on inactivity,
+  and the daily keepalive cron in vercel.json prevents that and purges old
+  records.
+- The hosted project also keeps the pre-rebuild tables (surveys, responses,
+  and others) with their rows. Public roles have no access to them.
 
 ## Commands
 
@@ -29,8 +34,18 @@ bun run data:release # build missing public/data/v1 files (needs numpy; delete a
 
 - `OPENAI_API_KEY` — required. Local dev: in `.env.local` (real key in the
   `claude-env` keychain via `~/.claude/manage-secret.sh get OPENAI_API_KEY`).
-- `NEXT_PUBLIC_SUPABASE_URL` + `SUPABASE_SECRET_KEY` — optional persistence.
+- `NEXT_PUBLIC_SUPABASE_URL` + `SUPABASE_SECRET_KEY` — required in production
+  (see Stack). `SUPABASE_SECRET_KEY` also keys the visitor hash, so rotating it
+  restarts the day's per-visitor counts.
 - `CRON_SECRET` — optional, protects /api/cron/keepalive.
+
+## Migrations
+
+The hosted project's migration history starts with `00001`–`00005` from the
+pre-rebuild schema, which this repo doesn't carry, so `supabase db push` refuses
+to run. Apply new files in `supabase/migrations/` through the Management API
+(`POST /v1/projects/<ref>/database/query`), then record the version in
+`supabase_migrations.schema_migrations`.
 
 ## Models
 

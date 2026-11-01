@@ -30,11 +30,17 @@ export async function GET() {
       status: ping.ok ? "ok" : "failed",
       message: ping.message,
     });
+  } else if (process.env.NODE_ENV === "production") {
+    checks.push({
+      name: "store",
+      status: "failed",
+      message: "store not configured; estimates stay paused without it",
+    });
   } else {
     checks.push({
       name: "store",
       status: "disabled",
-      message: "persistence not configured; runs return inline only",
+      message: "store not configured; local development runs without allowances or share links",
     });
   }
 

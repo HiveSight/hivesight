@@ -1,3 +1,4 @@
+import { readFileSync } from "node:fs";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import * as evalModels from "../../../evals/models.mjs";
 import { LlmRequestError, openAiClient } from "../elicit";
@@ -21,6 +22,21 @@ describe("served models", () => {
         SERVED_MODELS[id].reasoningEffort
       );
       expect(evalCfg.price).toEqual(SERVED_MODELS[id].price);
+    }
+  });
+
+  it("draw from the site allowance at least their measured cost", () => {
+    const { usage } = JSON.parse(readFileSync("evals/results/model-refresh-run.json", "utf8"));
+    const costPerCall = (id: string) => {
+      const arm = usage[`openai:${id}:cells+naive:all:default:g149`];
+      return arm.usd / arm.calls;
+    };
+    expect(SERVED_MODELS[DEFAULT_MODEL].siteUnits).toBe(1);
+    for (const id of SERVED_MODEL_IDS) {
+      expect(Number.isInteger(SERVED_MODELS[id].siteUnits)).toBe(true);
+      expect(SERVED_MODELS[id].siteUnits * costPerCall(DEFAULT_MODEL)).toBeGreaterThanOrEqual(
+        costPerCall(id)
+      );
     }
   });
 

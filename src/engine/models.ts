@@ -17,6 +17,11 @@ export interface ServedModel {
   reasoningEffort: "none" | "low";
   /** USD per million tokens [input, output]. */
   price: [number, number];
+  /**
+   * Units one estimate draws from the site's daily allowance, covering its
+   * measured cost relative to a Luna estimate.
+   */
+  siteUnits: number;
 }
 
 export const SERVED_MODELS = {
@@ -25,12 +30,14 @@ export const SERVED_MODELS = {
     provider: "openai",
     reasoningEffort: "none",
     price: [0.1, 0.5],
+    siteUnits: 1,
   },
   "gpt-6.1-sol": {
     label: "GPT-6.1 Sol",
     provider: "openai",
     reasoningEffort: "low",
     price: [2, 10],
+    siteUnits: 40,
   },
 } as const satisfies Record<string, ServedModel>;
 

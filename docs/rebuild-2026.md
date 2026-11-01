@@ -47,9 +47,10 @@ estimate (9.3pts topline) is surfaced in provenance as a cross-check.
 - **Data plane**: prebuilt cell tables + sample pools for US + 51 states
   (public/data/v1, ~420KB each); districts reduce at request time from the
   HF per-district files with in-memory caching.
-- **Persistence optional**: the demo runs stateless; Supabase enables share
-  links when configured. Daily keepalive cron prevents free-tier auto-pause
-  (the outage that took the old product down).
+- **Database**: Supabase holds saved estimates for share links and the daily
+  allowances that cap spending, and production stops estimates when it can't
+  reach them. Daily keepalive cron prevents free-tier auto-pause (the outage
+  that took the old product down).
 - **Dropped from v0**: accounts, credits, Stripe — reintroduce post-launch
   behind the same storage adapter.
 

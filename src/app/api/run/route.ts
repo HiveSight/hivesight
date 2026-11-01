@@ -1,33 +1,41 @@
 import { LlmRequestError, openAiClient } from "@/engine/elicit";
+import { SERVED_MODELS } from "@/engine/models";
 import { runEstimate } from "@/engine/run";
 import { RunRequestSchema } from "@/lib/schema";
-import { saveRun } from "@/lib/store";
+import { type RunClaim, claimRun, saveRun } from "@/lib/store";
+import { clientIp, visitorNetwork } from "@/lib/visitor";
 
 export const maxDuration = 300;
 
-// Best-effort per-instance limits for the free demo. Not a security boundary:
-// each serverless instance keeps its own counters; a durable limiter arrives
-// with accounts.
-const RATE_LIMIT_PER_DAY = 20;
+// Daily allowances, counted in the database. At the $0.0064 a Luna estimate
+// costs (evals/results/model-refresh-run.json), the site allowance caps model
+// spending near $3.20 a day.
+const ESTIMATES_PER_VISITOR_PER_DAY = 20;
+const SITE_UNITS_PER_DAY = 500;
+// Per-instance limits on work in flight.
 const MAX_ACTIVE_PER_IP = 2;
 const MAX_ACTIVE_PER_INSTANCE = 8;
 // Stop spending before the platform kills the function at maxDuration.
 const RUN_DEADLINE_MS = 270_000;
 
-const hits = new Map<string, { count: number; day: string }>();
+const REFUSALS: Record<Exclude<RunClaim, "ok">, { status: number; error: string }> = {
+  visitor: {
+    status: 429,
+    error: `HiveSight allows ${ESTIMATES_PER_VISITOR_PER_DAY} free estimates per day and resets the count at midnight UTC.`,
+  },
+  site: {
+    status: 429,
+    error: "HiveSight has run all of today's free estimates and resets the count at midnight UTC.",
+  },
+  unavailable: {
+    status: 503,
+    error:
+      "HiveSight can't check today's estimate count, so it has paused new estimates. Please try again in a few minutes.",
+  },
+};
+
 const activeByIp = new Map<string, number>();
 let activeRuns = 0;
-
-function rateLimited(ip: string): boolean {
-  const day = new Date().toISOString().slice(0, 10);
-  const cur = hits.get(ip);
-  if (!cur || cur.day !== day) {
-    hits.set(ip, { count: 1, day });
-    return false;
-  }
-  cur.count++;
-  return cur.count > RATE_LIMIT_PER_DAY;
-}
 
 function admit(ip: string): (() => void) | null {
   const mine = activeByIp.get(ip) ?? 0;
@@ -64,7 +72,7 @@ export async function POST(request: Request) {
     return Response.json({ error: "Model API not configured" }, { status: 503 });
   }
 
-  const ip = request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ?? "unknown";
+  const ip = visitorNetwork(clientIp(request.headers));
   const parsed = RunRequestSchema.safeParse(await request.json().catch(() => null));
   if (!parsed.success) {
     return Response.json(
@@ -81,14 +89,17 @@ export async function POST(request: Request) {
       { status: 429 }
     );
   }
-  if (rateLimited(ip)) {
-    release();
-    return Response.json(
-      { error: `Free demo allows ${RATE_LIMIT_PER_DAY} estimates per day.` },
-      { status: 429 }
-    );
-  }
   const spec = parsed.data;
+  const claim = await claimRun(ip, {
+    visitorLimit: ESTIMATES_PER_VISITOR_PER_DAY,
+    siteCost: SERVED_MODELS[spec.model].siteUnits,
+    siteLimit: SITE_UNITS_PER_DAY,
+  });
+  if (claim !== "ok") {
+    release();
+    const { status, error } = REFUSALS[claim];
+    return Response.json({ error }, { status });
+  }
   const llm = openAiClient(apiKey);
 
   // One signal stops all upstream work: the client disconnecting, the
