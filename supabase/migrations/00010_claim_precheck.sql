@@ -1,9 +1,10 @@
 -- claim_run reads the counts before it takes the site lock and refuses a claim
 -- they already rule out, so a flood of refused claims can't queue real claims
--- behind the site row. Counts only rise within a day, so a stale read can't
--- refuse a claim that fits. A stale read can pass a claim that no longer fits,
--- and the checks under the lock refuse it. The store ping's claim never fits and
--- skips the reads, because it exists to reach the write and the lock.
+-- behind the site row. Outside an operator's reset, counts only rise within a
+-- day, so a stale read can't refuse a claim that fits. A stale read can pass a
+-- claim that no longer fits, and the checks under the lock refuse it. The store
+-- ping's claim never fits and skips the reads, because it exists to reach the
+-- write and the lock.
 create or replace function public.claim_run(
   p_visitor text,
   p_visitor_limit integer,

@@ -75,7 +75,7 @@ describe("run quota migrations", { timeout: 60_000 }, () => {
     db = new PGlite();
     await db.exec(SUPABASE_ROLES);
     for (const sql of migrations) await db.exec(sql);
-  });
+  }, 60_000);
   beforeEach(() => db.exec("delete from public.run_quota; delete from public.runs;"));
   afterAll(() => db.close());
 
@@ -151,6 +151,23 @@ describe("run quota migrations", { timeout: 60_000 }, () => {
     expect((await counts()).get("site")).toBe(2);
   });
 
+  it("ignores the dates either side of UTC's whatever the session's time zone", async () => {
+    await db.exec(`insert into public.run_quota (bucket, day, used) values
+      ('site', ${TODAY} - 1, 500), ('site', ${TODAY} + 1, 500),
+      ('visitor:a', ${TODAY} - 1, 20), ('visitor:a', ${TODAY} + 1, 20)`);
+    for (const zone of ["Pacific/Kiritimati", "Etc/GMT+12"]) {
+      await db.exec(`set time zone '${zone}'`);
+      expect(await claim("a", 20, 1, 500)).toBe("ok");
+      await db.exec("reset time zone");
+    }
+  });
+
+  it("names the site when both allowances refuse, before or under the lock", async () => {
+    expect(await claim("a", 1, 1, 1)).toBe("ok");
+    expect(await claim("a", 1, 1, 1)).toBe("site");
+    expect(await claim("a", 1, 2, 1)).toBe("site");
+  });
+
   it("answers the store ping's oversized claim without counting it", async () => {
     expect(await claim("ping", 1, 2, 1)).toBe("site");
     expect((await counts()).get("site")).toBe(0);
@@ -167,8 +184,11 @@ describe("run quota migrations", { timeout: 60_000 }, () => {
   ])("fails the store ping on a read-only database %s the day's first claim", async (_, claimed) => {
     if (claimed) expect(await claim("a", 20, 1, 500)).toBe("ok");
     await db.exec("set default_transaction_read_only = on");
-    await expect(claim("ping", 1, 2, 1)).rejects.toThrow("read-only");
-    await db.exec("reset role; reset default_transaction_read_only");
+    try {
+      await expect(claim("ping", 1, 2, 1)).rejects.toThrow("read-only");
+    } finally {
+      await db.exec("reset role; reset default_transaction_read_only");
+    }
   });
 
   it("refuses what the counts rule out on a read-only database", async () => {
