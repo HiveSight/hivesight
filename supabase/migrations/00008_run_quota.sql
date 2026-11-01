@@ -60,8 +60,8 @@ begin
 end;
 $$;
 
--- Keeps the database inside the free tier: drops visitor keys after a day and
--- saved estimates beyond the newest p_keep_runs.
+-- Keeps the database inside the free tier: drops counts from before yesterday
+-- and saved estimates beyond the newest p_keep_runs.
 create or replace function public.purge_old_records(p_keep_runs integer) returns void
 language plpgsql
 security invoker

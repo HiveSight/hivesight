@@ -14,9 +14,9 @@ let client: SupabaseClient | null | undefined;
 // Persistence must never hold up a finished estimate.
 const STORE_TIMEOUT_MS = 2000;
 
-// About 450 MB at the largest payload the request schema allows, which keeps
-// the free tier's 500 MB database from filling and refusing every claim.
-const KEEP_RUNS = 15_000;
+// The largest request saves about 42 KB, so this keeps the runs table near
+// 420 MB at worst. A full 500 MB free-tier database would refuse every claim.
+const KEEP_RUNS = 10_000;
 
 function getClient(): SupabaseClient | null {
   if (client !== undefined) return client;
