@@ -10,7 +10,8 @@ export const maxDuration = 300;
 // Daily allowances, counted in the database. A typical Luna estimate costs about
 // $0.0064 (155 calls at the per-call cost in evals/results/model-refresh-run.json),
 // so a full site allowance typically spends about $3.20. The largest requests,
-// with every call at the token ceiling, would spend about $38.
+// with every call at the token ceiling, would spend about $38 on English text
+// and about $75 on text written to use the most tokens.
 const ESTIMATES_PER_VISITOR_PER_DAY = 20;
 const SITE_UNITS_PER_DAY = 500;
 // Per-instance limits on work in flight.

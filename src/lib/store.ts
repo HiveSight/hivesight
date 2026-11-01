@@ -15,9 +15,10 @@ let client: SupabaseClient | null | undefined;
 const STORE_TIMEOUT_MS = 2000;
 
 // The largest request stores about 47 KB, so this holds the runs table near
-// 460 MB at worst, dead rows included. An organization over the free plan's
-// 500 MB can have its requests refused, and that would stop every claim.
-const KEEP_RUNS = 8_000;
+// 400 MB at worst, dead rows included, and leaves room for the rest of the
+// database. An organization over the free plan's 500 MB can have its requests
+// refused, and that would stop every claim.
+const KEEP_RUNS = 7_000;
 
 function getClient(): SupabaseClient | null {
   if (client !== undefined) return client;
@@ -158,4 +159,16 @@ export async function pingStore(): Promise<{ ok: boolean; message: string }> {
     console.error("store ping failed:", err);
   }
   return { ok: false, message: "store unreachable" };
+}
+
+// /api/health is public and each ping takes the site row's lock, so it reuses a
+// recent ping and traffic can't queue claims behind it.
+const PING_INTERVAL_MS = 30_000;
+let lastPing: { at: number; result: ReturnType<typeof pingStore> } | undefined;
+
+export function recentPing(): ReturnType<typeof pingStore> {
+  if (!lastPing || Date.now() - lastPing.at >= PING_INTERVAL_MS) {
+    lastPing = { at: Date.now(), result: pingStore() };
+  }
+  return lastPing.result;
 }

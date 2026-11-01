@@ -48,8 +48,9 @@ The hosted project's migration history starts with `00001`–`00005` from the
 pre-rebuild schema, which this repo doesn't carry, so `supabase db push` refuses
 to run. Apply new files in `supabase/migrations/` through the Management API:
 `POST https://api.supabase.com/v1/projects/<ref>/database/query` with
-`Authorization: Bearer $SUPABASE_ACCESS_TOKEN` and the body `{"query": "<sql>"}`.
-Then insert the version into `supabase_migrations.schema_migrations`.
+`Authorization: Bearer $SUPABASE_ACCESS_TOKEN` (a personal access token, set in
+the shell) and the body `{"query": "<sql>"}`. Then insert `(version, name)` into
+`supabase_migrations.schema_migrations`.
 
 ## Models
 

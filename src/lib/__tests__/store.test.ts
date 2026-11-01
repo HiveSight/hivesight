@@ -137,7 +137,7 @@ describe("purgeOldRecords", () => {
     const { purgeOldRecords } = await loadStore();
     answers({ error: null });
     expect(await purgeOldRecords()).toBe(true);
-    expect(rpc.mock.calls[0]).toEqual(["purge_old_records", { p_keep_runs: 8_000 }]);
+    expect(rpc.mock.calls[0]).toEqual(["purge_old_records", { p_keep_runs: 7_000 }]);
     answers({ error: { message: "boom" } });
     expect(await purgeOldRecords()).toBe(false);
     rpc.mockReturnValue({ abortSignal: () => Promise.reject(new Error("timed out")) });
@@ -190,10 +190,78 @@ describe("pingStore", () => {
     expect(await pingStore()).toEqual({ ok: false, message: "store unreachable" });
   });
 
+  it("gives up on a database that never answers", { timeout: 10_000 }, async () => {
+    let signal: AbortSignal | undefined;
+    rpc.mockReturnValue({
+      abortSignal: (s: AbortSignal) => {
+        signal = s;
+        return new Promise((_, reject) => s.addEventListener("abort", () => reject(s.reason)));
+      },
+    });
+    const { pingStore } = await loadStore();
+    expect(await pingStore()).toEqual({ ok: false, message: "store unreachable" });
+    expect(signal?.aborted).toBe(true);
+  });
+
   it("reports a missing database", async () => {
     vi.stubEnv("NEXT_PUBLIC_SUPABASE_URL", "");
     const { pingStore } = await loadStore();
     expect(await pingStore()).toEqual({ ok: false, message: "store not configured" });
     expect(rpc).not.toHaveBeenCalled();
+  });
+
+  it("asks the database every time, for the cron", async () => {
+    answers({ data: "site", error: null });
+    const { pingStore } = await loadStore();
+    await pingStore();
+    await pingStore();
+    expect(rpc).toHaveBeenCalledTimes(2);
+  });
+});
+
+describe("recentPing", () => {
+  beforeEach(() => {
+    vi.spyOn(console, "error").mockImplementation(() => {});
+    vi.useFakeTimers({ toFake: ["Date"] });
+    rpc.mockReset();
+    vi.stubEnv("NEXT_PUBLIC_SUPABASE_URL", "https://example.supabase.co");
+    vi.stubEnv("SUPABASE_SECRET_KEY", "test-secret");
+  });
+  afterEach(() => {
+    vi.useRealTimers();
+    vi.unstubAllEnvs();
+    vi.restoreAllMocks();
+  });
+
+  it("sends one ping for a burst of health checks", async () => {
+    answers({ data: "site", error: null });
+    const { recentPing } = await loadStore();
+    const results = await Promise.all(Array.from({ length: 500 }, () => recentPing()));
+    expect(results.every((r) => r.ok)).toBe(true);
+    expect(rpc).toHaveBeenCalledOnce();
+  });
+
+  it("pings again once its answer has aged 30 seconds", async () => {
+    answers({ data: "site", error: null });
+    const { recentPing } = await loadStore();
+    await recentPing();
+    vi.advanceTimersByTime(29_999);
+    await recentPing();
+    expect(rpc).toHaveBeenCalledOnce();
+    vi.advanceTimersByTime(1);
+    await recentPing();
+    expect(rpc).toHaveBeenCalledTimes(2);
+    vi.advanceTimersByTime(29_999);
+    await recentPing();
+    expect(rpc).toHaveBeenCalledTimes(2);
+  });
+
+  it("reports a failure the next ping clears", async () => {
+    answers({ data: null, error: { message: "boom" } });
+    const { recentPing } = await loadStore();
+    expect((await recentPing()).ok).toBe(false);
+    answers({ data: "site", error: null });
+    vi.advanceTimersByTime(30_000);
+    expect((await recentPing()).ok).toBe(true);
   });
 });

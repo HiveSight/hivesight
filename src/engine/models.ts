@@ -1,6 +1,7 @@
 /**
- * Models the product serves, with the request settings the benchmark measured
- * them under. evals/models.mjs holds the same settings for the eval runners;
+ * Models the product can serve, with the request settings the benchmark
+ * measured them under. /api/run offers only DEFAULT_MODEL (RunRequestSchema).
+ * evals/models.mjs holds the same settings for the eval runners;
  * __tests__/models.test.ts keeps the two in agreement so published accuracy
  * describes the shipped configuration.
  *

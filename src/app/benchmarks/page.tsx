@@ -103,7 +103,7 @@ function CurrentModels() {
         amendments and one interrupted run). The refresh registered no confirmatory hypotheses,
         so all its comparisons are exploratory. Subgroup error pools every reported subgroup, as
         the original plan registered.
-        HiveSight serves {SERVED_MODELS[DEFAULT_MODEL].label} by default
+        HiveSight serves {SERVED_MODELS[DEFAULT_MODEL].label}
         {decision.default === DEFAULT_MODEL ? ", the model the registered rule selects" : ""}.
       </p>
       <div className="overflow-x-auto rounded-lg border border-line">

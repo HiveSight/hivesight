@@ -1,10 +1,10 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { GET } from "../route";
 
-const pingStore = vi.fn();
+const recentPing = vi.fn();
 const storeConfigured = vi.fn();
 vi.mock("@/lib/store", () => ({
-  pingStore: () => pingStore(),
+  recentPing: () => recentPing(),
   storeConfigured: () => storeConfigured(),
 }));
 vi.mock("@/engine/data", () => ({
@@ -24,7 +24,7 @@ async function storeCheck() {
 describe("GET /api/health", () => {
   beforeEach(() => {
     vi.stubEnv("OPENAI_API_KEY", "test-key");
-    pingStore.mockReset();
+    recentPing.mockReset();
     storeConfigured.mockReset();
   });
   afterEach(() => vi.unstubAllEnvs());
@@ -49,7 +49,7 @@ describe("GET /api/health", () => {
 
   it("reports an unreachable database as degraded", async () => {
     storeConfigured.mockReturnValue(true);
-    pingStore.mockResolvedValue({ ok: false, message: "store unreachable" });
+    recentPing.mockResolvedValue({ ok: false, message: "store unreachable" });
     const { code, store } = await storeCheck();
     expect(code).toBe(503);
     expect(store.status).toBe("failed");

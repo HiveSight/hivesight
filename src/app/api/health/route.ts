@@ -1,5 +1,5 @@
 import { loadGeography } from "@/engine/data";
-import { pingStore, storeConfigured } from "@/lib/store";
+import { recentPing, storeConfigured } from "@/lib/store";
 
 export async function GET() {
   const checks: Array<{ name: string; status: string; message: string }> = [];
@@ -24,7 +24,7 @@ export async function GET() {
   }
 
   if (storeConfigured()) {
-    const ping = await pingStore();
+    const ping = await recentPing();
     checks.push({
       name: "store",
       status: ping.ok ? "ok" : "failed",

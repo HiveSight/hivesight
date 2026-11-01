@@ -1,9 +1,9 @@
 import { pingStore, purgeOldRecords, storeConfigured } from "@/lib/store";
 
 /**
- * Daily cron (vercel.json): a small query keeps the free-tier database active,
- * since Supabase pauses projects on inactivity, and the purge keeps it inside
- * the free tier. Production runs no estimates while the database is away.
+ * Daily cron (vercel.json): Supabase pauses free-tier projects on inactivity,
+ * so this queries the database each day, and the purge limits what it holds.
+ * Production runs no estimates while the database is away.
  */
 export async function GET(request: Request) {
   const secret = process.env.CRON_SECRET;

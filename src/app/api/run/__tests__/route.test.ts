@@ -114,6 +114,7 @@ describe("POST /api/run", { timeout: 20_000 }, () => {
 
   it.each([
     ["text/plain;charset=UTF-8"],
+    ["text/plain; x=application/json"],
     ["application/x-www-form-urlencoded"],
     ["multipart/form-data; boundary=x"],
     [null],
