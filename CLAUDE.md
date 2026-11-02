@@ -63,6 +63,29 @@ Test the whole path with
 reads the failing `scripts/health-drill.json`. It opens a `[drill]` issue that
 closes itself, and doesn't touch a real outage's issue.
 
+## Edge limits
+
+`scripts/firewall.mjs` holds per-address limits that Vercel's firewall applies
+before a request reaches a function: 10 requests a minute to `/api/run`, 120 to
+`/runs/*`, 20 to `/api/health` and 5 to `/api/cron/keepalive`. Static pages get
+none. After each build, CI runs `node scripts/firewall.mjs routes`, which fails
+when a function route has no rule or two rules cover it.
+
+Vercel keeps the firewall configuration apart from deploys, so a merged change
+to `RULES` changes nothing live until someone applies it with a Vercel token
+(the CLI's login token works):
+
+```bash
+VERCEL_TOKEN=... node scripts/firewall.mjs dry-run  # stage the rules, check the draft, discard it
+VERCEL_TOKEN=... node scripts/firewall.mjs apply    # stage, publish and read back
+VERCEL_TOKEN=... node scripts/firewall.mjs check    # exit 1 when the live rules differ
+```
+
+The script changes only rules named `hivesight: ...`. `apply` refuses to run
+while the dashboard holds unpublished draft changes, because publishing would
+publish those too. Vercel counts each window separately in each region and
+bills per million requests a rule allows ($0.50 in iad1 as of November 2026).
+
 ## Migrations
 
 Apply migrations before deploying the code that needs them: production refuses

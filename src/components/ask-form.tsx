@@ -15,6 +15,7 @@ import {
   TENURES,
 } from "@/engine/bands";
 import { DISTRICT_PATTERN, STATES } from "@/lib/geographies";
+import { requestErrorMessage } from "@/lib/request-error";
 import { Results } from "./results";
 
 type FormatKind = "likert5" | "binary" | "choice";
@@ -131,10 +132,7 @@ export function AskForm({ individualMode = false }: { individualMode?: boolean }
       });
       if (!res.ok || !res.body) {
         const data = await res.json().catch(() => null);
-        const detail = data?.details?.[0]?.message;
-        throw new Error(
-          detail ? `${data.error}: ${detail}` : (data?.error ?? `Request failed (${res.status})`)
-        );
+        throw new Error(requestErrorMessage(res.status, data));
       }
       const reader = res.body.getReader();
       const decoder = new TextDecoder();
