@@ -1,15 +1,18 @@
 // Per-address request limits that Vercel's firewall applies before a request
 // reaches one of HiveSight's functions. The app refuses a flood on its own, but
 // each refusal still takes an `admit` slot, a pooled database connection and
-// egress. These rules make the edge refuse it first.
+// egress. These rules refuse what any one address sends past its limit, before a
+// function runs. A flood spread across many addresses still reaches the app.
 //
-//   node scripts/firewall.mjs routes   checks the build: one rule per function route
+//   node scripts/firewall.mjs routes   checks the build: one rule for each function route
 //   node scripts/firewall.mjs check    compares the live rules with RULES
 //   node scripts/firewall.mjs dry-run  stages RULES, checks the draft, then discards it
 //   node scripts/firewall.mjs apply    stages, publishes and reads back RULES
 //
-// `check`, `dry-run` and `apply` need VERCEL_TOKEN. They change only rules named with
-// PREFIX, so rules someone adds in the dashboard under another name stay.
+// `check`, `dry-run` and `apply` need VERCEL_TOKEN. `apply` switches the firewall
+// on when it's off, which also switches on any rule someone made in the dashboard.
+// Apart from that it changes only rules named with PREFIX, and it discards a draft
+// only when the draft holds nothing but this run's changes.
 // This file runs with plain Node, so it imports only Node's own modules.
 
 import { readFileSync } from "node:fs";
@@ -20,7 +23,8 @@ export const TEAM_ID = "team_o3QtvpZGRAXmvhbyKiMh7ZGv";
 export const PREFIX = "hivesight: ";
 // Vercel's Pro plan counts in fixed windows of 10 seconds to 10 minutes, keyed
 // by address or TLS fingerprint. A fingerprint key would let one client shut out
-// every visitor whose browser shares it, so each rule keys by address.
+// every visitor whose browser shares it, so each rule keys by address. Vercel
+// keeps a separate count in each region.
 export const WINDOW_SECONDS = 60;
 const REQUEST_TIMEOUT_MS = 30_000;
 
@@ -49,8 +53,8 @@ function perAddress(name, condition, limit, description) {
 
 export const RULES = [
   // The form sends one estimate at a time, an estimate takes 10 seconds or
-  // more, and route.ts runs two at once for a network. Ten a minute leaves room
-  // to retry after a refusal.
+  // more, and route.ts runs two at once for a network on each instance. Ten a
+  // minute leaves room to retry after a refusal.
   perAddress(
     "estimates",
     { type: "path", op: "eq", value: "/api/run" },
@@ -88,6 +92,15 @@ const managed = (rule) => typeof rule?.name === "string" && rule.name.startsWith
 function body(rule) {
   const { name, description, active, conditionGroup, action } = rule;
   return { name, description, active, conditionGroup, action };
+}
+
+/** JSON with each object's keys sorted, so two readings of one value compare equal. */
+function canonical(value) {
+  return JSON.stringify(value, (_key, v) =>
+    v && typeof v === "object" && !Array.isArray(v)
+      ? Object.fromEntries(Object.entries(v).sort(([a], [b]) => (a < b ? -1 : a > b ? 1 : 0)))
+      : v
+  );
 }
 
 /** A rule's meaning, so a rule read back from Vercel compares equal to its source. */
@@ -132,6 +145,10 @@ const same = (a, b) => JSON.stringify(normalize(a)) === JSON.stringify(normalize
  * lacks or that repeats a name, and never names a rule outside PREFIX.
  */
 export function plan(current, desired = RULES) {
+  const names = desired.map((d) => d.name);
+  if (!desired.every(managed) || new Set(names).size !== names.length) {
+    throw new Error(`Each desired rule needs its own name, starting with "${PREFIX}".`);
+  }
   const kept = new Set();
   const changes = [];
   for (const rule of current.filter(managed)) {
@@ -159,6 +176,10 @@ export function drift(rules, desired = RULES) {
     else if (found.length > 1) lines.push(`repeated ${found.length} times: ${want.name}`);
     else if (!same(found[0], want)) lines.push(`differs: ${want.name}`);
     if (found.some((r) => r.active !== true)) lines.push(`disabled: ${want.name}`);
+    // Vercel marks a rule it won't enforce, for example one past the plan's quota.
+    if (found.some((r) => r.valid === false || (r.validationErrors?.length ?? 0) > 0)) {
+      lines.push(`invalid: ${want.name}`);
+    }
   }
   for (const rule of live) {
     if (!desired.some((d) => d.name === rule.name)) lines.push(`unexpected: ${rule.name}`);
@@ -166,11 +187,26 @@ export function drift(rules, desired = RULES) {
   return lines;
 }
 
+/**
+ * Active bypass rules from the dashboard that sit ahead of a managed rule. Vercel
+ * skips the remaining custom rules for a request a bypass rule matches, so such a
+ * rule switches the limits off for whatever it matches.
+ */
+export function bypassesAhead(rules) {
+  const lines = [];
+  rules.forEach((rule, i) => {
+    if (managed(rule) || rule?.active !== true || rule?.action?.mitigate?.action !== "bypass") return;
+    const later = rules.slice(i + 1).filter(managed).map((r) => r.name);
+    if (later.length) lines.push(`${rule.name} bypasses ${later.join(", ")} for the requests it matches`);
+  });
+  return lines;
+}
+
 function conditionMatches(condition, requestPath) {
   if (condition.type !== "path") {
     throw new Error(`routes can't check a ${condition.type} condition`);
   }
-  // Vercel compares without regard to case.
+  // Vercel's docs say every operator ignores case.
   const subject = requestPath.toLowerCase();
   const value = String(condition.value).toLowerCase();
   const hit = {
@@ -191,40 +227,74 @@ export function ruleMatches(rule, requestPath) {
   );
 }
 
-/** A request path for an app route, with each dynamic segment filled in. */
-export function samplePath(route) {
-  return route.replace(/\[\[?\.\.\.[^\]]+\]?\]/g, "a/b").replace(/\[[^\]]+\]/g, "sample");
+// Two values for each dynamic segment, so a rule that covers only one spelling of
+// a route fails the check. The second has the shape of a run id.
+const FILLERS = ["sample", "0f0e8a2c-7d1b-4c5e-9a3f-2b6d8e1c4a70"];
+
+/**
+ * Request paths that reach an app route: each dynamic segment filled two ways, a
+ * catch-all with one segment and with two, and an optional catch-all left empty.
+ */
+export function samplePaths(route) {
+  const short =
+    route
+      .replace(/\/\[\[\.\.\.[^\]]+\]\]/g, "")
+      .replace(/\[\.\.\.[^\]]+\]/g, "a")
+      .replace(/\[[^\]]+\]/g, FILLERS[0]) || "/";
+  const long = route.replace(/\[\[?\.\.\.[^\]]+\]?\]/g, "a/b").replace(/\[[^\]]+\]/g, FILLERS[1]);
+  return [...new Set([short, long])];
 }
 
-/** Splits the build's app routes into those served as files and those a function serves. */
+/**
+ * Splits the build's routes into those served as files and those a function
+ * serves, and names any middleware, which runs a function on the requests it matches.
+ */
 export function buildRoutes(nextDir) {
   const read = (name) => JSON.parse(readFileSync(path.join(nextDir, name), "utf8"));
-  const all = [...new Set(Object.values(read("app-path-routes-manifest.json")))];
+  const appRoutes = Object.values(read("app-path-routes-manifest.json"));
+  // Next's own _app, _document and _error serve no route, and an .html entry is a file.
+  const pageRoutes = Object.entries(read("server/pages-manifest.json"))
+    .filter(([route, file]) => !route.startsWith("/_") && !file.endsWith(".html"))
+    .map(([route]) => route);
+  const all = [...new Set([...appRoutes, ...pageRoutes])];
   const prerendered = new Set(Object.keys(read("prerender-manifest.json").routes));
   return {
     functions: all.filter((route) => !prerendered.has(route)).sort(),
     files: all.filter((route) => prerendered.has(route)).sort(),
+    middleware: Object.keys(read("server/middleware-manifest.json").middleware ?? {}),
   };
 }
 
 /**
  * Problems with the rules for a build: a function route that no rule or two
- * rules cover, a file route that a rule covers, or a rule that covers nothing.
+ * rules cover, a rule that covers only some of a route's paths, a file route
+ * that a rule covers, a rule that covers nothing, or middleware.
+ * @param {{ functions: string[], files: string[], middleware?: string[] }} build
  */
-export function routeProblems({ functions, files }, rules = RULES) {
-  const problems = [];
-  const covering = (route) => rules.filter((rule) => ruleMatches(rule, samplePath(route)));
+export function routeProblems(build, rules = RULES) {
+  const { functions, files, middleware = [] } = build;
+  const problems = middleware.map(
+    (name) => `middleware ${name} runs a function on the requests it matches, and routes can't check those`
+  );
+  const matches = (rule, route) => samplePaths(route).map((p) => ruleMatches(rule, p));
   for (const route of functions) {
-    const found = covering(route);
-    if (found.length !== 1) {
-      problems.push(`${route} runs a function and ${found.length} rules cover it`);
+    const covering = rules.filter((rule) => matches(rule, route).every(Boolean));
+    if (covering.length !== 1) {
+      problems.push(`${route} runs a function and ${covering.length} rules cover it`);
+    }
+    for (const rule of rules) {
+      if (!covering.includes(rule) && matches(rule, route).some(Boolean)) {
+        problems.push(`${rule.name} covers only some paths of ${route}`);
+      }
     }
   }
   for (const route of files) {
-    for (const rule of covering(route)) problems.push(`${route} is a file and ${rule.name} covers it`);
+    for (const rule of rules) {
+      if (matches(rule, route).some(Boolean)) problems.push(`${route} is a file and ${rule.name} covers it`);
+    }
   }
   for (const rule of rules) {
-    if (!functions.some((route) => ruleMatches(rule, samplePath(route)))) {
+    if (!functions.some((route) => matches(rule, route).some(Boolean))) {
       problems.push(`${rule.name} covers no function route`);
     }
   }
@@ -252,64 +322,175 @@ export function vercelClient({ token, projectId = PROJECT_ID, teamId = TEAM_ID, 
   return {
     /** The active configuration and the unpublished draft, either of which may be null. */
     configs: () => call("GET", "/v1/security/firewall/config"),
+    /** Adds one change to the draft and returns the draft. */
     stage: (change) => call("PATCH", "/v1/security/firewall/config/draft", change),
     publish: () => call("POST", "/v1/security/firewall/config/draft/activate", {}),
     discard: () => call("DELETE", "/v1/security/firewall/config/draft"),
   };
 }
 
-const unmanagedOf = (config) => JSON.stringify((config?.rules ?? []).filter((r) => !managed(r)));
+// Vercel adds these to the rules a draft holds.
+const VALIDITY = new Set(["valid", "validationErrors"]);
+const withoutValidity = (rule) =>
+  rule && typeof rule === "object"
+    ? Object.fromEntries(Object.entries(rule).filter(([key]) => !VALIDITY.has(key)))
+    : rule;
+const rulesOf = (config, keep = () => true) =>
+  canonical((config?.rules ?? []).filter(keep).map(withoutValidity));
+const unmanagedOf = (config) => rulesOf(config, (r) => !managed(r));
 
-function confirm(config, desired, baseline, label) {
+// Fields that describe a copy of the configuration rather than the firewall.
+const BOOKKEEPING = new Set(["id", "version", "updatedAt", "createdAt", "ownerId", "projectKey", "changes", "rules"]);
+/** Everything a configuration holds apart from its rules: the switch, managed rulesets and IP blocks. */
+const settingsOf = (config) =>
+  canonical(Object.fromEntries(Object.entries(config ?? {}).filter(([key]) => !BOOKKEEPING.has(key))));
+
+/**
+ * What a rule change does, whether this script sent it or the draft recorded it.
+ * Vercel gives an inserted rule its id, so inserts compare by value alone. The
+ * draft records no firewallEnabled change, so those drop out here.
+ */
+function ruleChanges(changes) {
+  return changes
+    .filter((c) => c?.action !== "firewallEnabled")
+    .map(({ action, id, value }) => {
+      if (action === "rules.insert") return canonical([action, normalize(value)]);
+      if (action === "rules.update") return canonical([action, id, normalize(value)]);
+      if (action === "rules.remove") return canonical([action, id]);
+      return canonical([action, id, value]);
+    });
+}
+
+/** Ways the draft differs from the live configuration before this run stages anything. */
+function pendingChanges(active, draft) {
+  if (!draft) return [];
+  const problems = [];
+  if (draft.changes?.length) problems.push(`it records ${draft.changes.length} changes`);
+  if (!active) {
+    problems.push("it exists while nothing is live");
+  } else {
+    if (settingsOf(draft) !== settingsOf(active)) problems.push("its settings differ from the live ones");
+    if (rulesOf(draft) !== rulesOf(active)) problems.push("its rules differ from the live ones");
+  }
+  return problems;
+}
+
+/**
+ * Ways the draft holds more than the changes this run staged: a change it records
+ * that this run didn't send, or settings that moved after this run's first change.
+ */
+function foreignChanges(draft, staged, settings) {
+  const problems = [];
+  if (canonical(ruleChanges(draft?.changes ?? [])) !== canonical(ruleChanges(staged))) {
+    problems.push("it records rule changes this run didn't send");
+  }
+  if (settings === undefined || settingsOf(draft) !== settings) {
+    problems.push("its settings changed after this run's first change");
+  }
+  return problems;
+}
+
+/** Problems with a configuration that should hold `desired` and `baseline`'s other rules. */
+function configProblems(config, desired, baseline) {
   const problems = drift(config?.rules ?? [], desired);
   if (config?.firewallEnabled !== true) problems.push("firewall disabled");
   if (unmanagedOf(config) !== unmanagedOf(baseline)) problems.push("other rules changed");
-  if (problems.length) throw new Error(`The ${label} configuration doesn't match: ${problems.join("; ")}`);
+  return problems;
 }
 
 /**
  * Stages the changes, checks the draft, publishes it, and checks what went live.
- * It refuses to start while someone else's changes wait in the draft, because
- * publishing would publish those too, and it discards its draft if a step fails
- * before publishing. With `publish` false it discards the checked draft instead.
+ * Vercel keeps one draft for the project and publishes all of it, so the run
+ * refuses to start while the draft holds anything that isn't live, and publishes
+ * only when the draft holds this run's changes and nothing else. A dashboard edit
+ * that lands between that check and the publish call still goes live with them.
+ * After a failure the run discards the draft only when it holds nothing but this
+ * run's changes. With `publish` false the run discards the checked draft instead.
  */
 export async function applyRules({ client, desired = RULES, log = console.log, publish = true }) {
   const { active, draft } = await client.configs();
-  if (draft?.changes?.length) {
-    throw new Error(
-      "The firewall draft holds unpublished changes. Publish or discard them in Vercel, then run this again."
-    );
-  }
+  for (const line of bypassesAhead(active?.rules ?? [])) log(`warning: ${line}`);
   const changes = plan(active?.rules ?? [], desired);
   if (active?.firewallEnabled !== true) {
     changes.unshift({ action: "firewallEnabled", id: null, value: true });
   }
   if (changes.length === 0) {
+    const left = drift(active?.rules ?? [], desired);
+    if (left.length) throw new Error(`Nothing to stage, but the live rules don't match: ${left.join("; ")}.`);
     log("The live firewall already matches RULES.");
     return [];
   }
+  const pending = pendingChanges(active, draft);
+  if (pending.length) {
+    throw new Error(
+      `The firewall draft holds changes that aren't live: ${pending.join("; ")}. ` +
+        "Publish or discard them in Vercel, then run this again."
+    );
+  }
+
+  const staged = [];
+  let settings;
+  /** Discards the draft if it holds only this run's changes, and says what happened. */
+  async function cleanUp() {
+    try {
+      const { draft: now } = await client.configs();
+      if (!now) return { cleared: true, note: "No draft remains." };
+      const foreign = foreignChanges(now, staged, settings);
+      if (foreign.length) {
+        return { cleared: false, note: `The draft stays in Vercel, because ${foreign.join(" and ")}.` };
+      }
+      await client.discard();
+      return { cleared: true, note: `This run discarded its draft of ${staged.length} changes.` };
+    } catch (err) {
+      return {
+        cleared: false,
+        note: `This run couldn't clear its draft (${err.message}). Check the draft in Vercel before anyone publishes it.`,
+      };
+    }
+  }
+
   try {
     for (const change of changes) {
       log(`stage ${change.action} ${change.value?.name ?? change.id ?? ""}`.trim());
-      await client.stage(change);
+      const after = await client.stage(change);
+      staged.push(change);
+      settings ??= settingsOf(after);
     }
-    confirm((await client.configs()).draft, desired, active, "draft");
-    if (!publish) {
-      await client.discard();
-      log(`The draft held all ${changes.length} changes, and this run discarded it.`);
-      return changes;
-    }
+    const { draft: checked } = await client.configs();
+    const problems = [...foreignChanges(checked, staged, settings), ...configProblems(checked, desired, active)];
+    if (problems.length) throw new Error(`The draft doesn't match: ${problems.join("; ")}.`);
+  } catch (err) {
+    throw new Error(`${err.message} ${(await cleanUp()).note}`, { cause: err });
+  }
+
+  if (!publish) {
+    const { cleared, note } = await cleanUp();
+    if (!cleared) throw new Error(note);
+    log(`The draft held all ${changes.length} changes. ${note}`);
+    return changes;
+  }
+
+  try {
     await client.publish();
   } catch (err) {
-    await client.discard().catch(() => {});
-    throw err;
+    // The publish can take effect even when its response fails.
+    const live = await client.configs().then((c) => c.active, () => null);
+    if (live && configProblems(live, desired, active).length === 0) {
+      log(`Vercel answered the publish with an error (${err.message}), but the rules went live.`);
+      return changes;
+    }
+    throw new Error(`${err.message} ${(await cleanUp()).note}`, { cause: err });
   }
-  confirm((await client.configs()).active, desired, active, "active");
+  const problems = configProblems((await client.configs()).active, desired, active);
+  if (problems.length) throw new Error(`The live configuration doesn't match: ${problems.join("; ")}.`);
   log(`Published ${changes.length} changes.`);
   return changes;
 }
 
+const COMMANDS = ["routes", "check", "dry-run", "apply"];
+
 async function main(command) {
+  if (!COMMANDS.includes(command)) throw new Error("Use routes, check, dry-run or apply.");
   if (command === "routes") {
     const problems = routeProblems(buildRoutes(path.resolve(".next")));
     for (const problem of problems) console.error(problem);
@@ -324,13 +505,12 @@ async function main(command) {
     const { active } = await client.configs();
     const problems = drift(active?.rules ?? []);
     if (active?.firewallEnabled !== true) problems.push("firewall disabled");
+    for (const line of bypassesAhead(active?.rules ?? [])) console.warn(`warning: ${line}`);
     for (const problem of problems) console.error(problem);
     if (problems.length) process.exit(1);
     console.log("The live firewall matches RULES.");
-  } else if (command === "apply" || command === "dry-run") {
-    await applyRules({ client, publish: command === "apply" });
   } else {
-    throw new Error("Use routes, check, dry-run or apply.");
+    await applyRules({ client, publish: command === "apply" });
   }
 }
 

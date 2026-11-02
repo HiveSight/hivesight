@@ -22,14 +22,33 @@ describe("requestErrorMessage", () => {
     expect(requestErrorMessage(502, null)).toBe("Request failed (502)");
   });
 
-  it("shows the route's error when it sent one, and a fallback otherwise", () => {
+  it("shows the route's error when it sent one, and otherwise explains the status", () => {
+    const tooMany = "Your network sent too many requests in the last minute. Please wait a minute and try again.";
     fc.assert(
       fc.property(fc.integer({ min: 400, max: 599 }), fc.anything(), (status, data) => {
         const message = requestErrorMessage(status, data);
-        const error = (data as { error?: unknown } | null)?.error;
-        if (typeof error === "string") expect(message.startsWith(error)).toBe(true);
-        else expect([requestErrorMessage(status, null)]).toContain(message);
+        const body = data as { error?: unknown; details?: Array<{ message?: unknown }> } | null;
+        const error = body?.error;
+        if (typeof error === "string") {
+          const detail = Array.isArray(body?.details) ? body.details[0]?.message : undefined;
+          expect(message).toBe(typeof detail === "string" && detail ? `${error}: ${detail}` : error);
+        } else {
+          expect(message).toBe(status === 429 ? tooMany : `Request failed (${status})`);
+        }
       })
     );
+  });
+
+  it("keeps the route's error when its detail is empty or not text", () => {
+    expect(requestErrorMessage(400, { error: "Invalid request", details: [{ message: "" }] })).toBe("Invalid request");
+    expect(requestErrorMessage(400, { error: "Invalid request", details: [{ message: 7 }] })).toBe("Invalid request");
+    expect(requestErrorMessage(400, { error: "Invalid request", details: [{}, { message: "second" }] })).toBe(
+      "Invalid request"
+    );
+  });
+
+  it("doesn't call a platform refusal of another status a rate limit", () => {
+    expect(requestErrorMessage(413, "Request Entity Too Large")).toBe("Request failed (413)");
+    expect(requestErrorMessage(403, null)).toBe("Request failed (403)");
   });
 });

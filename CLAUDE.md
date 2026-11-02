@@ -68,8 +68,10 @@ closes itself, and doesn't touch a real outage's issue.
 `scripts/firewall.mjs` holds per-address limits that Vercel's firewall applies
 before a request reaches a function: 10 requests a minute to `/api/run`, 120 to
 `/runs/*`, 20 to `/api/health` and 5 to `/api/cron/keepalive`. Static pages get
-none. After each build, CI runs `node scripts/firewall.mjs routes`, which fails
-when a function route has no rule or two rules cover it.
+none. After each build, CI runs `bun scripts/firewall.mjs routes`, which fails
+when a function route has no rule, two rules, or a rule that covers only some of
+its paths. It also fails on a Pages Router API route that no rule covers and on
+any middleware.
 
 Vercel keeps the firewall configuration apart from deploys, so a merged change
 to `RULES` changes nothing live until someone applies it with a Vercel token
@@ -81,10 +83,33 @@ VERCEL_TOKEN=... node scripts/firewall.mjs apply    # stage, publish and read ba
 VERCEL_TOKEN=... node scripts/firewall.mjs check    # exit 1 when the live rules differ
 ```
 
-The script changes only rules named `hivesight: ...`. `apply` refuses to run
-while the dashboard holds unpublished draft changes, because publishing would
-publish those too. Vercel counts each window separately in each region and
-bills per million requests a rule allows ($0.50 in iad1 as of November 2026).
+`apply` switches the firewall on when it's off, which also switches on any rule
+someone made in the dashboard. Apart from that, it changes only rules named
+`hivesight: ...`. Vercel keeps one draft for the project and publishes all of it,
+so `apply` refuses to start while the draft holds anything that isn't live. It
+publishes only when the draft holds its own changes and nothing else, and after a
+failure it discards the draft only in that case. A dashboard edit that lands
+between that last check and the publish call still goes live with the rules.
+`check` and `apply` warn about a dashboard bypass rule placed ahead of these
+rules, since Vercel skips the remaining custom rules for whatever it matches.
+Nothing runs `check` on a schedule.
+
+Vercel counts each window separately in each region. It bills $0.50 per million
+requests a rule allows in iad1 (regional pricing page, September 14, 2026), and
+nothing for the requests it refuses.
+
+What the limits leave open:
+
+- They cap what one address sends. A flood from N addresses still gets 10N
+  requests a minute to `/api/run` and 120N to `/runs/*`.
+- Fifteen addresses can still spend the day's 500 units in about two minutes,
+  and the site then refuses everyone until midnight UTC.
+- One address can stay under the `/runs/*` limit and keep re-reading a large
+  saved estimate. At about 47 KB a read, it pulls the free plan's 5 GB of
+  Supabase egress in about 15 hours.
+- The rules key on the connecting IPv4 address. If either hostname gains an AAAA
+  record, each IPv6 visitor holds a /64 of fresh keys. If Cloudflare starts
+  proxying hivesight.ai, every visitor shares Cloudflare's addresses.
 
 ## Migrations
 

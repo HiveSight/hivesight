@@ -47,7 +47,7 @@ jobs:
         run: bun run build
 
       - name: Check edge limits cover each function route
-        run: node scripts/firewall.mjs routes
+        run: bun scripts/firewall.mjs routes
 
   reproduce-artifacts:
     runs-on: ubuntu-latest

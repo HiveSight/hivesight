@@ -7,7 +7,7 @@ export function requestErrorMessage(status: number, data: unknown): string {
   const body = (data ?? {}) as { error?: unknown; details?: Array<{ message?: unknown }> };
   if (typeof body.error === "string") {
     const detail = body.details?.[0]?.message;
-    return typeof detail === "string" ? `${body.error}: ${detail}` : body.error;
+    return typeof detail === "string" && detail ? `${body.error}: ${detail}` : body.error;
   }
   if (status === 429) {
     return "Your network sent too many requests in the last minute. Please wait a minute and try again.";
