@@ -123,10 +123,10 @@ counts against the same rule, and so do HEAD and OPTIONS requests.
   uncached Supabase egress in about 15 hours.
 - The rules key on the connecting address, and neither hostname has an AAAA
   record, so visitors reach the site over IPv4. Vercel's docs don't say whether
-  an `ip` key counts an IPv6 address alone or its whole /64, so if either
-  hostname gains an AAAA record, an IPv6 visitor may get a fresh count for each
-  address it holds. If Cloudflare starts proxying hivesight.ai, every visitor
-  shares Cloudflare's addresses.
+  an `ip` key counts an IPv6 address alone or its whole /64. If either hostname
+  gains an AAAA record, an IPv6 visitor may get a fresh count for each address
+  it holds. If Cloudflare starts proxying hivesight.ai, every visitor shares
+  Cloudflare's addresses.
 - Nothing runs `check` on a schedule, so nothing here reports a rule someone
   switches off in the dashboard.
 
