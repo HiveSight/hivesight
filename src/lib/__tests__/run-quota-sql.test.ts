@@ -75,7 +75,7 @@ describe("run quota migrations", { timeout: 60_000 }, () => {
     db = new PGlite();
     await db.exec(SUPABASE_ROLES);
     for (const sql of migrations) await db.exec(sql);
-  });
+  }, 60_000);
   beforeEach(() => db.exec("delete from public.run_quota; delete from public.runs;"));
   afterAll(() => db.close());
 
@@ -144,11 +144,34 @@ describe("run quota migrations", { timeout: 60_000 }, () => {
     // Between them these zones disagree with UTC's date at every hour.
     for (const zone of ["Pacific/Kiritimati", "Etc/GMT+12"]) {
       await db.exec(`set time zone '${zone}'`);
-      expect(await claim(zone, 1, 1, 10)).toBe("ok");
-      await db.exec("reset time zone");
+      try {
+        expect(await claim(zone, 1, 1, 10)).toBe("ok");
+      } finally {
+        await db.exec("reset role; reset time zone");
+      }
       expect((await counts()).get(`visitor:${zone}`)).toBe(1);
     }
     expect((await counts()).get("site")).toBe(2);
+  });
+
+  it("ignores the dates either side of UTC's whatever the session's time zone", async () => {
+    await db.exec(`insert into public.run_quota (bucket, day, used) values
+      ('site', ${TODAY} - 1, 500), ('site', ${TODAY} + 1, 500),
+      ('visitor:a', ${TODAY} - 1, 20), ('visitor:a', ${TODAY} + 1, 20)`);
+    for (const zone of ["Pacific/Kiritimati", "Etc/GMT+12"]) {
+      await db.exec(`set time zone '${zone}'`);
+      try {
+        expect(await claim("a", 20, 1, 500)).toBe("ok");
+      } finally {
+        await db.exec("reset role; reset time zone");
+      }
+    }
+  });
+
+  it("names the site when both allowances refuse, before or under the lock", async () => {
+    expect(await claim("a", 1, 1, 1)).toBe("ok");
+    expect(await claim("a", 1, 1, 1)).toBe("site");
+    expect(await claim("a", 1, 2, 1)).toBe("site");
   });
 
   it("answers the store ping's oversized claim without counting it", async () => {
@@ -161,10 +184,28 @@ describe("run quota migrations", { timeout: 60_000 }, () => {
     expect(stored.has("visitor:ping")).toBe(false);
   });
 
-  it("fails the store ping on a read-only database", async () => {
+  it.each([
+    ["before", false],
+    ["after", true],
+  ])("fails the store ping on a read-only database %s the day's first claim", async (_, claimed) => {
+    if (claimed) expect(await claim("a", 20, 1, 500)).toBe("ok");
     await db.exec("set default_transaction_read_only = on");
-    await expect(claim("ping", 1, 2, 1)).rejects.toThrow("read-only");
-    await db.exec("reset role; reset default_transaction_read_only");
+    try {
+      await expect(claim("ping", 1, 2, 1)).rejects.toThrow("read-only");
+    } finally {
+      await db.exec("reset role; reset default_transaction_read_only");
+    }
+  });
+
+  it("refuses what the counts rule out on a read-only database", async () => {
+    expect(await claim("a", 1, 1, 10)).toBe("ok");
+    await db.exec("set default_transaction_read_only = on");
+    try {
+      expect(await claim("a", 1, 1, 10)).toBe("visitor");
+      expect(await claim("b", 1, 10, 10)).toBe("site");
+    } finally {
+      await db.exec("reset role; reset default_transaction_read_only");
+    }
   });
 
   it("refuses limits below one instead of counting past them", async () => {
@@ -349,6 +390,51 @@ describe.runIf(databaseUrl)("claim_run under concurrency", { timeout: 60_000 }, 
     return { results, used: new Map(rows.map((r) => [r.bucket, r.used])) };
   }
 
+  async function seed(counts: Record<string, number>) {
+    for (const [bucket, used] of Object.entries(counts)) {
+      await pool.query(`insert into public.run_quota (bucket, day, used) values ($1, ${TODAY}, $2)`, [
+        bucket,
+        used,
+      ]);
+    }
+  }
+
+  // Holds the site row as a slow claim would, until the caller commits or rolls back.
+  async function holdSiteLock() {
+    const holder = await pool.connect();
+    await holder.query("begin");
+    await holder.query(
+      `select used from public.run_quota where bucket = 'site' and day = ${TODAY} for update`
+    );
+    return holder;
+  }
+
+  // Gives up after 200 ms in any lock queue, so a claim that waits fails the test.
+  async function claimWithoutWaiting(...args: [string, number, number, number]) {
+    const client = await pool.connect();
+    try {
+      await client.query("set role service_role; set lock_timeout = 200");
+      const { rows } = await client.query<{ result: string }>(
+        "select public.claim_run($1, $2, $3, $4) as result",
+        args
+      );
+      return rows[0].result;
+    } finally {
+      await client.query("reset role; reset lock_timeout");
+      client.release();
+    }
+  }
+
+  async function untilAClaimWaits() {
+    for (;;) {
+      const { rows } = await pool.query(
+        "select 1 from pg_stat_activity where wait_event_type = 'Lock' and datname = current_database()"
+      );
+      if (rows.length > 0) return;
+      await new Promise((r) => setTimeout(r, 5));
+    }
+  }
+
   beforeAll(async () => {
     expect(databaseUrl, "the setup drops the public schema").toMatch(/test/);
     pool = new pg.Pool({ connectionString: databaseUrl, max: 20 });
@@ -358,6 +444,85 @@ describe.runIf(databaseUrl)("claim_run under concurrency", { timeout: 60_000 }, 
   });
   beforeEach(() => pool.query("delete from public.run_quota"));
   afterAll(() => pool.end());
+
+  it("refuses what the counts rule out without waiting for the site lock", async () => {
+    await seed({ site: 50, "visitor:spent": 7, "visitor:fresh": 1 });
+    const holder = await holdSiteLock();
+    try {
+      expect(await claimWithoutWaiting("spent", 7, 1, 1000)).toBe("visitor");
+      expect(await claimWithoutWaiting("fresh", 7, 51, 100)).toBe("site");
+    } finally {
+      await holder.query("rollback");
+      holder.release();
+    }
+  });
+
+  it("sends a claim that could still pass, and the store ping, to the site lock", async () => {
+    await seed({ site: 50, "visitor:spent": 7, "visitor:fresh": 1 });
+    const holder = await holdSiteLock();
+    try {
+      await expect(claimWithoutWaiting("fresh", 7, 50, 100)).rejects.toThrow("lock timeout");
+      await expect(claimWithoutWaiting("ping", 1, 2, 1)).rejects.toThrow("lock timeout");
+    } finally {
+      await holder.query("rollback");
+      holder.release();
+    }
+  });
+
+  it("gives a transaction ID to the claims past the reads and to no other", async () => {
+    await seed({ site: 50, "visitor:spent": 7 });
+    async function xidAfter(...args: [string, number, number, number]) {
+      const client = await pool.connect();
+      try {
+        await client.query("begin; set local role service_role");
+        await client.query("select public.claim_run($1, $2, $3, $4)", args);
+        const { rows } = await client.query("select pg_current_xact_id_if_assigned() as xid");
+        return rows[0].xid;
+      } finally {
+        await client.query("rollback");
+        client.release();
+      }
+    }
+    expect(await xidAfter("spent", 7, 1, 1000)).toBeNull();
+    expect(await xidAfter("fresh", 7, 51, 100)).toBeNull();
+    expect(await xidAfter("fresh", 7, 50, 100)).not.toBeNull();
+    expect(await xidAfter("ping", 1, 2, 1)).not.toBeNull();
+  });
+
+  it("refuses under the lock when the claim ahead spends a visitor's last estimate", async () => {
+    await seed({ site: 0, "visitor:v": 6 });
+    const holder = await holdSiteLock();
+    await holder.query(
+      `update public.run_quota set used = 7 where bucket = 'visitor:v' and day = ${TODAY}`
+    );
+    await holder.query(
+      `update public.run_quota set used = 1 where bucket = 'site' and day = ${TODAY}`
+    );
+    const waiting = race([["v", 7, 1, 1000]]);
+    await untilAClaimWaits();
+    await holder.query("commit");
+    holder.release();
+    const { results, used } = await waiting;
+    expect(results).toEqual(["visitor"]);
+    expect(used.get("site")).toBe(1);
+    expect(used.get("visitor:v")).toBe(7);
+  });
+
+  it("refuses under the lock when the claim ahead spends the site's last unit", async () => {
+    await seed({ site: 99 });
+    const holder = await holdSiteLock();
+    await holder.query(
+      `update public.run_quota set used = 100 where bucket = 'site' and day = ${TODAY}`
+    );
+    const waiting = race([["other", 7, 1, 100]]);
+    await untilAClaimWaits();
+    await holder.query("commit");
+    holder.release();
+    const { results, used } = await waiting;
+    expect(results).toEqual(["site"]);
+    expect(used.get("site")).toBe(100);
+    expect(used.has("visitor:other")).toBe(false);
+  });
 
   it("admits exactly the visitor's allowance", async () => {
     const claims = Array.from({ length: 120 }, (): [string, number, number, number] => [
