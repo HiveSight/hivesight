@@ -428,7 +428,8 @@ describe("the workflow", () => {
   const workflow = readFileSync(path.resolve(".github/workflows/health-monitor.yml"), "utf8");
 
   it("avoids the top of the hour and runs every 15 minutes", () => {
-    expect(workflow).toContain('cron: "7,22,37,52 * * * *"');
+    // GitHub's docs read 20/15 as minutes 20, 35 and 50, so 7/15 means 7, 22, 37 and 52.
+    expect(workflow).toContain('cron: "7/15 * * * *"');
   });
 
   it("lets one run finish before the next looks for an issue", () => {
