@@ -18,6 +18,17 @@ describe("requestErrorMessage", () => {
     }
   });
 
+  it("explains the refusal Vercel's firewall sent on November 2, read the way the form reads it", async () => {
+    const res = new Response("Too Many Requests\n\nToo Many Requests\niad1::txhgg-1793635104436-46c3e27a0604", {
+      status: 429,
+      headers: { "content-type": "text/plain; charset=utf-8", "x-vercel-mitigated": "deny" },
+    });
+    const data = await res.json().catch(() => null);
+    expect(requestErrorMessage(res.status, data)).toBe(
+      "Your network sent too many requests in the last minute. Please wait a minute and try again."
+    );
+  });
+
   it("falls back to the status for anything else", () => {
     expect(requestErrorMessage(502, null)).toBe("Request failed (502)");
   });

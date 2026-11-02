@@ -106,6 +106,12 @@ windows, with a separate count in each region. It bills $0.50 per million
 requests a rule allows in iad1 (regional pricing page, September 14, 2026), and
 nothing for the requests it refuses.
 
+A refused request gets a plain-text 429 with the header `x-vercel-mitigated:
+deny` and no reset time, so the form can't read it as JSON and shows its own
+rate-limit message. Both hostnames share one count. Live checks on November 2
+found that `/api/run` with a query string, in capitals or with an encoded letter
+counts against the same rule, and so do HEAD and OPTIONS requests.
+
 ### What the limits leave open
 
 - Each limit caps one address, so N addresses can still send 10N requests a
