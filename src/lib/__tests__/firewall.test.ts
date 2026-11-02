@@ -396,14 +396,19 @@ describe("routes", () => {
     expect(buildRoutes(dir)).toEqual({ functions: ["/api/run", "/runs/[id]"], files: ["/", "/404"], middleware: [] });
   });
 
-  it("counts a Pages Router API route as a function and names middleware", () => {
+  it("counts Pages Router function routes, an underscore page included, and names middleware", () => {
     const dir = fakeBuild(
       { "/page": "/" },
-      { "/_app": "pages/_app.js", "/api/legacy": "pages/api/legacy.js", "/about": "pages/about.js" },
+      {
+        "/_app": "pages/_app.js",
+        "/_status": "pages/_status.js",
+        "/api/legacy": "pages/api/legacy.js",
+        "/about": "pages/about.js",
+      },
       ["/", "/about"],
       { "/": { name: "middleware" } }
     );
-    expect(buildRoutes(dir)).toEqual({ functions: ["/api/legacy"], files: ["/", "/about"], middleware: ["/"] });
+    expect(buildRoutes(dir)).toEqual({ functions: ["/_status", "/api/legacy"], files: ["/", "/about"], middleware: ["/"] });
     expect(routeProblems({ functions: [], files: [], middleware: ["/"] }, [])).toEqual([
       "middleware / runs a function on the requests it matches, and routes can't check those",
     ]);

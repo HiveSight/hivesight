@@ -83,22 +83,24 @@ VERCEL_TOKEN=... node scripts/firewall.mjs apply    # stage, publish and read ba
 VERCEL_TOKEN=... node scripts/firewall.mjs check    # exit 1 when the live rules differ
 ```
 
-`apply` switches the firewall on when it's off, which also switches on any rule,
-IP block or managed ruleset someone set up in the dashboard. Apart from that, it
-changes only rules whose names start with `hivesight: `. Vercel keeps one draft
-for the project and publishes all of it, so `apply` refuses to start while the
-draft holds anything the live configuration doesn't. It publishes only when the
-draft holds this run's changes and nothing else. The draft doesn't record a flip
-of the firewall switch, so `apply` also compares the draft's other settings with
-the ones Vercel returned after the run's first change. After a failure, it
-discards the draft only when the draft holds nothing but this run's changes.
+`apply` switches the firewall on when it's off. Vercel's docs don't say what the
+switch gates, so a rule, IP block or managed ruleset someone set up in the
+dashboard may start acting then. Apart from that, `apply` changes only rules
+whose names start with `hivesight: `. Vercel keeps one draft for the project and
+publishes all of it, so `apply` refuses to start while the draft holds anything
+the live configuration doesn't. It publishes only when the draft holds this
+run's changes and nothing else. The draft doesn't record a flip of the firewall
+switch, so `apply` also compares the draft's other settings with the ones Vercel
+returned after the run's first change. After a failure, it discards the draft
+only when the draft holds nothing but this run's changes.
 
 Some dashboard edits can still slip past these checks. One that lands between
 the last check and the publish call goes live with the rules. `apply` throws
 away one that lands between its last read of the draft and the discard. And a
-change the draft doesn't record, such as a switch flip, joins the settings
-`apply` compares against if it lands before Vercel answers the run's first
-change.
+change the draft doesn't record joins the settings `apply` compares against if it
+lands before Vercel answers the run's first change. A switch flip is one such
+change: a flip to off in that window fails the run, which then discards the flip
+with the draft.
 
 `check` and `apply` warn when an active dashboard rule with a bypass or allow
 action sits ahead of these rules. Vercel skips the remaining custom rules for

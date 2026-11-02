@@ -9,10 +9,10 @@
 //   node scripts/firewall.mjs apply    stages, publishes and reads back RULES
 //
 // `check`, `dry-run` and `apply` need VERCEL_TOKEN. `apply` switches the firewall
-// on when it's off, which also switches on any rule, IP block or managed ruleset
-// someone set up in the dashboard. Apart from that it changes only rules whose
-// names start with PREFIX, and it discards a draft only when the draft holds
-// nothing but this run's changes.
+// on when it's off. Vercel's docs don't say what the switch gates, so a rule, IP
+// block or managed ruleset someone set up in the dashboard may start acting then.
+// Apart from that `apply` changes only rules whose names start with PREFIX, and it
+// discards a draft only when the draft holds nothing but this run's changes.
 // This file runs with plain Node, so it imports only Node's own modules.
 
 import { readFileSync } from "node:fs";
@@ -22,9 +22,9 @@ export const PROJECT_ID = "prj_TWAQsAF7qNZpWMLx6Lhvd7YwyZgu";
 export const TEAM_ID = "team_o3QtvpZGRAXmvhbyKiMh7ZGv";
 export const PREFIX = "hivesight: ";
 // On the Pro plan, Vercel counts in fixed windows of 10 seconds to 10 minutes and
-// keys each count by address or TLS fingerprint. A fingerprint key would let one
-// client shut out every visitor whose browser shares it, so each rule keys by
-// address. Vercel keeps a separate count in each region.
+// lets each rule key its count by address or TLS fingerprint. A fingerprint key
+// would let one client shut out every visitor whose browser shares it, so each
+// rule keys by address. Vercel keeps a separate count in each region.
 export const WINDOW_SECONDS = 60;
 const REQUEST_TIMEOUT_MS = 30_000;
 
@@ -176,8 +176,8 @@ export function drift(rules, desired = RULES) {
     else if (found.length > 1) lines.push(`repeated ${found.length} times: ${want.name}`);
     else if (!same(found[0], want)) lines.push(`differs: ${want.name}`);
     if (found.some((r) => r.active !== true)) lines.push(`disabled: ${want.name}`);
-    // Vercel can flag a rule with valid: false or validationErrors. Its docs don't
-    // say what it does with one.
+    // Vercel can flag a rule with valid: false or validationErrors. Its API spec
+    // doesn't say what it does with one.
     if (found.some((r) => r.valid === false || (r.validationErrors?.length ?? 0) > 0)) {
       lines.push(`invalid: ${want.name}`);
     }
@@ -250,17 +250,19 @@ export function samplePaths(route) {
   return [...new Set([short, long])];
 }
 
+const NEXT_OWN = new Set(["/_app", "/_document", "/_error"]);
+
 /**
- * Splits the build's routes into those Next serves as files and those a function
- * serves. It also names any middleware, which runs a function on the requests it
+ * Splits the build's routes into those Next writes out as static files and those
+ * a function serves. It also names any middleware, which runs a function on the requests it
  * matches.
  */
 export function buildRoutes(nextDir) {
   const read = (name) => JSON.parse(readFileSync(path.join(nextDir, name), "utf8"));
   const appRoutes = Object.values(read("app-path-routes-manifest.json"));
   // Next's own _app, _document and _error serve no route, and an .html entry
-  // points to a static file.
-  const pages = Object.entries(read("server/pages-manifest.json")).filter(([route]) => !route.startsWith("/_"));
+  // points to a static file. Any other page whose name starts with _ still routes.
+  const pages = Object.entries(read("server/pages-manifest.json")).filter(([route]) => !NEXT_OWN.has(route));
   const staticPages = pages.filter(([, file]) => file.endsWith(".html")).map(([route]) => route);
   const pageRoutes = pages.filter(([, file]) => !file.endsWith(".html")).map(([route]) => route);
   const all = [...new Set([...appRoutes, ...pageRoutes])];
@@ -425,7 +427,8 @@ function configProblems(config, desired, baseline) {
  * away one that lands between its last read of the draft and the discard. And the
  * draft doesn't record some changes, such as a flip of the firewall switch. If
  * one lands before Vercel answers the first stage, it joins the settings this run
- * compares against.
+ * compares against. A flip to off in that window fails the run, which then
+ * discards the flip with the draft.
  */
 export async function applyRules({ client, desired = RULES, log = console.log, publish = true }) {
   const { active, draft } = await client.configs();
