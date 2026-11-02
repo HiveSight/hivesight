@@ -56,8 +56,8 @@ things outside it watch `/api/health`:
   Telegram, once, including one that opened and closed while the Mac was off.
   It also alerts when it sees no successful scheduled run for 6 hours, whether
   GitHub or its own `gh` is the cause. `say` holds alerts for the next morning
-  card from 22:00 to 07:00 and once six have gone out that day, so an outage
-  can wait until then.
+  card from 22:00 to 07:00 and once six have gone out that day, so Max may not
+  hear of an outage until then.
 
 Test the whole path with
 `gh workflow run health-monitor.yml -R HiveSight/hivesight -f drill=true`, which
