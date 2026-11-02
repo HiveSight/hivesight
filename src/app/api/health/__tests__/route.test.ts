@@ -76,13 +76,13 @@ describe("GET /api/health", () => {
     expect((await sizeCheck(12_274_835)).size).toEqual({
       name: "database_size",
       status: "ok",
-      message: "12 MB of 500 MB",
+      message: "this project holds 12 MB; the organization's quota is 500 MB",
     });
   });
 
-  it("warns from 400 MB and stays healthy, because estimates still run", async () => {
-    expect((await sizeCheck(399_999_999)).size.status).toBe("ok");
-    const { code, size } = await sizeCheck(400_000_000);
+  it("warns from 450 MB and stays healthy, because estimates still run", async () => {
+    expect((await sizeCheck(449_999_999)).size.status).toBe("ok");
+    const { code, size } = await sizeCheck(450_000_000);
     expect(size.status).toBe("warning");
     expect(code).toBe(200);
   });
@@ -119,7 +119,7 @@ describe("GET /api/health", () => {
         expect(sizeProblems(answer)).toEqual(
           reading === null
             ? null
-            : reading >= 400_000_000
+            : reading >= 450_000_000
               ? [expect.stringContaining("database_size: ")]
               : []
         );

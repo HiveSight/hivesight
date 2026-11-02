@@ -29,7 +29,7 @@ const healthy = (overrides: object = {}) => ({
       { name: "model_config", status: "ok", message: "OPENAI_API_KEY configured" },
       { name: "cell_data", status: "ok", message: "139 cells" },
       { name: "store", status: "ok", message: "ok" },
-      { name: "database_size", status: "ok", message: "12 MB of 500 MB" },
+      { name: "database_size", status: "ok", message: "this project holds 12 MB" },
     ],
     ...overrides,
   },
@@ -111,10 +111,10 @@ describe("outageProblems", () => {
 
 describe("sizeProblems", () => {
   const sized = (status: string) =>
-    healthy({ checks: [{ name: "database_size", status, message: "450 MB of 500 MB" }] });
+    healthy({ checks: [{ name: "database_size", status, message: "this project holds 455 MB" }] });
 
   it("warns on a warning and clears on a good reading", () => {
-    expect(sizeProblems(sized("warning"))).toEqual(["database_size: 450 MB of 500 MB"]);
+    expect(sizeProblems(sized("warning"))).toEqual(["database_size: this project holds 455 MB"]);
     expect(sizeProblems(sized("ok"))).toEqual([]);
   });
 
@@ -259,7 +259,7 @@ describe("a sequence of runs", () => {
     const github = fakeGithub();
     const run = (observed: object, now: number) =>
       apply({ observed, issues: github.openIssues(), github, now, runUrl: "https://example.test/run" });
-    await run({ "database-size": ["database_size: 450 MB of 500 MB"] }, NOW);
+    await run({ "database-size": ["database_size: this project holds 455 MB"] }, NOW);
     await run({ "database-size": null }, NOW + 24 * 60 * MINUTE);
     expect(github.openIssues()).toHaveLength(1);
   });

@@ -47,13 +47,16 @@ things outside it watch `/api/health`:
 - `.github/workflows/health-monitor.yml` (`scripts/health-monitor.mjs`) runs
   every 15 minutes, retries a failure twice, and keeps one open issue labeled
   `health-alert` per problem. A later failure edits that issue, which notifies
-  nobody. The issue closes itself after 30 minutes without a failure.
-  `database_size` turns to `warning` at 400 MB and opens its own issue; health
-  stays 200 for it.
+  nobody. The issue closes itself after an hour without a failure.
+  `database_size` turns to `warning` at 450 MB, above what the purge allows, and
+  opens its own issue; health stays 200 for it. It reads this project alone,
+  and Supabase's quota sums the organization.
 - GitHub's email for this repo goes unread, so `~/chief-of-staff/bin/hivesight-health-watch`
   (launchd, every 5 minutes on Max's Mac) sends each new issue through `say` to
-  Telegram, once. It also alerts when scheduled runs stop succeeding for 6 hours.
-  `say` holds alerts from 22:00 to 07:00 for the morning card.
+  Telegram, once, including one that opened and closed while the Mac was off.
+  It also alerts when it sees no successful scheduled run for 6 hours, whether
+  GitHub or its own `gh` is the cause. `say` holds alerts from 22:00 to 07:00
+  for the morning card.
 
 Test the whole path with
 `gh workflow run health-monitor.yml -R HiveSight/hivesight -f drill=true`, which

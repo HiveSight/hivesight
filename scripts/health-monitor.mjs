@@ -19,7 +19,8 @@ const RETRY_MS = 40_000;
 const REQUEST_TIMEOUT_MS = 20_000;
 const STALE_ANSWER_MS = 10 * 60_000;
 // A problem that clears and returns inside this window stays the same incident.
-export const QUIET_MS = 30 * 60_000;
+// Each new issue pages Max, so a site must pass for an hour to count as recovered.
+export const QUIET_MS = 60 * 60_000;
 
 export const CONDITIONS = {
   outage: {
@@ -183,9 +184,10 @@ export function githubClient({ token, repo, fetchFn = fetch }) {
     create: (title, body) =>
       call("POST", "/issues", { title, body, labels: [LABEL], assignees: [ASSIGNEE] }),
     update: (number, body) => call("PATCH", `/issues/${number}`, { body }),
+    // Closes first: a run that dies between the two calls can't comment twice.
     async close(number, comment) {
-      await call("POST", `/issues/${number}/comments`, { body: comment });
       await call("PATCH", `/issues/${number}`, { state: "closed", state_reason: "completed" });
+      await call("POST", `/issues/${number}/comments`, { body: comment });
     },
   };
 }
