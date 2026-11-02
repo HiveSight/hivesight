@@ -1,8 +1,8 @@
 // Per-address request limits that Vercel's firewall applies before a request
 // reaches one of HiveSight's functions. The app refuses a flood on its own, but
-// each refusal still takes an `admit` slot, a pooled database connection and
-// egress. These rules refuse what any one address sends past its limit, before a
-// function runs. A flood spread across many addresses still reaches the app.
+// only after a function starts, and often after a database read. These rules
+// refuse what any one address sends past its limit, before a function runs. A
+// flood spread across many addresses still reaches the app.
 //
 //   node scripts/firewall.mjs routes   checks the build: one rule for each function route
 //   node scripts/firewall.mjs check    compares the live rules with RULES
