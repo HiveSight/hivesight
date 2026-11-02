@@ -7,9 +7,9 @@ name: Health monitor
 
 on:
   schedule:
-    # Every 15 minutes from minute 7 (7, 22, 37 and 52), off the hour: GitHub
+    # Every 15 minutes from minute 8 (8, 23, 38 and 53), off the hour: GitHub
     # warns that runs at the top of the hour face delays.
-    - cron: "7/15 * * * *"
+    - cron: "8/15 * * * *"
   workflow_dispatch:
     inputs:
       drill:
