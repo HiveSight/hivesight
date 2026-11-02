@@ -264,6 +264,9 @@ describe("bypassesAhead", () => {
     expect(bypassesAhead([...RULES, bypass("Allow API")])).toEqual([]);
     expect(bypassesAhead([bypass("Allow API", false), ...RULES])).toEqual([]);
     expect(bypassesAhead([{ ...bypass("Block"), action: { mitigate: { action: "deny" } } }, ...RULES])).toEqual([]);
+    expect(bypassesAhead([{ ...bypass("Allow"), action: { mitigate: { action: "allow" } } }, RULES[0]])).toEqual([
+      `Allow bypasses ${PREFIX}estimates for the requests it matches`,
+    ]);
     expect(bypassesAhead([{ ...bypass(`${PREFIX}x`) }, ...RULES])).toEqual([]);
   });
 });
@@ -461,10 +464,13 @@ const sortKeys = <T,>(value: T): T =>
 const live = (rules: Rule[] = [], firewallEnabled = true): Config => ({ firewallEnabled, rules, ...settings() });
 
 /**
- * An in-memory stand-in for Vercel's firewall API with one shared draft, built to
- * match what the live API did on 2026-11-02: a stage returns the draft, the draft
- * records each rule change with the inserted rule's new id, and it records no
- * firewallEnabled change.
+ * An in-memory stand-in for Vercel's firewall API with one shared draft. It
+ * follows what probes of the live API showed on 2026-11-02: a stage returns the
+ * whole draft; the draft records rule changes and IP blocks with ids, the
+ * inserted rule's new one included; it records no flip of the firewall switch;
+ * and removing a rule it inserted drops that rule's earlier entries. No probe has
+ * seen a crs.update, which the fake records like an IP block, or what a publish
+ * leaves behind, which the fake clears.
  */
 function fakeVercel(
   active: Config | null,
@@ -505,6 +511,9 @@ function fakeVercel(
     } else if (change.action === "crs.update") {
       draft.crs = { ...draft.crs, [change.id!]: change.value as Config["crs"][string] };
       draft.changes.push({ ...change, createdAt: "t" });
+    } else if (change.action === "rules.remove" && draft.changes.some((c) => c.action === "rules.insert" && c.id === change.id)) {
+      draft.rules = draft.rules.filter((r) => r.id !== change.id);
+      draft.changes = draft.changes.filter((c) => c.id !== change.id);
     } else {
       draft.rules = stageAll(draft.rules, [change], ids).map((r) =>
         sortKeys({ ...r, valid: r.name !== opts.invalid, validationErrors: r.name === opts.invalid ? ["quota"] : null })
@@ -661,6 +670,7 @@ describe("applyRules", () => {
       ["an IP block", { action: "ip.insert", id: null, value: { ip: "203.0.113.7", action: "deny" } }, 2],
       ["a managed ruleset change", { action: "crs.update", id: "xss", value: { active: true, action: "deny" } }, 3],
       ["a firewall switch", { action: "firewallEnabled", id: null, value: false }, 4],
+      ["a removal of a rule this run inserted, which Vercel folds into the insert", { action: "rules.remove", id: "new_0", value: null }, 2],
     ];
     for (const [name, change, at] of foreign) {
       it(name, async () => {
@@ -720,7 +730,9 @@ describe("applyRules", () => {
 
   it("leaves the draft when its first stage reached Vercel but the answer was lost", async () => {
     const { client, state } = fakeVercel(null, { failStage: 1, failStageAfterApply: true });
-    await expect(applyRules({ client, log: quiet })).rejects.toThrow("timeout The draft stays in Vercel");
+    await expect(applyRules({ client, log: quiet })).rejects.toThrow(
+      "timeout The draft stays in Vercel, because this run has no answer from its first stage"
+    );
     expect(state.calls).not.toContain("discard");
     expect(state.draft?.firewallEnabled).toBe(true);
   });
@@ -754,6 +766,21 @@ describe("applyRules", () => {
   it("fails when the published config doesn't hold every rule", async () => {
     const { client } = fakeVercel(null, { dropOnPublish: `${PREFIX}health` });
     await expect(applyRules({ client, log: quiet })).rejects.toThrow(`missing: ${PREFIX}health`);
+  });
+
+  it("says when Vercel keeps a draft after publishing", async () => {
+    const { client, state } = fakeVercel(null);
+    const publish = client.publish;
+    client.publish = async () => {
+      await publish();
+      state.draft = { ...structuredClone(state.active!), id: "w", version: 9, changes: [] };
+    };
+    const lines: string[] = [];
+    await applyRules({ client, log: (line: string) => lines.push(line) });
+    expect(lines.slice(-2)).toEqual([
+      "Vercel kept a draft after publishing, with 0 recorded changes.",
+      `Published ${RULES.length + 1} changes.`,
+    ]);
   });
 
   it("fails when a rule outside its names changed on the way to production", async () => {

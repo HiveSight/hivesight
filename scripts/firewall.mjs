@@ -187,15 +187,18 @@ export function drift(rules, desired = RULES) {
   return lines;
 }
 
+// Vercel skips the remaining custom rules for a request a bypass rule matches.
+// Its API also lists an allow action, which its docs don't describe.
+const SKIPS_LATER_RULES = new Set(["bypass", "allow"]);
+
 /**
- * Active bypass rules from the dashboard that sit ahead of a managed rule. Vercel
- * skips the remaining custom rules for a request a bypass rule matches, so such a
- * rule switches the limits off for whatever it matches.
+ * Active dashboard rules that may skip the limits for the requests they match:
+ * a bypass or allow rule that sits ahead of a managed rule.
  */
 export function bypassesAhead(rules) {
   const lines = [];
   rules.forEach((rule, i) => {
-    if (managed(rule) || rule?.active !== true || rule?.action?.mitigate?.action !== "bypass") return;
+    if (managed(rule) || rule?.active !== true || !SKIPS_LATER_RULES.has(rule?.action?.mitigate?.action)) return;
     const later = rules.slice(i + 1).filter(managed).map((r) => r.name);
     if (later.length) lines.push(`${rule.name} bypasses ${later.join(", ")} for the requests it matches`);
   });
@@ -346,9 +349,12 @@ const settingsOf = (config) =>
   canonical(Object.fromEntries(Object.entries(config ?? {}).filter(([key]) => !BOOKKEEPING.has(key))));
 
 /**
- * What a rule change does, whether this script sent it or the draft recorded it.
- * Vercel gives an inserted rule its id, so inserts compare by value alone. The
- * draft records no firewallEnabled change, so those drop out here.
+ * What a change does, whether this script sent it or the draft recorded it.
+ * Vercel gives an inserted rule its id, so inserts compare by value alone. In
+ * probes on November 2 the draft recorded rule changes and IP blocks but no flip
+ * of the firewall switch, so switch changes drop out here and the settings
+ * comparison catches them. The draft also drops a rule's earlier entries when it
+ * removes a rule it inserted, which `plan` never asks for in one run.
  */
 function ruleChanges(changes) {
   return changes
@@ -376,16 +382,19 @@ function pendingChanges(active, draft) {
 }
 
 /**
- * Ways the draft holds more than the changes this run staged: a change it records
- * that this run didn't send, or settings that moved after this run's first change.
+ * Ways the draft may hold more than the changes this run staged: recorded changes
+ * that differ from the ones this run sent, or settings that moved after Vercel
+ * answered this run's first stage.
  */
 function foreignChanges(draft, staged, settings) {
   const problems = [];
   if (canonical(ruleChanges(draft?.changes ?? [])) !== canonical(ruleChanges(staged))) {
-    problems.push("it records rule changes this run didn't send");
+    problems.push("the changes it records don't match the ones this run staged");
   }
-  if (settings === undefined || settingsOf(draft) !== settings) {
-    problems.push("its settings changed after this run's first change");
+  if (settings === undefined) {
+    problems.push("this run has no answer from its first stage to compare its settings with");
+  } else if (settingsOf(draft) !== settings) {
+    problems.push("its settings changed after this run's first stage");
   }
   return problems;
 }
@@ -402,10 +411,15 @@ function configProblems(config, desired, baseline) {
  * Stages the changes, checks the draft, publishes it, and checks what went live.
  * Vercel keeps one draft for the project and publishes all of it, so the run
  * refuses to start while the draft holds anything that isn't live, and publishes
- * only when the draft holds this run's changes and nothing else. A dashboard edit
- * that lands between that check and the publish call still goes live with them.
- * After a failure the run discards the draft only when it holds nothing but this
- * run's changes. With `publish` false the run discards the checked draft instead.
+ * only when the draft holds this run's changes and nothing else. After a failure
+ * the run discards the draft only when it holds nothing but this run's changes.
+ * With `publish` false the run discards the checked draft instead.
+ *
+ * Three gaps remain. A dashboard edit that lands between the final check and the
+ * publish call goes live with the rules. One that lands between the check and the
+ * discard goes with the draft. And a change the draft doesn't record, such as a
+ * flip of the firewall switch, that lands before Vercel answers the first stage
+ * joins the settings this run compares against.
  */
 export async function applyRules({ client, desired = RULES, log = console.log, publish = true }) {
   const { active, draft } = await client.configs();
@@ -466,7 +480,7 @@ export async function applyRules({ client, desired = RULES, log = console.log, p
   if (!publish) {
     const { cleared, note } = await cleanUp();
     if (!cleared) throw new Error(note);
-    log(`The draft held all ${changes.length} changes. ${note}`);
+    log(`The draft passed its checks with this run's ${changes.length} changes. ${note}`);
     return changes;
   }
 
@@ -481,7 +495,9 @@ export async function applyRules({ client, desired = RULES, log = console.log, p
     }
     throw new Error(`${err.message} ${(await cleanUp()).note}`, { cause: err });
   }
-  const problems = configProblems((await client.configs()).active, desired, active);
+  const after = await client.configs();
+  if (after.draft) log(`Vercel kept a draft after publishing, with ${after.draft.changes?.length ?? 0} recorded changes.`);
+  const problems = configProblems(after.active, desired, active);
   if (problems.length) throw new Error(`The live configuration doesn't match: ${problems.join("; ")}.`);
   log(`Published ${changes.length} changes.`);
   return changes;

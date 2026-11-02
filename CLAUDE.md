@@ -69,9 +69,9 @@ closes itself, and doesn't touch a real outage's issue.
 before a request reaches a function: 10 requests a minute to `/api/run`, 120 to
 `/runs/*`, 20 to `/api/health` and 5 to `/api/cron/keepalive`. Static pages get
 none. After each build, CI runs `bun scripts/firewall.mjs routes`, which fails
-when a function route has no rule, two rules, or a rule that covers only some of
-its paths. It also fails on a Pages Router API route that no rule covers and on
-any middleware.
+when an App Router or Pages Router function route has no rule, two rules, or a
+rule that covers only some of its paths. It also fails when a rule covers a
+static page or no function route, and when the build has middleware.
 
 Vercel keeps the firewall configuration apart from deploys, so a merged change
 to `RULES` changes nothing live until someone applies it with a Vercel token
@@ -87,29 +87,42 @@ VERCEL_TOKEN=... node scripts/firewall.mjs check    # exit 1 when the live rules
 someone made in the dashboard. Apart from that, it changes only rules named
 `hivesight: ...`. Vercel keeps one draft for the project and publishes all of it,
 so `apply` refuses to start while the draft holds anything that isn't live. It
-publishes only when the draft holds its own changes and nothing else, and after a
-failure it discards the draft only in that case. A dashboard edit that lands
-between that last check and the publish call still goes live with the rules.
-`check` and `apply` warn about a dashboard bypass rule placed ahead of these
-rules, since Vercel skips the remaining custom rules for whatever it matches.
-Nothing runs `check` on a schedule.
+publishes only when the draft holds this run's changes and nothing else, and
+after a failure it discards the draft only in that case.
 
-Vercel counts each window separately in each region. It bills $0.50 per million
+Three kinds of dashboard edit can still slip past those checks. One that lands
+between the last check and the publish call goes live with the rules, and
+`apply` throws away one that lands after the check but before it discards the
+draft. The draft doesn't record a flip of the firewall switch, so a flip that
+lands before Vercel answers the run's first change joins the settings `apply`
+compares against.
+
+`check` and `apply` warn when an active dashboard rule with a bypass or allow
+action sits ahead of these rules. Vercel skips the remaining custom rules for
+every request a bypass rule matches, and its docs don't describe allow.
+
+Vercel counts each address's requests under each rule in fixed 60-second
+windows, with a separate count in each region. It bills $0.50 per million
 requests a rule allows in iad1 (regional pricing page, September 14, 2026), and
 nothing for the requests it refuses.
 
-What the limits leave open:
+### What the limits leave open
 
-- They cap what one address sends. A flood from N addresses still gets 10N
-  requests a minute to `/api/run` and 120N to `/runs/*`.
+- Each limit caps one address, so N addresses can still send 10N requests a
+  minute to `/api/run` and 120N to `/runs/*`.
 - Fifteen addresses can still spend the day's 500 units in about two minutes,
   and the site then refuses everyone until midnight UTC.
 - One address can stay under the `/runs/*` limit and keep re-reading a large
   saved estimate. At about 47 KB a read, it pulls the free plan's 5 GB of
-  Supabase egress in about 15 hours.
-- The rules key on the connecting IPv4 address. If either hostname gains an AAAA
-  record, each IPv6 visitor holds a /64 of fresh keys. If Cloudflare starts
-  proxying hivesight.ai, every visitor shares Cloudflare's addresses.
+  uncached Supabase egress in about 15 hours.
+- The rules key on the connecting address, and neither hostname has an AAAA
+  record, so visitors reach the site over IPv4. Vercel's docs don't say whether
+  an `ip` key counts an IPv6 address alone or its whole /64, so if either
+  hostname gains an AAAA record, an IPv6 visitor may get a fresh count for each
+  address it holds. If Cloudflare starts proxying hivesight.ai, every visitor
+  shares Cloudflare's addresses.
+- Nothing runs `check` on a schedule, so nothing here reports a rule someone
+  switches off in the dashboard.
 
 ## Migrations
 
