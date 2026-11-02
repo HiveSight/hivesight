@@ -408,6 +408,15 @@ describe("githubClient", () => {
     });
   });
 
+  it("closes before it comments, so a run that dies between them can't comment twice", async () => {
+    const { github, calls } = client([]);
+    await github.close(5, "Passing again.");
+    expect(calls.map((c) => [c.method, c.url.split("/issues/")[1]])).toEqual([
+      ["PATCH", "5"],
+      ["POST", "5/comments"],
+    ]);
+  });
+
   it("stops on a GitHub error instead of reporting nothing open", async () => {
     const fetchFn = async () => new Response("{}", { status: 500 });
     const github = githubClient({ token: "t", repo: "HiveSight/hivesight", fetchFn });
@@ -424,6 +433,10 @@ describe("the workflow", () => {
 
   it("lets one run finish before the next looks for an issue", () => {
     expect(workflow).toMatch(/concurrency:\n\s+group: health-monitor\n\s+cancel-in-progress: false/);
+  });
+
+  it("keeps the job's token out of the checkout", () => {
+    expect(workflow).toMatch(/actions\/checkout@v4\n\s+with:\n\s+persist-credentials: false/);
   });
 
   it("passes inputs through the environment, not into a shell line", () => {
