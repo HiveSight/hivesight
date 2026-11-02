@@ -393,7 +393,7 @@ describe("routes", () => {
       { "/_app": "pages/_app.js", "/_document": "pages/_document.js", "/_error": "pages/_error.js", "/404": "pages/404.html" },
       ["/"]
     );
-    expect(buildRoutes(dir)).toEqual({ functions: ["/api/run", "/runs/[id]"], files: ["/"], middleware: [] });
+    expect(buildRoutes(dir)).toEqual({ functions: ["/api/run", "/runs/[id]"], files: ["/", "/404"], middleware: [] });
   });
 
   it("counts a Pages Router API route as a function and names middleware", () => {
@@ -411,7 +411,7 @@ describe("routes", () => {
 
   it("covers each function route once and no file route", () => {
     const functions = ["/api/cron/keepalive", "/api/health", "/api/run", "/runs/[id]"];
-    const files = ["/", "/_not-found", "/benchmarks", "/methodology"];
+    const files = ["/", "/404", "/_not-found", "/benchmarks", "/methodology"];
     expect(routeProblems({ functions, files })).toEqual([]);
   });
 
@@ -468,9 +468,10 @@ const live = (rules: Rule[] = [], firewallEnabled = true): Config => ({ firewall
  * follows what probes of the live API showed on 2026-11-02: a stage returns the
  * whole draft; the draft records rule changes and IP blocks with ids, the
  * inserted rule's new one included; it records no flip of the firewall switch;
- * and removing a rule it inserted drops that rule's earlier entries. No probe has
- * seen a crs.update, which the fake records like an IP block, or what a publish
- * leaves behind, which the fake clears.
+ * and removing a rule it inserted drops that rule's earlier entries. A publish
+ * left no draft behind, and a new draft over an empty project started with the
+ * switch on. No probe has seen a crs.update, which the fake records like an IP
+ * block.
  */
 function fakeVercel(
   active: Config | null,
@@ -497,7 +498,7 @@ function fakeVercel(
   let stages = 0;
   const apply = (change: Change) => {
     const base: Draft = state.draft ?? {
-      ...(structuredClone(state.active) ?? { firewallEnabled: false, rules: [], ...settings() }),
+      ...(structuredClone(state.active) ?? { firewallEnabled: true, rules: [], ...settings() }),
       id: "waf_1",
       version: 1,
       changes: [],
@@ -738,7 +739,7 @@ describe("applyRules", () => {
   });
 
   it("publishes nothing when Vercel leaves the firewall off in the draft", async () => {
-    const { client, state } = fakeVercel(null, { ignoreSwitch: true });
+    const { client, state } = fakeVercel(live([], false), { ignoreSwitch: true });
     await expect(applyRules({ client, log: quiet })).rejects.toThrow("firewall disabled");
     expect(state.calls).not.toContain("publish");
     expect(state.draft).toBeNull();

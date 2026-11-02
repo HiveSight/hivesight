@@ -1,7 +1,7 @@
 /**
- * The message the form shows when /api/run refuses a request. The route answers
- * with JSON, but Vercel's firewall answers a rate-limited request itself, before
- * the route runs, with a plain-text body.
+ * The message the form shows when a request to /api/run fails. The route answers
+ * with JSON, but when Vercel's firewall refuses a request, it answers with a
+ * plain-text body before the route runs.
  */
 export function requestErrorMessage(status: number, data: unknown): string {
   const body = (data ?? {}) as { error?: unknown; details?: Array<{ message?: unknown }> };

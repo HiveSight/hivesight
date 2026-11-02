@@ -69,11 +69,11 @@ closes itself, and doesn't touch a real outage's issue.
 before a request reaches a function: 10 requests a minute to `/api/run`, 120 to
 `/runs/*`, 20 to `/api/health` and 5 to `/api/cron/keepalive`. Static pages get
 none. After each build, CI runs `bun scripts/firewall.mjs routes`, which fails
-when an App Router or Pages Router function route has no rule, two rules, or a
-rule that covers only some of its paths. It also fails when a rule covers a
-static page or no function route, and when the build has middleware.
+when an App Router or Pages Router function route has no rule, more than one
+rule, or a rule that covers only some of its paths. It also fails when a rule
+covers a static page or no function route, and when the build has middleware.
 
-Vercel keeps the firewall configuration apart from deploys, so a merged change
+Vercel keeps the firewall configuration apart from deploys, so merging a change
 to `RULES` changes nothing live until someone applies it with a Vercel token
 (the CLI's login token works):
 
@@ -83,19 +83,22 @@ VERCEL_TOKEN=... node scripts/firewall.mjs apply    # stage, publish and read ba
 VERCEL_TOKEN=... node scripts/firewall.mjs check    # exit 1 when the live rules differ
 ```
 
-`apply` switches the firewall on when it's off, which also switches on any rule
-someone made in the dashboard. Apart from that, it changes only rules named
-`hivesight: ...`. Vercel keeps one draft for the project and publishes all of it,
-so `apply` refuses to start while the draft holds anything that isn't live. It
-publishes only when the draft holds this run's changes and nothing else, and
-after a failure it discards the draft only in that case.
+`apply` switches the firewall on when it's off, which also switches on any rule,
+IP block or managed ruleset someone set up in the dashboard. Apart from that, it
+changes only rules whose names start with `hivesight: `. Vercel keeps one draft
+for the project and publishes all of it, so `apply` refuses to start while the
+draft holds anything the live configuration doesn't. It publishes only when the
+draft holds this run's changes and nothing else. The draft doesn't record a flip
+of the firewall switch, so `apply` also compares the draft's other settings with
+the ones Vercel returned after the run's first change. After a failure, it
+discards the draft only when the draft holds nothing but this run's changes.
 
-Three kinds of dashboard edit can still slip past those checks. One that lands
-between the last check and the publish call goes live with the rules, and
-`apply` throws away one that lands after the check but before it discards the
-draft. The draft doesn't record a flip of the firewall switch, so a flip that
-lands before Vercel answers the run's first change joins the settings `apply`
-compares against.
+Some dashboard edits can still slip past these checks. One that lands between
+the last check and the publish call goes live with the rules. `apply` throws
+away one that lands between its last read of the draft and the discard. And a
+change the draft doesn't record, such as a switch flip, joins the settings
+`apply` compares against if it lands before Vercel answers the run's first
+change.
 
 `check` and `apply` warn when an active dashboard rule with a bypass or allow
 action sits ahead of these rules. Vercel skips the remaining custom rules for
@@ -106,11 +109,12 @@ windows, with a separate count in each region. It bills $0.50 per million
 requests a rule allows in iad1 (regional pricing page, September 14, 2026), and
 nothing for the requests it refuses.
 
-A refused request gets a plain-text 429 with the header `x-vercel-mitigated:
-deny` and no reset time, so the form can't read it as JSON and shows its own
-rate-limit message. Both hostnames share one count. Live checks on November 2
-found that `/api/run` with a query string, in capitals or with an encoded letter
-counts against the same rule, and so do HEAD and OPTIONS requests.
+When the firewall refuses a request, it answers with a plain-text 429 that
+carries the header `x-vercel-mitigated: deny` and no reset time. The form can't
+read that body as JSON, so it shows its own rate-limit message. hivesight.ai and
+hivesight-nu.vercel.app share one count. Live checks on November 2 found that
+`/api/run` with a query string, in capitals or with an encoded letter counts
+against the same rule, and so do HEAD and OPTIONS requests.
 
 ### What the limits leave open
 
@@ -127,8 +131,8 @@ counts against the same rule, and so do HEAD and OPTIONS requests.
   gains an AAAA record, an IPv6 visitor may get a fresh count for each address
   it holds. If Cloudflare starts proxying hivesight.ai, every visitor shares
   Cloudflare's addresses.
-- Nothing runs `check` on a schedule, so nothing here reports a rule someone
-  switches off in the dashboard.
+- Nothing runs `check` on a schedule, so nothing reports a rule someone switches
+  off in the dashboard.
 
 ## Migrations
 

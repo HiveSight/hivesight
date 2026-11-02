@@ -35,8 +35,17 @@ describe("requestErrorMessage", () => {
 
   it("shows the route's error when it sent one, and otherwise explains the status", () => {
     const tooMany = "Your network sent too many requests in the last minute. Please wait a minute and try again.";
+    // Bodies shaped like the route's, so string errors and details come up often.
+    const text = fc.oneof(fc.string(), fc.anything());
+    const routeLike = fc.record(
+      {
+        error: text,
+        details: fc.oneof(fc.array(fc.record({ message: text }, { requiredKeys: [] })), fc.string(), fc.constant(null)),
+      },
+      { requiredKeys: [] }
+    );
     fc.assert(
-      fc.property(fc.integer({ min: 400, max: 599 }), fc.anything(), (status, data) => {
+      fc.property(fc.integer({ min: 400, max: 599 }), fc.oneof(fc.anything(), routeLike), (status, data) => {
         const message = requestErrorMessage(status, data);
         const body = data as { error?: unknown; details?: Array<{ message?: unknown }> } | null;
         const error = body?.error;

@@ -1,8 +1,7 @@
 // Per-address request limits that Vercel's firewall applies before a request
 // reaches one of HiveSight's functions. The app refuses a flood on its own, but
-// only after a function starts, and often after a database read. These rules
-// refuse what any one address sends past its limit, before a function runs. A
-// flood spread across many addresses still reaches the app.
+// only after a function starts, and often after a database read. A flood from
+// many addresses still reaches the app.
 //
 //   node scripts/firewall.mjs routes   checks the build: one rule for each function route
 //   node scripts/firewall.mjs check    compares the live rules with RULES
@@ -10,9 +9,10 @@
 //   node scripts/firewall.mjs apply    stages, publishes and reads back RULES
 //
 // `check`, `dry-run` and `apply` need VERCEL_TOKEN. `apply` switches the firewall
-// on when it's off, which also switches on any rule someone made in the dashboard.
-// Apart from that it changes only rules named with PREFIX, and it discards a draft
-// only when the draft holds nothing but this run's changes.
+// on when it's off, which also switches on any rule, IP block or managed ruleset
+// someone set up in the dashboard. Apart from that it changes only rules whose
+// names start with PREFIX, and it discards a draft only when the draft holds
+// nothing but this run's changes.
 // This file runs with plain Node, so it imports only Node's own modules.
 
 import { readFileSync } from "node:fs";
@@ -21,10 +21,10 @@ import path from "node:path";
 export const PROJECT_ID = "prj_TWAQsAF7qNZpWMLx6Lhvd7YwyZgu";
 export const TEAM_ID = "team_o3QtvpZGRAXmvhbyKiMh7ZGv";
 export const PREFIX = "hivesight: ";
-// Vercel's Pro plan counts in fixed windows of 10 seconds to 10 minutes, keyed
-// by address or TLS fingerprint. A fingerprint key would let one client shut out
-// every visitor whose browser shares it, so each rule keys by address. Vercel
-// keeps a separate count in each region.
+// On the Pro plan, Vercel counts in fixed windows of 10 seconds to 10 minutes and
+// keys each count by address or TLS fingerprint. A fingerprint key would let one
+// client shut out every visitor whose browser shares it, so each rule keys by
+// address. Vercel keeps a separate count in each region.
 export const WINDOW_SECONDS = 60;
 const REQUEST_TIMEOUT_MS = 30_000;
 
@@ -52,17 +52,17 @@ function perAddress(name, condition, limit, description) {
 }
 
 export const RULES = [
-  // The form sends one estimate at a time, an estimate takes 10 seconds or
-  // more, and route.ts runs two at once for a network on each instance. Ten a
-  // minute leaves room to retry after a refusal.
+  // The form sends one estimate at a time, and each takes 10 seconds or more, so
+  // ten a minute leaves room to retry after a refusal. On each instance, route.ts
+  // also runs at most two at once for an address.
   perAddress(
     "estimates",
     { type: "path", op: "eq", value: "/api/run" },
     10,
     "Ten requests a minute for each address."
   ),
-  // Each view of a shared link reads the database once. 120 covers a link
-  // shared around an office that reaches the site through one address.
+  // Each view of a shared link reads the database once. 120 covers an office
+  // that passes a link around and reaches the site through one address.
   perAddress(
     "shared estimates",
     { type: "path", op: "pre", value: "/runs/" },
@@ -94,7 +94,7 @@ function body(rule) {
   return { name, description, active, conditionGroup, action };
 }
 
-/** JSON with each object's keys sorted, so two readings of one value compare equal. */
+/** Writes a value as JSON and sorts each object's keys, so two readings of one value compare equal. */
 function canonical(value) {
   return JSON.stringify(value, (_key, v) =>
     v && typeof v === "object" && !Array.isArray(v)
@@ -103,7 +103,7 @@ function canonical(value) {
   );
 }
 
-/** A rule's meaning, so a rule read back from Vercel compares equal to its source. */
+/** A rule's meaning, so a rule the script reads back from Vercel compares equal to its source. */
 export function normalize(rule) {
   const mitigate = rule.action?.mitigate ?? {};
   const rateLimit = mitigate.rateLimit;
@@ -176,7 +176,8 @@ export function drift(rules, desired = RULES) {
     else if (found.length > 1) lines.push(`repeated ${found.length} times: ${want.name}`);
     else if (!same(found[0], want)) lines.push(`differs: ${want.name}`);
     if (found.some((r) => r.active !== true)) lines.push(`disabled: ${want.name}`);
-    // Vercel marks a rule it won't enforce, for example one past the plan's quota.
+    // Vercel can flag a rule with valid: false or validationErrors. Its docs don't
+    // say what it does with one.
     if (found.some((r) => r.valid === false || (r.validationErrors?.length ?? 0) > 0)) {
       lines.push(`invalid: ${want.name}`);
     }
@@ -235,8 +236,9 @@ export function ruleMatches(rule, requestPath) {
 const FILLERS = ["sample", "0f0e8a2c-7d1b-4c5e-9a3f-2b6d8e1c4a70"];
 
 /**
- * Request paths that reach an app route: each dynamic segment filled two ways, a
- * catch-all with one segment and with two, and an optional catch-all left empty.
+ * Request paths that reach an app route. The function fills each dynamic segment
+ * two ways, gives a catch-all one segment and then two, and leaves an optional
+ * catch-all empty.
  */
 export function samplePaths(route) {
   const short =
@@ -249,29 +251,31 @@ export function samplePaths(route) {
 }
 
 /**
- * Splits the build's routes into those served as files and those a function
- * serves, and names any middleware, which runs a function on the requests it matches.
+ * Splits the build's routes into those Next serves as files and those a function
+ * serves. It also names any middleware, which runs a function on the requests it
+ * matches.
  */
 export function buildRoutes(nextDir) {
   const read = (name) => JSON.parse(readFileSync(path.join(nextDir, name), "utf8"));
   const appRoutes = Object.values(read("app-path-routes-manifest.json"));
-  // Next's own _app, _document and _error serve no route, and an .html entry is a file.
-  const pageRoutes = Object.entries(read("server/pages-manifest.json"))
-    .filter(([route, file]) => !route.startsWith("/_") && !file.endsWith(".html"))
-    .map(([route]) => route);
+  // Next's own _app, _document and _error serve no route, and an .html entry
+  // points to a static file.
+  const pages = Object.entries(read("server/pages-manifest.json")).filter(([route]) => !route.startsWith("/_"));
+  const staticPages = pages.filter(([, file]) => file.endsWith(".html")).map(([route]) => route);
+  const pageRoutes = pages.filter(([, file]) => !file.endsWith(".html")).map(([route]) => route);
   const all = [...new Set([...appRoutes, ...pageRoutes])];
   const prerendered = new Set(Object.keys(read("prerender-manifest.json").routes));
   return {
     functions: all.filter((route) => !prerendered.has(route)).sort(),
-    files: all.filter((route) => prerendered.has(route)).sort(),
+    files: [...new Set([...all.filter((route) => prerendered.has(route)), ...staticPages])].sort(),
     middleware: Object.keys(read("server/middleware-manifest.json").middleware ?? {}),
   };
 }
 
 /**
- * Problems with the rules for a build: a function route that no rule or two
- * rules cover, a rule that covers only some of a route's paths, a file route
- * that a rule covers, a rule that covers nothing, or middleware.
+ * Problems with the rules for a build: a function route that no rule or more
+ * than one rule covers, a rule that covers only some of a route's paths, a file
+ * route that a rule covers, a rule that covers nothing, or middleware.
  * @param {{ functions: string[], files: string[], middleware?: string[] }} build
  */
 export function routeProblems(build, rules = RULES) {
@@ -344,17 +348,18 @@ const unmanagedOf = (config) => rulesOf(config, (r) => !managed(r));
 
 // Fields that describe a copy of the configuration rather than the firewall.
 const BOOKKEEPING = new Set(["id", "version", "updatedAt", "createdAt", "ownerId", "projectKey", "changes", "rules"]);
-/** Everything a configuration holds apart from its rules: the switch, managed rulesets and IP blocks. */
+/** Everything a configuration holds apart from its rules: the switch, Vercel's managed rulesets and IP blocks. */
 const settingsOf = (config) =>
   canonical(Object.fromEntries(Object.entries(config ?? {}).filter(([key]) => !BOOKKEEPING.has(key))));
 
 /**
  * What a change does, whether this script sent it or the draft recorded it.
  * Vercel gives an inserted rule its id, so inserts compare by value alone. In
- * probes on November 2 the draft recorded rule changes and IP blocks but no flip
- * of the firewall switch, so switch changes drop out here and the settings
- * comparison catches them. The draft also drops a rule's earlier entries when it
- * removes a rule it inserted, which `plan` never asks for in one run.
+ * probes on November 2, the draft recorded rule changes and IP blocks but no flip
+ * of the firewall switch. So this function drops switch changes, and
+ * `foreignChanges` catches a flip by comparing settings. When someone removes a
+ * rule that an earlier change in the same draft inserted, the draft drops that
+ * rule's earlier entries. `plan` never asks for both in one run.
  */
 function ruleChanges(changes) {
   return changes
@@ -382,9 +387,9 @@ function pendingChanges(active, draft) {
 }
 
 /**
- * Ways the draft may hold more than the changes this run staged: recorded changes
- * that differ from the ones this run sent, or settings that moved after Vercel
- * answered this run's first stage.
+ * Ways the draft may hold more than the changes this run staged. The draft may
+ * record changes this run didn't send, or its settings may have moved after
+ * Vercel answered this run's first stage.
  */
 function foreignChanges(draft, staged, settings) {
   const problems = [];
@@ -410,16 +415,17 @@ function configProblems(config, desired, baseline) {
 /**
  * Stages the changes, checks the draft, publishes it, and checks what went live.
  * Vercel keeps one draft for the project and publishes all of it, so the run
- * refuses to start while the draft holds anything that isn't live, and publishes
- * only when the draft holds this run's changes and nothing else. After a failure
- * the run discards the draft only when it holds nothing but this run's changes.
- * With `publish` false the run discards the checked draft instead.
+ * refuses to start while the draft holds anything the live configuration doesn't.
+ * It publishes only when the draft holds this run's changes and nothing else.
+ * After a failure, it discards the draft only when the draft holds nothing but
+ * this run's changes. With `publish` false, it discards the checked draft instead.
  *
- * Three gaps remain. A dashboard edit that lands between the final check and the
- * publish call goes live with the rules. One that lands between the check and the
- * discard goes with the draft. And a change the draft doesn't record, such as a
- * flip of the firewall switch, that lands before Vercel answers the first stage
- * joins the settings this run compares against.
+ * Some dashboard edits can still slip past these checks. One that lands between
+ * the final check and the publish call goes live with the rules. The run throws
+ * away one that lands between its last read of the draft and the discard. And the
+ * draft doesn't record some changes, such as a flip of the firewall switch. If
+ * one lands before Vercel answers the first stage, it joins the settings this run
+ * compares against.
  */
 export async function applyRules({ client, desired = RULES, log = console.log, publish = true }) {
   const { active, draft } = await client.configs();
