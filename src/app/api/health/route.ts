@@ -1,5 +1,24 @@
 import { loadGeography } from "@/engine/data";
-import { recentPing, storeConfigured } from "@/lib/store";
+import { recentDatabaseBytes, recentPing, storeConfigured } from "@/lib/store";
+
+// Supabase counts every database in the organization against the free plan's
+// 500 MB, and this reads only the project's own, the one that grows. The warning
+// sits above the 412 MB or so the purge allows, so it means the purge isn't
+// holding: at the site's daily allowance the largest estimates add under 24 MB a
+// day, which leaves at least two days.
+const DATABASE_QUOTA_BYTES = 500_000_000;
+const DATABASE_WARNING_BYTES = 450_000_000;
+
+function databaseSizeCheck(bytes: number | null) {
+  if (bytes === null) {
+    return { name: "database_size", status: "unknown", message: "database size unavailable" };
+  }
+  return {
+    name: "database_size",
+    status: bytes >= DATABASE_WARNING_BYTES ? "warning" : "ok",
+    message: `this project holds ${Math.round(bytes / 1_000_000)} MB; the organization's quota is ${DATABASE_QUOTA_BYTES / 1_000_000} MB`,
+  };
+}
 
 export async function GET() {
   const checks: Array<{ name: string; status: string; message: string }> = [];
@@ -24,12 +43,13 @@ export async function GET() {
   }
 
   if (storeConfigured()) {
-    const ping = await recentPing();
+    const [ping, bytes] = await Promise.all([recentPing(), recentDatabaseBytes()]);
     checks.push({
       name: "store",
       status: ping.ok ? "ok" : "failed",
       message: ping.message,
     });
+    checks.push(databaseSizeCheck(bytes));
   } else if (process.env.NODE_ENV === "production") {
     checks.push({
       name: "store",
