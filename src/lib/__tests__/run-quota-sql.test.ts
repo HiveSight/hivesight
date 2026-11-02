@@ -144,8 +144,11 @@ describe("run quota migrations", { timeout: 60_000 }, () => {
     // Between them these zones disagree with UTC's date at every hour.
     for (const zone of ["Pacific/Kiritimati", "Etc/GMT+12"]) {
       await db.exec(`set time zone '${zone}'`);
-      expect(await claim(zone, 1, 1, 10)).toBe("ok");
-      await db.exec("reset time zone");
+      try {
+        expect(await claim(zone, 1, 1, 10)).toBe("ok");
+      } finally {
+        await db.exec("reset role; reset time zone");
+      }
       expect((await counts()).get(`visitor:${zone}`)).toBe(1);
     }
     expect((await counts()).get("site")).toBe(2);
@@ -157,8 +160,11 @@ describe("run quota migrations", { timeout: 60_000 }, () => {
       ('visitor:a', ${TODAY} - 1, 20), ('visitor:a', ${TODAY} + 1, 20)`);
     for (const zone of ["Pacific/Kiritimati", "Etc/GMT+12"]) {
       await db.exec(`set time zone '${zone}'`);
-      expect(await claim("a", 20, 1, 500)).toBe("ok");
-      await db.exec("reset time zone");
+      try {
+        expect(await claim("a", 20, 1, 500)).toBe("ok");
+      } finally {
+        await db.exec("reset role; reset time zone");
+      }
     }
   });
 
@@ -461,6 +467,26 @@ describe.runIf(databaseUrl)("claim_run under concurrency", { timeout: 60_000 }, 
       await holder.query("rollback");
       holder.release();
     }
+  });
+
+  it("gives a transaction ID to the claims past the reads and to no other", async () => {
+    await seed({ site: 50, "visitor:spent": 7 });
+    async function xidAfter(...args: [string, number, number, number]) {
+      const client = await pool.connect();
+      try {
+        await client.query("begin; set local role service_role");
+        await client.query("select public.claim_run($1, $2, $3, $4)", args);
+        const { rows } = await client.query("select pg_current_xact_id_if_assigned() as xid");
+        return rows[0].xid;
+      } finally {
+        await client.query("rollback");
+        client.release();
+      }
+    }
+    expect(await xidAfter("spent", 7, 1, 1000)).toBeNull();
+    expect(await xidAfter("fresh", 7, 51, 100)).toBeNull();
+    expect(await xidAfter("fresh", 7, 50, 100)).not.toBeNull();
+    expect(await xidAfter("ping", 1, 2, 1)).not.toBeNull();
   });
 
   it("refuses under the lock when the claim ahead spends a visitor's last estimate", async () => {
