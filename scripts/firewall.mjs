@@ -69,8 +69,9 @@ export const RULES = [
     120,
     "120 page views a minute for each address."
   ),
-  // The outside monitor sends at most three requests every 15 minutes, and each
-  // request can take the site lock through the store ping.
+  // The outside monitor runs about every 15 minutes and sends at most three
+  // requests each time. Each request can take the site lock through the store
+  // ping.
   perAddress(
     "health",
     { type: "path", op: "eq", value: "/api/health" },
