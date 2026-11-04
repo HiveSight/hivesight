@@ -55,15 +55,16 @@ programs outside Vercel report it:
   project alone, while Supabase counts the whole organization against its
   quota.
 - `~/chief-of-staff/bin/hivesight-health-watch` (launchd, every 5 minutes on
-  Max's Mac) starts that workflow about every 15 minutes, once 14 minutes have
-  passed since the last start and every run that started in the last hour, on
-  any branch, has finished. We keep the cron line only as a backup. In the 45
-  hours after the workflow landed on November 2, 2026, GitHub started six
-  scheduled runs, and
+  Max's Mac) starts that workflow about every 15 minutes. It starts a run once
+  14 minutes have passed since the last start and every run that started in
+  the last hour, on any branch, has finished. We keep the cron line only as a
+  backup. In the 45 hours after the workflow landed on November 2, 2026, GitHub
+  started six scheduled runs, and
   [others report missing or sparse scheduled runs too](https://github.com/orgs/community/discussions/206019).
   Max doesn't read GitHub's email for this repo, so the watcher also sends each
   new issue through `say` to Telegram, once, including one that opened and
-  closed while the watcher didn't run.
+  closed while the watcher didn't run. If 1,000 or more did, it sends one alert
+  for them all.
 
   The watcher also alerts when the monitor stops. It adds up the time between
   its checks, at most 5 minutes for each gap, since it last saw a new
