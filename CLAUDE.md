@@ -55,9 +55,11 @@ programs outside Vercel report it:
   project alone, while Supabase counts the whole organization against its
   quota.
 - `~/chief-of-staff/bin/hivesight-health-watch` (launchd, every 5 minutes on
-  Max's Mac) starts that workflow about every 15 minutes. We keep the cron line
-  only as a backup. In the 45 hours after the workflow landed on November 2,
-  2026, GitHub started six scheduled runs, and
+  Max's Mac) starts that workflow about every 15 minutes, once 14 minutes have
+  passed since the last start and every run that started in the last hour, on
+  any branch, has finished. We keep the cron line only as a backup. In the 45
+  hours after the workflow landed on November 2, 2026, GitHub started six
+  scheduled runs, and
   [others report missing or sparse scheduled runs too](https://github.com/orgs/community/discussions/206019).
   Max doesn't read GitHub's email for this repo, so the watcher also sends each
   new issue through `say` to Telegram, once, including one that opened and
@@ -67,12 +69,16 @@ programs outside Vercel report it:
   its checks, at most 5 minutes for each gap, since it last saw a new
   successful run on `main` and since its last clean read of the issues. Once
   either total reaches 6 hours, it alerts on the first check that finds a
-  fault. It counts as a fault a failed run, a run unfinished after an hour, an
-  error from `gh` or in the watcher itself, and two starts that GitHub never
-  listed. It counts a night with the Mac off as 5 minutes, so it never alerts
-  over sleep alone. `say` holds alerts for the next morning card from 22:00 to
-  07:00 and once six have gone out that day, so Max may not hear of an outage
-  until then.
+  fault. It finds one when the newest run on `main` ended in anything but
+  success or has stayed unfinished for an hour, or when GitHub never listed the
+  last two runs the watcher started. A failed start or `gh` call counts as a
+  fault too, as do an answer from GitHub that the watcher can't read in full
+  and a crash while it relays the issues. A night with the Mac off adds 5
+  minutes, but each short wake that macOS makes during sleep adds up to 5
+  minutes too. A wake without a network finds a fault, so a sleep with 72 such
+  wakes raises the alarm. `say` holds alerts for the next morning card from
+  22:00 to 07:00 and once six have gone out that day, so Max may not hear of an
+  outage until then.
 
   launchd runs the watcher only while the Mac stays awake and during the short
   wakes macOS makes while it sleeps. At other times only GitHub starts runs, on
