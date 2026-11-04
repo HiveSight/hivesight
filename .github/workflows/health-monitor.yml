@@ -3,15 +3,15 @@ name: Health monitor
 # Reads /api/health from outside Vercel and keeps one open issue per problem.
 # This job fails only when the monitor itself breaks, never for an outage.
 # On Max's Mac, ~/chief-of-staff/bin/hivesight-health-watch starts this workflow
-# about every 15 minutes, alerts when runs stop succeeding, and sends each new
-# issue to Max.
+# about every 15 minutes, sends each new issue to Max, and alerts him when the
+# monitor stops.
 
 on:
   schedule:
-    # We keep this schedule as a backup to the watcher. GitHub started the first
-    # scheduled run 13 hours after the workflow landed on November 2, 2026, then
-    # one every 7 to 8 hours, and others report missing or sparse scheduled runs
-    # too: https://github.com/orgs/community/discussions/206019
+    # We keep this schedule as a backup to the watcher. In the 33 hours after
+    # this workflow landed on November 2, 2026, GitHub started four scheduled
+    # runs, and others report missing or sparse scheduled runs too:
+    # https://github.com/orgs/community/discussions/206019
     # We picked minutes 8, 23, 38 and 53 to stay off the hour, where GitHub
     # warns that runs face delays.
     - cron: "8/15 * * * *"
