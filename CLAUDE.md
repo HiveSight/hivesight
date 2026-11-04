@@ -42,27 +42,54 @@ bun run data:release # build missing public/data/v1 files (needs numpy; delete a
 ## Monitoring
 
 Nothing on Vercel can report that the site stopped serving estimates, so two
-things outside it watch `/api/health`:
+programs outside Vercel report it:
 
-- `.github/workflows/health-monitor.yml` (`scripts/health-monitor.mjs`) runs
-  every 15 minutes, retries a failure twice, and keeps one open issue labeled
-  `health-alert` per problem. A later failure edits that issue, which notifies
-  nobody. The issue closes itself after an hour without a failure.
-  `database_size` turns to `warning` at 450 MB, above what the purge allows, and
-  opens its own issue; health stays 200 for it. It reads this project alone,
-  and Supabase's quota sums the organization.
-- GitHub's email for this repo goes unread, so `~/chief-of-staff/bin/hivesight-health-watch`
-  (launchd, every 5 minutes on Max's Mac) sends each new issue through `say` to
-  Telegram, once, including one that opened and closed while the Mac was off.
-  It also alerts when it sees no successful scheduled run for 6 hours, whether
-  GitHub or its own `gh` is the cause. `say` holds alerts for the next morning
-  card from 22:00 to 07:00 and once six have gone out that day, so Max may not
-  hear of an outage until then.
+- `.github/workflows/health-monitor.yml` (`scripts/health-monitor.mjs`) reads
+  `/api/health`, retries a failure twice, and keeps one open issue for each
+  kind of problem (an outage, the database size or a drill), with the label
+  `health-alert`. It edits that issue on each later failure, and GitHub
+  notifies nobody of the edit. It closes the issue on its first run at least
+  an hour after the last failure. From 450 MB, above what the purge allows,
+  `/api/health` reports `database_size` as `warning` but still answers 200,
+  and the workflow opens the database size issue. That check reads this
+  project alone, while Supabase counts the whole organization against its
+  quota.
+- `~/chief-of-staff/bin/hivesight-health-watch` (launchd, every 5 minutes on
+  Max's Mac) starts that workflow about every 15 minutes. It starts a run once
+  14 minutes have passed since the last start and every run that started in
+  the last hour, on any branch, has finished. We keep the cron line only as a
+  backup. In the 45 hours after the workflow landed on November 2, 2026, GitHub
+  started six scheduled runs, and
+  [others report missing or sparse scheduled runs too](https://github.com/orgs/community/discussions/206019).
+  Max doesn't read GitHub's email for this repo, so the watcher also sends each
+  new issue through `say` to Telegram, once, including one that opened and
+  closed while the watcher didn't run. If 1,000 or more did, it sends one alert
+  for them all.
+
+  The watcher also alerts when the monitor stops. It adds up the time between
+  its checks, at most 5 minutes for each gap, since it last saw a new
+  successful run on `main` and since its last clean read of the issues. Once
+  either total reaches 6 hours, it alerts on the first check that finds a
+  fault. It finds one when the newest run on `main` ended in anything but
+  success or has stayed unfinished for an hour, or when GitHub never listed the
+  last two runs the watcher started. A failed start or `gh` call counts as a
+  fault too, as do an answer from GitHub that the watcher can't read in full
+  and a crash while it relays the issues. A night with the Mac off adds 5
+  minutes, but each short wake that macOS makes during sleep adds up to 5
+  minutes too. A wake without a network finds a fault, so a sleep with 72 such
+  wakes raises the alarm. `say` holds alerts for the next morning card from
+  22:00 to 07:00 and once six have gone out that day, so Max may not hear of an
+  outage until then.
+
+  launchd runs the watcher only while the Mac stays awake and during the short
+  wakes macOS makes while it sleeps. At other times only GitHub starts runs, on
+  its sparse schedule, and nothing tells Max about an outage.
 
 Test the whole path with
 `gh workflow run health-monitor.yml -R HiveSight/hivesight -f drill=true`, which
-reads the failing `scripts/health-drill.json`. It opens a `[drill]` issue that
-closes itself, and doesn't touch a real outage's issue.
+reads the failing `scripts/health-drill.json`. The run opens a `[drill]` issue
+and leaves a real outage's issue alone. The first regular run at least an hour
+after the drill's last failure closes the drill issue.
 
 ## Edge limits
 
