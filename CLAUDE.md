@@ -56,8 +56,8 @@ programs outside Vercel report it:
   quota.
 - `~/chief-of-staff/bin/hivesight-health-watch` (launchd, every 5 minutes on
   Max's Mac) starts that workflow about every 15 minutes. We keep the cron line
-  only as a backup. In the 33 hours after the workflow landed on November 2,
-  2026, GitHub started four scheduled runs, and
+  only as a backup. In the 45 hours after the workflow landed on November 2,
+  2026, GitHub started six scheduled runs, and
   [others report missing or sparse scheduled runs too](https://github.com/orgs/community/discussions/206019).
   Max doesn't read GitHub's email for this repo, so the watcher also sends each
   new issue through `say` to Telegram, once, including one that opened and
@@ -65,12 +65,12 @@ programs outside Vercel report it:
 
   The watcher also alerts when the monitor stops. It adds up the time between
   its checks, at most 5 minutes for each gap, since it last saw a new
-  successful run on `main` and since it last read the issues. Once either
-  total reaches 6 hours, it alerts on the first check that finds a fault. It
-  counts as a fault a failed run, a run unfinished after an hour, an error from
-  `gh` or in the watcher itself, and two starts that GitHub never listed. It
-  counts a night with the Mac off as 5 minutes, and it raises no alert while
-  the monitor works. `say` holds alerts for the next morning card from 22:00 to
+  successful run on `main` and since its last clean read of the issues. Once
+  either total reaches 6 hours, it alerts on the first check that finds a
+  fault. It counts as a fault a failed run, a run unfinished after an hour, an
+  error from `gh` or in the watcher itself, and two starts that GitHub never
+  listed. It counts a night with the Mac off as 5 minutes, so it never alerts
+  over sleep alone. `say` holds alerts for the next morning card from 22:00 to
   07:00 and once six have gone out that day, so Max may not hear of an outage
   until then.
 

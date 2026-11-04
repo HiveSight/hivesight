@@ -8,8 +8,8 @@ name: Health monitor
 
 on:
   schedule:
-    # We keep this schedule as a backup to the watcher. In the 33 hours after
-    # this workflow landed on November 2, 2026, GitHub started four scheduled
+    # We keep this schedule as a backup to the watcher. In the 45 hours after
+    # this workflow landed on November 2, 2026, GitHub started six scheduled
     # runs, and others report missing or sparse scheduled runs too:
     # https://github.com/orgs/community/discussions/206019
     # We picked minutes 8, 23, 38 and 53 to stay off the hour, where GitHub
